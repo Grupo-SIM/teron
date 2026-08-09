@@ -288,30 +288,22 @@ const shadowStyles = `
   gap: 6px;
   padding: 6px 8px;
   border-radius: 10px;
-  background: rgba(255, 255, 255, 0.96);
-  box-shadow: 0 2px 20px rgba(0, 0, 0, 0.08), 0 0 0 1px rgba(0, 0, 0, 0.04);
-  color: #1a1a1a;
+  background: rgba(38, 38, 41, 0.96);
+  box-shadow: 0 2px 24px rgba(0, 0, 0, 0.45), 0 0 0 1px rgba(255, 255, 255, 0.08);
+  color: #F2F2F6;
   font-size: 13px;
 }
 
-@media (prefers-color-scheme: dark) {
-  .bar {
-    background: rgba(42, 42, 46, 0.96);
-    box-shadow: 0 2px 24px rgba(0, 0, 0, 0.45), 0 0 0 1px rgba(255, 255, 255, 0.08);
-    color: #e8e8e8;
-  }
-}
-
 :host-context([data-theme='theme-dark']) .bar {
-  background: rgba(42, 42, 46, 0.96);
+  background: rgba(38, 38, 41, 0.96);
   box-shadow: 0 2px 24px rgba(0, 0, 0, 0.45), 0 0 0 1px rgba(255, 255, 255, 0.08);
-  color: #e8e8e8;
+  color: #F2F2F6;
 }
 
 .field {
   width: 200px;
   padding: 7px 10px;
-  border: 1px solid rgba(0, 0, 0, 0.14);
+  border: 1px solid rgba(255, 255, 255, 0.16);
   border-radius: 8px;
   background: transparent;
   color: inherit;
@@ -321,29 +313,17 @@ const shadowStyles = `
   box-sizing: border-box;
 }
 
-@media (prefers-color-scheme: dark) {
-  .field {
-    border-color: rgba(255, 255, 255, 0.16);
-  }
-}
-
 :host-context([data-theme='theme-dark']) .field {
   border-color: rgba(255, 255, 255, 0.16);
 }
 
 .field:focus {
-  border-color: color-mix(in srgb, var(--accent-color, #0b74da) 42%, rgba(0, 0, 0, 0.2));
-  box-shadow: 0 0 0 1px color-mix(in srgb, var(--accent-color, #0b74da) 35%, transparent);
-}
-
-@media (prefers-color-scheme: dark) {
-  .field:focus {
-    border-color: color-mix(in srgb, var(--accent-color, #0b74da) 50%, rgba(255, 255, 255, 0.22));
-  }
+  border-color: color-mix(in srgb, var(--accent-color, #6098F2) 50%, rgba(255, 255, 255, 0.22));
+  box-shadow: 0 0 0 1px color-mix(in srgb, var(--accent-color, #6098F2) 35%, transparent);
 }
 
 :host-context([data-theme='theme-dark']) .field:focus {
-  border-color: color-mix(in srgb, var(--accent-color, #0b74da) 50%, rgba(255, 255, 255, 0.22));
+  border-color: color-mix(in srgb, var(--accent-color, #6098F2) 50%, rgba(255, 255, 255, 0.22));
 }
 
 .field::placeholder {
@@ -357,15 +337,9 @@ const shadowStyles = `
   line-height: 1.35;
   font-variant-numeric: tabular-nums;
   text-align: right;
-  color: rgba(0, 0, 0, 0.52);
+  color: rgba(255, 255, 255, 0.48);
   user-select: none;
   flex-shrink: 0;
-}
-
-@media (prefers-color-scheme: dark) {
-  .match-count {
-    color: rgba(255, 255, 255, 0.48);
-  }
 }
 
 :host-context([data-theme='theme-dark']) .match-count {
@@ -378,13 +352,7 @@ const shadowStyles = `
   gap: 2px;
   padding-left: 4px;
   margin-left: 2px;
-  border-left: 1px solid rgba(0, 0, 0, 0.08);
-}
-
-@media (prefers-color-scheme: dark) {
-  .nav {
-    border-left-color: rgba(255, 255, 255, 0.12);
-  }
+  border-left: 1px solid rgba(255, 255, 255, 0.12);
 }
 
 :host-context([data-theme='theme-dark']) .nav {
@@ -416,13 +384,7 @@ const shadowStyles = `
 
 .icon-btn:hover:not(:disabled) {
   opacity: 1;
-  background: rgba(0, 0, 0, 0.05);
-}
-
-@media (prefers-color-scheme: dark) {
-  .icon-btn:hover:not(:disabled) {
-    background: rgba(255, 255, 255, 0.08);
-  }
+  background: rgba(255, 255, 255, 0.08);
 }
 
 :host-context([data-theme='theme-dark']) .icon-btn:hover:not(:disabled) {

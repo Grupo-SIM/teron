@@ -20,14 +20,12 @@
   import FontSize from './icons/FontSize.svelte'
   import Language from './icons/Language.svelte'
 
-  import ThemeButton from './ThemeButton.svelte'
   import ui, {
     Html,
     Icon,
     Label,
     ModernPopup,
     showPopup,
-    deviceOptionsStore as deviceInfo,
     modalStore,
     eventToHTMLElement
   } from '../..'
@@ -37,10 +35,6 @@
     currentFontSize: Readable<string>
     setFontSize: (value: string) => void
   }>('fontsize')
-
-  const { currentTheme, setTheme } = getContext<{ currentTheme: Readable<string>, setTheme: (theme: string) => void }>(
-    'theme'
-  )
 
   const { currentLanguage, setLanguage } = getContext<{
     currentLanguage: Readable<string>
@@ -55,12 +49,6 @@
   const fontsizes: Array<{ id: string, label: IntlString, size: number }> = [
     { id: 'normal-font', label: ui.string.Spacious, size: 16 },
     { id: 'small-font', label: ui.string.Compact, size: 14 }
-  ]
-
-  const themes: Array<{ id: string, label: IntlString }> = [
-    { id: 'theme-light', label: ui.string.ThemeLight },
-    { id: 'theme-dark', label: ui.string.ThemeDark },
-    { id: 'theme-system', label: ui.string.ThemeSystem }
   ]
 
   const emojis: Array<{ id: string, label: IntlString }> = [
@@ -104,11 +92,6 @@
     $modalStore = $modalStore
   }
 
-  function selectTheme (theme: string): void {
-    if ($currentTheme === theme) return
-    setTheme(theme)
-  }
-
   function selectLanguage (language: string): void {
     if ($currentLanguage === language) return
     setLanguage(language)
@@ -119,7 +102,6 @@
     setEmoji(emoji)
   }
 
-  $: $deviceInfo.theme = $currentTheme
   $: fontsize = fontsizes.find((fs) => fs.id === $currentFontSize) ?? fontsizes[0]
   $: language = langs.find((lang) => lang.id === $currentLanguage) ?? langs[0]
   $: emoji = emojis.find((e) => e.id === $currentEmoji) ?? emojis[0]
@@ -130,28 +112,6 @@
 
   <div class="ap-scroll">
     <div class="ap-box">
-      <div class="flex-row-center m-4">
-        {#each themes as theme}
-          {@const selected = $currentTheme === theme.id}
-          <!-- svelte-ignore a11y-click-events-have-key-events -->
-          <!-- svelte-ignore a11y-no-static-element-interactions -->
-          <div
-            class="statusPopup-option"
-            class:selected
-            on:click={() => {
-              selectTheme(theme.id)
-            }}
-          >
-            <ThemeButton theme={theme.id} focused={$currentTheme} />
-            <span class="label overflow-label">
-              <Label label={theme.label} />
-            </span>
-          </div>
-        {/each}
-      </div>
-
-      <div class="ap-menuItem separator halfMargin" />
-
       <button
         class="ap-menuItem antiPopup-submenu withIcon noMargin flex-row-center flex-grow"
         on:click={(ev) => {

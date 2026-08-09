@@ -42,7 +42,7 @@
   $: colors = $themeStore.dark
     ? `
     --theme-text-primary-color: rgba(255, 255, 255, .8);
-    --theme-link-color: #377AE6;
+    --theme-link-color: #6098F2;
     --button-border-hover: #45484e;
     --text-editor-table-header-color: rgba(255, 255, 255, 0.06);
     --scrollbar-bar-color: #35354a;
@@ -50,7 +50,7 @@
   `
     : `
     --theme-text-primary-color: rgba(0, 0, 0, .8);
-    --theme-link-color: #377AE6;
+    --theme-link-color: #6098F2;
     --button-border-hover: #c9cbcd;
     --text-editor-table-header-color: rgba(0, 0, 0, 0.06);
     --scrollbar-bar-color: #e0e0e0;

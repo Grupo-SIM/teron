@@ -79,19 +79,12 @@ window.addEventListener('DOMContentLoaded', () => {
     const titleBarRoot = document.getElementById('desktop-app-titlebar-root')
     if (titleBarRoot != null) {
       void setupTitleBarMenu(ipcMain, titleBarRoot).then((menuBar) => {
+        menuBar.setTheme(ThemeVariant.Dark)
         themeStore.subscribe((themeOptions) => {
           if (themeOptions != null) {
             menuBar.setTheme(themeOptions.variant)
           }
         })
-
-        if (menuBar.lastUsedThemeIsUnknown()) {
-          void ipcMain.isOsUsingDarkTheme().then((isDarkTheme) => {
-            menuBar.setTheme(isDarkTheme ? ThemeVariant.Dark : ThemeVariant.Light)
-          }).catch(() => {
-            menuBar.setTheme(ThemeVariant.Light) // fallback
-          })
-        }
       })
     }
   }

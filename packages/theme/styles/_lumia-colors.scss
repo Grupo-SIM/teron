@@ -5,31 +5,31 @@
 
 /* Common Colors */
 * {
-  --global-accent-IconColor: #6796FF;
+  --global-accent-IconColor: #6098F2;
   --global-on-accent-TextColor: #FFFFFF;
   --global-higlight-Color: #CB4B42;
 
   --global-online-color: #05A05C;
 
-  --global-ui-hover-OverlayColor: #15307226;
-  --global-ui-active-OverlayColor: #15307233;
+  --global-ui-hover-OverlayColor: #2869D826;
+  --global-ui-active-OverlayColor: #2869D833;
 
   --button-accent-LabelColor: #fff;
   --button-disabled-LabelColor: #8b97ad;
   --button-accent-IconColor: #fff;
   --button-disabled-IconColor: #8b97ad;
-  --button-primary-BackgroundColor: #3364e2;
+  --button-primary-BackgroundColor: #2869D8;
   --button-primary-BorderColor: #d1d5de1a;
-  --button-primary-hover-BackgroundColor: #6191fe;
-  --button-primary-active-BackgroundColor: #2553cf;
-  --button-primary-loading-LabelColor: #6191fe;
+  --button-primary-hover-BackgroundColor: #2C70DE;
+  --button-primary-active-BackgroundColor: #2058B8;
+  --button-primary-loading-LabelColor: #6098F2;
   --button-negative-loading-LabelColor: #ff9187;
   --button-negative-BackgroundColor: #CB4B42;
   --button-negative-BorderColor: #d1d5de26;
   --button-negative-hover-BackgroundColor: #DC5148;
   --button-negative-active-BackgroundColor: #B34139;
 
-  --selector-active-BackgroundColor: #3364e2;
+  --selector-active-BackgroundColor: #2869D8;
   --selector-IconColor: #ffffff;
   --selector-disabled-IconColor: #8b97ad;
 
@@ -38,104 +38,104 @@
 
   --border-color-global-error-border-color: #fb6863;
 
-  --border-talk-indication-primary: #4683EA;
+  --border-talk-indication-primary: #6098F2;
 }
 
 /* Dark Theme */
 .theme-dark {
-  --global-ui-BackgroundColor: 1530720D;
-  --global-ui-BorderColor: #A5BDFF1A;
-  --global-ui-hover-BackgroundColor: #A5BDFF1A;
-  --global-ui-active-BackgroundColor: #A5BDFF26;
-  --global-ui-highlight-BackgroundColor: #A5BDFF0D;
-  --global-ui-hover-highlight-BackgroundColor: #A5BDFF26;
-  --global-surface-01-BackgroundColor: #0E0F10;
-  --global-surface-01-BorderColor: #1F2737;
-  --global-surface-01-hover-BackgroundColor: #121314;
-  --global-surface-02-BackgroundColor: #161719;
-  --global-surface-02-BorderColor: #262F40;
-  --global-surface-03-hover-BackgroundColor: #1A1C1F;
-  --global-subtle-ui-BorderColor: #A5BDFF0D;
-  --global-subtle-BackgroundColor: #072790;
-  --global-popover-BackgroundColor: #1F2328;
-  --global-popover-hover-BackgroundColor: #2C3139;
+  --global-ui-BackgroundColor: #6098F20D;
+  --global-ui-BorderColor: #6098F21A;
+  --global-ui-hover-BackgroundColor: #6098F21A;
+  --global-ui-active-BackgroundColor: #6098F226;
+  --global-ui-highlight-BackgroundColor: #6098F20D;
+  --global-ui-hover-highlight-BackgroundColor: #6098F226;
+  --global-surface-01-BackgroundColor: #0B0B0B;
+  --global-surface-01-BorderColor: #303030;
+  --global-surface-01-hover-BackgroundColor: #151413;
+  --global-surface-02-BackgroundColor: #151413;
+  --global-surface-02-BorderColor: #303030;
+  --global-surface-03-hover-BackgroundColor: #1B1A1C;
+  --global-subtle-ui-BorderColor: #6098F20D;
+  --global-subtle-BackgroundColor: #2058B8;
+  --global-popover-BackgroundColor: #262629;
+  --global-popover-hover-BackgroundColor: #303239;
   --global-popover-BorderColor: #FFFFFF14;
-  --global-primary-LinkColor: #4D7FF5;
-  --global-primary-IconColor: #ffffff;
-  --global-primary-TextColor: #FFFFFF;
-  --global-secondary-TextColor: #C1C9D6;
-  --global-tertiary-TextColor: #8E99AF;
-  --global-disabled-TextColor: #5A667E;
-  --global-accent-TextColor: #4D7FF5;
+  --global-primary-LinkColor: #6098F2;
+  --global-primary-IconColor: #F2F2F6;
+  --global-primary-TextColor: #F2F2F6;
+  --global-secondary-TextColor: #C0BFC4;
+  --global-tertiary-TextColor: #979AA1;
+  --global-disabled-TextColor: #5E5C63;
+  --global-accent-TextColor: #6098F2;
   --global-error-TextColor: #FF6359;
-  --global-focus-BorderColor: #2A59D6;
-  --global-focus-inset-BorderColor: #0D121C;
-  --global-popover-ShadowColor: #0E131E59;
-  --global-modal-ShadowColor: #0E131E73;
-  --global-accent-SkyText: #B9D1F5;
-  --global-accent-BackgroundColor: #205DC2;
-  --global-on-nuance-TextColor: #041d7d;
+  --global-focus-BorderColor: #6098F2;
+  --global-focus-inset-BorderColor: #151413;
+  --global-popover-ShadowColor: #0B0B0B80;
+  --global-modal-ShadowColor: #0B0B0BA6;
+  --global-accent-SkyText: #80ACF0;
+  --global-accent-BackgroundColor: #2869D8;
+  --global-on-nuance-TextColor: #0B0B0B;
 
-  --global-no-priority-PriorityColor: #8E99AF;
-  --global-low-PriorityColor: #6493FF;
+  --global-no-priority-PriorityColor: #979AA1;
+  --global-low-PriorityColor: #6098F2;
   --global-medium-PriorityColor: #FFBD2E;
   --global-high-PriorityColor: #F6684B;
   --global-urgent-PriorityColor: #F6684B;
-  --global-disabled-PriorityColor: #5A667E;
+  --global-disabled-PriorityColor: #5E5C63;
 
   --tag-on-subtle-PorpoiseText: #F2F4F6;
-  --tag-subtle-PorpoiseBackground: #343F49;
-  --tag-nuance-SunshineBackground: #262F40;
+  --tag-subtle-PorpoiseBackground: #303239;
+  --tag-nuance-SunshineBackground: #202020;
   --tag-accent-SunshineText: #FFBD2E;
-  --tag-nuance-SkyBackground: #1F2737;
+  --tag-nuance-SkyBackground: #202020;
 
-  --icon-disabled-IconColor: #394358;
+  --icon-disabled-IconColor: #5E5C63;
 
-  --border-talk-indication-secondary: #22262B;
+  --border-talk-indication-secondary: #202020;
 
   /** Buttons **/
   --button-subtle-LabelColor: #fff;
   --button-subtle-IconColor: #fff;
   --button-disabled-BackgroundColor: #d1d5de0d;
-  --button-primary-loading-LabelColor: #6191fe;
+  --button-primary-loading-LabelColor: #6098F2;
   --button-secondary-BackgroundColor: #d1d5de0d;
   --button-secondary-BorderColor: #d1d5de1a;
-  --button-secondary-hover-BackgroundColor: #A5BDFF1A;
+  --button-secondary-hover-BackgroundColor: #6098F21A;
   --button-secondary-active-BackgroundColor: #d1d5de26;
   --button-tertiary-hover-BackgroundColor: #d1d5de1a;
   --button-tertiary-active-BackgroundColor: #d1d5de26;
   --button-menu-active-BorderColor: #d9dee6;
 
   /** Editbox **/
-  --input-BackgroundColor: #a5bdff0d;
-  --input-hover-BackgroundColor: #a5bdff1a;
-  --input-BorderColor: #a5bdff0d;
-  --input-TextColor: #ffffff;
-  --input-LabelColor: #ffffff;
-  --input-filled-LabelColor: #8b97ad;
-  --input-PlaceholderColor: #8b97ad;
-  --input-hover-PlaceholderColor: #ffffff;
-  --input-focus-PlaceholderColor: #556178;
-  --input-HelperColor: #8b97ad;
+  --input-BackgroundColor: #6098F20D;
+  --input-hover-BackgroundColor: #6098F21A;
+  --input-BorderColor: #6098F20D;
+  --input-TextColor: #F2F2F6;
+  --input-LabelColor: #F2F2F6;
+  --input-filled-LabelColor: #979AA1;
+  --input-PlaceholderColor: #979AA1;
+  --input-hover-PlaceholderColor: #F2F2F6;
+  --input-focus-PlaceholderColor: #5E5C63;
+  --input-HelperColor: #979AA1;
   --input-error-BorderColor: #fb6863;
-  --input-search-IconColor: #ffffff;
+  --input-search-IconColor: #F2F2F6;
 
   /** Checkboxes **/
-  --selector-BackgroundColor: #a5bdff0d;
-  --selector-BorderColor: #d9dee6;
-  --selector-off-BackgroundColor: #556178;
-  --selector-hover-overlay-BackgroundColor: #a5bdff1a;
-  --selector-disabled-BackgroundColor: #a5bdff1a;
-  --selector-disabled-BorderColor: #a5bdff0d;
+  --selector-BackgroundColor: #6098F20D;
+  --selector-BorderColor: #C0BFC4;
+  --selector-off-BackgroundColor: #5E5C63;
+  --selector-hover-overlay-BackgroundColor: #6098F21A;
+  --selector-disabled-BackgroundColor: #6098F21A;
+  --selector-disabled-BorderColor: #6098F20D;
 
-  --love-active-call-color-1: #5190EC;
-  --love-active-call-color-2: #F47758;
+  --love-active-call-color-1: #6098F2;
+  --love-active-call-color-2: #E27252;
   --love-active-call-transform: scaleY(0.25) scaleX(0.4);
   --love-active-call-filter: blur(17px);
 
-  --global-offline-color: #d1d5de;
+  --global-offline-color: #C0BFC4;
 
-  --avatar-counter-BackgroundColor: #141523
+  --avatar-counter-BackgroundColor: #1B1A1C
 }
 
 /* Light Theme */

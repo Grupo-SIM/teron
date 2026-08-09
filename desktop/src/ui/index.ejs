@@ -1,5 +1,5 @@
 <!doctype html>
-<html>
+<html class="theme-dark">
 
 <script>
 
@@ -25,19 +25,19 @@
         }
 
         body {
-            background-color: var(--bg-body, #ffffff);
+            background-color: var(--bg-body, #151413);
         }
 
         :root {
-            --bg-body: #ffffff;
-            --bg-secondary: #f3f3f3;
-            --bg-tertiary: #ffffff;
-            --bg-hover: #e8e8e8;
-            --bg-separator: #d4d4d4;
-            --text-primary: #333333;
-            --text-secondary: #666666;
-            --border-color: #e5e5e5;
-            --accent-color: #0078d4;
+            --bg-body: #151413;
+            --bg-secondary: #0B0B0B;
+            --bg-tertiary: #262629;
+            --bg-hover: #202020;
+            --bg-separator: #303030;
+            --text-primary: #F2F2F6;
+            --text-secondary: #979AA1;
+            --border-color: #303030;
+            --accent-color: #6098F2;
             --close-hover: #e81123;
             --huly-top-indent: 32px;
             --huly-history-box-left-indent: 0;
@@ -48,15 +48,15 @@
         }
 
         [data-theme="theme-dark"] {
-            --bg-body: #1a1928;
-            --bg-secondary: #323233;
-            --bg-tertiary: #252526;
-            --bg-hover: #2a2d2e;
-            --bg-separator: #454545;
-            --text-primary: #cccccc;
-            --text-secondary: #888888;
-            --border-color: #2d2d30;
-            --accent-color: #007acc;
+            --bg-body: #151413;
+            --bg-secondary: #0B0B0B;
+            --bg-tertiary: #262629;
+            --bg-hover: #202020;
+            --bg-separator: #303030;
+            --text-primary: #F2F2F6;
+            --text-secondary: #979AA1;
+            --border-color: #303030;
+            --accent-color: #6098F2;
             --close-hover: #c42b1c;
         }
 
@@ -234,7 +234,7 @@
 
 </head>
 
-<body style="margin: 0; overflow: hidden;">
+<body data-theme="theme-dark" style="margin: 0; overflow: hidden;">
 
   <% if (typeof isWindows !== 'undefined' && isWindows) { %>
     <div id="desktop-app-titlebar-root">
@@ -261,12 +261,3 @@
 </body>
 
 </html>
-
-<% if (typeof isWindows !== 'undefined' && isWindows) { %>
-<script>
-    const lastUsedTheme = localStorage.getItem('last-used-theme')
-    if (lastUsedTheme != null) {
-      document.body.setAttribute('data-theme', lastUsedTheme)
-    }
-</script>
-<% } %>

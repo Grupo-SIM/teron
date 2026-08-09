@@ -48,7 +48,7 @@ export const isThemeDark = (theme: string): boolean =>
 /**
  * @public
  */
-export const getCurrentTheme = (): string => localStorage.getItem('theme') ?? getDefaultProps('theme', 'theme-system')
+export const getCurrentTheme = (): string => ThemeVariant.Dark
 /**
  * @public
  */

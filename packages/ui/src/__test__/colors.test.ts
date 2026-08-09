@@ -13,9 +13,26 @@
 // limitations under the License.
 //
 
-import { getPlatformColorByName, getPlatformAvatarColorByName, avatarWhiteColors, avatarDarkColors } from '../colors'
+import {
+  getPlatformColorByName,
+  getPlatformAvatarColorByName,
+  avatarWhiteColors,
+  avatarDarkColors,
+  defaultBackground,
+  defineAlpha
+} from '../colors'
 
 describe('colors module tests', () => {
+  describe('dark theme background', () => {
+    it('uses the branded surface gradient', () => {
+      expect(defaultBackground(true)).toBe('linear-gradient(90deg, #202020, #151413)')
+    })
+
+    it('uses the branded canvas when blending translucent colors', () => {
+      expect(defineAlpha(true, '#FFFFFF', 50)).toBe('#8a8a89')
+    })
+  })
+
   describe('getPlatformColorByName', () => {
     it('get existing color, light theme', () => {
       const result = getPlatformColorByName('Firework', false)

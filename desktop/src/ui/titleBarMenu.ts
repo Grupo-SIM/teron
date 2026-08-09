@@ -16,7 +16,7 @@
 import { IPCMainExposed, MenuBarAction } from './types'
 import { isMenuBarAction } from './typesUtils'
 import { TitleBarMenuState } from './titleBarMenuState'
-import { type ThemeVariantType } from '@hcengineering/theme'
+import { ThemeVariant, type ThemeVariantType } from '@hcengineering/theme'
 
 const ToggleMinimizeToTrayAction: MenuBarAction = 'toggle-minimize-to-tray'
 const ToggleAutoLaunchAction: MenuBarAction = 'toggle-auto-launch'
@@ -80,13 +80,9 @@ export class MenuBar {
   constructor (private readonly theme: ThemeManager) {
   }
 
-  public setTheme (theme: ThemeVariantType): void {
-    localStorage.setItem(MenuBar.lastUsedThemeKey, theme)
-    this.theme.setTheme(theme)
-  }
-
-  public lastUsedThemeIsUnknown (): boolean {
-    return localStorage.getItem(MenuBar.lastUsedThemeKey) == null
+  public setTheme (_theme: ThemeVariantType): void {
+    localStorage.setItem(MenuBar.lastUsedThemeKey, ThemeVariant.Dark)
+    this.theme.setTheme(ThemeVariant.Dark)
   }
 }
 
