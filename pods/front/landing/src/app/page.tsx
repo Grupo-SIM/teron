@@ -122,7 +122,7 @@ export default function Home() {
             }}
           >
             <a
-              href="#comecar"
+              href="/login/signup"
               className="lp-btn-white"
               style={{ fontWeight: 700, borderRadius: 9 }}
             >
@@ -357,7 +357,7 @@ export default function Home() {
         </div>
         <div data-reveal style={{ textAlign: "center", marginTop: 64 }}>
           <a
-            href="#comecar"
+            href="/login/signup"
             className="lp-btn-white"
             style={{
               display: "inline-block",
