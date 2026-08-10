@@ -1,0 +1,988 @@
+@import "tailwindcss";
+
+:root {
+  --background: #000000;
+  --foreground: #ffffff;
+}
+
+@theme inline {
+  --color-background: var(--background);
+  --color-foreground: var(--foreground);
+  --font-sans: var(--font-manrope);
+}
+
+html,
+body {
+  margin: 0;
+  padding: 0;
+  background: #000;
+}
+
+body {
+  color: var(--foreground);
+  font-family: var(--font-manrope), system-ui, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+a {
+  color: #7aa7ff;
+  text-decoration: none;
+}
+
+::selection {
+  background: #2f6bff;
+  color: #fff;
+}
+
+/* Reveal on scroll --------------------------------------------------- */
+
+[data-reveal] {
+  opacity: 0;
+  transform: translateY(22px);
+  transition:
+    opacity 0.7s cubic-bezier(0.22, 0.61, 0.36, 1),
+    transform 0.7s cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+
+[data-reveal].is-visible {
+  opacity: 1;
+  transform: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-reveal] {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+}
+
+/* Links e botões ------------------------------------------------------ */
+
+.lp-navlink {
+  color: #b6b6bb;
+  transition: color 0.18s ease;
+}
+
+.lp-navlink:hover {
+  color: #fff;
+}
+
+.lp-link-plain {
+  color: #e6e6ea;
+}
+
+.lp-link-plain:hover {
+  color: #fff;
+}
+
+.lp-btn-white {
+  background: #fff;
+  color: #000;
+  transition: background 0.18s ease;
+}
+
+.lp-btn-white:hover {
+  background: #e3e3e8;
+  color: #000;
+}
+
+.lp-btn-ghost {
+  background: #161618;
+  color: #fff;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  transition: background 0.18s ease;
+}
+
+.lp-btn-ghost:hover {
+  background: #202024;
+  color: #fff;
+}
+
+.lp-btn-round {
+  background: #141417;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: #fff;
+  transition: background 0.18s ease;
+}
+
+.lp-btn-round:hover {
+  background: #1f1f25;
+}
+
+.lp-input {
+  background: #141418;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+  padding: 14px 16px;
+  color: #fff;
+  font-family: inherit;
+  font-size: 14.5px;
+  outline: none;
+  transition: border-color 0.18s ease;
+}
+
+.lp-input::placeholder {
+  color: #6f6f77;
+}
+
+.lp-input:focus {
+  border-color: #3b82f6;
+}
+
+/* Header responsivo --------------------------------------------------- */
+
+.lp-desktop-only {
+  display: flex;
+}
+
+.lp-burger {
+  display: none;
+}
+
+@media (max-width: 899px) {
+  .lp-desktop-only {
+    display: none;
+  }
+
+  .lp-burger {
+    display: block;
+  }
+}
+
+/* Menu mobile em tela cheia ------------------------------------------- */
+
+.lp-menu {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  display: flex;
+  flex-direction: column;
+  padding: 14px 20px 28px;
+  background: #08080a;
+  overflow-y: auto;
+}
+
+.lp-menu-top {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 4px 10px;
+}
+
+.lp-menu-close {
+  background: none;
+  border: none;
+  padding: 4px;
+  color: #fff;
+  font-size: 22px;
+  line-height: 1;
+  cursor: pointer;
+}
+
+.lp-menu-links {
+  display: flex;
+  flex-direction: column;
+  margin-top: 12px;
+}
+
+.lp-menu-link {
+  padding: 14px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.09);
+  color: #fff;
+  font-size: 17px;
+  font-weight: 500;
+}
+
+.lp-menu-link:hover {
+  color: #fff;
+}
+
+/* botões colados na base, como no huly.io */
+.lp-menu-actions {
+  margin-top: auto;
+  padding-top: 40px;
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.lp-menu-btn {
+  display: block;
+  padding: 17px 20px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 999px;
+  background: #0e0e11;
+  color: #fff;
+  text-align: center;
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+}
+
+.lp-menu-btn:hover {
+  background: #17171b;
+  color: #fff;
+}
+
+/* CTA final ----------------------------------------------------------- */
+
+/* Hero ---------------------------------------------------------------- */
+
+/* O vídeo reserva um retângulo preto para a screenshot: x 704/3840,
+   y 1456/2876, largura 2048/3840 — as porcentagens abaixo encaixam
+   `hero-shot.png` exatamente nesse recorte em qualquer largura. */
+/* Janela de 2194px do frame: corta 400px no topo (feixe quase vazio) e
+   282px embaixo, de modo que a base da caixa caia exatamente na base da
+   screenshot — sem sobra preta antes do texto seguinte.
+   400 / (2876 - 2194) = 58.65% de object-position. */
+.lp-hero-media {
+  position: relative;
+  width: 100%;
+  aspect-ratio: 3840 / 2194;
+  overflow: hidden;
+}
+
+.lp-hero-video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 58.65%;
+  display: block;
+}
+
+/* O SVG tem 1449x731 de tela mas a screenshot ocupa só x=87 y=32
+   w=1257.84 dentro dela. Para esse retângulo interno cair no recorte do
+   vídeo (18.333% / 48.13% / 53.333%), a tela toda é ampliada em
+   1449/1257.84 e deslocada pelas margens:
+     width = 53.333% * 1449/1257.84      = 61.439%
+     left  = 18.333% - 87/1449 * 61.439% = 14.644%
+     top   = 48.13%  - 32/731 * 61.439% * (3840/2194) = 45.76% */
+/* +2% de escala sobre esses valores, ancorado no centro:
+   left/top recuam metade do que a caixa cresce. */
+.lp-hero-shot {
+  position: absolute;
+  left: 14.01%;
+  top: 45.2%;
+  width: 62.67%;
+  display: block;
+}
+
+/* O espaço livre acima da screenshot é ~20% da largura da viewport, por
+   isso o texto do hero escala em vw — senão invade o print. */
+.lp-hero-copy {
+  position: absolute;
+  /* o header é fixo e transparente: 84px garante que o texto comece abaixo dele */
+  top: max(84px, 4%);
+  left: 18.333%;
+  max-width: 60%;
+  z-index: 2;
+}
+
+/* Dissolve a base da screenshot no preto da seção seguinte. */
+.lp-hero-fade {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 38%;
+  background: linear-gradient(to bottom, transparent, #000 88%);
+  pointer-events: none;
+}
+
+/* Logos sobrepostos ao terço inferior da screenshot: 45% = centro do
+   recorte (18.333% + 53.333% / 2). O PNG já tem alpha, então dispensa
+   blend. */
+.lp-hero-logos {
+  position: absolute;
+  left: 45%;
+  transform: translateX(-50%);
+  bottom: 4%;
+  width: 32%;
+  display: block;
+}
+
+.lp-hero-copy h1 {
+  font-size: clamp(26px, 3.5vw, 54px);
+}
+
+.lp-hero-copy p {
+  font-size: clamp(13px, 1.15vw, 16px);
+}
+
+.lp-hero-copy a {
+  font-size: 13.5px;
+  padding: 10px 20px;
+}
+
+/* Só telas largas crescem o texto e o descem: abaixo de 1500px nada
+   disso se aplica, o hero fica exatamente como antes. */
+@media (min-width: 1500px) {
+  .lp-hero-copy {
+    top: max(84px, 7%);
+  }
+
+  .lp-hero-copy h1 {
+    font-size: min(3.6vw, 70px);
+  }
+
+  .lp-hero-copy p {
+    font-size: min(1.15vw, 20px);
+  }
+
+  .lp-hero-copy a {
+    font-size: min(0.95vw, 18px);
+    padding: 0.8em 1.6em;
+  }
+}
+
+@media (min-width: 1900px) {
+  .lp-hero-copy {
+    top: 9%;
+  }
+}
+
+/* Com o header fora do fluxo, o texto empilhado precisa do respiro dele. */
+@media (max-width: 1199px) {
+  .lp-hero-copy {
+    padding-top: 110px;
+  }
+}
+
+/* Abaixo de 1150px não sobra altura acima da screenshot para o texto
+   sobreposto — ele volta para o fluxo, acima do vídeo. */
+@media (max-width: 1199px) {
+  .lp-hero-copy {
+    position: static;
+    left: auto;
+    right: auto;
+    max-width: none;
+    padding: 90px 24px 46px;
+  }
+}
+
+/* No celular a composição inteira (feixe + screenshot + logos) fica
+   pequena. A caixa do vídeo é ampliada e a altura acompanha pelo
+   aspect-ratio, então tudo cresce junto, na mesma proporção — nada é
+   recortado nem reposicionado. A margem negativa recentraliza a
+   screenshot, que fica em 45.345% da caixa, e não no meio dela:
+     margin-left = -(45.345 * escala - 50) */
+@media (max-width: 899px) {
+  .lp-hero-media {
+    width: 135%;
+    margin-left: -11.22%;
+  }
+}
+
+@media (max-width: 599px) {
+  .lp-hero-media {
+    width: 165%;
+    margin-left: -24.82%;
+  }
+}
+
+/* Caixa com o tamanho exato da arte, para o esfumado grudar nas bordas
+   reais da imagem em vez das bordas da seção. */
+.lp-cta-art {
+  --cta-h: clamp(380px, 34vw, 600px);
+  position: relative;
+  width: min(100%, calc(var(--cta-h) * 2.79));
+  aspect-ratio: 2.79 / 1;
+  margin: 0 auto;
+}
+
+.lp-cta-art img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+@media (max-width: 899px) {
+  .lp-cta-art {
+    width: 100%;
+    aspect-ratio: auto;
+    height: 420px;
+  }
+}
+
+.lp-cta-copy {
+  margin-left: 52%;
+  max-width: 440px;
+}
+
+@media (max-width: 899px) {
+  .lp-cta-copy {
+    margin-left: 0;
+    max-width: none;
+    text-align: center;
+  }
+
+  .lp-cta-actions {
+    justify-content: center;
+  }
+}
+
+/* FAQ ------------------------------------------------------------------ */
+
+.lp-faq {
+  position: relative;
+  padding: 70px 24px 90px;
+}
+
+/* cartão externo: o brilho estrelado fica contido nele */
+.lp-faq-card {
+  position: relative;
+  max-width: 1000px;
+  margin: 0 auto;
+  padding: 46px 44px 52px;
+  background: #08080a;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 28px;
+  overflow: hidden;
+}
+
+.lp-faq-card::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: url("/assets/faq-glow.png") center 58% / 130% auto no-repeat;
+  filter: grayscale(1) brightness(1.7);
+  opacity: 1;
+}
+
+.lp-faq-cta {
+  display: block;
+  text-align: center;
+  color: #fff;
+  font-weight: 500;
+  margin-bottom: 44px;
+  position: relative;
+  z-index: 2;
+}
+
+.lp-faq-cta:hover {
+  color: #fff;
+  text-decoration: underline;
+}
+
+.lp-faq-title {
+  position: relative;
+  z-index: 2;
+  margin: 0 0 34px;
+  text-align: center;
+  font-size: clamp(34px, 3.4vw, 48px);
+  font-weight: 800;
+  letter-spacing: -0.02em;
+  color: #fff;
+}
+
+/* painel de vidro sobre o brilho de fundo */
+.lp-faq-panel {
+  position: relative;
+  z-index: 2;
+  margin: 0 auto;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 16px;
+  box-shadow: 0 4px 30px rgba(0, 0, 0, 0.1);
+  backdrop-filter: blur(2.6px);
+  -webkit-backdrop-filter: blur(2.6px);
+  padding: 14px;
+}
+
+/* cada pergunta é um cartão próprio */
+.lp-acc {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.lp-acc-item {
+  background: #131316;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.lp-acc-q {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px;
+  padding: 16px 22px;
+  background: none;
+  border: none;
+  cursor: pointer;
+  text-align: left;
+  font-family: inherit;
+  font-weight: 600;
+  font-size: 14px;
+  color: #fff;
+}
+
+.lp-acc-pm {
+  color: #8a8a93;
+  font-size: 20px;
+  flex: none;
+  transition: transform 0.2s;
+}
+
+.lp-acc-item.is-open .lp-acc-pm {
+  transform: rotate(45deg);
+}
+
+/* 0fr → 1fr anima a altura sem precisar medir scrollHeight */
+.lp-acc-a {
+  display: grid;
+  grid-template-rows: 0fr;
+  transition: grid-template-rows 0.3s ease;
+}
+
+.lp-acc-item.is-open .lp-acc-a {
+  grid-template-rows: 1fr;
+}
+
+.lp-acc-a > div {
+  overflow: hidden;
+}
+
+.lp-acc-a p {
+  margin: 0;
+  padding: 0 22px 18px;
+  color: #9a9aa1;
+  font-size: 14px;
+  line-height: 1.65;
+}
+
+@media (max-width: 899px) {
+  .lp-faq {
+    padding: 50px 16px 70px;
+  }
+
+  .lp-faq-card {
+    padding: 34px 16px 36px;
+    border-radius: 22px;
+  }
+
+  /* cartão estreito: aproxima o brilho para ele não sumir */
+  .lp-faq-card::before {
+    background-size: 260% auto;
+    background-position: center 54%;
+  }
+
+  .lp-faq-panel {
+    padding: 10px;
+  }
+
+  .lp-acc-q {
+    padding: 15px 16px;
+    font-size: 13px;
+  }
+
+  .lp-acc-a p {
+    padding: 0 16px 16px;
+    font-size: 13.5px;
+  }
+}
+
+/* Carrossel de logos de clientes --------------------------------------- */
+
+.lp-logos-box {
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 18px;
+  background: #0a0a0c;
+  padding: 8px 0;
+  overflow: hidden;
+  display: flex;
+  align-items: center;
+}
+
+/* esfuma as pontas para os logos entrarem e saírem sem corte seco */
+.lp-logos-strip {
+  position: relative;
+  overflow: hidden;
+  width: 100%;
+  -webkit-mask-image: linear-gradient(
+    90deg,
+    transparent 0%,
+    #000 12%,
+    #000 88%,
+    transparent 100%
+  );
+  mask-image: linear-gradient(
+    90deg,
+    transparent 0%,
+    #000 12%,
+    #000 88%,
+    transparent 100%
+  );
+}
+
+.lp-logos-track {
+  display: flex;
+  align-items: center;
+  gap: 60px;
+  width: max-content;
+  animation: lp-logos-scroll 32s linear infinite;
+}
+
+.lp-logo {
+  height: 44px;
+  width: auto;
+  object-fit: contain;
+  filter: brightness(0) invert(1);
+  opacity: 0.65;
+  flex-shrink: 0;
+  transition: opacity 0.2s;
+}
+
+.lp-logo:hover {
+  opacity: 1;
+}
+
+.lp-logo-sm {
+  height: 34px;
+}
+
+.lp-logo-xl {
+  height: 100px;
+}
+
+.lp-logo-xxl {
+  height: 140px;
+}
+
+.lp-logo-dark {
+  filter: invert(1);
+  opacity: 0.8;
+}
+
+@keyframes lp-logos-scroll {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .lp-logos-track {
+    animation: none;
+  }
+}
+
+/* Rodapé --------------------------------------------------------------- */
+
+.lp-footer-bar {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 20px 34px;
+  font-size: 13px;
+  color: #6f6f77;
+}
+
+@media (max-width: 899px) {
+  .lp-footer-bar {
+    justify-content: center;
+    text-align: center;
+  }
+}
+
+.lp-footer-link {
+  color: #b6b6bb;
+  font-weight: 500;
+  transition: color 0.18s ease;
+}
+
+.lp-footer-link:hover {
+  color: #fff;
+}
+
+.lp-social {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.lp-social a {
+  color: #8b8b93;
+  display: block;
+  transition: color 0.18s ease;
+}
+
+.lp-social a:hover {
+  color: #fff;
+}
+
+/* Bento da plataforma -------------------------------------------------- */
+
+.lp-bento {
+  display: flex;
+  justify-content: center;
+  gap: 18px;
+}
+
+.lp-bento-col {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 18px;
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.lp-bento-col-a {
+  width: 808px;
+}
+
+.lp-bento-col-b {
+  width: 518px;
+}
+
+.lp-bento-card {
+  position: relative;
+  border-radius: 30px;
+}
+
+.lp-bento-card img {
+  position: absolute;
+  top: 0;
+  left: 0;
+  pointer-events: none;
+  border-radius: 30px;
+}
+
+.lp-bento-m {
+  display: none;
+}
+
+.lp-bento-txt {
+  position: absolute;
+  inset: 0 0 auto;
+  z-index: 10;
+  margin: 0;
+  padding: 19px 24px;
+  font-size: 15px;
+  font-weight: 300;
+  line-height: 1.25;
+  color: rgba(255, 255, 255, 0.65);
+}
+
+.lp-bento-txt strong {
+  font-weight: 500;
+  color: #fff;
+}
+
+/* Cards — tamanhos do huly.io */
+
+.lp-bento-tasks {
+  margin-left: 256px;
+  width: 270px;
+  height: 250px;
+}
+
+/* A arte de tarefas transborda o card e cobre também o card de anotações. */
+.lp-bento-card .lp-bento-tasks-img {
+  top: -1px;
+  left: auto;
+  right: -1px;
+  width: 534px;
+  height: 508px;
+  max-width: none;
+  border-radius: 0;
+}
+
+.lp-bento-plan {
+  width: 250px;
+  height: 250px;
+}
+
+.lp-bento-plan .lp-bento-d {
+  width: 264px;
+  height: 250px;
+}
+
+.lp-bento-notes {
+  width: 270px;
+  height: 232px;
+}
+
+.lp-bento-txt-notes {
+  padding-top: 0;
+  top: -2px;
+}
+
+.lp-bento-pilcrow {
+  display: block;
+  margin-bottom: 7px;
+  font-size: 14px;
+  line-height: 1;
+  color: rgba(255, 255, 255, 0.75);
+}
+
+.lp-bento-txt-notes::after {
+  content: "";
+  position: relative;
+  top: 5px;
+  left: 6px;
+  display: inline-block;
+  width: 1px;
+  height: 18px;
+  background: #d1d4fa;
+  opacity: 0.8;
+  vertical-align: -4px;
+}
+
+.lp-bento-sync {
+  width: 515px;
+  height: 232px;
+}
+
+.lp-bento-sync .lp-bento-d {
+  width: 520px;
+  height: 232px;
+}
+
+.lp-bento-txt-sync {
+  max-width: 425px;
+}
+
+.lp-bento-cal {
+  width: 236px;
+  height: 236px;
+}
+
+.lp-bento-card .lp-bento-cal-img {
+  top: -4px;
+  left: -4px;
+  width: 244px;
+  height: 244px;
+  max-width: none;
+  border-radius: 0;
+}
+
+.lp-bento-chat {
+  width: 250px;
+  height: 250px;
+}
+
+.lp-bento-chat .lp-bento-d {
+  width: 264px;
+  height: 250px;
+}
+
+.lp-bento-projects {
+  width: 422px;
+  height: 232px;
+}
+
+.lp-bento-projects-img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.lp-bento-txt-projects {
+  max-width: 85%;
+}
+
+/* Abaixo de 1200px o layout vira grade e usa as artes de mobile. */
+@media (max-width: 1199px) {
+  .lp-bento {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 14px;
+    max-width: 720px;
+    margin: 0 auto;
+  }
+
+  .lp-bento-col {
+    display: contents;
+  }
+
+  .lp-bento-card {
+    width: auto;
+    height: auto;
+    margin-left: 0;
+    aspect-ratio: 1.45;
+    overflow: hidden;
+    border-radius: 20px;
+  }
+
+  .lp-bento-d,
+  .lp-bento-cal {
+    display: none;
+  }
+
+  .lp-bento-card .lp-bento-m {
+    display: block;
+    top: 50%;
+    left: 50%;
+    width: auto;
+    height: auto;
+    min-width: 100%;
+    transform: translate(-50%, -50%);
+    border-radius: 20px;
+  }
+
+  .lp-bento-txt {
+    padding: 20px;
+  }
+
+  .lp-bento-txt-notes {
+    top: 0;
+    padding-top: 20px;
+  }
+
+  .lp-bento-txt-notes::after,
+  .lp-bento-pilcrow,
+  .lp-bento-txt-notes br {
+    display: none;
+  }
+
+  .lp-bento-txt-sync,
+  .lp-bento-txt-projects {
+    max-width: 290px;
+  }
+}
+
+@media (max-width: 599px) {
+  .lp-bento {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .lp-bento-card {
+    aspect-ratio: 1.65;
+  }
+}
+
+/* Placeholder de asset ausente ---------------------------------------- */
+
+.lp-asset-fallback {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background:
+    linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(0, 0, 0, 0)),
+    #0b0b0e;
+  border: 1px dashed rgba(255, 255, 255, 0.12);
+  border-radius: 12px;
+  color: #55555f;
+  font-size: 12px;
+  letter-spacing: 0.04em;
+  text-align: center;
+  padding: 12px;
+}
