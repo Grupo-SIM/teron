@@ -398,6 +398,8 @@ export function start (
 
   const dist = resolve(process.env.PUBLIC_DIR ?? cwd(), 'dist')
   console.log('serving static files from', dist)
+  const landingDist = join(dist, 'landing')
+  const landingIndex = join(landingDist, 'index.html')
 
   let brandingUrl: URL | undefined
   if (config.brandingUrl !== undefined) {
@@ -406,6 +408,42 @@ export function start (
     } catch (e) {
       console.error('Invalid branding URL. Must be absolute URL.', e)
     }
+  }
+
+  if (fs.existsSync(landingIndex)) {
+    console.log('serving landing page from', landingDist)
+    app.get('/', (_request, response) => {
+      response.sendFile(landingIndex, {
+        etag: true,
+        lastModified: true,
+        cacheControl: false,
+        headers: {
+          'Cache-Control': cacheControlNoCache,
+          'Keep-Alive': `timeout=${KEEP_ALIVE_TIMEOUT}`
+        }
+      })
+    })
+    app.use(
+      expressStaticGzip(landingDist, {
+        serveStatic: {
+          cacheControl: true,
+          dotfiles: 'allow',
+          maxAge: '365d',
+          etag: true,
+          lastModified: true,
+          index: false,
+          setHeaders (res, path) {
+            if (path.toLowerCase().includes('index.html')) {
+              res.setHeader('Cache-Control', cacheControlNoCache)
+            }
+            res.setHeader('Connection', 'keep-alive')
+            res.setHeader('Keep-Alive', `timeout=${KEEP_ALIVE_TIMEOUT}, max=${KEEP_ALIVE_MAX}`)
+          }
+        }
+      })
+    )
+  } else {
+    console.warn('landing page was not found, keeping the application fallback for /', { landingIndex })
   }
 
   app.use(
