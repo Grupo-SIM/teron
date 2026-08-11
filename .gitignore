@@ -114,3 +114,9 @@ dev/tool/history.json
 .tmp
 ws-tests/docker-compose.override.yml
 .cursor/*
+
+# Vídeos: mantém só os de produção em public/
+*.mp4
+*.webm
+!public/**/*.mp4
+!public/**/*.webm
