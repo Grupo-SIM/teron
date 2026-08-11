@@ -123,6 +123,8 @@ jobs:
           node common/scripts/install-run-rush.js bundle -v "${selectors[@]}"
 
       - name: Package frontend assets
+        env:
+          NODE_OPTIONS: --max-old-space-size=4096
         run: |
           node common/scripts/install-run-rush.js package -v --only @hcengineering/prod
           node common/scripts/install-run-rush.js package -v --only @hcengineering/pod-front
