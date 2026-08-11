@@ -39,3 +39,6 @@ yarn-error.log*
 # typescript
 *.tsbuildinfo
 next-env.d.ts
+
+# copiado de node_modules por scripts/copy-rive-wasm.mjs
+/public/rive/

@@ -61,10 +61,10 @@ export function SiteHeader() {
         }}
       >
         <Asset
-          src="/assets/logo-nav.png"
-          alt="huly"
-          ratio="4 / 1"
-          style={{ height: 26, width: "auto", display: "block" }}
+          src="/assets/teronwhite.svg"
+          alt="Teron"
+          ratio="595 / 550"
+          style={{ height: 30, width: "auto", display: "block" }}
         />
         <nav
           className="lp-desktop-only"
@@ -126,10 +126,10 @@ export function SiteHeader() {
         <div className="lp-menu" role="dialog" aria-modal="true" aria-label="Menu">
           <div className="lp-menu-top">
             <Asset
-              src="/assets/logo-nav.png"
-              alt="huly"
-              ratio="4 / 1"
-              style={{ height: 26, width: "auto", display: "block" }}
+              src="/assets/teronwhite.svg"
+              alt="Teron"
+              ratio="595 / 550"
+              style={{ height: 30, width: "auto", display: "block" }}
             />
             <button
               type="button"

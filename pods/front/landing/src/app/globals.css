@@ -969,6 +969,575 @@ a {
   }
 }
 
+/* Conhecimento --------------------------------------------------------- */
+
+.lp-know {
+  padding: 130px 24px 0;
+}
+
+.lp-know-inner {
+  display: grid;
+  grid-template-columns: minmax(0, 5fr) minmax(0, 6fr);
+  align-items: start;
+  gap: 60px;
+  max-width: 1240px;
+  margin: 0 auto;
+}
+
+/*
+ * O item da grade precisa ocupar a linha inteira: `sticky` só desliza dentro da
+ * caixa do pai, e com o item encolhido na altura do conteúdo não sobrava
+ * percurso — o card subia junto com o texto em vez de acompanhar a seção.
+ */
+.lp-know-art {
+  align-self: stretch;
+}
+
+.lp-know-stick {
+  position: sticky;
+  top: 120px;
+}
+
+/* A proporção real vem do artboard, escrita pelo componente ao carregar. */
+.lp-know-cards {
+  position: relative;
+  aspect-ratio: 1;
+  width: 100%;
+}
+
+/*
+ * Texto do card, sobre a metade branca desenhada pelo Rive. As medidas são em %
+ * da caixa do canvas, que tem a proporção do artboard — mas o artboard é maior
+ * que o card: o desenho ocupa de 23% a 86.6% na horizontal e de 11.6% a 78.4%
+ * na vertical, sobrando margem para as sombras. Os valores abaixo são o recuo
+ * interno do card já convertido para essa caixa maior.
+ */
+.lp-know-card-txt {
+  position: absolute;
+  top: 53%;
+  /* Margem direita maior que a esquerda de propósito: as porcentagens saem de
+     medição em print e essa folga absorve o erro sem deixar o texto vazar. */
+  right: 24%;
+  left: 28%;
+  color: #0b0b0d;
+  opacity: 0;
+  transition: opacity 0.3s ease;
+  pointer-events: none;
+}
+
+.lp-know-card-txt[data-on="true"] {
+  opacity: 1;
+}
+
+.lp-know-card-txt strong {
+  display: block;
+  margin-bottom: 6px;
+  font-size: 15px;
+  font-weight: 700;
+}
+
+.lp-know-card-txt span {
+  display: block;
+  color: #4a4a52;
+  font-size: 13.5px;
+  line-height: 1.45;
+}
+
+.lp-rive-canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+.lp-know-title {
+  /* Caixa em que o marcador do título é arrastado. */
+  position: relative;
+  margin: 0;
+  font-size: clamp(28px, 3.4vw, 46px);
+  font-weight: 800;
+  line-height: 1.12;
+  letter-spacing: -0.03em;
+}
+
+.lp-know-lead {
+  margin: 22px 0 0;
+  max-width: 62ch;
+  color: #a7a7ad;
+  font-size: 15px;
+  line-height: 1.6;
+}
+
+.lp-know-doc {
+  position: relative;
+  margin-top: 34px;
+  padding: 30px 32px 34px;
+  background: #0c0c0e;
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 16px;
+}
+
+.lp-know-p {
+  margin: 0 0 22px;
+  color: #b9b9c0;
+  font-size: 14.5px;
+  line-height: 1.72;
+}
+
+.lp-know-p strong {
+  color: #fff;
+  font-weight: 700;
+}
+
+.lp-know-fig {
+  margin: 0 0 22px;
+  overflow: hidden;
+  border-radius: 10px;
+}
+
+.lp-know-fig img {
+  display: block;
+  width: 100%;
+}
+
+.lp-know-code {
+  margin: 0 0 22px;
+  padding: 18px 20px;
+  overflow-x: auto;
+  background: #08080a;
+  border: 1px solid rgba(255, 255, 255, 0.06);
+  border-radius: 10px;
+  color: #c8c8d0;
+  font-size: 12.5px;
+  line-height: 1.6;
+}
+
+.lp-know-code .k {
+  color: #c07aff;
+}
+
+.lp-know-code .t {
+  color: #6fb3ff;
+}
+
+.lp-know-code .s {
+  color: #7ddba0;
+}
+
+.lp-know-code .n {
+  color: #f0a35e;
+}
+
+/*
+ * Marcadores de presença. Ficam soltos sobre o bloco em que nasceram e podem
+ * ser arrastados dentro dele; o componente guarda a posição em % e escreve em
+ * `left`/`top`.
+ */
+
+.lp-know-pin {
+  position: absolute;
+  z-index: 5;
+  transform: translate(-50%, -50%);
+  cursor: grab;
+  /* Sem isso o navegador rola a página em vez de deixar arrastar no toque. */
+  touch-action: none;
+  user-select: none;
+}
+
+.lp-know-pin:active {
+  cursor: grabbing;
+}
+
+.lp-know-pin[data-author="blue"] {
+  color: #2f6bff;
+}
+
+.lp-know-pin[data-author="orange"] {
+  color: #ef6f4a;
+}
+
+.lp-know-pin img {
+  display: block;
+  width: 44px;
+  height: 44px;
+  border: 3px solid currentColor;
+  border-radius: 50%;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.45);
+}
+
+/* Risco do cursor, saindo por baixo do avatar e terminando num ponto. */
+.lp-know-pin i {
+  position: absolute;
+  top: calc(100% - 4px);
+  left: 50%;
+  width: 2px;
+  height: 22px;
+  background: currentColor;
+  transform: translateX(-50%);
+}
+
+.lp-know-pin i::after {
+  content: "";
+  position: absolute;
+  bottom: -3px;
+  left: 50%;
+  width: 7px;
+  height: 7px;
+  background: currentColor;
+  border-radius: 50%;
+  transform: translateX(-50%);
+}
+
+/*
+ * Trecho que o scroll seleciona. `--mark` vai de 0 a 1 e é escrito pelo
+ * componente: varre o realce da esquerda para a direita, acende os cursores de
+ * seleção nas pontas e, no fim, libera a barra de formatação.
+ */
+
+.lp-know-marked {
+  position: relative;
+}
+
+.lp-know-marked .lp-know-p {
+  background-image: linear-gradient(
+    rgba(245, 196, 81, 0.24),
+    rgba(245, 196, 81, 0.24)
+  );
+  background-repeat: no-repeat;
+  background-size: calc(var(--mark, 0) * 100%) 100%;
+}
+
+/* Barras verticais nas pontas da seleção. */
+.lp-know-marked::before,
+.lp-know-marked::after {
+  content: "";
+  position: absolute;
+  width: 2px;
+  height: 1.5em;
+  background: #e7e7ee;
+  opacity: var(--mark, 0);
+}
+
+.lp-know-marked::before {
+  top: 0;
+  left: -3px;
+}
+
+.lp-know-marked::after {
+  right: -3px;
+  bottom: 22px;
+}
+
+.lp-know-tools {
+  position: absolute;
+  bottom: calc(100% + 10px);
+  left: 50%;
+  z-index: 6;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  padding: 6px;
+  background: #26262c;
+  border-radius: 9px;
+  box-shadow: 0 14px 34px rgba(0, 0, 0, 0.55);
+  color: #d8d8e0;
+  font-size: 13px;
+  opacity: 0;
+  transform: translate(-50%, 6px);
+  transition:
+    opacity 0.25s ease,
+    transform 0.25s ease;
+  pointer-events: none;
+}
+
+.lp-know-tools[data-on="true"] {
+  opacity: 1;
+  transform: translate(-50%, 0);
+}
+
+.lp-know-tools > span {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 26px;
+  height: 26px;
+  border-radius: 6px;
+}
+
+.lp-know-tool-link {
+  padding: 0 10px;
+  background: #2f6bff;
+  color: #fff;
+  font-size: 12px;
+  font-weight: 600;
+}
+
+.lp-know-tool-B {
+  font-weight: 800;
+}
+
+.lp-know-tool-I {
+  font-style: italic;
+}
+
+.lp-know-tool-U {
+  text-decoration: underline;
+}
+
+.lp-know-tool-S {
+  text-decoration: line-through;
+}
+
+.lp-know-tool-hl {
+  background: linear-gradient(135deg, #f5c451, #ef6f4a);
+}
+
+.lp-know-tool-hl,
+.lp-know-tools > .lp-know-tool-hl {
+  min-width: 16px;
+  width: 16px;
+  height: 16px;
+  margin: 0 5px;
+  border-radius: 4px;
+}
+
+/* Parágrafo que hospeda um marcador. */
+.lp-know-p-pinned {
+  position: relative;
+}
+
+/*
+ * Sem animação: nada aqui depende de tempo — o realce segue o scroll e os
+ * marcadores só se movem quando arrastados — então basta cortar as transições.
+ */
+@media (prefers-reduced-motion: reduce) {
+  .lp-know-tools {
+    transition: none;
+  }
+}
+
+
+@media (max-width: 899px) {
+  .lp-know-inner {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 30px;
+  }
+
+  .lp-know-art {
+    position: static;
+    max-width: 380px;
+  }
+
+  .lp-know-doc {
+    padding: 24px 20px 28px;
+  }
+}
+
+/* Escritório virtual --------------------------------------------------- */
+
+.lp-office {
+  position: relative;
+  /* Proporção do video-block.png (3850x2092). */
+  aspect-ratio: 3850 / 2092;
+  width: 100%;
+  /* O brilho é maior que o bloco de propósito; recorta na borda da arte. */
+  overflow: hidden;
+  /* Texto, botões e bordas do painel escalam junto com a arte. */
+  container-type: inline-size;
+}
+
+.lp-office-plate {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+/*
+ * Brilho animado extraído do waves.mp4 do huly (ver scripts/extract-glow.py).
+ * É preto com swirls azuis, então entra em `screen`: soma luz sobre a arte e o
+ * preto não pinta nada. As medidas alinham o vão do painel do vídeo (29.06% a
+ * 78.44% da largura) com o painel da nossa arte.
+ */
+.lp-office-glow {
+  position: absolute;
+  top: -12.3%;
+  left: 0.15%;
+  width: 97.2%;
+  height: 110.4%;
+  mix-blend-mode: screen;
+  pointer-events: none;
+}
+
+/*
+ * Retângulo do painel medido no próprio PNG (48% x 56.883%, centrado em
+ * 52.39%/40.679%), com 1.5% a mais: na medida exata a moldura branca queimada
+ * na arte encosta na nossa e aparece como borda dupla.
+ *
+ * O painel tem proporção 1.553 e o vídeo é 16:9, então sobra vídeo. Alargá-lo
+ * até caber inteiro cobriria os nomes das salas ao redor, então cortamos —
+ * ancorado à direita, que é onde ficam as miniaturas dos participantes. O que
+ * sai é a faixa esquerda do quadro principal, só parede.
+ */
+.lp-office-screen {
+  position: absolute;
+  top: 11.81%;
+  left: 28.03%;
+  width: 48.72%;
+  height: 57.74%;
+  overflow: hidden;
+  background: #0b0b0d;
+  border: max(2px, 0.26cqw) solid #fff;
+  border-radius: clamp(8px, 0.73cqw, 28px);
+}
+
+.lp-office-video {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: right center;
+}
+
+.lp-office-head {
+  position: absolute;
+  top: 4%;
+  left: 3%;
+  display: flex;
+  flex-direction: column;
+  gap: 0.35em;
+  color: #fff;
+  font-size: clamp(9px, 1.15cqw, 17px);
+  line-height: 1.2;
+  text-shadow: 0 1px 6px rgba(0, 0, 0, 0.45);
+}
+
+.lp-office-head strong {
+  font-weight: 500;
+}
+
+.lp-office-head span {
+  font-size: 0.8em;
+  color: rgba(255, 255, 255, 0.85);
+}
+
+.lp-office-controls {
+  position: absolute;
+  inset: auto 0 6%;
+  display: flex;
+  justify-content: center;
+  gap: 1.6%;
+}
+
+.lp-office-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: clamp(14px, 1.7cqw, 34px);
+  aspect-ratio: 1;
+  color: #fff;
+  background: rgba(60, 60, 66, 0.72);
+  border-radius: 50%;
+}
+
+.lp-office-btn-end {
+  background: #e8382f;
+}
+
+.lp-office-btn svg {
+  width: 52%;
+  height: 52%;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+/* Cards Rive da seção "Evolução" --------------------------------------- */
+
+/* Larguras e altura vêm do huly.io: 428/768 x 420, com gap de 20px. */
+.lp-prod-grid {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 20px;
+  max-width: 1216px;
+  margin: 56px auto 0;
+  padding: 0;
+  list-style: none;
+}
+
+.lp-prod-card {
+  position: relative;
+  height: 420px;
+  overflow: hidden;
+  background: #0c0c0e;
+  border: 1px solid rgba(255, 255, 255, 0.07);
+  border-radius: 12px;
+}
+
+.lp-prod-narrow {
+  width: 428px;
+}
+
+.lp-prod-wide {
+  width: 768px;
+}
+
+.lp-prod-anim,
+.lp-prod-video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  pointer-events: none;
+}
+
+.lp-prod-txt {
+  position: absolute;
+  inset: auto 0 0;
+  z-index: 10;
+  margin: 0;
+  padding: 24px;
+  font-size: 15px;
+  font-weight: 300;
+  line-height: 1.35;
+  color: rgba(255, 255, 255, 0.65);
+  /* Sem o degradê o texto some sobre as partes claras da animação. */
+  background: linear-gradient(180deg, rgba(9, 10, 12, 0), #090a0c 62%);
+}
+
+.lp-prod-wide .lp-prod-txt {
+  max-width: 460px;
+}
+
+.lp-prod-txt strong {
+  font-weight: 500;
+  color: #fff;
+}
+
+@media (max-width: 1263px) {
+  .lp-prod-grid {
+    max-width: 720px;
+  }
+
+  .lp-prod-card {
+    width: 100%;
+    height: auto;
+    /* Mantém a proporção da arte larga; a estreita é recortada pelo Fit.Cover. */
+    aspect-ratio: 1.82857;
+  }
+}
+
+@media (max-width: 599px) {
+  .lp-prod-card {
+    aspect-ratio: 1.45;
+  }
+
+  .lp-prod-txt {
+    padding: 20px;
+    font-size: 14px;
+  }
+}
+
 /* Placeholder de asset ausente ---------------------------------------- */
 
 .lp-asset-fallback {

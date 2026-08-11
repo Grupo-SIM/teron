@@ -1,10 +1,13 @@
 import { Asset } from "@/components/landing/asset";
 import { Bento } from "@/components/landing/bento";
 import { Faq } from "@/components/landing/faq";
+import { Knowledge } from "@/components/landing/knowledge";
 import { LogosMarquee } from "@/components/landing/logos-marquee";
 import { RevealObserver } from "@/components/landing/reveal-observer";
+import { RiveCard } from "@/components/landing/rive-card";
 import { SiteHeader } from "@/components/landing/site-header";
 import { SocialIcons } from "@/components/landing/social-icons";
+import { VideoBlock } from "@/components/landing/video-block";
 
 const PROBLEMS = [
   {
@@ -286,12 +289,7 @@ export default function Home() {
           </p>
         </div>
         <div data-reveal style={{ margin: "40px auto 0", maxWidth: 1600 }}>
-          <Asset
-            src="/assets/video-block.png"
-            alt=""
-            ratio="21 / 9"
-            style={{ width: "100%", display: "block" }}
-          />
+          <VideoBlock />
         </div>
         <div
           style={{
@@ -399,49 +397,40 @@ export default function Home() {
             Uma plataforma feita para evoluir junto com sua equipe.
           </h2>
           <Asset
-            src="/assets/logo-mark.png"
+            src="/assets/teronwhite.svg"
             alt=""
-            ratio="1 / 1"
+            ratio="595 / 550"
             style={{ width: 118, height: "auto", display: "block" }}
           />
         </div>
-        <div data-reveal style={{ maxWidth: 1330, margin: "56px auto 0" }}>
-          <Asset
-            src="/assets/evo-1.png"
-            alt=""
-            ratio="21 / 9"
-            style={{ width: "100%", display: "block" }}
+        <ul className="lp-prod-grid">
+          <RiveCard
+            src="/animations/hotkeys.riv"
+            title="Atalhos de teclado."
+            text="Trabalhe com eficiência e acesso instantâneo às ações mais comuns."
           />
-        </div>
-        <div
-          style={{
-            maxWidth: 1330,
-            margin: "34px auto 0",
-            display: "flex",
-            gap: 30,
-            alignItems: "center",
-            justifyContent: "center",
-            flexWrap: "wrap",
-          }}
-        >
-          <div data-reveal style={{ flex: "1 1 420px", minWidth: 0 }}>
-            <Asset
-              src="/assets/evo-2.png"
-              alt=""
-              ratio="16 / 9"
-              style={{ width: "100%", display: "block" }}
-            />
-          </div>
-          <div data-reveal style={{ width: 300, maxWidth: "60%" }}>
-            <Asset
-              src="/assets/orb.png"
-              alt=""
-              ratio="1 / 1"
-              style={{ width: "100%", display: "block" }}
-            />
-          </div>
-        </div>
+          <RiveCard
+            src="/animations/team-planner.riv"
+            title="Planner da equipe."
+            text="Acompanhe o quadro geral visualizando todas as tarefas individuais em um calendário único da equipe."
+            variant="wide"
+          />
+          <RiveCard
+            src="/animations/time-blocking.riv"
+            title="Blocos de tempo."
+            text="Transforme as tarefas do dia em blocos de tempo estruturados para manter o foco."
+            variant="wide"
+          />
+          <RiveCard
+            src="/animations/notifications.riv"
+            title="Notificações."
+            text="Fique por dentro de cada mudança recebendo notificações instantâneas."
+            video="/assets/waves.webm"
+          />
+        </ul>
       </section>
+
+      <Knowledge />
 
       {/* Clientes ------------------------------------------------------ */}
       <section id="clientes" style={{ padding: "110px 24px 0" }}>
