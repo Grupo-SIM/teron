@@ -172,13 +172,17 @@ jobs:
             done
           done
 
+      - name: Archive Docker build contexts
+        run: tar -czf docker-build-contexts.tar.gz -C docker-contexts .
+
       - name: Upload Docker build contexts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v7
         with:
           name: docker-build-contexts-${{ github.sha }}
           if-no-files-found: error
           retention-days: 1
-          path: docker-contexts/
+          compression-level: 0
+          path: docker-build-contexts.tar.gz
 
   publish:
     name: Build and publish ${{ matrix.image }} image
@@ -228,10 +232,13 @@ jobs:
         uses: actions/checkout@v6
 
       - name: Download Docker build contexts
-        uses: actions/download-artifact@v5
+        uses: actions/download-artifact@v8
         with:
           name: docker-build-contexts-${{ github.sha }}
-          path: .
+          path: .artifacts
+
+      - name: Extract Docker build contexts
+        run: tar -xzf .artifacts/docker-build-contexts.tar.gz -C .
 
       - name: Build and publish image
         uses: hyoretsu/gh-actions/ghcr@main
