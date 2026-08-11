@@ -1,12 +1,13 @@
 import { Asset } from "@/components/landing/asset";
 import { Bento } from "@/components/landing/bento";
 import { Faq } from "@/components/landing/faq";
+import { GithubSync } from "@/components/landing/github-sync";
 import { Knowledge } from "@/components/landing/knowledge";
 import { LogosMarquee } from "@/components/landing/logos-marquee";
 import { RevealObserver } from "@/components/landing/reveal-observer";
 import { RiveCard } from "@/components/landing/rive-card";
+import { SiteFooter } from "@/components/landing/site-footer";
 import { SiteHeader } from "@/components/landing/site-header";
-import { SocialIcons } from "@/components/landing/social-icons";
 import { VideoBlock } from "@/components/landing/video-block";
 
 const PROBLEMS = [
@@ -371,7 +372,7 @@ export default function Home() {
       </section>
 
       {/* Evolução ------------------------------------------------------ */}
-      <section style={{ padding: "130px 24px 0" }}>
+      <section id="evolucao" style={{ padding: "130px 24px 0" }}>
         <div
           style={{
             maxWidth: 1240,
@@ -431,6 +432,8 @@ export default function Home() {
       </section>
 
       <Knowledge />
+
+      <GithubSync />
 
       {/* Clientes ------------------------------------------------------ */}
       <section id="clientes" style={{ padding: "110px 24px 0" }}>
@@ -559,35 +562,7 @@ export default function Home() {
         </div>
       </section>
 
-      <footer style={{ padding: "40px 24px 40px" }}>
-        <div style={{ maxWidth: 1240, margin: "0 auto" }}>
-          <div style={{ textAlign: "center", marginBottom: 40 }}>
-            <Asset
-              src="/assets/logo-footer.png"
-              alt="huly"
-              ratio="4 / 1"
-              style={{
-                height: 44,
-                width: "auto",
-                display: "inline-block",
-              }}
-            />
-          </div>
-          <div className="lp-footer-bar">
-            <span>© {new Date().getFullYear()} Huly Labs. Todos os direitos reservados.</span>
-            <span style={{ display: "flex", gap: 26 }}>
-              <a href="#faq" className="lp-footer-link">
-                Termos de Serviço
-              </a>
-              <a href="#faq" className="lp-footer-link">
-                Política de Privacidade
-              </a>
-            </span>
-            <SocialIcons />
-            <span>Feito com paixão e Huly</span>
-          </div>
-        </div>
-      </footer>
+      <SiteFooter />
     </div>
   );
 }

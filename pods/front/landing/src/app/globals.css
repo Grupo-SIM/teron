@@ -18,6 +18,28 @@ body {
   background: #000;
 }
 
+/*
+ * Os links do topo são âncoras: sem isto o navegador pula direto para a seção,
+ * e o salto some com a noção de onde ela fica na página.
+ */
+html {
+  scroll-behavior: smooth;
+}
+
+/*
+ * Folga acima do alvo da âncora. O cabeçalho não é fixo, mas parar com o título
+ * colado no topo da janela dá a impressão de conteúdo cortado.
+ */
+[id] {
+  scroll-margin-top: 90px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+}
+
 body {
   color: var(--foreground);
   font-family: var(--font-manrope), system-ui, sans-serif;
@@ -985,17 +1007,27 @@ a {
 }
 
 /*
- * O item da grade precisa ocupar a linha inteira: `sticky` só desliza dentro da
- * caixa do pai, e com o item encolhido na altura do conteúdo não sobrava
- * percurso — o card subia junto com o texto em vez de acompanhar a seção.
+ * A coluna precisa ocupar a linha inteira: ela é o curso por onde o card desce,
+ * e encolhida na altura do conteúdo não sobraria percurso nenhum.
  */
 .lp-know-art {
+  position: relative;
   align-self: stretch;
 }
 
-.lp-know-stick {
-  position: sticky;
-  top: 120px;
+/*
+ * O card desce pela coluna: o deslocamento é escrito pelo componente em
+ * `transform`. Nada de `sticky` — sticky cravaria o card na tela, que é o
+ * oposto de descer junto com a rolagem.
+ */
+.lp-know-card {
+  position: relative;
+  /*
+   * Sem `transition` aqui: o alvo muda a cada quadro de scroll e cada mudança
+   * reiniciaria a curva do zero, deixando o card arrastado a ponto de parecer
+   * parado. O amortecimento é feito no componente.
+   */
+  will-change: transform;
 }
 
 /* A proporção real vem do artboard, escrita pelo componente ao carregar. */
@@ -1021,7 +1053,9 @@ a {
   left: 28%;
   color: #0b0b0d;
   opacity: 0;
-  transition: opacity 0.3s ease;
+  /* Cruza com folga: os dois textos se revezam no meio da virada do Rive, e um
+     corte curto demais deixa a troca seca no meio da animação. */
+  transition: opacity 0.5s ease;
   pointer-events: none;
 }
 
@@ -1323,7 +1357,6 @@ a {
   }
 
   .lp-know-art {
-    position: static;
     max-width: 380px;
   }
 
@@ -1538,6 +1571,141 @@ a {
   }
 }
 
+/* Integração com o GitHub ---------------------------------------------- */
+
+.lp-gh {
+  padding: 130px 24px 0;
+}
+
+.lp-gh-inner {
+  max-width: 1240px;
+  margin: 0 auto;
+}
+
+.lp-gh-title {
+  margin: 0;
+  font-size: clamp(30px, 4vw, 54px);
+  font-weight: 800;
+  line-height: 1.06;
+  letter-spacing: -0.035em;
+}
+
+.lp-gh-lead {
+  margin: 18px 0 0;
+  max-width: 60ch;
+  color: #a7a7ad;
+  font-size: 15px;
+  line-height: 1.6;
+}
+
+/*
+ * A janela fica menor que a coluna e centrada, como no huly.io: o brilho
+ * precisa de folga dos dois lados para vazar sem encostar na borda da tela.
+ */
+.lp-gh-shot {
+  position: relative;
+  max-width: 1010px;
+  margin: 84px auto 0;
+}
+
+/*
+ * O vídeo do brilho é maior que a janela: ele traz a moldura acesa e as duas
+ * luzes ao redor dela. A moldura fica em 252..1220 x 201.5..759.5 do quadro de
+ * 1472x1056 (medido no próprio arquivo), então o vídeo é dimensionado a partir
+ * dela — 968/558 da caixa da janela — para as duas bordas coincidirem.
+ *
+ * Entra em `screen`: o quadro é preto com as luzes, e no `screen` o preto não
+ * pinta nada. Sem recorte nenhum, que é o que deixa o halo vazar para fora.
+ */
+.lp-gh-glow {
+  position: absolute;
+  top: -36.11%;
+  left: -26.03%;
+  z-index: 0;
+  width: 152.07%;
+  height: 189.25%;
+  /* O preflight do Tailwind trava vídeo em `max-width: 100%`, e o brilho é
+     maior que a janela justamente por precisar sobrar dos dois lados. */
+  max-width: none;
+  /* A caixa já tem a proporção do arquivo; `fill` evita a tarja preta que o
+     `contain` deixaria se as duas divergissem por arredondamento. */
+  object-fit: fill;
+  mix-blend-mode: screen;
+  pointer-events: none;
+}
+
+/*
+ * Proporção do artboard do .riv (960x554) — a mesma da moldura do vídeo a menos
+ * de 0.1%, então a arte cai dentro do brilho sem sobra de nenhum lado.
+ *
+ * Sem fundo nem borda próprios: quem desenha a moldura é o vídeo, e uma chapa
+ * por cima do preto da página só apareceria como um retângulo mais claro atrás
+ * dela. O raio fica para recortar os cantos da arte.
+ */
+.lp-gh-window {
+  position: relative;
+  z-index: 1;
+  aspect-ratio: 960 / 554;
+  overflow: hidden;
+  border-radius: 14px;
+}
+
+.lp-gh-art {
+  width: 100%;
+  height: 100%;
+}
+
+/* Grade de recursos ----------------------------------------------------- */
+
+.lp-gh-feats {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 56px 40px;
+  margin: 110px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.lp-gh-feat-icon {
+  display: block;
+  width: 30px;
+  height: 30px;
+}
+
+.lp-gh-feat-title {
+  margin: 18px 0 10px;
+  font-size: 21px;
+  font-weight: 800;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+}
+
+.lp-gh-feat-txt {
+  margin: 0;
+  max-width: 34ch;
+  color: #9a9aa1;
+  font-size: 13.5px;
+  line-height: 1.6;
+}
+
+@media (max-width: 899px) {
+  .lp-gh-shot {
+    margin-top: 56px;
+  }
+
+  .lp-gh-feats {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 44px 28px;
+    margin-top: 72px;
+  }
+}
+
+@media (max-width: 599px) {
+  .lp-gh-feats {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}
+
 /* Placeholder de asset ausente ---------------------------------------- */
 
 .lp-asset-fallback {
@@ -1554,4 +1722,830 @@ a {
   letter-spacing: 0.04em;
   text-align: center;
   padding: 12px;
+}
+
+/* Página de planos ----------------------------------------------------- */
+
+/*
+ * O preto daqui é #090a0c, e não o #000 do resto do site, porque é o preto do
+ * vídeo dos raios. O arquivo não tem canal alpha: o fundo dele é essa cor, e
+ * qualquer diferença entre os dois desenha o retângulo do vídeo em volta do
+ * cartão aceso. Igualar as duas cores faz a caixa sumir sem depender de filtro
+ * nenhum — filtro sobre `<video>` nem sempre sobrevive ao caminho de composição
+ * da GPU, e aí o retângulo volta a aparecer só em algumas máquinas.
+ *
+ * A diferença para o #000 é de 3,5% de luminância: invisível dentro da página,
+ * que não tem preto de outra origem para comparar.
+ */
+.lp-pr-page {
+  position: relative;
+  flex: 1;
+  background: #090a0c;
+  color: #fff;
+  overflow-x: hidden;
+}
+
+.lp-pr {
+  position: relative;
+  padding: 212px 0 400px;
+}
+
+.lp-pr-inner {
+  max-width: 960px;
+  margin: 0 auto;
+  padding: 0 32px;
+}
+
+/* Título que existe para leitor de tela: na tela quem abre a página é o texto
+   corrido, não um cabeçalho. */
+.lp-pr-sr {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+.lp-pr-prose {
+  position: relative;
+  z-index: 3;
+  font-size: 36px;
+  font-weight: 500;
+  line-height: 1.75;
+  letter-spacing: -0.01em;
+  color: #fff;
+}
+
+.lp-pr-p {
+  margin: 0 0 64px;
+  text-wrap: pretty;
+}
+
+.lp-pr-p:last-of-type {
+  margin-bottom: 0;
+}
+
+/* Palavra apagada até a leitura chegar nela. Já nasce apagada no HTML — se
+   dependesse do JS para apagar, a página piscaria inteira acesa antes do
+   efeito começar. O `data-lit` vem do `WordsObserver`. */
+[data-word] {
+  opacity: 0.25;
+  transition: opacity 0.5s ease;
+}
+
+[data-word][data-lit="true"] {
+  opacity: 1;
+}
+
+.lp-pr-grad {
+  background: linear-gradient(
+    90deg,
+    #e4ffff 0.61%,
+    #628eff 24.99%,
+    #725eff 78.85%,
+    #ffdeff 99.78%
+  );
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  [data-word] {
+    opacity: 1;
+    transition: none;
+  }
+}
+
+/*
+ * Ícone animado no meio da frase.
+ *
+ * Escondido, a margem direita negativa engole a largura inteira dele e as
+ * palavras se fecham por cima; ao acender, a margem cresce e empurra o texto,
+ * abrindo espaço. As margens verticais negativas mantêm a linha na altura de
+ * sempre — o canvas é muito mais alto que o texto.
+ */
+.lp-pr-icon {
+  position: relative;
+  z-index: 20;
+  display: inline-block;
+  vertical-align: middle;
+  opacity: 0;
+  pointer-events: none;
+  transition:
+    margin-right 0.5s cubic-bezier(0.42, 0, 0.09, 1),
+    opacity 0.15s ease;
+}
+
+.lp-pr-icon[data-shown="true"] {
+  opacity: 1;
+  transition:
+    margin-right 0.8s cubic-bezier(0.42, 0, 0.09, 1),
+    opacity 0.2s ease 0.2s;
+}
+
+.lp-pr-icon-art {
+  display: block;
+  width: 100%;
+  height: 100%;
+  transform: scale(0);
+  transform-origin: left center;
+  transition: transform 0.5s cubic-bezier(0.42, 0, 0.09, 1);
+}
+
+.lp-pr-icon[data-shown="true"] .lp-pr-icon-art {
+  transform: scale(1);
+  transition: transform 0.7s cubic-bezier(0.42, 0, 0.09, 1) 0.1s;
+}
+
+.lp-pr-icon-art canvas {
+  width: 100% !important;
+  height: 100% !important;
+}
+
+/* Ícone e palavra que ele ilustra andam juntos: a quebra de linha não pode
+   deixar um sem o outro. */
+.lp-pr-keep {
+  white-space: nowrap;
+}
+
+/* Quebra fixa, para a linha não se rearranjar quando os ícones acendem. Some
+   nas telas em que a linha inteira não caberia, e aí a quebra volta a ser do
+   navegador — que ali é o comportamento certo. */
+@media (max-width: 1023px) {
+  .lp-pr-br {
+    display: none;
+  }
+}
+
+/* Marca girando encaixada na primeira frase. As margens negativas tiram a
+   altura dela do fluxo para o parágrafo não abrir um buraco de 168px. */
+.lp-pr-mark {
+  position: relative;
+  display: inline-block;
+  width: 168px;
+  height: 168px;
+  margin: -79px -46px;
+  vertical-align: middle;
+  pointer-events: none;
+}
+
+.lp-pr-mark-glow {
+  position: absolute;
+  inset: 0;
+  border-radius: 50%;
+  background: conic-gradient(
+    from 0deg,
+    rgba(98, 142, 255, 0) 0deg,
+    rgba(98, 142, 255, 0.5) 90deg,
+    rgba(114, 94, 255, 0.35) 180deg,
+    rgba(255, 222, 255, 0.28) 260deg,
+    rgba(98, 142, 255, 0) 360deg
+  );
+  filter: blur(26px);
+  animation: lp-pr-spin 12s linear infinite;
+}
+
+.lp-pr-mark-img {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 58px;
+  height: 58px;
+  transform: translate(-50%, -50%);
+}
+
+@keyframes lp-pr-spin {
+  to {
+    transform: rotate(1turn);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .lp-pr-mark-glow {
+    animation: none;
+  }
+}
+
+/* Régua de planos ------------------------------------------------------ */
+
+.lp-pr-rail-wrap {
+  position: relative;
+  z-index: 1;
+  margin: -208px 0;
+}
+
+/*
+ * A faixa sangra até a borda da janela: as porcentagens resolvem contra a
+ * largura do container de texto, então a margem negativa abre e o padding
+ * devolve o recuo — o primeiro cartão nasce alinhado ao texto.
+ *
+ * O padding vertical grande é o respiro do brilho: `overflow-x: auto` corta
+ * também na vertical, e sem folga o glow do cartão aceso sumiria.
+ */
+.lp-pr-rail {
+  display: flex;
+  margin: 0 calc((100% - 100vw) / 2);
+  padding: 320px calc((100vw - 100%) / 2);
+  overflow-x: auto;
+  overscroll-behavior-x: contain;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  -webkit-mask-image: linear-gradient(
+    270deg,
+    rgba(115, 115, 115, 0) 9.82%,
+    #d9d9d9 30.43%,
+    #d9d9d9 78.87%,
+    rgba(217, 217, 217, 0) 99.54%
+  );
+  mask-image: linear-gradient(
+    270deg,
+    rgba(115, 115, 115, 0) 9.82%,
+    #d9d9d9 30.43%,
+    #d9d9d9 78.87%,
+    rgba(217, 217, 217, 0) 99.54%
+  );
+}
+
+.lp-pr-rail::-webkit-scrollbar {
+  display: none;
+}
+
+.lp-pr-track {
+  display: flex;
+  flex: none;
+}
+
+.lp-pr-card {
+  position: relative;
+  display: flex;
+  flex: none;
+  flex-direction: column;
+  width: 390px;
+  aspect-ratio: 0.7372;
+  margin-right: 56px;
+  padding: 28px 28px 25px;
+  color: #fff;
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 24px;
+  scroll-snap-align: center;
+  cursor: pointer;
+  transition:
+    background 0.2s ease,
+    box-shadow 0.2s ease;
+}
+
+/* Apagado é o estado com fundo chapado. O aceso abre mão dele para deixar
+   passar o vidro e os raios que vêm nas camadas de baixo. */
+.lp-pr-card[data-active="false"] {
+  background: rgb(13 15 17 / 40%);
+  box-shadow: 4px 6px 25px rgba(0, 0, 0, 0.56);
+}
+
+/*
+ * Raios do plano. O vídeo é bem maior que o cartão e fica deslocado para cima e
+ * para a esquerda, que é de onde o brilho nasce. Como o arquivo não tem canal
+ * alpha, quem dissolve a borda retangular dele é a máscara aplicada aqui.
+ *
+ * A máscara vai no container, e não num PNG por cima do vídeo, porque o Chrome
+ * no Windows promove `<video>` a overlay de hardware: nesse caminho o vídeo é
+ * composto fora da ordem de pintura da página, ignora filtro e passa por cima
+ * de qualquer elemento sobreposto — o esfumaçado simplesmente sumia e o
+ * retângulo do vídeo aparecia cortado a régua. Máscara no pai obriga o vídeo a
+ * ser rasterizado junto com a página, e aí a borda some de verdade.
+ *
+ * `z-index` negativo é o que segura a caixa atrás de todos os cartões, e não só
+ * do dono dela. O cartão não abre contexto de empilhamento próprio, então o -1
+ * sobe até a régua: a caixa passa a ser pintada antes de qualquer cartão, o raio
+ * atravessa o vão entre eles e o retângulo preto do vídeo não cobre vizinho
+ * nenhum. Dar `z-index` ao cartão aceso faria justamente o contrário.
+ */
+.lp-pr-bolt {
+  position: absolute;
+  left: -70%;
+  top: -300px;
+  z-index: -1;
+  width: 1000px;
+  aspect-ratio: 0.925925;
+  opacity: 0;
+  pointer-events: none;
+  user-select: none;
+  /* Apagar é mais rápido que acender: com os dois tempos iguais, o cartão que
+     sai e o que entra ficam acesos juntos por quase um segundo. */
+  transition: opacity 0.3s ease;
+  -webkit-mask:
+    url("/assets/plan-mask.png") center / 100% 100% no-repeat;
+  mask: url("/assets/plan-mask.png") center / 100% 100% no-repeat;
+}
+
+.lp-pr-card[data-active="true"] .lp-pr-bolt {
+  opacity: 1;
+  transition: opacity 0.8s ease 0.1s;
+}
+
+.lp-pr-bolt-video {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  max-width: none;
+  object-fit: cover;
+}
+
+
+/* Vidro do cartão aceso: um SVG só, com os degradês e a borda que o CSS não
+   reproduz sem virar meia dúzia de camadas.
+
+   Nenhuma destas camadas usa `z-index`: a ordem no DOM já é a profundidade
+   (raios, vidro, conteúdo), e um `z-index` aqui saltaria por cima do conteúdo,
+   que só tem `position: relative`. */
+.lp-pr-glass {
+  position: absolute;
+  inset: -1px;
+  border-radius: inherit;
+  opacity: 0;
+  pointer-events: none;
+  user-select: none;
+  transition: opacity 0.5s ease;
+}
+
+.lp-pr-glass img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border-radius: inherit;
+}
+
+.lp-pr-card[data-active="true"] .lp-pr-glass {
+  opacity: 1;
+}
+
+.lp-pr-name {
+  position: relative;
+  margin: 0;
+  font-size: 20px;
+  font-weight: 600;
+  line-height: 1.375;
+  letter-spacing: -0.02em;
+}
+
+.lp-pr-price {
+  position: relative;
+  margin: 10px 0 0;
+  line-height: 1.375;
+}
+
+.lp-pr-amount {
+  font-size: 64px;
+  font-weight: 600;
+  letter-spacing: -0.03em;
+}
+
+/* Sem tabela fechada o lugar do número recebe um rótulo; o corpo menor é para
+   caber na largura do cartão. */
+.lp-pr-amount-soon {
+  font-size: 44px;
+}
+
+.lp-pr-cents,
+.lp-pr-per {
+  margin-left: 4px;
+  color: #c9cbcf;
+  font-size: 20px;
+  font-weight: 500;
+  letter-spacing: -0.02em;
+}
+
+.lp-pr-txt {
+  position: relative;
+  margin: 4px 0 0;
+  padding-right: 12px;
+  font-size: 18px;
+  font-weight: 500;
+  line-height: 1.375;
+  letter-spacing: -0.03em;
+}
+
+/* `position: relative` em todo o conteúdo do cartão: sem isso ele pintaria
+   antes das camadas de vidro e brilho, que são posicionadas. */
+.lp-pr-rule {
+  position: relative;
+  display: block;
+  margin-top: 18px;
+  height: 1px;
+  background: rgba(255, 255, 255, 0.1);
+}
+
+.lp-pr-items {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  margin: 24px 0 0;
+  padding: 0;
+  list-style: none;
+}
+
+.lp-pr-items li {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 18px;
+  line-height: 1.1;
+  letter-spacing: -0.02em;
+  color: rgba(255, 255, 255, 0.9);
+}
+
+.lp-pr-items svg {
+  flex: none;
+  width: 16px;
+  height: 16px;
+  color: #fff;
+}
+
+.lp-pr-cta {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-top: auto;
+  height: 56px;
+  width: 100%;
+  color: #fff;
+  font-size: 18px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  background: transparent;
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.14);
+  border-radius: 999px;
+  transition:
+    background 0.3s ease,
+    box-shadow 0.3s ease,
+    color 0.3s ease;
+}
+
+.lp-pr-cta:hover {
+  background: rgba(255, 255, 255, 0.08);
+  color: #fff;
+}
+
+/* Só o cartão aceso leva o botão chapado — os apagados ficam no contorno. */
+.lp-pr-card[data-active="true"] .lp-pr-cta {
+  color: #000;
+  background: #fff;
+  box-shadow: none;
+}
+
+.lp-pr-card[data-active="true"] .lp-pr-cta:hover {
+  background: rgba(255, 255, 255, 0.85);
+  color: #000;
+}
+
+.lp-pr-tip {
+  position: relative;
+  display: inline-flex;
+  margin-left: 4px;
+  vertical-align: middle;
+  color: #7c7c85;
+  outline: none;
+  transition: color 0.2s ease;
+}
+
+.lp-pr-tip:hover,
+.lp-pr-tip:focus-visible {
+  color: #fff;
+}
+
+.lp-pr-tip svg {
+  width: 16px;
+  height: 16px;
+  color: inherit;
+}
+
+.lp-pr-tip-bubble {
+  position: absolute;
+  bottom: calc(100% + 10px);
+  left: 50%;
+  z-index: 5;
+  width: 230px;
+  padding: 10px 12px;
+  transform: translate(-50%, 6px);
+  color: #c9cbcf;
+  font-size: 13px;
+  font-weight: 500;
+  line-height: 1.45;
+  letter-spacing: 0;
+  text-align: left;
+  background: #15161a;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 10px;
+  box-shadow: 0 14px 34px rgba(0, 0, 0, 0.55);
+  opacity: 0;
+  visibility: hidden;
+  transition:
+    opacity 0.2s ease,
+    transform 0.2s ease,
+    visibility 0.2s;
+}
+
+.lp-pr-tip:hover .lp-pr-tip-bubble,
+.lp-pr-tip:focus-visible .lp-pr-tip-bubble {
+  opacity: 1;
+  visibility: visible;
+  transform: translate(-50%, 0);
+}
+
+/*
+ * Chamada de contato. `flex` põe o link em linha própria abaixo da pergunta,
+ * sem precisar de um parágrafo só para ele.
+ *
+ * A entrada é em três tempos, como a do artboard que ele substitui: o avião
+ * chega deslizando, o texto sobe e o sublinhado se desenha da esquerda para a
+ * direita. Mesma curva de aceleração dos ícones do texto.
+ */
+.lp-pr-contact {
+  display: flex;
+  width: fit-content;
+  align-items: center;
+  gap: 0.36em;
+  margin-top: 0.4em;
+  color: #4aa3ff;
+  font-weight: 700;
+  text-decoration: none;
+  transition: color 0.2s ease;
+}
+
+.lp-pr-contact:hover {
+  color: #8cc4ff;
+}
+
+.lp-pr-contact-plane {
+  flex: none;
+  width: 0.72em;
+  height: 0.72em;
+  opacity: 0;
+  transform: translate(-0.7em, 0.4em) rotate(-16deg);
+  transition:
+    opacity 0.3s ease,
+    transform 0.7s cubic-bezier(0.42, 0, 0.09, 1);
+}
+
+.lp-pr-contact[data-shown="true"] .lp-pr-contact-plane {
+  opacity: 1;
+  transform: none;
+}
+
+.lp-pr-contact-text {
+  position: relative;
+  display: inline-block;
+  opacity: 0;
+  transform: translateY(0.2em);
+  transition:
+    opacity 0.35s ease 0.1s,
+    transform 0.6s cubic-bezier(0.42, 0, 0.09, 1) 0.1s;
+}
+
+.lp-pr-contact[data-shown="true"] .lp-pr-contact-text {
+  opacity: 1;
+  transform: none;
+}
+
+/* Sublinhado próprio, e não `text-decoration`, porque só assim ele pode ser
+   desenhado da esquerda para a direita. */
+.lp-pr-contact-text::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: -0.16em;
+  height: 2px;
+  background: currentColor;
+  transform: scaleX(0);
+  transform-origin: left center;
+  transition: transform 0.6s cubic-bezier(0.42, 0, 0.09, 1) 0.25s;
+}
+
+.lp-pr-contact[data-shown="true"] .lp-pr-contact-text::after {
+  transform: none;
+}
+
+/* Depois das regras de entrada: o avião avança no hover e precisa vencer o
+   `transform: none` do estado aceso. */
+.lp-pr-contact[data-shown="true"]:hover .lp-pr-contact-plane {
+  transform: translateX(0.2em);
+  transition: transform 0.25s ease;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .lp-pr-contact-plane,
+  .lp-pr-contact-text,
+  .lp-pr-contact-text::after {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+}
+
+.lp-pr-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+  margin: 44px 0 0;
+}
+
+.lp-pr-action {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 56px;
+  padding: 0 32px;
+  color: #000;
+  font-size: 18px;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+  background: #fff;
+  border-radius: 999px;
+  transition: background 0.3s ease;
+}
+
+.lp-pr-action:hover {
+  background: rgba(255, 255, 255, 0.85);
+  color: #000;
+}
+
+.lp-pr-action-ghost {
+  color: #fff;
+  background: transparent;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+}
+
+.lp-pr-action-ghost:hover {
+  color: #fff;
+  background: transparent;
+  border-color: rgba(255, 255, 255, 0.5);
+}
+
+@media (max-width: 1279px) {
+  .lp-pr {
+    padding: 168px 0 400px;
+  }
+
+  .lp-pr-inner {
+    max-width: 860px;
+  }
+
+  .lp-pr-prose {
+    font-size: 32px;
+  }
+
+  .lp-pr-p {
+    margin-bottom: 56px;
+  }
+
+  .lp-pr-amount {
+    font-size: 56px;
+  }
+
+  .lp-pr-amount-soon {
+    font-size: 40px;
+  }
+
+  .lp-pr-card {
+    margin-right: 48px;
+  }
+}
+
+@media (max-width: 1023px) {
+  .lp-pr {
+    padding: 145px 0 360px;
+  }
+
+  .lp-pr-inner {
+    max-width: 635px;
+  }
+
+  .lp-pr-prose {
+    font-size: 28px;
+  }
+
+  .lp-pr-p {
+    margin-bottom: 48px;
+  }
+
+  .lp-pr-mark {
+    width: 140px;
+    height: 140px;
+    margin: -65px -40px;
+  }
+
+  .lp-pr-mark-img {
+    width: 50px;
+    height: 50px;
+  }
+
+  .lp-pr-card {
+    width: 366px;
+  }
+
+  .lp-pr-amount {
+    font-size: 48px;
+  }
+
+  .lp-pr-amount-soon {
+    font-size: 36px;
+  }
+}
+
+@media (max-width: 767px) {
+  .lp-pr {
+    padding: 109px 0 300px;
+  }
+
+  .lp-pr-inner {
+    max-width: 470px;
+  }
+
+  .lp-pr-prose {
+    font-size: 20px;
+    line-height: 1.65;
+  }
+
+  .lp-pr-p {
+    margin-bottom: 32px;
+  }
+
+  .lp-pr-mark {
+    width: 104px;
+    height: 104px;
+    margin: -46px -30px;
+  }
+
+  .lp-pr-mark-img {
+    width: 36px;
+    height: 36px;
+  }
+
+  /* Sem a máscara nas bordas: em tela estreita ela apaga justamente o cartão
+     que está sendo lido. */
+  .lp-pr-rail {
+    padding-top: 200px;
+    padding-bottom: 200px;
+    -webkit-mask-image: none;
+    mask-image: none;
+  }
+
+  .lp-pr-rail-wrap {
+    margin: -140px 0;
+  }
+
+  .lp-pr-card {
+    width: 91vw;
+    max-width: 366px;
+    margin-right: 20px;
+    padding: 19px;
+  }
+
+  .lp-pr-name,
+  .lp-pr-cents,
+  .lp-pr-per,
+  .lp-pr-txt,
+  .lp-pr-items li,
+  .lp-pr-cta,
+  .lp-pr-action {
+    font-size: 16px;
+  }
+
+  .lp-pr-amount {
+    font-size: 36px;
+  }
+
+  .lp-pr-amount-soon {
+    font-size: 30px;
+  }
+
+  .lp-pr-items {
+    gap: 12px;
+    margin-top: 16px;
+  }
+
+  .lp-pr-cta,
+  .lp-pr-action {
+    height: 40px;
+  }
+}
+
+@media (max-width: 479px) {
+  .lp-pr-inner {
+    max-width: 410px;
+    padding: 0 20px;
+  }
+
+  .lp-pr-card {
+    width: 288px;
+  }
 }

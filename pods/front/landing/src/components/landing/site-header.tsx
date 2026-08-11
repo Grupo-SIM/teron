@@ -3,19 +3,24 @@
 import { useEffect, useState } from "react";
 import { Asset } from "./asset";
 
-const DESKTOP_LINKS = [
-  { href: "#plataforma", label: "Solutions" },
-  { href: "#plataforma", label: "Platform" },
-  { href: "#clientes", label: "Community" },
-  { href: "#faq", label: "Resources" },
-  { href: "#operacao", label: "Enterprise" },
-  { href: "#comecar", label: "Pricing" },
-];
-
-const MOBILE_LINKS = [
-  { href: "#plataforma", label: "Plataforma" },
-  { href: "#operacao", label: "Operação" },
-  { href: "#faq", label: "FAQ" },
+/*
+ * Uma entrada por seção da página, na ordem em que elas aparecem — o topo serve
+ * de índice, e link que pula para trás confunde quem está lendo de cima a
+ * baixo. O menu do celular repete a mesma lista para não haver duas versões do
+ * que a página tem.
+ *
+ * As âncoras levam a raiz junto (`/#...`) porque o cabeçalho também aparece em
+ * `/precos`: sem o caminho o link cairia numa seção que não existe ali. Na
+ * própria home o navegador trata `/#x` como salto na mesma página, então a
+ * rolagem suave continua valendo.
+ */
+const LINKS = [
+  { href: "/#plataforma", label: "Plataforma" },
+  { href: "/#operacao", label: "Operação" },
+  { href: "/#conhecimento", label: "Conhecimento" },
+  { href: "/#github", label: "GitHub" },
+  { href: "/precos", label: "Preços" },
+  { href: "/#faq", label: "FAQ" },
 ];
 
 export function SiteHeader() {
@@ -70,7 +75,7 @@ export function SiteHeader() {
           className="lp-desktop-only"
           style={{ gap: 26, fontSize: 14, fontWeight: 500 }}
         >
-          {DESKTOP_LINKS.map((link) => (
+          {LINKS.map((link) => (
             <a key={link.label} href={link.href} className="lp-navlink">
               {link.label}
             </a>
@@ -142,7 +147,7 @@ export function SiteHeader() {
           </div>
 
           <nav className="lp-menu-links">
-            {MOBILE_LINKS.map((link) => (
+            {LINKS.map((link) => (
               <a
                 key={link.label}
                 href={link.href}
