@@ -16,93 +16,49 @@ import { useEffect, useRef, useState } from "react";
  */
 
 /**
- * Valores ainda não fechados. Quando a tabela sair, basta preencher `price`
- * (`{ int: "199", cents: "90" }`) que o cartão troca de "Em breve" para o
- * número — o espaço já está reservado no layout.
+ * `price` aceita três formas: `"free"` escreve "Grátis", um objeto escreve o
+ * valor (`{ int: "9", cents: "99", per: "por usuário" }`) e `null` deixa o
+ * cartão em "Em breve" — o espaço no layout é o mesmo nos três casos.
  */
 type Plan = {
   name: string;
+  /**
+   * Chave dos assets em `public`: o vídeo do raio (`/videos/planos/<slug>`) e o
+   * SVG do vidro (`/assets/plan-card-<slug>.svg`), que trazem a cor do cartão.
+   * Por isso ela não acompanha o nome do plano.
+   */
   slug: string;
-  price: { int: string; cents?: string } | null;
+  price: "free" | { int: string; cents?: string; per: string } | null;
   text: string;
+  cta: string;
   items: { label: string; tip?: string }[];
 };
 
 const PLANS: Plan[] = [
   {
-    name: "Essencial",
+    name: "Free",
     slug: "essencial",
-    price: null,
-    text: "Para pessoas e times dando os primeiros passos na Teron.",
+    price: "free",
+    text: "Para experimentar a plataforma com o time inteiro.",
+    cta: "Começar grátis",
     items: [
       { label: "Usuários ilimitados" },
-      { label: "Objetos Teron ilimitados" },
-      {
-        label: "10GB de armazenamento",
-        tip: "Vale por workspace. Conta anexos, imagens e vídeos; os objetos da Teron não ocupam essa cota.",
-      },
-      {
-        label: "10GB de tráfego de mídia",
-        tip: "Só chamadas de áudio e vídeo consomem tráfego de rede.",
-      },
-      { label: "IA — a definir" },
+      { label: "Armazenamento básico incluso" },
+      { label: "Chamadas de vídeo ilimitadas" },
+      { label: "Limitado a 1 mês de uso" },
     ],
   },
   {
-    name: "Time",
-    slug: "time",
-    price: null,
-    text: "Para equipes que precisam de planejamento, calendário e integrações.",
-    items: [
-      { label: "Usuários ilimitados" },
-      { label: "Objetos Teron ilimitados" },
-      {
-        label: "100GB de armazenamento",
-        tip: "Vale por workspace. Conta anexos, imagens e vídeos; os objetos da Teron não ocupam essa cota.",
-      },
-      {
-        label: "100GB de tráfego de mídia",
-        tip: "Só chamadas de áudio e vídeo consomem tráfego de rede.",
-      },
-      { label: "IA — a definir" },
-    ],
-  },
-  {
-    name: "Empresa",
+    name: "Empresas",
     slug: "empresa",
-    price: null,
-    text: "Para empresas e operações que exigem controle, suporte e escala.",
+    price: { int: "9", cents: "99", per: "por usuário" },
+    text: "Para o time que fica, sem teto de armazenamento.",
+    cta: "Começar agora",
     items: [
       { label: "Usuários ilimitados" },
-      { label: "Objetos Teron ilimitados" },
-      {
-        label: "1TB de armazenamento",
-        tip: "Vale por workspace. Conta anexos, imagens e vídeos; os objetos da Teron não ocupam essa cota.",
-      },
-      {
-        label: "500GB de tráfego de mídia",
-        tip: "Só chamadas de áudio e vídeo consomem tráfego de rede.",
-      },
-      { label: "IA — a definir" },
-    ],
-  },
-  {
-    name: "Ilimitado",
-    slug: "ilimitado",
-    price: null,
-    text: "Para várias equipes que precisam da capacidade máxima da plataforma.",
-    items: [
-      { label: "Usuários ilimitados" },
-      { label: "Objetos Teron ilimitados" },
-      {
-        label: "10TB de armazenamento",
-        tip: "Vale por workspace. Conta anexos, imagens e vídeos; os objetos da Teron não ocupam essa cota.",
-      },
-      {
-        label: "2TB de tráfego de mídia",
-        tip: "Só chamadas de áudio e vídeo consomem tráfego de rede.",
-      },
-      { label: "IA — a definir" },
+      { label: "Armazenamento básico incluso" },
+      { label: "Chamadas de vídeo ilimitadas" },
+      { label: "Armazenamento criptografado ilimitado" },
     ],
   },
 ];
@@ -240,13 +196,15 @@ export function PricingPlans() {
                 <h3 className="lp-pr-name">{plan.name}</h3>
 
                 <p className="lp-pr-price">
-                  {plan.price ? (
+                  {plan.price === "free" ? (
+                    <span className="lp-pr-amount">Grátis</span>
+                  ) : plan.price ? (
                     <>
                       <span className="lp-pr-amount">R$ {plan.price.int}</span>
                       {plan.price.cents ? (
                         <span className="lp-pr-cents">,{plan.price.cents}</span>
                       ) : null}
-                      <span className="lp-pr-per">/mensal</span>
+                      <span className="lp-pr-per">{plan.price.per}</span>
                     </>
                   ) : (
                     <>
@@ -284,7 +242,7 @@ export function PricingPlans() {
                 </ul>
 
                 <a href="/login/signup" className="lp-pr-cta">
-                  Começar grátis
+                  {plan.cta}
                 </a>
               </article>
             );

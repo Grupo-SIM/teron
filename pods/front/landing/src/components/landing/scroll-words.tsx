@@ -58,7 +58,25 @@ const RAMP = 3;
 
 function readLine() {
   const reach = window.innerHeight * READ_LINE;
-  return window.scrollY + Math.min(window.scrollY * RAMP, reach);
+  const line = window.scrollY + Math.min(window.scrollY * RAMP, reach);
+
+  /*
+   * Rampa de saída, espelho da de entrada.
+   *
+   * A linha fica a 62% da janela, então os 38% de baixo só acendem porque a
+   * página ainda rola e os traz para cima. No fim do documento essa rolagem
+   * acaba: o que estiver na última meia tela nunca passa da linha e fica
+   * apagado para sempre — quanto, depende do que houver abaixo do texto, e
+   * mexer no recuo do rodapé é o bastante para apagar o último parágrafo.
+   *
+   * Perto do fim a linha desce sozinha o que falta, chegando ao pé do
+   * documento exatamente quando a rolagem termina.
+   */
+  const max = document.documentElement.scrollHeight - window.innerHeight;
+  const left = max - window.scrollY;
+  if (left >= reach) return line;
+
+  return line + ((reach - left) / reach) * (window.innerHeight - reach);
 }
 
 function reduced() {

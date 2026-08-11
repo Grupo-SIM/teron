@@ -1,9 +1,9 @@
 import { Asset } from "@/components/landing/asset";
 import { Bento } from "@/components/landing/bento";
-import { Faq } from "@/components/landing/faq";
 import { GithubSync } from "@/components/landing/github-sync";
+import { HeroCta } from "@/components/landing/hero-cta";
 import { Knowledge } from "@/components/landing/knowledge";
-import { LogosMarquee } from "@/components/landing/logos-marquee";
+import { LoopFadeVideo } from "@/components/landing/loop-fade-video";
 import { RevealObserver } from "@/components/landing/reveal-observer";
 import { RiveCard } from "@/components/landing/rive-card";
 import { SiteFooter } from "@/components/landing/site-footer";
@@ -65,80 +65,50 @@ export default function Home() {
       <section
         style={{ position: "relative", paddingBottom: 120, overflow: "hidden" }}
       >
-        <div className="lp-hero-media">
-          <video
-            className="lp-hero-video"
-            src="/assets/hero.webm"
-            autoPlay
-            muted
-            loop
-            playsInline
-            aria-hidden
-          />
-          <Asset
-            src="/assets/Mask group.svg"
-            alt=""
-            ratio="1449 / 731"
-            className="lp-hero-shot"
-          />
-          <div aria-hidden className="lp-hero-fade" />
-          <Asset
-            src="/assets/Grid.svg"
-            alt="Dribbble, LEGORA, Zapier, Perplexity, Cal.com, Mixpanel, Miro e DoorDash"
-            ratio="600 / 136"
-            className="lp-hero-logos"
-          />
-        </div>
-        <div className="lp-hero-copy">
-          <h1
-            data-reveal
-            style={{
-              margin: 0,
-              lineHeight: 1.05,
-              letterSpacing: "-.035em",
-              fontWeight: 800,
-              maxWidth: "30ch",
-              textWrap: "balance",
-            }}
-          >
-            Tudo o que sua equipe precisa. Em um só lugar.
-          </h1>
-          <p
-            data-reveal
-            style={{
-              margin: "16px 0 0",
-              lineHeight: 1.5,
-              color: "#a7a7ad",
-              maxWidth: "62ch",
-            }}
-          >
-            Pare de alternar entre dezenas de ferramentas. Centralize projetos,
-            tarefas, reuniões e comunicação em uma única plataforma para sua
-            equipe produzir mais.
-          </p>
-          <div
-            data-reveal
-            style={{
-              marginTop: 22,
-              display: "flex",
-              flexWrap: "wrap",
-              gap: 10,
-            }}
-          >
-            <a
-              href="/login/signup"
-              className="lp-btn-white"
-              style={{ fontWeight: 700, borderRadius: 9 }}
+        {/* O frame existe só para dar altura à `.lp-hero-copy`: ela é
+            absoluta e sua altura em % precisa resolver contra a caixa da
+            mídia, não contra a seção (que tem padding-bottom). */}
+        <div className="lp-hero-frame">
+          <div className="lp-hero-copy">
+            {/* tamanho, peso, entrelinha e espaçamento vivem no
+                `globals.css` (`.lp-hero-copy h1/p`), onde os degraus do
+                huly.io precisam de media query. */}
+            <h1 data-reveal style={{ margin: 0 }}>
+              Tudo o que sua equipe precisa. Em um só lugar.
+            </h1>
+            <p
+              data-reveal
+              style={{
+                marginBottom: 0,
+                color: "#a7a7ad",
+              }}
             >
-              Começar agora
-            </a>
-            <a
-              href="#plataforma"
-              className="lp-btn-ghost"
-              style={{ fontWeight: 600, borderRadius: 9 }}
-            >
-              Saiba Mais
-            </a>
+              Pare de alternar entre dezenas de ferramentas. Centralize
+              projetos, tarefas, reuniões e comunicação em uma única plataforma
+              para sua equipe produzir mais.
+            </p>
+            <div data-reveal className="lp-hero-cta">
+              <HeroCta />
+            </div>
+          </div>
+
+          <div className="lp-hero-media">
+            <video
+              className="lp-hero-video"
+              src="/assets/hero.webm"
+              autoPlay
+              muted
+              loop
+              playsInline
+              aria-hidden
+            />
+            <Asset
+              src="/assets/hero-shot%20(1).png"
+              alt=""
+              ratio="2048 / 1138"
+              className="lp-hero-shot"
+            />
+            <div aria-hidden className="lp-hero-fade" />
           </div>
         </div>
       </section>
@@ -435,129 +405,28 @@ export default function Home() {
 
       <GithubSync />
 
-      {/* Clientes ------------------------------------------------------ */}
-      <section id="clientes" style={{ padding: "110px 24px 0" }}>
-        <p
-          data-reveal
-          style={{
-            textAlign: "center",
-            margin: "0 0 30px",
-            fontSize: 12,
-            letterSpacing: ".18em",
-            textTransform: "uppercase",
-            color: "#6f6f77",
-            fontWeight: 700,
-          }}
-        >
-          Empresas que já usam
-        </p>
-        <div data-reveal style={{ maxWidth: 1720, margin: "0 auto" }}>
-          <LogosMarquee />
-        </div>
-      </section>
-
-      <Faq />
-
       {/* CTA final ------------------------------------------------------ */}
-      <section id="comecar" style={{ position: "relative", marginTop: 120 }}>
-        <div className="lp-cta-art">
-          <Asset src="/assets/watch.png" alt="" ratio="2.79 / 1" />
-          {/* Esfuma as bordas da arte contra o fundo preto da página. */}
-          <div
-            aria-hidden
-            style={{
-              position: "absolute",
-              inset: 0,
-              pointerEvents: "none",
-              boxShadow: "inset 0 0 160px 90px #000",
-            }}
-          />
-          <div
-            aria-hidden
-            style={{
-              position: "absolute",
-              inset: 0,
-              pointerEvents: "none",
-              background:
-                "linear-gradient(to right,#000 0%,transparent 18%,transparent 82%,#000 100%)," +
-                "linear-gradient(to bottom,#000 0%,transparent 20%,transparent 80%,#000 100%)",
-            }}
-          />
-        </div>
-        <div
-          style={{
-            position: "absolute",
-            inset: 0,
-            display: "flex",
-            alignItems: "center",
-          }}
-        >
-          <div
-            style={{
-              width: "100%",
-              maxWidth: 1240,
-              margin: "0 auto",
-              padding: "0 24px",
-            }}
-          >
-            <div className="lp-cta-copy" data-reveal>
-              <h2
-                style={{
-                  margin: 0,
-                  fontSize: "clamp(32px,4.4vw,58px)",
-                  lineHeight: 1.05,
-                  letterSpacing: "-.035em",
-                  fontWeight: 800,
-                }}
-              >
-                Junte-se ao movimento
-              </h2>
-              <p
-                style={{
-                  margin: "16px 0 0",
-                  fontSize: 15,
-                  lineHeight: 1.55,
-                  color: "#a7a7ad",
-                }}
-              >
-                Centralize o trabalho da sua equipe com a Huly. Essa jornada
-                está apenas começando.
-              </p>
-              <div
-                className="lp-cta-actions"
-                style={{
-                  marginTop: 26,
-                  display: "flex",
-                  flexWrap: "wrap",
-                  gap: 12,
-                }}
-              >
-                <a
-                  href="#plataforma"
-                  className="lp-btn-white"
-                  style={{
-                    fontSize: 14,
-                    fontWeight: 700,
-                    padding: "12px 24px",
-                    borderRadius: 999,
-                  }}
-                >
-                  Ver em ação
-                </a>
-                <a
-                  href="#faq"
-                  className="lp-btn-ghost"
-                  style={{
-                    fontSize: 14,
-                    fontWeight: 600,
-                    padding: "12px 24px",
-                    borderRadius: 999,
-                  }}
-                >
-                  Falar com o time
-                </a>
-              </div>
+      <section id="comecar" className="lp-cta">
+        <div className="lp-cta-row">
+          <div className="lp-cta-copy" data-reveal>
+            <h2 className="lp-cta-title">Junte-se ao movimento</h2>
+            <p className="lp-cta-text">
+              Centralize o trabalho da sua equipe com a Teron. Essa jornada
+              está apenas começando.
+            </p>
+            <div className="lp-cta-actions">
+              <HeroCta href="#plataforma" label="Ver em ação" />
+              <a href="/precos" className="lp-btn-pill-dark">
+                Falar com o time
+              </a>
             </div>
+          </div>
+
+          {/* Depois do texto no DOM, como no original: a arte é decorativa e
+              absoluta, então a ordem aqui só decide quem o leitor de tela
+              encontra primeiro. */}
+          <div className="lp-cta-art" aria-hidden>
+            <LoopFadeVideo src="/assets/teron.mp4" />
           </div>
         </div>
       </section>

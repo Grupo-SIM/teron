@@ -1,13 +1,12 @@
 import type { ReactNode } from "react";
-import { RiveAnim } from "./rive-anim";
 
 /**
  * Seção de integração com o GitHub, no mesmo arranjo do huly.io: título curto,
  * a janela sob um brilho laranja/azul e a grade de seis recursos embaixo.
  *
- * A janela não é um print: é o `interface-github.riv`, que alterna entre o
- * quadro de tarefas e a lista do GitHub — os dois lados da sincronização. O
- * brilho ao redor vem do vídeo, que também desenha a moldura acesa.
+ * A janela não é um print: é o `Terongit.mp4`, que alterna entre o quadro de
+ * tarefas e a lista do GitHub — os dois lados da sincronização. O brilho ao
+ * redor vem de outro vídeo, que também desenha a moldura acesa.
  */
 
 /**
@@ -149,16 +148,17 @@ export function GithubSync() {
             aria-hidden
           />
 
-          {/*
-            Sem `progress`: a animação corre sozinha em loop enquanto está em
-            cena, que é o que faz a tela alternar entre os dois lados. Presa ao
-            scroll ela pararia no meio da troca em quem só passa por ali.
-          */}
+          {/* 1872x1080 é exatamente a proporção da janela (960/554), então o
+              vídeo preenche sem sobrar borda. */}
           <div className="lp-gh-window">
-            <RiveAnim
-              src="/animations/interface-github.riv"
+            <video
               className="lp-gh-art"
-              fit="contain"
+              src="/assets/gh-window.mp4"
+              autoPlay
+              muted
+              loop
+              playsInline
+              aria-hidden
             />
           </div>
         </div>

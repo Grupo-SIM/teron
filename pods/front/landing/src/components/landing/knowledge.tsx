@@ -151,6 +151,20 @@ export function Knowledge() {
   const docRef = useRef<HTMLDivElement>(null);
   const markRef = useRef<HTMLDivElement>(null);
   const [face, setFace] = useState(0);
+  const [stacked, setStacked] = useState(false);
+
+  /*
+   * Mesmo corte do CSS: abaixo de 899px as duas colunas viram uma só, e aí não
+   * existe coluna ao lado do documento para o card descer.
+   */
+  useEffect(() => {
+    const mq = window.matchMedia("(max-width: 899px)");
+    const sync = () => setStacked(mq.matches);
+
+    sync();
+    mq.addEventListener("change", sync);
+    return () => mq.removeEventListener("change", sync);
+  }, []);
 
   /*
    * O card desce pela coluna enquanto a página rola. A posição é escrita direto
@@ -172,6 +186,12 @@ export function Knowledge() {
     const card = cardRef.current;
     const doc = docRef.current;
     if (rail == null || card == null || doc == null) return;
+
+    // Empilhado o card fica onde está; quem anima é o loop do efeito abaixo.
+    if (stacked) {
+      card.style.transform = "";
+      return;
+    }
 
     let tick = 0;
     let chase = 0;
@@ -240,7 +260,60 @@ export function Knowledge() {
       window.removeEventListener("scroll", onScroll);
       window.removeEventListener("resize", onScroll);
     };
-  }, []);
+  }, [stacked]);
+
+  /*
+   * Empilhado, a virada do card deixa de depender da rolagem e roda sozinha,
+   * em loop: para em cada face e leva `TURN` para trocar, de ida e de volta.
+   * Só anda com o card em cena — o `.riv` desenha a cada quadro e girar isso
+   * fora da tela é gasto puro de bateria.
+   */
+  useEffect(() => {
+    const card = cardRef.current;
+    if (!stacked || card == null) return;
+    if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
+
+    /** Parado em cada face, e duração da troca, em ms. */
+    const HOLD = 1600;
+    const TURN = 1100;
+    const CYCLE = (HOLD + TURN) * 2;
+
+    let raf = 0;
+    let from = 0;
+
+    const tick = (now: number) => {
+      if (from === 0) from = now;
+      const t = (now - from) % CYCLE;
+
+      let p: number;
+      if (t < HOLD) p = 0;
+      else if (t < HOLD + TURN) p = (t - HOLD) / TURN;
+      else if (t < HOLD * 2 + TURN) p = 1;
+      else p = 1 - (t - HOLD * 2 - TURN) / TURN;
+
+      // Suaviza as pontas da troca; sem isso ela começa e para no talo.
+      setFace(p * p * (3 - 2 * p));
+      raf = requestAnimationFrame(tick);
+    };
+
+    const io = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          if (raf === 0) raf = requestAnimationFrame(tick);
+        } else {
+          cancelAnimationFrame(raf);
+          raf = 0;
+        }
+      },
+      { rootMargin: "120px 0px" },
+    );
+    io.observe(card);
+
+    return () => {
+      io.disconnect();
+      cancelAnimationFrame(raf);
+    };
+  }, [stacked]);
 
   const mark = useEnter(markRef, 0.68, 0.38);
   const tools = mark > 0.95;
@@ -324,7 +397,7 @@ export function Knowledge() {
 
             <figure className="lp-know-fig">
               {/* eslint-disable-next-line @next/next/no-img-element -- arte solta em public */}
-              <img src="/assets/know/billboard.jpg" alt="" loading="lazy" />
+              <img src="/assets/billboard.jpg" alt="" loading="lazy" />
             </figure>
 
             <p className="lp-know-p lp-know-p-pinned">

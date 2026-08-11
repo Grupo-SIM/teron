@@ -136,6 +136,194 @@ a {
   background: #1f1f25;
 }
 
+/* Pílulas do hero, no molde do "See in Action" do huly.io: cápsula clara de
+   40px, borda branca translúcida, rótulo caixa-alta de 12px e um brilho
+   quente que varre por trás do texto (o `overflow: hidden` recorta o brilho
+   na própria cápsula). */
+.lp-btn-pill {
+  position: relative;
+  z-index: 0;
+  overflow: hidden;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  height: 40px;
+  padding: 0 52px 0 59px;
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  border-radius: 999px;
+  background: #d1d1d1;
+  color: #5a250a;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: -0.015em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  transition: background 0.2s ease, border-color 0.2s ease;
+}
+
+.lp-btn-pill:hover {
+  background: #e6e6e6;
+  color: #5a250a;
+}
+
+/* Par escuro da pílula acima (no huly.io é o "Join our Slack"): mesma
+   altura e caixa-alta, só que preto com aro discreto. */
+.lp-btn-pill-dark {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  height: 40px;
+  min-width: 174px;
+  padding: 0 24px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 999px;
+  background: #0b0c0f;
+  color: #fff;
+  font-size: 12px;
+  font-weight: 700;
+  letter-spacing: -0.015em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  transition: border-color 0.2s ease, background 0.2s ease;
+}
+
+.lp-btn-pill-dark:hover {
+  border-color: rgba(255, 255, 255, 0.15);
+  background: #131418;
+  color: #fff;
+}
+
+/* Brilho interno, recortado pelo `overflow: hidden` do botão acima: só
+   aparece enquanto o mouse se move por cima (JS liga `--btn-x`), laranja —
+   sem o miolo branco/creme que o halo parado já não tem. */
+.lp-btn-pill-glow {
+  position: absolute;
+  z-index: -1;
+  top: 50%;
+  left: 50%;
+  width: 130px;
+  height: 84px;
+  margin: -42px 0 0 -65px;
+  border-radius: 50%;
+  /* núcleo aceso (branco) esmaecendo pro laranja ao redor — bem mais
+     branco que laranja, e o laranja só aparece já quase transparente. */
+  background: radial-gradient(
+    50% 50% at 50% 50%,
+    #fffefc 0%,
+    #fffaf1 35%,
+    #ffe3c6 55%,
+    rgba(255, 180, 136, 0.4) 72%,
+    rgba(233, 132, 99, 0) 90%
+  );
+  filter: blur(5px);
+  opacity: 0;
+  pointer-events: none;
+  transform: translateX(var(--btn-x, 0px));
+  transition: opacity 90ms linear, transform 70ms linear;
+}
+
+.lp-btn-pill-wrap--hover .lp-btn-pill-glow {
+  opacity: 0.9;
+}
+
+/* Halo externo do botão: anel-gradiente na borda (com `border` transparente
+   + fundo em duas camadas — padding-box some por cima, border-box pinta só
+   o aro) repetido em duas camadas borradas, maior que o `.lp-btn-pill` e
+   atrás dele. Valores copiados 1:1 do huly.io (classes `border-button-light`
+   / `border-button-light-blur`) — só laranja, sem o miolo branco/creme que
+   eles têm por cima (removido a pedido).
+   Duas cópias do halo se sobrepõem — uma normal (quente à direita), outra
+   espelhada com `scaleX(-1)` (quente à esquerda) — e o mouse faz uma
+   aparecer enquanto a outra some (`--btn-r`/`--btn-l`), o que dá a
+   impressão de a luz "andar" de um lado a outro. Sem interação, some no
+   valor de onde o cursor deixou o botão (não volta pro padrão). */
+.lp-btn-pill-wrap {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  --btn-r: 1;
+  --btn-l: 0;
+}
+
+.lp-btn-pill-halo {
+  position: absolute;
+  inset: -4.5px;
+  border-radius: 999px;
+  pointer-events: none;
+  transition: opacity 90ms linear;
+}
+
+.lp-btn-pill-halo--r {
+  opacity: var(--btn-r);
+}
+
+.lp-btn-pill-halo--l {
+  opacity: var(--btn-l);
+  transform: scaleX(-1);
+}
+
+.lp-btn-pill-halo-ring {
+  display: block;
+  height: 100%;
+  width: 100%;
+  border-radius: 999px;
+  border: 1px solid transparent;
+  background:
+    linear-gradient(transparent, transparent) padding-box,
+    linear-gradient(
+        103.7deg,
+        hsla(15, 25%, 65%, 0.1) 38.66%,
+        rgba(233, 132, 99, 0.1) 68.55%,
+        #e98463 85.01%,
+        #fff 92.12%
+      )
+      border-box;
+}
+
+.lp-btn-pill-halo::before,
+.lp-btn-pill-halo::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 999px;
+}
+
+/* Camada mais larga e mais borrada: o alcance visível do halo. */
+.lp-btn-pill-halo::after {
+  inset: -3px;
+  border: 3px solid transparent;
+  background:
+    linear-gradient(transparent, transparent) padding-box,
+    linear-gradient(91.88deg, rgba(255, 137, 100, 0.2) 46.45%, #cd3100 98.59%)
+      border-box;
+  filter: blur(15px);
+}
+
+/* Camada estreita e menos borrada: acentua a borda logo na virada do botão. */
+.lp-btn-pill-halo::before {
+  inset: -2px;
+  border: 2px solid transparent;
+  background:
+    linear-gradient(transparent, transparent) padding-box,
+    linear-gradient(
+        97.68deg,
+        rgba(255, 177, 153, 0) 38.1%,
+        rgba(255, 177, 153, 0.2) 82.47%,
+        #ff7950 93.3%
+      )
+      border-box;
+  filter: blur(2px);
+}
+
+.lp-hero-cta {
+  margin-top: 22px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
 .lp-input {
   background: #141418;
   border: 1px solid rgba(255, 255, 255, 0.1);
@@ -263,11 +451,64 @@ a {
    282px embaixo, de modo que a base da caixa caia exatamente na base da
    screenshot — sem sobra preta antes do texto seguinte.
    400 / (2876 - 2194) = 58.65% de object-position. */
+/* Uma única fonte de verdade para o vão do hero: a copy é centrada entre a
+   base do header e o topo da screenshot, então a distância header→texto e
+   texto→imagem é sempre a mesma — em qualquer largura, sem breakpoint. */
+.lp-hero-frame {
+  position: relative;
+  /* logo de 30px + 14px de padding em cima e embaixo no header */
+  --lp-header-h: 62px;
+  /* Topo da screenshot dentro da caixa da mídia (ver `.lp-hero-shot`); a
+     `.lp-hero-copy` usa o mesmo valor, porque a faixa do texto vai do
+     header até aí. */
+  --lp-shot-top: 55.45%;
+  /* respiro do modo empilhado, onde não há screenshot acima do texto */
+  --lp-hero-gap: clamp(28px, 6vw, 72px);
+}
+
+/* O vídeo é 3840x2876 (proporção 1.3352). A caixa é mais larga que isso,
+   então `object-fit: cover` escala pela largura e corta altura; com
+   `object-position: center top` o corte sai todo embaixo, e tudo que está
+   acima — feixe, tela do vídeo — fica medido a partir do topo da caixa.
+   A altura (2606) é onde a screenshot termina: 0.678582 da largura. */
 .lp-hero-media {
   position: relative;
   width: 100%;
-  aspect-ratio: 3840 / 2194;
+  aspect-ratio: 3840 / 2606;
   overflow: hidden;
+}
+
+/* Único lugar que decide o tamanho da composição: texto, vídeo e screenshot
+   são todos % desta caixa, então encolher aqui encolhe tudo junto e nada
+   sai do lugar. O teto de 2160px é o que o huly.io faz com arte em px fixo
+   (o preto da seção preenche o resto nas telas largas).
+   Só no layout sobreposto: abaixo de 1280px o texto volta pro fluxo e
+   precisa da largura toda. */
+@media (min-width: 1280px) {
+  .lp-hero-frame {
+    max-width: min(2160px, 86%);
+    margin-inline: auto;
+  }
+
+  /* Com a sobra preta dos lados, a borda do vídeo marca uma linha vertical;
+     o degradê dissolve as duas pontas. A screenshot começa em 14%, longe
+     do esfumado. */
+  .lp-hero-media {
+    -webkit-mask-image: linear-gradient(
+      to right,
+      transparent,
+      #000 7%,
+      #000 93%,
+      transparent
+    );
+    mask-image: linear-gradient(
+      to right,
+      transparent,
+      #000 7%,
+      #000 93%,
+      transparent
+    );
+  }
 }
 
 .lp-hero-video {
@@ -276,39 +517,51 @@ a {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  object-position: center 58.65%;
+  object-position: center top;
   display: block;
 }
 
-/* O SVG tem 1449x731 de tela mas a screenshot ocupa só x=87 y=32
-   w=1257.84 dentro dela. Para esse retângulo interno cair no recorte do
-   vídeo (18.333% / 48.13% / 53.333%), a tela toda é ampliada em
-   1449/1257.84 e deslocada pelas margens:
-     width = 53.333% * 1449/1257.84      = 61.439%
-     left  = 18.333% - 87/1449 * 61.439% = 14.644%
-     top   = 48.13%  - 32/731 * 61.439% * (3840/2194) = 45.76% */
-/* +2% de escala sobre esses valores, ancorado no centro:
-   left/top recuam metade do que a caixa cresce. */
+/* Retângulo da tela desenhada dentro do vídeo, medida no frame dele
+   (3840x2876): x de 18.20% a 71.62%, topo em 50.6% da altura. A screenshot
+   é 2% maior que isso, ancorada no centro, pra cobrir a borda:
+     width = 53.42% x 1.02                    = 54.40% da caixa
+     left  = 18.20% - 1% x 54.40%             = 17.77%
+     top   = 50.6% x (largura / 1.335188)     = 37.63% da largura,
+             que sobre a altura da caixa (largura / 1.473687) dá 55.45%
+   NÃO trocar por px: a tela do vídeo acompanha a caixa, e valor fixo só
+   coincide numa largura. Quem decide o tamanho é o `max-width` do
+   `.lp-hero-frame`. Trocar a imagem exige refazer isto se ela tiver moldura
+   própria (a anterior era um SVG 1449x731 com a tela em x=87 y=32 w=1257.84). */
 .lp-hero-shot {
   position: absolute;
-  left: 14.01%;
-  top: 45.2%;
-  width: 62.67%;
+  left: 17.77%;
+  top: var(--lp-shot-top);
+  width: 54.4%;
   display: block;
 }
 
-/* O espaço livre acima da screenshot é ~20% da largura da viewport, por
-   isso o texto do hero escala em vw — senão invade o print. */
+/* A caixa vai da base do header até o topo exato da screenshot; centrar o
+   conteúdo nela reparte a sobra em duas metades iguais, que é literalmente
+   o espaçamento pedido. Como `--lp-shot-top` é % da altura do frame (= da
+   mídia, que escala com a largura), a proporção se mantém em toda tela.
+   O texto ainda escala em vw para não estourar essa faixa. */
 .lp-hero-copy {
   position: absolute;
-  /* o header é fixo e transparente: 84px garante que o texto comece abaixo dele */
-  top: max(84px, 4%);
+  top: var(--lp-header-h);
+  height: calc(var(--lp-shot-top) - var(--lp-header-h));
   left: 18.333%;
-  max-width: 60%;
+  /* o texto vai até onde a caixa deixa (18.333% de recuo à esquerda): quanto
+     mais largo, menos linhas o título de 84px gasta — e é a contagem de
+     linhas que decide se ele cabe na faixa acima da screenshot. */
+  max-width: 81%;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
   z-index: 2;
 }
 
-/* Dissolve a base da screenshot no preto da seção seguinte. */
+/* Dissolve a base da screenshot no preto da seção seguinte (ela termina na
+   base da caixa, por isso o degradê fica colado embaixo). */
 .lp-hero-fade {
   position: absolute;
   left: 0;
@@ -319,74 +572,100 @@ a {
   pointer-events: none;
 }
 
-/* Logos sobrepostos ao terço inferior da screenshot: 45% = centro do
-   recorte (18.333% + 53.333% / 2). O PNG já tem alpha, então dispensa
-   blend. */
-.lp-hero-logos {
-  position: absolute;
-  left: 45%;
-  transform: translateX(-50%);
-  bottom: 4%;
-  width: 32%;
-  display: block;
-}
-
+/* Tipografia do hero copiada do huly.io (classes `text-84 font-semibold
+   leading-[0.9] tracking-tight` no h1, `mt-5 text-18 leading-snug` no
+   parágrafo e `mt-11` no botão), com os mesmos degraus de 1279/1023/767 px
+   que eles usam. Os `max-width` são os deles convertidos pra `em` (616px em
+   84px = 7.33em) e alargados na proporção do nosso texto, que é mais longo:
+   assim o título continua quebrando em duas linhas como o original. */
 .lp-hero-copy h1 {
-  font-size: clamp(26px, 3.5vw, 54px);
+  /* Chega nos 84px do huly.io, mas só onde a faixa entre o header e a
+     screenshot comporta duas linhas: `5.55vw` mantém as duas linhas e
+     `14.34vw - 124px` é a altura que sobra na faixa (ela cresce com a
+     largura, o header não). Acima de ~1500px vale o teto de 84px. */
+  font-size: min(84px, 5.55vw, calc(17.98vw - 120px));
+  font-weight: 600;
+  line-height: 0.9;
+  letter-spacing: -0.04em;
+  max-width: min(14.2em, 100%);
 }
 
 .lp-hero-copy p {
-  font-size: clamp(13px, 1.15vw, 16px);
+  margin-top: 20px;
+  font-size: 18px;
+  line-height: 1.375;
+  letter-spacing: -0.04em;
+  max-width: min(39em, 100%);
 }
 
-.lp-hero-copy a {
-  font-size: 13.5px;
-  padding: 10px 20px;
+.lp-hero-cta {
+  margin-top: 44px;
 }
 
-/* Só telas largas crescem o texto e o descem: abaixo de 1500px nada
-   disso se aplica, o hero fica exatamente como antes. */
-@media (min-width: 1500px) {
-  .lp-hero-copy {
-    top: max(84px, 7%);
+/* Fora do layout sobreposto o hero fica como era antes de copiarmos as
+   medidas do huly.io: mesmo enquadramento de vídeo, mesma escala de texto.
+   Tudo aqui é abaixo de 1280px de propósito — o desktop não muda. */
+@media (max-width: 1279px) {
+  .lp-hero-frame {
+    /* Mesmo ponto do vídeo de antes, convertido para o recorte antigo:
+       0.376252 (topo da screenshot, em fração da largura) menos o
+       deslocamento de 0.104164 que o `58.65%` empurra, sobre a altura da
+       caixa antiga (0.5714 da largura). */
+    --lp-shot-top: 47.62%;
+  }
+
+  .lp-hero-media {
+    aspect-ratio: 3840 / 2194;
+  }
+
+  .lp-hero-video {
+    object-position: center 58.65%;
   }
 
   .lp-hero-copy h1 {
-    font-size: min(3.6vw, 70px);
+    font-size: clamp(26px, 3.5vw, 54px);
+    font-weight: 800;
+    line-height: 1.05;
+    letter-spacing: -0.035em;
+    max-width: 30ch;
+    text-wrap: balance;
   }
 
   .lp-hero-copy p {
-    font-size: min(1.15vw, 20px);
+    margin-top: 16px;
+    font-size: clamp(13px, 1.15vw, 16px);
+    line-height: 1.5;
+    letter-spacing: normal;
+    max-width: 62ch;
   }
 
-  .lp-hero-copy a {
-    font-size: min(0.95vw, 18px);
-    padding: 0.8em 1.6em;
-  }
-}
-
-@media (min-width: 1900px) {
-  .lp-hero-copy {
-    top: 9%;
+  .lp-hero-cta {
+    margin-top: 22px;
   }
 }
 
-/* Com o header fora do fluxo, o texto empilhado precisa do respiro dele. */
-@media (max-width: 1199px) {
-  .lp-hero-copy {
-    padding-top: 110px;
-  }
-}
-
-/* Abaixo de 1150px não sobra altura acima da screenshot para o texto
-   sobreposto — ele volta para o fluxo, acima do vídeo. */
-@media (max-width: 1199px) {
+/* Abaixo de 1280px (o corte `lg` do huly.io) não sobra altura acima da
+   screenshot para o texto sobreposto — ele volta para o fluxo, acima do
+   vídeo. Sem screenshot em cima, o par de espaçamentos vira padding:
+   header + gap / gap. */
+@media (max-width: 1279px) {
   .lp-hero-copy {
     position: static;
+    height: auto;
     left: auto;
     right: auto;
     max-width: none;
+    /* Os mesmos 90/46 do último commit: o header é fixo e transparente, e
+       90px já o limpam. A fórmula com `--lp-hero-gap` deixava o bloco 32px
+       mais alto no celular. */
     padding: 90px 24px 46px;
+  }
+}
+
+@media (max-width: 899px) {
+  .lp-hero-frame {
+    /* o menu hambúrguer tem 38px, e não os 30px do logo */
+    --lp-header-h: 66px;
   }
 }
 
@@ -410,41 +689,138 @@ a {
   }
 }
 
-/* Caixa com o tamanho exato da arte, para o esfumado grudar nas bordas
-   reais da imagem em vez das bordas da seção. */
-.lp-cta-art {
-  --cta-h: clamp(380px, 34vw, 600px);
+/* CTA final no molde do "Join the Movement" do huly.io: o texto ocupa a
+   coluna direita de uma grade de duas colunas e a arte não participa da
+   grade — é uma faixa larga, absoluta, que vaza pela borda esquerda da
+   tela por trás do texto. Lá é um .jpg de 1920x689 com o esfumado já
+   pintado; aqui é o vídeo recortado na mesma proporção, com o esfumado
+   feito por máscara (ver `.lp-cta-art video`). */
+.lp-cta {
   position: relative;
-  width: min(100%, calc(var(--cta-h) * 2.79));
-  aspect-ratio: 2.79 / 1;
-  margin: 0 auto;
+  overflow: hidden;
+  padding: clamp(90px, 9vw, 152px) 0 clamp(120px, 12vw, 200px);
 }
 
-.lp-cta-art img {
+.lp-cta-row {
+  position: relative;
+  max-width: 1240px;
+  margin: 0 auto;
+  padding: 0 24px;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 32px;
+}
+
+.lp-cta-copy {
+  position: relative;
+  z-index: 10;
+  grid-column: 2;
+  /* o `-ml-16` do original: a coluna do texto avança um pouco sobre a da
+     arte, senão a linha do título quebra cedo demais. */
+  margin-left: clamp(-64px, -3vw, 0px);
+  max-width: 510px;
+}
+
+.lp-cta-title {
+  margin: 0;
+  font-size: clamp(40px, 5.6vw, 80px);
+  line-height: 1.05;
+  letter-spacing: -0.03em;
+  font-weight: 700;
+  background: linear-gradient(to bottom right, #fff 30%, #d5d8f6 80%, #fdf7fe);
+  -webkit-background-clip: text;
+  background-clip: text;
+  color: transparent;
+}
+
+.lp-cta-text {
+  margin: 10px 0 0;
+  font-size: 16px;
+  line-height: 1.4;
+  letter-spacing: -0.01em;
+  color: #c5c5cd;
+}
+
+.lp-cta-actions {
+  margin-top: 28px;
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 31px;
+}
+
+/* `left: 50%` cai no centro do container, que é o centro da janela (ele é
+   `margin: 0 auto`); daí o translate joga a arte 15vw pra esquerda, que é
+   onde o brilho fica no original. `top: 0; bottom: 0; margin-block: auto`
+   centram a arte na altura do texto — ela transborda pra fora da seção e o
+   `overflow: hidden` do `.lp-cta` corta.
+   A largura sai da proporção do original: lá o relógio tem ~21vw, e como
+   ele preenche a altura do nosso vídeo (16:9), a caixa fica em ~42vw. */
+.lp-cta-art {
+  --cta-art-w: clamp(480px, 51vw, 900px);
+  position: absolute;
+  z-index: 0;
+  left: 50%;
+  top: 0;
+  bottom: 0;
+  margin-block: auto;
+  width: var(--cta-art-w);
+  aspect-ratio: 16 / 9;
+  transform: translateX(calc(-50% - 15vw));
+  pointer-events: none;
+}
+
+.lp-cta-art img,
+.lp-cta-art video {
   width: 100%;
   height: 100%;
   object-fit: cover;
   display: block;
 }
 
+/* A máscara substitui as duas camadas escuras que ficavam por cima do
+   vídeo: em vez de pintar preto nas bordas, apaga o próprio vídeo numa
+   elipse, então ele some no fundo preto sem deixar aresta — inclusive do
+   lado direito, antes de chegar no texto. */
+.lp-cta-art video {
+  filter: brightness(1.12) saturate(1.08);
+  --cta-art-mask: radial-gradient(
+    46% 50% at 50% 50%,
+    #000 44%,
+    rgba(0, 0, 0, 0.5) 72%,
+    transparent 94%
+  );
+  -webkit-mask-image: var(--cta-art-mask);
+  mask-image: var(--cta-art-mask);
+}
+
+/* Sem largura pra faixa vazar, a arte volta pro fluxo e fica acima do
+   texto (`order: -1`), como o layout de celular do original. */
 @media (max-width: 899px) {
-  .lp-cta-art {
-    width: 100%;
-    aspect-ratio: auto;
-    height: 420px;
+  .lp-cta {
+    padding: 70px 0 90px;
   }
-}
 
-.lp-cta-copy {
-  margin-left: 52%;
-  max-width: 440px;
-}
+  .lp-cta-row {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 24px;
+  }
 
-@media (max-width: 899px) {
   .lp-cta-copy {
+    grid-column: 1;
     margin-left: 0;
     max-width: none;
     text-align: center;
+  }
+
+  .lp-cta-art {
+    position: relative;
+    order: -1;
+    inset: auto;
+    margin-block: 0;
+    width: 100%;
+    aspect-ratio: 16 / 9;
+    transform: none;
   }
 
   .lp-cta-actions {
@@ -1022,6 +1398,9 @@ a {
  */
 .lp-know-card {
   position: relative;
+  /* O texto abaixo mede em `cqw` para escalar junto com o card — em px fixo
+     ele vazava da metade branca assim que o card encolhia. */
+  container-type: inline-size;
   /*
    * Sem `transition` aqui: o alvo muda a cada quadro de scroll e cada mudança
    * reiniciaria a curva do zero, deixando o card arrastado a ponto de parecer
@@ -1063,17 +1442,20 @@ a {
   opacity: 1;
 }
 
+/* 2.8cqw e 2.52cqw são os 15px/13.5px de antes sobre o card de 536px do
+   desktop; o `max` segura um piso legível nas telas bem estreitas, onde a
+   proporção já daria menos de 9px. */
 .lp-know-card-txt strong {
   display: block;
-  margin-bottom: 6px;
-  font-size: 15px;
+  margin-bottom: 1.1cqw;
+  font-size: max(9.5px, 2.8cqw);
   font-weight: 700;
 }
 
 .lp-know-card-txt span {
   display: block;
   color: #4a4a52;
-  font-size: 13.5px;
+  font-size: max(8.5px, 2.52cqw);
   line-height: 1.45;
 }
 
@@ -1700,9 +2082,23 @@ a {
   }
 }
 
+/* Em coluna única cada item ocupa a largura toda, e alinhado à esquerda o
+   texto fica solto na faixa; centralizado, ícone e texto ficam no eixo da
+   seção (o `max-width` do parágrafo precisa das margens automáticas para
+   centralizar junto). */
 @media (max-width: 599px) {
   .lp-gh-feats {
     grid-template-columns: minmax(0, 1fr);
+    justify-items: center;
+    text-align: center;
+  }
+
+  .lp-gh-feat-icon {
+    margin-inline: auto;
+  }
+
+  .lp-gh-feat-txt {
+    margin-inline: auto;
   }
 }
 
@@ -1828,11 +2224,24 @@ a {
  * palavras se fecham por cima; ao acender, a margem cresce e empurra o texto,
  * abrindo espaço. As margens verticais negativas mantêm a linha na altura de
  * sempre — o canvas é muito mais alto que o texto.
+ *
+ * Medida e recuos vêm do componente como número puro (`--w`, `--h`, `--ml`,
+ * `--mr`, `--mt`) e são multiplicados aqui pelo `--s` da faixa de tela. Um
+ * ícone de 210px no meio de um texto de 20px tomaria a tela inteira no celular,
+ * então o desenho encolhe junto com a letra — e como quem encolhe é a caixa, e
+ * não um `transform`, o espaço volta para o texto.
  */
 .lp-pr-icon {
+  --s: 1;
   position: relative;
   z-index: 20;
   display: inline-block;
+  width: calc(var(--w) * var(--s) * 1px);
+  height: calc(var(--h) * var(--s) * 1px);
+  margin-top: calc(var(--mt) * var(--s) * 1px);
+  margin-right: calc(var(--mr) * var(--s) * 1px);
+  margin-bottom: calc((var(--mt) - 10) * var(--s) * 1px);
+  margin-left: calc(var(--ml) * var(--s) * 1px);
   vertical-align: middle;
   opacity: 0;
   pointer-events: none;
@@ -2407,6 +2816,12 @@ a {
     margin-bottom: 56px;
   }
 
+  /* Os ícones do texto acompanham o corpo da letra: 36px → 32px pede ~0,9 da
+     medida cheia. */
+  .lp-pr-icon {
+    --s: 0.895;
+  }
+
   .lp-pr-amount {
     font-size: 56px;
   }
@@ -2417,6 +2832,10 @@ a {
 
   .lp-pr-card {
     margin-right: 48px;
+  }
+
+  .lp-pr-items {
+    margin-top: 32px;
   }
 }
 
@@ -2437,6 +2856,10 @@ a {
     margin-bottom: 48px;
   }
 
+  .lp-pr-icon {
+    --s: 0.79;
+  }
+
   .lp-pr-mark {
     width: 140px;
     height: 140px;
@@ -2452,6 +2875,13 @@ a {
     width: 366px;
   }
 
+  /* O cartão estreita, e o raio estreita com ele: a caixa do vídeo é maior que
+     o cartão de propósito, mas não pode crescer sozinha. */
+  .lp-pr-bolt {
+    top: -282px;
+    width: 932px;
+  }
+
   .lp-pr-amount {
     font-size: 48px;
   }
@@ -2459,11 +2889,24 @@ a {
   .lp-pr-amount-soon {
     font-size: 36px;
   }
+
+  .lp-pr-txt {
+    margin-top: 0;
+  }
+
+  .lp-pr-items {
+    margin-top: 28px;
+  }
 }
 
 @media (max-width: 767px) {
+  /* O recuo de baixo é medido pelo vão que aparece, não pelo número da
+     referência: lá o rodapé sobe por cima do recuo e o desenho do "fale com a
+     gente" ainda invade o que sobra, então dos 400px do papel restam uns 130 na
+     tela. Aqui o rodapé começa onde o recuo acaba e o botão não invade nada —
+     copiar os 400px abriria três telas de preto antes do rodapé. */
   .lp-pr {
-    padding: 109px 0 300px;
+    padding: 109px 0 140px;
   }
 
   .lp-pr-inner {
@@ -2479,6 +2922,12 @@ a {
     margin-bottom: 32px;
   }
 
+  /* Metade da medida: o texto caiu de 36px para 20px e o ícone acompanha, senão
+     um desenho de 210px sobra da coluna inteira. */
+  .lp-pr-icon {
+    --s: 0.476;
+  }
+
   .lp-pr-mark {
     width: 104px;
     height: 104px;
@@ -2491,23 +2940,33 @@ a {
   }
 
   /* Sem a máscara nas bordas: em tela estreita ela apaga justamente o cartão
-     que está sendo lido. */
+     que está sendo lido. O respiro vertical continua o mesmo de sempre — é ele
+     que deixa o raio vazar por fora do cartão sem `overflow-x` cortar. */
   .lp-pr-rail {
-    padding-top: 200px;
-    padding-bottom: 200px;
     -webkit-mask-image: none;
     mask-image: none;
-  }
-
-  .lp-pr-rail-wrap {
-    margin: -140px 0;
   }
 
   .lp-pr-card {
     width: 91vw;
     max-width: 366px;
     margin-right: 20px;
-    padding: 19px;
+    padding: 18px;
+  }
+
+  /* Aqui o raio deixa de ser medido em pixel e passa a ser medido em cartão: da
+     largura do cartão para baixo o desenho tem de encolher junto, ou o brilho
+     cobre a tela inteira em vez de contornar a peça. */
+  .lp-pr-bolt {
+    left: -68.666%;
+    top: -56%;
+    width: 255%;
+  }
+
+  /* O SVG do vidro fecha um pouco mais o canto: no cartão pequeno o raio de
+     24px lê como borda arredondada demais. */
+  .lp-pr-glass {
+    border-radius: 18px;
   }
 
   .lp-pr-name,
@@ -2528,9 +2987,41 @@ a {
     font-size: 30px;
   }
 
+  /* O recuo à direita existe para o texto não encostar na borda numa linha
+     larga; no cartão estreito ele só rouba caracteres. */
+  .lp-pr-txt {
+    padding-right: 0;
+  }
+
+  .lp-pr-rule {
+    margin-top: 16px;
+  }
+
   .lp-pr-items {
     gap: 12px;
     margin-top: 16px;
+  }
+
+  /* Item em uma linha só: quebrado em duas, a lista de cinco itens passa da
+     altura fixa do cartão. */
+  .lp-pr-items li {
+    gap: 6px;
+    white-space: nowrap;
+  }
+
+  /* No toque não existe `hover`, e `focus-visible` não casa com o dedo: sem o
+     `focus` puro a explicação de cobrança ficaria inalcançável no celular. */
+  .lp-pr-tip:focus .lp-pr-tip-bubble {
+    opacity: 1;
+    visibility: visible;
+    transform: translate(-50%, 0);
+  }
+
+  /* A bolha é mais larga que a folga que sobra ao lado do ícone; presa à
+     largura do cartão ela para de vazar para fora da tela. */
+  .lp-pr-tip-bubble {
+    width: min(200px, 52vw);
+    white-space: normal;
   }
 
   .lp-pr-cta,
@@ -2539,13 +3030,128 @@ a {
   }
 }
 
-@media (max-width: 479px) {
+/*
+ * Daqui para baixo o cartão para de acompanhar a tela e assume largura fixa: em
+ * 91vw ele encostaria nas duas bordas e o vizinho não apareceria mais, e é o
+ * vizinho espiando que conta que a faixa rola de lado.
+ *
+ * A coluna de texto ganha o recuo lateral no mesmo ponto, e a faixa passa a
+ * medir o respiro contra 122% da coluna: com a folga menor o primeiro cartão
+ * nasce rente à margem, e não centrado com meia tela vazia à esquerda.
+ */
+@media (max-width: 639px) {
   .lp-pr-inner {
     max-width: 410px;
     padding: 0 20px;
   }
 
+  .lp-pr-rail-wrap {
+    padding: 0 20px;
+  }
+
+  .lp-pr-rail {
+    padding-right: calc((100vw - 122%) / 2);
+    padding-left: calc((100vw - 122%) / 2);
+  }
+
   .lp-pr-card {
     width: 288px;
+  }
+}
+
+@media (max-width: 413px) {
+  .lp-pr-inner {
+    max-width: 340px;
+  }
+}
+
+/* Páginas de texto legal (termos, privacidade) --------------------------- */
+
+.lp-legal-page {
+  position: relative;
+  flex: 1;
+  background: #000;
+  color: #fff;
+  overflow-x: hidden;
+}
+
+.lp-legal {
+  max-width: 760px;
+  margin: 0 auto;
+  padding: 80px 24px 110px;
+}
+
+.lp-legal-title {
+  margin: 0;
+  font-size: clamp(32px, 5vw, 54px);
+  line-height: 1.08;
+  letter-spacing: -0.035em;
+  font-weight: 800;
+}
+
+.lp-legal-date {
+  margin: 14px 0 0;
+  font-size: 13.5px;
+  color: #6f6f77;
+}
+
+.lp-legal-intro {
+  margin: 26px 0 0;
+  font-size: 17px;
+  line-height: 1.65;
+  color: #c5c5cd;
+}
+
+.lp-legal-sec {
+  margin-top: 44px;
+}
+
+.lp-legal-sec h2 {
+  margin: 0 0 14px;
+  font-size: 20px;
+  font-weight: 800;
+  letter-spacing: -0.015em;
+  line-height: 1.3;
+}
+
+.lp-legal-sec h3 {
+  margin: 24px 0 10px;
+  font-size: 15.5px;
+  font-weight: 700;
+  color: #e4e4ea;
+}
+
+.lp-legal-sec p {
+  margin: 0 0 14px;
+  font-size: 15px;
+  line-height: 1.7;
+  color: #a7a7ad;
+}
+
+.lp-legal-sec ul {
+  margin: 0 0 14px;
+  padding-left: 20px;
+  list-style: disc;
+}
+
+.lp-legal-sec li {
+  margin-bottom: 8px;
+  font-size: 15px;
+  line-height: 1.7;
+  color: #a7a7ad;
+}
+
+.lp-legal-sec strong {
+  color: #e4e4ea;
+  font-weight: 700;
+}
+
+.lp-legal-sec a {
+  color: #7aa7ff;
+}
+
+@media (max-width: 599px) {
+  .lp-legal {
+    padding: 56px 20px 80px;
   }
 }

@@ -1,7 +1,6 @@
 import Link from "next/link";
 
 import { Asset } from "./asset";
-import { SocialIcons } from "./social-icons";
 
 /**
  * Rodapé da landing. Vive fora da página porque agora é usado também em
@@ -24,14 +23,13 @@ export function SiteFooter() {
             © {new Date().getFullYear()} Teron. Todos os direitos reservados.
           </span>
           <span style={{ display: "flex", gap: 26 }}>
-            <Link href="/#faq" className="lp-footer-link">
+            <Link href="/termos" className="lp-footer-link">
               Termos de Serviço
             </Link>
-            <Link href="/#faq" className="lp-footer-link">
+            <Link href="/privacidade" className="lp-footer-link">
               Política de Privacidade
             </Link>
           </span>
-          <SocialIcons />
           <span>Feito com paixão e Teron</span>
         </div>
       </div>

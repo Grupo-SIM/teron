@@ -20,7 +20,6 @@ const LINKS = [
   { href: "/#conhecimento", label: "Conhecimento" },
   { href: "/#github", label: "GitHub" },
   { href: "/precos", label: "Preços" },
-  { href: "/#faq", label: "FAQ" },
 ];
 
 export function SiteHeader() {
@@ -65,12 +64,14 @@ export function SiteHeader() {
           gap: 34,
         }}
       >
-        <Asset
-          src="/assets/teronwhite.svg"
-          alt="Teron"
-          ratio="595 / 550"
-          style={{ height: 30, width: "auto", display: "block" }}
-        />
+        <a href="/" aria-label="Teron — início" style={{ display: "block" }}>
+          <Asset
+            src="/assets/teronwhite.svg"
+            alt="Teron"
+            ratio="595 / 550"
+            style={{ height: 30, width: "auto", display: "block" }}
+          />
+        </a>
         <nav
           className="lp-desktop-only"
           style={{ gap: 26, fontSize: 14, fontWeight: 500 }}
@@ -130,12 +131,19 @@ export function SiteHeader() {
       {menuOpen && (
         <div className="lp-menu" role="dialog" aria-modal="true" aria-label="Menu">
           <div className="lp-menu-top">
-            <Asset
-              src="/assets/teronwhite.svg"
-              alt="Teron"
-              ratio="595 / 550"
-              style={{ height: 30, width: "auto", display: "block" }}
-            />
+            <a
+              href="/"
+              aria-label="Teron — início"
+              onClick={() => setMenuOpen(false)}
+              style={{ display: "block" }}
+            >
+              <Asset
+                src="/assets/teronwhite.svg"
+                alt="Teron"
+                ratio="595 / 550"
+                style={{ height: 30, width: "auto", display: "block" }}
+              />
+            </a>
             <button
               type="button"
               onClick={() => setMenuOpen(false)}

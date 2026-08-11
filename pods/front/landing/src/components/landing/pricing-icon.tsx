@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, type CSSProperties } from "react";
 import {
   Alignment,
   Fit,
@@ -113,27 +113,35 @@ export function PricingIcon({
     return () => clearTimeout(timer);
   }, [rive, shown, intro, outro]);
 
+  /*
+   * As medidas saem daqui como número puro, não como pixel: o CSS multiplica
+   * todas elas pelo fator `--s` da faixa de tela antes de virar comprimento.
+   * O ícone inteiro (caixa, recuos e altura da linha) encolhe junto, então a
+   * arte continua caindo na altura do texto em qualquer largura — que é o que
+   * um `transform: scale` não daria, porque ele não devolve espaço ao texto.
+   */
   return (
     <span
       ref={hostRef}
       aria-hidden
       className="lp-pr-icon"
       data-shown={shown}
-      style={{
-        width,
-        height,
-        marginLeft,
-        marginTop: offsetTop,
-        marginBottom: offsetTop - 10,
-        /*
-         * Recolhido, a margem direita anula exatamente a largura e a margem
-         * esquerda: o ícone passa a ocupar zero e some do meio da frase. O que
-         * ele não pode é ocupar menos que zero — com um recuo extra ele comeria
-         * o espaço entre as palavras vizinhas, e ao subir a página o texto
-         * ficaria grudado.
-         */
-        marginRight: shown ? marginRight : -(width + marginLeft),
-      }}
+      style={
+        {
+          "--w": width,
+          "--h": height,
+          "--ml": marginLeft,
+          "--mt": offsetTop,
+          /*
+           * Recolhido, a margem direita anula exatamente a largura e a margem
+           * esquerda: o ícone passa a ocupar zero e some do meio da frase. O
+           * que ele não pode é ocupar menos que zero — com um recuo extra ele
+           * comeria o espaço entre as palavras vizinhas, e ao subir a página o
+           * texto ficaria grudado.
+           */
+          "--mr": shown ? marginRight : -(width + marginLeft),
+        } as CSSProperties
+      }
     >
       <span className="lp-pr-icon-art">
         <RiveComponent />
