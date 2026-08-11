@@ -33,16 +33,106 @@ jobs:
         with:
           version: 10
 
+      - name: Restore Rush and pnpm cache
+        id: rush-dependencies-cache
+        uses: actions/cache/restore@v5
+        with:
+          path: |
+            common/temp/install-run
+            common/temp/pnpm-store
+          key: ${{ runner.os }}-rush-dependencies-${{ hashFiles('.nvmrc', 'rush.json', 'common/config/rush/pnpm-lock.yaml', 'common/config/rush/pnpm-config.json') }}
+
       - name: Install root workspace dependencies
         run: node common/scripts/install-run-rush.js install
+
+      - name: Save Rush and pnpm cache
+        if: steps.rush-dependencies-cache.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v5
+        with:
+          path: |
+            common/temp/install-run
+            common/temp/pnpm-store
+          key: ${{ steps.rush-dependencies-cache.outputs.cache-primary-key }}
+
+      - name: Restore Rush build cache
+        id: rush-build-cache
+        uses: actions/cache/restore@v5
+        with:
+          path: common/temp/build-cache
+          key: ${{ runner.os }}-rush-build-${{ github.sha }}-${{ github.run_id }}-${{ github.run_attempt }}
+          restore-keys: |
+            ${{ runner.os }}-rush-build-${{ github.sha }}-
+            ${{ runner.os }}-rush-build-
 
       - name: Set model version
         run: node common/scripts/install-run-rush.js model-version
 
-      - name: Build root workspace artifacts
+      - name: Build selected projects
         run: |
-          node common/scripts/install-run-rush.js bundle -v
-          node common/scripts/install-run-rush.js package -v
+          targets=(
+            @hcengineering/pod-account
+            @hcengineering/pod-calendar
+            @hcengineering/pod-collaborator
+            @hcengineering/pod-front
+            @hcengineering/pod-fulltext
+            @hcengineering/pod-gmail
+            @hcengineering/pod-love
+            @hcengineering/pod-mail
+            @hcengineering/pod-notification
+            @hcengineering/pod-print
+            @hcengineering/rekoni-service
+            @hcengineering/pod-stats
+            @hcengineering/pod-telegram
+            @hcengineering/pod-server
+            @hcengineering/pod-workspace
+            @hcengineering/prod
+          )
+          selectors=()
+
+          for target in "${targets[@]}"; do
+            selectors+=(--to "$target")
+          done
+
+          node common/scripts/install-run-rush.js build -v "${selectors[@]}"
+
+      - name: Bundle selected container packages
+        run: |
+          targets=(
+            @hcengineering/pod-account
+            @hcengineering/pod-calendar
+            @hcengineering/pod-collaborator
+            @hcengineering/pod-front
+            @hcengineering/pod-fulltext
+            @hcengineering/pod-gmail
+            @hcengineering/pod-love
+            @hcengineering/pod-mail
+            @hcengineering/pod-notification
+            @hcengineering/pod-print
+            @hcengineering/rekoni-service
+            @hcengineering/pod-stats
+            @hcengineering/pod-telegram
+            @hcengineering/pod-server
+            @hcengineering/pod-workspace
+          )
+          selectors=()
+
+          for target in "${targets[@]}"; do
+            selectors+=(--only "$target")
+          done
+
+          node common/scripts/install-run-rush.js bundle -v "${selectors[@]}"
+
+      - name: Package frontend assets
+        run: |
+          node common/scripts/install-run-rush.js package -v --only @hcengineering/prod
+          node common/scripts/install-run-rush.js package -v --only @hcengineering/pod-front
+
+      - name: Save Rush build cache
+        if: always() && steps.rush-build-cache.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v5
+        with:
+          path: common/temp/build-cache
+          key: ${{ steps.rush-build-cache.outputs.cache-primary-key }}
 
       - name: Download workspace initialization scripts
         run: |
