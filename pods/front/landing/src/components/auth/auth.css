@@ -1,0 +1,764 @@
+/*
+ * Estilos das telas de acesso (`/entrar` e `/cadastro`), copiados de
+ * huly.io/login e huly.io/signup — medidas, cores e camadas conferidas contra
+ * o HTML e o CSS servidos por eles.
+ *
+ * Ficam neste arquivo, e não em `globals.css`, porque só as duas rotas de
+ * acesso usam: o `globals.css` já carrega a landing inteira, e misturar as
+ * duas coisas obrigaria quem mexe no card a caçar as regras no meio de tudo.
+ *
+ * As medidas são as do original (card de 480x479, campo de 42px, botão de
+ * 44px) porque a proporção entre elas é o que dá o desenho; arredondar uma
+ * sozinha desalinha o resto. Os cinzas vêm da paleta deles: grey-90
+ * rgb(229,229,231), grey-60 rgb(149,151,158), grey-40 rgb(97,101,107),
+ * grey-30 rgb(74,75,80) e grey-5 rgb(11,12,14).
+ */
+
+.auth-page {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  min-height: 100dvh;
+  background: #090a0f;
+  color: #fff;
+}
+
+/* Volta pra landing. Fica solto sobre o palco, no canto superior esquerdo. */
+.auth-topbar {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  z-index: 50;
+  padding: 16px 24px;
+}
+
+.auth-home {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: -0.02em;
+  color: rgb(229, 229, 231);
+  transition: color 0.2s ease;
+}
+
+.auth-home:hover {
+  color: #fff;
+}
+
+.auth-home svg {
+  color: rgb(97, 101, 107);
+  transition: color 0.2s ease;
+}
+
+.auth-home:hover svg {
+  color: rgb(149, 151, 158);
+}
+
+/* `overflow: hidden` é o que segura a aurora (1403px de largura) dentro da
+   tela: sem ele o card fica no lugar mas a página ganha barra horizontal. */
+.auth-stage {
+  position: relative;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+  min-height: 770px;
+  padding: 64px 0;
+}
+
+/* O `z-index` positivo faz do card um contexto de empilhamento: é o que
+   permite às camadas decorativas usarem `z-index` negativo e ficarem entre o
+   fundo preto e o conteúdo, sem escapar para trás do palco. */
+.auth-card {
+  position: relative;
+  z-index: 10;
+  width: 480px;
+  height: 479px;
+  padding: 56px 48px 0;
+  background: #000;
+  /* O preto do card é o que sobra por baixo da trama, que só chega até o raio
+     da moldura. Sem arredondar aqui também, os quatro cantos aparecem
+     quadrados por fora do desenho. */
+  border-radius: 20px;
+}
+
+.auth-decor {
+  pointer-events: none;
+}
+
+.auth-aurora {
+  position: absolute;
+  left: 28%;
+  top: 50%;
+  z-index: -2;
+  max-width: none;
+  transform: translate(-50%, -50%);
+  background-blend-mode: lighten;
+  filter: blur(4px);
+}
+
+/* Moldura recortada: o `overflow` corta a trama e o aro no raio do card, e a
+   sombra desgruda o card do fundo. */
+.auth-card-frame {
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  overflow: hidden;
+  border-radius: 20px;
+  box-shadow: 0 4px 25px rgba(11, 13, 16, 0.8);
+  transform: translateZ(0);
+}
+
+.auth-card-pattern {
+  position: absolute;
+  inset: 1px;
+  z-index: -1;
+  max-width: none;
+  border-radius: 20px;
+  background: #000;
+}
+
+.auth-card-border {
+  position: absolute;
+  left: 0.5px;
+  top: 0;
+  max-width: none;
+}
+
+/* As quatro medidas abaixo desenham a régua "OU" e a fileira de provedores, e
+   são as mesmas que posicionam as luzes de baixo do botão — que precisam cair
+   em cima dessa fileira. Ficam como variáveis porque quem as usa está em dois
+   ramos distantes da árvore (o formulário e os provedores), e o deslocamento
+   fixo do original (`bottom: -111px`) desalinha assim que o espaçamento muda.
+   Moram aqui, no ancestral comum dos dois. */
+.auth-card-body {
+  --auth-or-mt: 16px;
+  --auth-or-h: 18px;
+  --auth-providers-mt: 25px;
+  --auth-provider-h: 40px;
+}
+
+.auth-logo {
+  display: block;
+  height: 28px;
+  width: auto;
+}
+
+.auth-title {
+  margin: 17px 0 0;
+  font-size: 36px;
+  font-weight: 600;
+  line-height: 1;
+  letter-spacing: -0.02em;
+  color: #fff;
+}
+
+.auth-form {
+  display: flex;
+  flex-direction: column;
+  margin-top: 28px;
+}
+
+.auth-label {
+  display: block;
+  font-size: 14px;
+  line-height: 1.375;
+  letter-spacing: -0.02em;
+  color: rgb(149, 151, 158);
+}
+
+.auth-input-row {
+  position: relative;
+  margin-top: 2px;
+}
+
+.auth-input {
+  display: block;
+  height: 42px;
+  width: 100%;
+  padding: 9px 12px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+  background: #000;
+  color: #fff;
+  font: inherit;
+  font-size: 15px;
+  letter-spacing: -0.02em;
+  outline: none;
+  transition: border-color 0.18s ease;
+}
+
+.auth-input::placeholder {
+  color: rgba(255, 255, 255, 0.2);
+}
+
+.auth-input:focus {
+  border-color: rgba(209, 208, 255, 0.5);
+}
+
+/* O preenchimento automático do Chrome pinta o campo de azul-claro e deixa o
+   texto preto sobre o card escuro. O `box-shadow` interno é o único jeito de
+   cobrir esse fundo. */
+.auth-input:-webkit-autofill,
+.auth-input:-webkit-autofill:focus {
+  -webkit-text-fill-color: #fff;
+  box-shadow: inset 0 0 0 1000px #000;
+}
+
+.auth-submit-row {
+  height: 44px;
+  margin-top: 27px;
+}
+
+.auth-submit-wrap {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  width: 100%;
+  /* Estado inicial: luz parada à direita, como no original antes de qualquer
+     interação. `usePillGlow` cruza os dois valores conforme o ponteiro anda. */
+  --btn-r: 1;
+  --btn-l: 0;
+}
+
+/* Aro externo do botão, em três camadas de desfoque diferentes — os
+   gradientes, os ângulos e os raios de desfoque são os das classes
+   `border-button-light` e `border-button-light-blur` do huly.io. A cópia
+   espelhada (`--l`) é a mesma coisa com `scaleX(-1)`: é a troca de opacidade
+   entre as duas que dá a impressão de a luz andar de um lado a outro. */
+.auth-ring {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  height: calc(100% + 9px);
+  width: calc(100% + 9px);
+  border: 3px solid transparent;
+  border-radius: 9999px;
+  pointer-events: none;
+  transition: opacity 90ms linear;
+  /* Não é dica de desempenho: `will-change` fecha um contexto de empilhamento
+     e prende aqui dentro os `z-index` das três camadas abaixo. Sem isso elas
+     sobem por cima da cápsula (que vem depois no HTML) e o laranja, que devia
+     só encostar na borda, cobre o botão inteiro. O huly.io depende do mesmo
+     efeito. */
+  will-change: transform;
+}
+
+.auth-ring--r {
+  opacity: var(--btn-r);
+  transform: translate(-50%, -50%);
+}
+
+.auth-ring--l {
+  opacity: var(--btn-l);
+  transform: translate(-50%, -50%) scaleX(-1);
+}
+
+.auth-ring::before,
+.auth-ring::after {
+  content: "";
+  position: absolute;
+  box-sizing: content-box;
+  height: 100%;
+  width: 100%;
+  border-style: solid;
+  border-color: transparent;
+  border-radius: 9999px;
+}
+
+/* Camada mais larga e mais borrada: o alcance visível do halo. */
+.auth-ring::after {
+  left: -3px;
+  top: -3px;
+  z-index: 20;
+  border-width: 3px;
+  filter: blur(15px);
+  background:
+    linear-gradient(transparent, transparent) padding-box,
+    linear-gradient(91.88deg, rgba(255, 137, 100, 0.2) 46.45%, #cd3100 98.59%)
+      border-box;
+}
+
+/* Camada estreita e menos borrada: acentua a borda logo na virada do botão. */
+.auth-ring::before {
+  left: -2px;
+  top: -2px;
+  z-index: 10;
+  border-width: 2px;
+  filter: blur(2px);
+  background:
+    linear-gradient(transparent, transparent) padding-box,
+    linear-gradient(
+        97.68deg,
+        rgba(255, 177, 153, 0) 38.1%,
+        rgba(255, 177, 153, 0.2) 82.47%,
+        #ff7950 93.3%
+      )
+      border-box;
+}
+
+/* Fio de 1px na borda do aro, quase branco na ponta acesa. */
+.auth-ring-inner {
+  position: relative;
+  height: 100%;
+  width: 100%;
+  border: 1px solid transparent;
+  border-radius: 9999px;
+  background:
+    linear-gradient(transparent, transparent) padding-box,
+    linear-gradient(
+        103.7deg,
+        hsla(15, 25%, 65%, 0.1) 38.66%,
+        rgba(233, 132, 99, 0.1) 68.55%,
+        #e98463 85.01%,
+        #fff 92.12%
+      )
+      border-box;
+}
+
+.auth-ring-inner::before {
+  content: "";
+  position: absolute;
+  left: -2px;
+  top: -2px;
+  z-index: 30;
+  box-sizing: content-box;
+  height: 100%;
+  width: 100%;
+  border: 2px solid transparent;
+  border-radius: 9999px;
+  filter: blur(7px);
+  background:
+    linear-gradient(transparent, transparent) padding-box,
+    linear-gradient(
+        91.96deg,
+        rgba(255, 177, 153, 0) 6.11%,
+        rgba(255, 177, 153, 0.2) 53.57%,
+        #ff7950 93.6%
+      )
+      border-box;
+}
+
+.auth-submit {
+  position: relative;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 44px;
+  width: 100%;
+  padding: 0 64px;
+  overflow: hidden;
+  border: 1px solid rgba(255, 255, 255, 0.6);
+  border-radius: 9999px;
+  background: #d1d1d1;
+  color: #000;
+  font: inherit;
+  font-weight: 700;
+  letter-spacing: -0.015em;
+  cursor: pointer;
+  transition: background 0.2s ease;
+}
+
+.auth-submit-label {
+  font-size: 14px;
+  line-height: 42px;
+  text-transform: uppercase;
+  white-space: nowrap;
+  color: #000;
+}
+
+/* Miolo aceso dentro da cápsula, recortado pelo `overflow` do botão. Ao
+   contrário do halo, este fica sempre visível: parado, mora 105px à direita do
+   centro, e anda com o ponteiro entre -105px e 105px. */
+.auth-btn-glow {
+  position: absolute;
+  z-index: -1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 204px;
+  transform: translateX(calc((var(--btn-r, 1) - var(--btn-l, 0)) * 105px))
+    translateZ(0);
+  transition: transform 70ms linear;
+}
+
+.auth-btn-glow-core {
+  position: absolute;
+  top: 50%;
+  height: 121px;
+  width: 121px;
+  transform: translateY(-50%);
+  background: radial-gradient(
+    50% 50% at 50% 50%,
+    #fffff5 3.5%,
+    #ffaa81 26.5%,
+    #ffda9f 37.5%,
+    rgba(255, 170, 129, 0.5) 49%,
+    rgba(210, 106, 58, 0) 92.5%
+  );
+}
+
+.auth-btn-glow-wide {
+  position: absolute;
+  top: 50%;
+  height: 103px;
+  width: 204px;
+  transform: translateY(-50%);
+  background: radial-gradient(
+    43.3% 44.23% at 50% 49.51%,
+    #fffff7 29%,
+    #fffacd 48.5%,
+    #f4d2bf 60.71%,
+    rgba(214, 211, 210, 0) 100%
+  );
+  filter: blur(5px);
+}
+
+.auth-btn-lights {
+  position: absolute;
+  inset: 0;
+  z-index: 50;
+  pointer-events: none;
+}
+
+.auth-btn-light {
+  position: absolute;
+  max-width: none;
+  border-radius: 4px;
+  transition: opacity 90ms linear;
+}
+
+.auth-btn-light--tr {
+  right: 0;
+  top: -69px;
+  height: 42px;
+  width: auto;
+  opacity: var(--btn-r);
+}
+
+.auth-btn-light--tl {
+  left: 0;
+  top: -69px;
+  height: 42px;
+  width: auto;
+  opacity: var(--btn-l);
+}
+
+/* Aro externo do card, grande o bastante para envolvê-lo inteiro: no original
+   ele nasce daqui, do bloco do botão, e não do card. */
+.auth-btn-light--outer {
+  right: -48px;
+  top: -288px;
+  opacity: var(--btn-r);
+}
+
+/* Estas duas contornam a fileira de provedores. O SVG tem 42px de altura para
+   40px de botão, então sobra 1px em cima e 1px embaixo — a mesma folga que
+   sobra nas laterais pela margem de 1px do `.auth-provider`. */
+.auth-btn-light--br,
+.auth-btn-light--bl {
+  bottom: calc(
+    -1px - var(--auth-or-mt) - var(--auth-or-h) - var(--auth-providers-mt) -
+      var(--auth-provider-h)
+  );
+}
+
+.auth-btn-light--br {
+  right: 0;
+  opacity: var(--btn-r);
+}
+
+.auth-btn-light--bl {
+  left: 0;
+  opacity: var(--btn-l);
+}
+
+/* Fio quente por cima da régua "OU": cai no meio dela. */
+.auth-btn-hair {
+  position: absolute;
+  bottom: calc(-1 * (var(--auth-or-mt) + var(--auth-or-h) / 2));
+  height: 1px;
+  width: 169px;
+  transition: opacity 90ms linear;
+}
+
+.auth-btn-hair--l {
+  left: 0;
+  opacity: var(--btn-l);
+  background: linear-gradient(
+    270deg,
+    #2d2f31 0%,
+    #2d2f31 40%,
+    #835549 88.5%,
+    #ca9a8c 100%
+  );
+}
+
+.auth-btn-hair--r {
+  right: 0;
+  opacity: var(--btn-r);
+  background: linear-gradient(
+    90deg,
+    #2d2f31 0%,
+    #2d2f31 40%,
+    #835549 88.5%,
+    #ca9a8c 100%
+  );
+}
+
+.auth-or {
+  display: flex;
+  align-items: center;
+  height: var(--auth-or-h);
+  margin-top: var(--auth-or-mt);
+}
+
+.auth-or-line {
+  flex: 1;
+  height: 1px;
+}
+
+.auth-or-line--l {
+  background: linear-gradient(90deg, #443d59 0%, #2d2f31 50.9%);
+}
+
+.auth-or-line--r {
+  background: #2d2f31;
+}
+
+.auth-or-label {
+  padding: 0 14px;
+  font-size: 13px;
+  line-height: var(--auth-or-h);
+  text-transform: uppercase;
+  color: rgb(97, 101, 107);
+}
+
+.auth-providers {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 0 16px;
+  margin-top: var(--auth-providers-mt);
+}
+
+/* Aro por `box-shadow` interno, e não por `border`: assim a espessura não
+   entra na altura de 40px nem empurra o conteúdo ao ficar mais clara no
+   hover. */
+.auth-provider {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  height: var(--auth-provider-h);
+  margin: 0 1px;
+  padding: 0 8px;
+  border: 0;
+  border-radius: 4px;
+  background: rgb(11, 12, 14);
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.1);
+  color: #fff;
+  font: inherit;
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: -0.02em;
+  cursor: pointer;
+  transition: box-shadow 0.2s ease;
+}
+
+.auth-provider:hover {
+  box-shadow: inset 0 0 0 1px rgba(255, 255, 255, 0.15);
+}
+
+.auth-provider img {
+  flex: none;
+}
+
+.auth-switch {
+  position: relative;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin: 16px 0 0;
+  font-size: 14px;
+  line-height: 1.375;
+  letter-spacing: -0.02em;
+}
+
+.auth-switch span {
+  color: rgba(255, 255, 255, 0.4);
+}
+
+.auth-switch a {
+  color: rgb(229, 229, 231);
+  transition: color 0.2s ease;
+}
+
+.auth-switch a:hover {
+  color: #fff;
+}
+
+.auth-legal {
+  position: absolute;
+  bottom: 32px;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  font-size: 13px;
+  line-height: 1.375;
+  letter-spacing: -0.02em;
+}
+
+.auth-legal a {
+  color: rgba(255, 255, 255, 0.4);
+  transition: opacity 0.2s ease;
+}
+
+.auth-legal a:hover {
+  color: rgba(255, 255, 255, 0.8);
+}
+
+.auth-legal-sep {
+  display: block;
+  width: 1px;
+  height: 12px;
+  background: rgb(74, 75, 80);
+}
+
+@media (max-width: 1279px) {
+  .auth-card {
+    width: 464px;
+    padding: 64px 40px 0;
+  }
+
+  .auth-title {
+    font-size: 32px;
+  }
+
+  .auth-form {
+    margin-top: 24px;
+  }
+
+  .auth-card-body {
+    --auth-providers-mt: 22px;
+  }
+}
+
+@media (max-width: 1023px) {
+  .auth-card {
+    padding-left: 44px;
+    padding-right: 44px;
+  }
+
+  .auth-title {
+    font-size: 28px;
+  }
+
+  .auth-input {
+    height: 41px;
+  }
+}
+
+/* As luzes de fora do botão somem no mesmo ponto que no original: encostadas
+   nas bordas de um card estreito elas viram borrões. */
+@media (max-width: 767px) {
+  .auth-btn-lights {
+    display: none;
+  }
+
+  .auth-submit {
+    padding: 0 52px 0 59px;
+  }
+
+  .auth-input {
+    font-size: 16px;
+  }
+}
+
+/* No celular o card ocupa a largura da tela e a altura passa a ser mínima: os
+   provedores empilham, e a altura fixa cortaria o segundo botão. */
+@media (max-width: 639px) {
+  .auth-stage {
+    min-height: 440px;
+    padding: 72px 20px 32px;
+  }
+
+  .auth-card {
+    width: 100%;
+    max-width: 384px;
+    height: auto;
+    min-height: 384px;
+    padding: 20px 20px 24px;
+    border-radius: 18px;
+  }
+
+  .auth-card-frame {
+    border-radius: 18px;
+  }
+
+  .auth-card-pattern {
+    left: 50%;
+    height: 384px;
+    width: auto;
+    border-radius: 18px;
+    transform: translateX(-50%);
+  }
+
+  .auth-card-border {
+    left: 0;
+    width: 100%;
+    max-width: 384px;
+  }
+
+  .auth-aurora {
+    left: 80px;
+    transform: translate(-50%, -50%) scale(0.9);
+  }
+
+  .auth-logo {
+    height: 24px;
+  }
+
+  .auth-title {
+    margin-top: 12px;
+    font-size: 24px;
+  }
+
+  .auth-form {
+    margin-top: 20px;
+  }
+
+  .auth-input-row {
+    margin-bottom: 8px;
+  }
+
+  .auth-submit-row {
+    height: 40px;
+    margin-top: 16px;
+  }
+
+  .auth-submit {
+    height: 40px;
+  }
+
+  .auth-card-body {
+    --auth-providers-mt: 16px;
+  }
+
+  .auth-providers {
+    grid-template-columns: 1fr;
+    gap: 12px 0;
+  }
+
+  .auth-legal {
+    position: static;
+    margin-top: 24px;
+  }
+}

@@ -88,14 +88,14 @@ export function SiteHeader() {
           style={{ alignItems: "center", gap: 18 }}
         >
           <a
-            href="/login"
+            href="/entrar"
             className="lp-link-plain"
             style={{ fontSize: 14, fontWeight: 600 }}
           >
             Log in
           </a>
           <a
-            href="/login/signup"
+            href="/cadastro"
             className="lp-btn-white"
             style={{
               fontSize: 14,
@@ -169,14 +169,14 @@ export function SiteHeader() {
 
           <div className="lp-menu-actions">
             <a
-              href="/login"
+              href="/entrar"
               onClick={() => setMenuOpen(false)}
               className="lp-menu-btn"
             >
               Entrar
             </a>
             <a
-              href="/login/signup"
+              href="/cadastro"
               onClick={() => setMenuOpen(false)}
               className="lp-menu-btn"
             >

@@ -35,7 +35,7 @@ export function Faq() {
 
   return (
     <section id="faq" className="lp-faq">
-      <a href="/login/signup" className="lp-faq-cta">
+      <a href="/cadastro" className="lp-faq-cta">
         Começar agora
       </a>
       <div className="lp-faq-card" data-reveal>

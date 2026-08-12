@@ -326,7 +326,7 @@ export default function Home() {
         </div>
         <div data-reveal style={{ textAlign: "center", marginTop: 64 }}>
           <a
-            href="/login/signup"
+            href="/cadastro"
             className="lp-btn-white"
             style={{
               display: "inline-block",

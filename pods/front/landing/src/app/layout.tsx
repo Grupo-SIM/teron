@@ -8,7 +8,7 @@ const manrope = Manrope({
 });
 
 export const metadata: Metadata = {
-  title: "Huly — Tudo o que sua equipe precisa. Em um só lugar.",
+  title: "Teron — Tudo o que sua equipe precisa. Em um só lugar.",
   description:
     "Centralize projetos, tarefas, reuniões e comunicação em uma única plataforma para sua equipe produzir mais.",
 };
