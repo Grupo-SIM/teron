@@ -25,7 +25,7 @@ import express, { Request, Response } from 'express'
 import fileUpload, { UploadedFile } from 'express-fileupload'
 import expressStaticGzip from 'express-static-gzip'
 import morgan from 'morgan'
-import { join, normalize, resolve } from 'path'
+import { extname, join, normalize, resolve } from 'path'
 import { cwd } from 'process'
 import sharp, { type Sharp } from 'sharp'
 import { getClient as getAccountClient } from '@hcengineering/account-client'
@@ -442,6 +442,40 @@ export function start (
         }
       })
     )
+
+    // O export estático do Next grava cada rota como um arquivo irmão
+    // (`/entrar` -> `entrar.html`), e o middleware acima só entrega arquivos
+    // pedidos pelo nome exato. Sem esta ponte toda rota da landing além da
+    // raiz cairia no `index.html` da aplicação, que abriria o workbench no
+    // lugar da página.
+    //
+    // Só entra quem tem arquivo correspondente no export, então as rotas da
+    // aplicação (`/login`, `/workbench`, ...) seguem intactas.
+    app.get('*', (request, response, next) => {
+      if (request.method !== 'GET' || extname(request.path) !== '') {
+        next()
+        return
+      }
+      const route = request.path.replace(/\/+$/, '')
+      if (route === '') {
+        next()
+        return
+      }
+      const page = normalize(join(landingDist, `${route}.html`))
+      if (!page.startsWith(landingDist) || !fs.existsSync(page)) {
+        next()
+        return
+      }
+      response.sendFile(page, {
+        etag: true,
+        lastModified: true,
+        cacheControl: false,
+        headers: {
+          'Cache-Control': cacheControlNoCache,
+          'Keep-Alive': `timeout=${KEEP_ALIVE_TIMEOUT}`
+        }
+      })
+    })
   } else {
     console.warn('landing page was not found, keeping the application fallback for /', { landingIndex })
   }
