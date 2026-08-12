@@ -241,7 +241,7 @@ export function PricingPlans() {
                   ))}
                 </ul>
 
-                <a href="/login/signup" className="lp-pr-cta">
+                <a href="/cadastro" className="lp-pr-cta">
                   {plan.cta}
                 </a>
               </article>

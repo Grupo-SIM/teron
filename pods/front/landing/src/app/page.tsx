@@ -415,8 +415,8 @@ export default function Home() {
               está apenas começando.
             </p>
             <div className="lp-cta-actions">
-              <HeroCta href="#plataforma" label="Ver em ação" />
-              <a href="/precos" className="lp-btn-pill-dark">
+              <HeroCta href="/cadastro" label="Ver em ação" />
+              <a href="mailto:jbmidia@gmail.com" className="lp-btn-pill-dark">
                 Falar com o time
               </a>
             </div>

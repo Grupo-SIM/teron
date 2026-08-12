@@ -61,10 +61,17 @@ export default function PrecosPage() {
 
         <div className="lp-pr-inner">
           <div className="lp-pr-prose">
+            {/* Os blocos de texto são `div` com `role="paragraph"`, e não `p`.
+                O `RiveComponent` que desenha os ícones monta uma `div`, e `div`
+                dentro de `p` é HTML inválido: o navegador fecha o parágrafo
+                sozinho e joga a `div` para fora, a árvore do cliente deixa de
+                bater com a do servidor e o React remonta a página inteira.
+                A `role` devolve a semântica que o `p` dava. */}
+
             {/* A frase de abertura não entra no efeito: com a página no topo
                 nada foi lido ainda, e se ela dependesse do scroll o visitante
                 chegaria numa tela inteira de texto apagado. */}
-            <p className="lp-pr-p">
+            <div className="lp-pr-p" role="paragraph">
               A{" "}
               <span aria-hidden className="lp-pr-mark">
                 <span className="lp-pr-mark-glow" />
@@ -76,7 +83,7 @@ export default function PrecosPage() {
                 />
               </span>
               {OPENING}
-            </p>
+            </div>
 
             {/* Os ícones entram no meio da frase, como pontuação animada: cada
                 um acende junto com a palavra que ele ilustra.
@@ -84,7 +91,7 @@ export default function PrecosPage() {
                 Ícone e palavra vão juntos dentro de `lp-pr-keep` para a quebra
                 de linha nunca separar os dois — sem isso o ícone cai sozinho no
                 começo da linha seguinte e perde a ligação com o que ilustra. */}
-            <p className="lp-pr-p">
+            <div className="lp-pr-p" role="paragraph">
               {/* Quando o ícone vem antes da palavra, o espaço que separa os
                   dois fica dentro do grupo, e não antes dele: recolhido o ícone
                   ocupa zero, e um espaço de cada lado viraria espaço duplo. */}
@@ -115,14 +122,14 @@ export default function PrecosPage() {
                 <PricingIcon artboard="compute" />{" "}
                 <Words text="processamento." />
               </span>
-            </p>
+            </div>
 
             {/* As duas quebras são fixas de propósito. Os ícones mudam de
                 largura ao acender, e com a quebra a cargo do navegador as
                 palavras trocavam de linha no meio do efeito. Presas assim, a
                 linha é a mesma com ou sem ícone — só o espaço entre as palavras
                 abre. Abaixo de 1024px elas saem: a linha inteira não caberia. */}
-            <p className="lp-pr-p">
+            <div className="lp-pr-p" role="paragraph">
               <Words text={STORAGE_BEFORE} />{" "}
               <br className="lp-pr-br" />
               <Words text="mas" />{" "}
@@ -159,9 +166,9 @@ export default function PrecosPage() {
                 />
               </span>{" "}
               <Words text="entram na conta do plano." />
-            </p>
+            </div>
 
-            <p className="lp-pr-p">
+            <div className="lp-pr-p" role="paragraph">
               <Words text={NETWORK} />{" "}
               <span className="lp-pr-keep">
                 <Words text="vídeo." />
@@ -174,9 +181,9 @@ export default function PrecosPage() {
                   offsetTop={-98}
                 />
               </span>
-            </p>
+            </div>
 
-            <p className="lp-pr-p">
+            <div className="lp-pr-p" role="paragraph">
               <Words text={COMPUTE_BEFORE} />{" "}
               <Word className="lp-pr-grad">Teron IA e Teron MetaBrain</Word>{" "}
               <Words text={COMPUTE_AFTER} />{" "}
@@ -185,26 +192,26 @@ export default function PrecosPage() {
                 <PricingIcon artboard="chatgpt" marginRight={-58} />
                 <Words text="." />
               </span>
-            </p>
+            </div>
           </div>
 
           <PricingPlans />
 
           <div className="lp-pr-prose">
-            <p className="lp-pr-p">
+            <div className="lp-pr-p" role="paragraph">
               <Words text={CUSTOM} />
-            </p>
+            </div>
 
             {/* Aqui o ícone do arquivo Rive traz "Contact us" desenhado dentro
                 da arte, sem como traduzir. Vira um link de verdade: fica em
                 português, em linha própria, e é navegável por teclado. */}
-            <p className="lp-pr-p">
+            <div className="lp-pr-p" role="paragraph">
               <Words text={CONTACT} />
-              <PricingContact href="/#faq">Fale com a gente</PricingContact>
-            </p>
+              <PricingContact href="mailto:jbmidia@gmail.com">Fale com a gente</PricingContact>
+            </div>
 
             <p className="lp-pr-actions">
-              <a href="/login/signup" className="lp-pr-action">
+              <a href="/cadastro" className="lp-pr-action">
                 Começar grátis
               </a>
             </p>

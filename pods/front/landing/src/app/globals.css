@@ -2181,7 +2181,11 @@ a {
   text-wrap: pretty;
 }
 
-.lp-pr-p:last-of-type {
+/* `:last-child`, e não `:last-of-type`: os blocos de texto são `div` (ver o
+   comentário em `precos/page.tsx`), e o segundo bloco termina na fileira de
+   botões — com `:last-of-type` a regra passaria a pegar o último texto ali e
+   comeria a folga até os botões. */
+.lp-pr-p:last-child {
   margin-bottom: 0;
 }
 
