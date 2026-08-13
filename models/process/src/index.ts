@@ -455,7 +455,7 @@ export function createModel (builder: Builder): void {
       icon: process.icon.Process,
       accessLevel: AccountRole.User,
       alias: processId,
-      hidden: false,
+      hidden: true,
       component: process.component.Main
     },
     process.app.Process

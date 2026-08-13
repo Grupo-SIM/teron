@@ -56,6 +56,7 @@
   let categoryId: string = ''
 
   let categories: SettingsCategory[] = []
+  const hiddenCategories = new Set(['integrations', 'translation', 'calendar', 'mailboxes', 'types', 'spaceTypes'])
   const account = getCurrentAccount()
   let asideComponent: ComponentType | AnyComponent | null = null
   let asideProps: object | null = null
@@ -65,7 +66,9 @@
     setting.class.SettingsCategory,
     {},
     (res) => {
-      categories = res.filter((p) => hasAccountRole(account, p.role) && !isDisabled(p.feature))
+      categories = res.filter(
+        (p) => !hiddenCategories.has(p.name) && hasAccountRole(account, p.role) && !isDisabled(p.feature)
+      )
       category = findCategory(categoryId)
     },
     { sort: { order: 1 } }

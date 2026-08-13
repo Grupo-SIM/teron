@@ -155,7 +155,7 @@ export function createModel (builder: Builder): void {
       label: inventory.string.Inventory,
       icon: inventory.icon.InventoryApplication,
       alias: inventoryId,
-      hidden: false,
+      hidden: true,
       navigatorModel: {
         specials: [
           {

@@ -57,7 +57,7 @@ function defineApplication (builder: Builder): void {
       label: testManagement.string.TestManagementApplication,
       icon: testManagement.icon.TestManagementApplication,
       alias: testManagementId,
-      hidden: false,
+      hidden: true,
       navigatorModel: {
         spaces: [
           {

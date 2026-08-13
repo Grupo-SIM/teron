@@ -609,7 +609,7 @@ export function createModel (builder: Builder): void {
       label: card.string.CardApplication,
       icon: card.icon.Card,
       alias: cardId,
-      hidden: false,
+      hidden: true,
       locationResolver: card.resolver.Location,
       locationDataResolver: card.resolver.LocationData,
       navigatorModel: {

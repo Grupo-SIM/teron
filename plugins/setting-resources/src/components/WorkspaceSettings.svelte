@@ -35,6 +35,16 @@
   let categoryId: string = ''
 
   let categories: SettingsCategory[] = []
+  const hiddenCategories = new Set([
+    'message-templates',
+    'relations',
+    'classes',
+    'tagrelation',
+    'relation',
+    'enums',
+    'export',
+    'emojis'
+  ])
   const account = getCurrentAccount()
   const admin = isAdminUser()
 
@@ -43,7 +53,9 @@
     setting.class.WorkspaceSettingCategory,
     {},
     (res) => {
-      categories = res.filter((p) => hasAccountRole(account, p.role) && !isDisabled(p.feature ?? ''))
+      categories = res.filter(
+        (p) => !hiddenCategories.has(p.name) && hasAccountRole(account, p.role) && !isDisabled(p.feature ?? '')
+      )
       if (!admin) {
         categories = categories.filter((p) => !(p.adminOnly ?? false))
       }
