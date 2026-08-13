@@ -36,6 +36,9 @@
 
   let categories: SettingsCategory[] = []
   const hiddenCategories = new Set([
+    'backup',
+    'guestPermissions',
+    'configuration',
     'message-templates',
     'relations',
     'classes',
