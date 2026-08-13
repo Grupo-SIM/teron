@@ -95,6 +95,7 @@ jobs:
             @hcengineering/pod-collaborator
             @hcengineering/pod-front
             @hcengineering/pod-fulltext
+            @hcengineering/pod-github
             @hcengineering/pod-love
             @hcengineering/pod-mail
             @hcengineering/pod-notification
@@ -120,6 +121,7 @@ jobs:
             @hcengineering/pod-collaborator
             @hcengineering/pod-front
             @hcengineering/pod-fulltext
+            @hcengineering/pod-github
             @hcengineering/pod-love
             @hcengineering/pod-mail
             @hcengineering/pod-notification
@@ -169,6 +171,7 @@ jobs:
             pods/server
             pods/stats
             pods/workspace
+            services/github/pod-github
             services/love
             services/mail/pod-mail
             services/notification/pod-notification
@@ -216,6 +219,8 @@ jobs:
             context: pods/front
           - image: fulltext
             context: pods/fulltext
+          - image: github
+            context: services/github/pod-github
           - image: love
             context: services/love
           - image: mail

@@ -56,7 +56,7 @@
   let categoryId: string = ''
 
   let categories: SettingsCategory[] = []
-  const hiddenCategories = new Set(['integrations', 'translation', 'calendar', 'mailboxes', 'types', 'spaceTypes'])
+  const hiddenCategories = new Set(['translation', 'calendar', 'mailboxes', 'types', 'spaceTypes'])
   const account = getCurrentAccount()
   let asideComponent: ComponentType | AnyComponent | null = null
   let asideProps: object | null = null
