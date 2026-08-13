@@ -1195,39 +1195,9 @@ source = "registry+https://github.com/rust-lang/crates.io-index"
 checksum = "df3b46402a9d5adb4c86a0cf463f42e19994e3ee891101b1841f30a545cb49a9"
 
 [[package]]
-name = "teronpulse"
-version = "0.4.2"
-dependencies = [
- "actix-cors",
- "actix-web",
- "actix-ws",
- "anyhow",
- "config",
- "futures",
- "futures-util",
- "hex",
- "teronrs",
- "md5",
- "redis",
- "regorus",
- "secrecy",
- "serde",
- "serde_json",
- "serde_with",
- "strum",
- "tokio",
- "tokio-stream",
- "tokio-tungstenite",
- "tracing",
- "tracing-subscriber",
- "url",
- "uuid",
-]
-
-[[package]]
-name = "teronrs"
+name = "hulyrs"
 version = "0.1.0"
-source = "git+https://github.com/hcengineering/teronrs.git#3684385152b5022a2ef2c44a4e99c561e965de57"
+source = "git+https://github.com/hcengineering/hulyrs.git#415b309e1639b4a7b30759b0bf0fc434b1ecaaaf"
 dependencies = [
  "actix-web",
  "bytes",
@@ -2915,6 +2885,36 @@ dependencies = [
  "proc-macro2",
  "quote",
  "syn",
+]
+
+[[package]]
+name = "teronpulse"
+version = "0.4.2"
+dependencies = [
+ "actix-cors",
+ "actix-web",
+ "actix-ws",
+ "anyhow",
+ "config",
+ "futures",
+ "futures-util",
+ "hex",
+ "hulyrs",
+ "md5",
+ "redis",
+ "regorus",
+ "secrecy",
+ "serde",
+ "serde_json",
+ "serde_with",
+ "strum",
+ "tokio",
+ "tokio-stream",
+ "tokio-tungstenite",
+ "tracing",
+ "tracing-subscriber",
+ "url",
+ "uuid",
 ]
 
 [[package]]
