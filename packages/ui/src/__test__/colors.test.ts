@@ -25,11 +25,11 @@ import {
 describe('colors module tests', () => {
   describe('dark theme background', () => {
     it('uses the branded surface gradient', () => {
-      expect(defaultBackground(true)).toBe('linear-gradient(90deg, #202020, #151413)')
+      expect(defaultBackground(true)).toBe('linear-gradient(90deg, #1B1C1E, #161719)')
     })
 
     it('uses the branded canvas when blending translucent colors', () => {
-      expect(defineAlpha(true, '#FFFFFF', 50)).toBe('#8a8a89')
+      expect(defineAlpha(true, '#FFFFFF', 50)).toBe('#8b8b8c')
     })
   })
 

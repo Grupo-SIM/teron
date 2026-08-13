@@ -49,16 +49,16 @@
   --global-ui-active-BackgroundColor: #6098F226;
   --global-ui-highlight-BackgroundColor: #6098F20D;
   --global-ui-hover-highlight-BackgroundColor: #6098F226;
-  --global-surface-01-BackgroundColor: #0B0B0B;
-  --global-surface-01-BorderColor: #303030;
-  --global-surface-01-hover-BackgroundColor: #151413;
-  --global-surface-02-BackgroundColor: #151413;
-  --global-surface-02-BorderColor: #303030;
-  --global-surface-03-hover-BackgroundColor: #1B1A1C;
+  --global-surface-01-BackgroundColor: #0E0F11;
+  --global-surface-01-BorderColor: #292A2D;
+  --global-surface-01-hover-BackgroundColor: #161719;
+  --global-surface-02-BackgroundColor: #161719;
+  --global-surface-02-BorderColor: #292A2D;
+  --global-surface-03-hover-BackgroundColor: #1B1C1E;
   --global-subtle-ui-BorderColor: #6098F20D;
   --global-subtle-BackgroundColor: #2058B8;
-  --global-popover-BackgroundColor: #262629;
-  --global-popover-hover-BackgroundColor: #303239;
+  --global-popover-BackgroundColor: #222326;
+  --global-popover-hover-BackgroundColor: #2A2B2E;
   --global-popover-BorderColor: #FFFFFF14;
   --global-primary-LinkColor: #6098F2;
   --global-primary-IconColor: #F2F2F6;
@@ -69,12 +69,12 @@
   --global-accent-TextColor: #6098F2;
   --global-error-TextColor: #FF6359;
   --global-focus-BorderColor: #6098F2;
-  --global-focus-inset-BorderColor: #151413;
-  --global-popover-ShadowColor: #0B0B0B80;
-  --global-modal-ShadowColor: #0B0B0BA6;
+  --global-focus-inset-BorderColor: #161719;
+  --global-popover-ShadowColor: #0E0F1180;
+  --global-modal-ShadowColor: #0E0F11A6;
   --global-accent-SkyText: #80ACF0;
   --global-accent-BackgroundColor: #2869D8;
-  --global-on-nuance-TextColor: #0B0B0B;
+  --global-on-nuance-TextColor: #0E0F11;
 
   --global-no-priority-PriorityColor: #979AA1;
   --global-low-PriorityColor: #6098F2;
@@ -84,14 +84,14 @@
   --global-disabled-PriorityColor: #5E5C63;
 
   --tag-on-subtle-PorpoiseText: #F2F4F6;
-  --tag-subtle-PorpoiseBackground: #303239;
-  --tag-nuance-SunshineBackground: #202020;
+  --tag-subtle-PorpoiseBackground: #2A2B2E;
+  --tag-nuance-SunshineBackground: #1B1C1E;
   --tag-accent-SunshineText: #FFBD2E;
-  --tag-nuance-SkyBackground: #202020;
+  --tag-nuance-SkyBackground: #1B1C1E;
 
   --icon-disabled-IconColor: #5E5C63;
 
-  --border-talk-indication-secondary: #202020;
+  --border-talk-indication-secondary: #1B1C1E;
 
   /** Buttons **/
   --button-subtle-LabelColor: #fff;
@@ -135,7 +135,7 @@
 
   --global-offline-color: #C0BFC4;
 
-  --avatar-counter-BackgroundColor: #1B1A1C
+  --avatar-counter-BackgroundColor: #1B1C1E
 }
 
 /* Light Theme */
