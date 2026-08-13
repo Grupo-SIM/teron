@@ -416,7 +416,7 @@ export default function Home() {
             </p>
             <div className="lp-cta-actions">
               <HeroCta href="/cadastro" label="Ver em ação" />
-              <a href="mailto:jbmidia@gmail.com" className="lp-btn-pill-dark">
+              <a href="mailto:jbmidiadigital@gmail.com" className="lp-btn-pill-dark">
                 Falar com o time
               </a>
             </div>

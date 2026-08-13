@@ -207,7 +207,7 @@ export default function PrecosPage() {
                 português, em linha própria, e é navegável por teclado. */}
             <div className="lp-pr-p" role="paragraph">
               <Words text={CONTACT} />
-              <PricingContact href="mailto:jbmidia@gmail.com">Fale com a gente</PricingContact>
+              <PricingContact href="mailto:jbmidiadigital@gmail.com">Fale com a gente</PricingContact>
             </div>
 
             <p className="lp-pr-actions">

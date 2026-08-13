@@ -178,7 +178,7 @@ export default function PrivacidadePage() {
         </p>
         <p>
           Para exercer qualquer um deles, escreva para{" "}
-          <a href="mailto:jbmidia@gmail.com">jbmidia@gmail.com</a>. Respondemos
+          <a href="mailto:jbmidiadigital@gmail.com">jbmidiadigital@gmail.com</a>. Respondemos
           em até 15 dias. Se você usa a Teron por meio de uma organização,
           encaminharemos o pedido a ela quando o tratamento estiver sob a
           responsabilidade dela.

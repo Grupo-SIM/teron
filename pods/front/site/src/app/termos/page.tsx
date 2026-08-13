@@ -187,7 +187,7 @@ export default function TermosPage() {
       <LegalSection title="11. Contato">
         <p>
           Dúvidas sobre estes Termos:{" "}
-          <a href="mailto:jbmidia@gmail.com">jbmidia@gmail.com</a>.
+          <a href="mailto:jbmidiadigital@gmail.com">jbmidiadigital@gmail.com</a>.
         </p>
       </LegalSection>
     </LegalPage>
