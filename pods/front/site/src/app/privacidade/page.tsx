@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 
-import { LegalPage, LegalSection } from "@/components/landing/legal-page";
+import { LegalPage, LegalSection } from "@/components/site/legal-page";
 
 export const metadata: Metadata = {
   title: "Teron — Política de Privacidade",

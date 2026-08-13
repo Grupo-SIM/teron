@@ -10,17 +10,16 @@
  * branco a 60%. O "G" colorido do Google puxaria o olho para longe do botão
  * principal, que é onde a tela quer levar.
  *
- * Os botões ainda não levam a lugar nenhum: esta é a versão visual das telas.
- * Quando o acesso for ligado, cada um vira link para `<account>/auth/google` e
- * `<account>/auth/github` — é só trocar o `<button>` por `<a href>`, o resto
- * do estilo não muda.
+ * Os links entram pela SPA para que ela use a URL de contas configurada no
+ * ambiente e conclua o OAuth pelo mesmo fluxo do login original.
  */
 type AuthProvidersProps = {
   /** Prefixo do rótulo: "Entrar" em `/entrar`, "Cadastrar" em `/cadastro`. */
   action: string;
+  flowHref: "/login" | "/login/signup";
 };
 
-export function AuthProviders({ action }: AuthProvidersProps) {
+export function AuthProviders({ action, flowHref }: AuthProvidersProps) {
   return (
     <>
       <div className="auth-or">
@@ -30,7 +29,7 @@ export function AuthProviders({ action }: AuthProvidersProps) {
       </div>
 
       <div className="auth-providers">
-        <button type="button" className="auth-provider">
+        <a href={`${flowHref}?provider=google`} className="auth-provider">
           <img
             src="/assets/auth/google.svg"
             width={22}
@@ -39,8 +38,8 @@ export function AuthProviders({ action }: AuthProvidersProps) {
             aria-hidden
           />
           <span>{`${action} com Google`}</span>
-        </button>
-        <button type="button" className="auth-provider">
+        </a>
+        <a href={`${flowHref}?provider=github`} className="auth-provider">
           <img
             src="/assets/auth/github.svg"
             width={22}
@@ -49,7 +48,7 @@ export function AuthProviders({ action }: AuthProvidersProps) {
             aria-hidden
           />
           <span>{`${action} com GitHub`}</span>
-        </button>
+        </a>
       </div>
     </>
   );

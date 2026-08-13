@@ -1,6 +1,6 @@
 "use client";
 
-import { usePillGlow } from "@/components/landing/use-pill-glow";
+import { usePillGlow } from "@/components/site/use-pill-glow";
 
 import { AuthButtonLights } from "./auth-decor";
 
@@ -9,13 +9,8 @@ import { AuthButtonLights } from "./auth-decor";
  * o teron.io pede o e-mail primeiro e resolve senha, código ou provedor no
  * passo seguinte, e as telas daqui seguem o mesmo caminho.
  *
- * Versão visual: o `submit` é barrado no `onSubmit`. O ponto de integração é
- * exatamente esse handler — quando o acesso for ligado, é dali que sai a
- * chamada ao serviço de contas, sem mexer no restante da árvore.
- *
- * `noValidate` deixa a validação para quem for ligar o formulário: sem isso o
- * navegador já barraria o envio com a bolha nativa, o que não tem nada a ver
- * com o desenho da tela.
+ * O envio segue como GET para o fluxo original e preserva o e-mail na query.
+ * A SPA assume dali em diante senha, OTP, cadastro e seleção de workspace.
  *
  * O botão repete a montagem do original: dois aros borrados espelhados por
  * cima (`auth-ring`), o miolo aceso recortado por dentro (`auth-btn-glow`) e
@@ -25,20 +20,15 @@ import { AuthButtonLights } from "./auth-decor";
 type AuthFormProps = {
   /** Rótulo do botão principal, ex.: "Entrar". */
   submitLabel: string;
+  /** Entrada correspondente no fluxo de autenticação original. */
+  flowHref: "/login" | "/login/signup";
 };
 
-export function AuthForm({ submitLabel }: AuthFormProps) {
+export function AuthForm({ submitLabel, flowHref }: AuthFormProps) {
   const wrapRef = usePillGlow<HTMLDivElement>();
 
   return (
-    <form
-      className="auth-form"
-      noValidate
-      onSubmit={(event) => {
-        // TODO: ligar ao serviço de contas. Hoje as telas são só visuais.
-        event.preventDefault();
-      }}
-    >
+    <form className="auth-form" method="get" action={flowHref}>
       <label className="auth-label" htmlFor="email">
         E-mail
       </label>
@@ -47,6 +37,7 @@ export function AuthForm({ submitLabel }: AuthFormProps) {
           id="email"
           name="email"
           type="email"
+          required
           autoComplete="email"
           maxLength={320}
           placeholder="nome@empresa.com.br"

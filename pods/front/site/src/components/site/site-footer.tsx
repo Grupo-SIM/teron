@@ -3,7 +3,7 @@ import Link from "next/link";
 import { Asset } from "./asset";
 
 /**
- * Rodapé da landing. Vive fora da página porque agora é usado também em
+ * Rodapé do site. Vive fora da página porque agora é usado também em
  * `/precos`, e duas cópias divergiriam na primeira mudança de link.
  */
 export function SiteFooter() {

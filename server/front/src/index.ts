@@ -398,8 +398,8 @@ export function start (
 
   const dist = resolve(process.env.PUBLIC_DIR ?? cwd(), 'dist')
   console.log('serving static files from', dist)
-  const landingDist = join(dist, 'landing')
-  const landingIndex = join(landingDist, 'index.html')
+  const siteDist = join(dist, 'site')
+  const siteIndex = join(siteDist, 'index.html')
 
   let brandingUrl: URL | undefined
   if (config.brandingUrl !== undefined) {
@@ -410,10 +410,10 @@ export function start (
     }
   }
 
-  if (fs.existsSync(landingIndex)) {
-    console.log('serving landing page from', landingDist)
+  if (fs.existsSync(siteIndex)) {
+    console.log('serving public site from', siteDist)
     app.get('/', (_request, response) => {
-      response.sendFile(landingIndex, {
+      response.sendFile(siteIndex, {
         etag: true,
         lastModified: true,
         cacheControl: false,
@@ -424,7 +424,7 @@ export function start (
       })
     })
     app.use(
-      expressStaticGzip(landingDist, {
+      expressStaticGzip(siteDist, {
         serveStatic: {
           cacheControl: true,
           dotfiles: 'allow',
@@ -444,10 +444,9 @@ export function start (
     )
 
     // O export estático do Next grava cada rota como um arquivo irmão
-    // (`/entrar` -> `entrar.html`), e o middleware acima só entrega arquivos
-    // pedidos pelo nome exato. Sem esta ponte toda rota da landing além da
-    // raiz cairia no `index.html` da aplicação, que abriria o workbench no
-    // lugar da página.
+    // (`/precos` -> `precos.html`), e o middleware acima só entrega arquivos
+    // pedidos pelo nome exato. Esta ponte permite incorporar todas as páginas
+    // presentes no site sem manter uma lista de rotas no servidor.
     //
     // Só entra quem tem arquivo correspondente no export, então as rotas da
     // aplicação (`/login`, `/workbench`, ...) seguem intactas.
@@ -461,8 +460,8 @@ export function start (
         next()
         return
       }
-      const page = normalize(join(landingDist, `${route}.html`))
-      if (!page.startsWith(landingDist) || !fs.existsSync(page)) {
+      const page = normalize(join(siteDist, `${route}.html`))
+      if (!page.startsWith(siteDist) || !fs.existsSync(page)) {
         next()
         return
       }
@@ -477,7 +476,7 @@ export function start (
       })
     })
   } else {
-    console.warn('landing page was not found, keeping the application fallback for /', { landingIndex })
+    console.warn('public site was not found, keeping the application fallback for /', { siteIndex })
   }
 
   app.use(

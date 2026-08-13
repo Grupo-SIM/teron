@@ -1,4 +1,6 @@
-import { Asset } from "@/components/landing/asset";
+import Link from "next/link";
+
+import { Asset } from "@/components/site/asset";
 
 import { AuthDecor } from "./auth-decor";
 import { AuthForm } from "./auth-form";
@@ -25,6 +27,7 @@ const COPY = {
     switchText: "Não tem uma conta?",
     switchLabel: "Cadastre-se",
     switchHref: "/cadastro",
+    flowHref: "/login",
   },
   signup: {
     title: "Criar nova conta",
@@ -33,6 +36,7 @@ const COPY = {
     switchText: "Já tem uma conta?",
     switchLabel: "Entrar",
     switchHref: "/entrar",
+    flowHref: "/login/signup",
   },
 } as const satisfies Record<AuthVariant, unknown>;
 
@@ -42,10 +46,10 @@ export function AuthPage({ variant }: { variant: AuthVariant }) {
   return (
     <div className="auth-page">
       <header className="auth-topbar">
-        <a href="/" className="auth-home">
+        <Link href="/" className="auth-home">
           <BackArrow />
           Início
-        </a>
+        </Link>
       </header>
 
       <section className="auth-stage">
@@ -59,8 +63,8 @@ export function AuthPage({ variant }: { variant: AuthVariant }) {
             />
             <h1 className="auth-title">{copy.title}</h1>
 
-            <AuthForm submitLabel={copy.submitLabel} />
-            <AuthProviders action={copy.providerAction} />
+            <AuthForm submitLabel={copy.submitLabel} flowHref={copy.flowHref} />
+            <AuthProviders action={copy.providerAction} flowHref={copy.flowHref} />
           </main>
 
           <AuthDecor />
@@ -68,13 +72,13 @@ export function AuthPage({ variant }: { variant: AuthVariant }) {
 
         <p className="auth-switch">
           <span>{copy.switchText}</span>
-          <a href={copy.switchHref}>{copy.switchLabel}</a>
+          <Link href={copy.switchHref}>{copy.switchLabel}</Link>
         </p>
 
         <div className="auth-legal">
-          <a href="/termos">Termos de Uso</a>
+          <Link href="/termos">Termos de Uso</Link>
           <span aria-hidden className="auth-legal-sep" />
-          <a href="/privacidade">Política de Privacidade</a>
+          <Link href="/privacidade">Política de Privacidade</Link>
         </div>
       </section>
     </div>

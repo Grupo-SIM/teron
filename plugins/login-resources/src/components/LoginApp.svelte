@@ -14,6 +14,7 @@
 // limitations under the License.
 -->
 <script lang="ts">
+  import { concatLink } from '@hcengineering/core'
   import { getMetadata, setMetadata } from '@hcengineering/platform'
   import presentation from '@hcengineering/presentation'
   import {
@@ -62,6 +63,7 @@
   const useOTP = getMetadata(presentation.metadata.MailUrl) != null && getMetadata(presentation.metadata.MailUrl) !== ''
   let navigateUrl: string | undefined
   let tfaToken: string | undefined = undefined
+  let email: string | undefined
 
   onDestroy(location.subscribe(updatePageLoc))
 
@@ -91,6 +93,18 @@
 
     navigateUrl = loc.query?.navigateUrl ?? undefined
     tfaToken = loc.query?.token ?? undefined
+    email = loc.query?.email ?? undefined
+  }
+
+  function startRequestedProvider (): void {
+    const provider = getCurrentLocation().query?.provider
+    if (provider !== 'google' && provider !== 'github') return
+    if (page === 'signup' && (signUpDisabled || localLoginHidden)) return
+
+    const accountsUrl = getMetadata(login.metadata.AccountsUrl)
+    if (accountsUrl === undefined || accountsUrl === '') return
+
+    window.location.assign(concatLink(accountsUrl, `/auth/${provider}`))
   }
 
   async function chooseToken (): Promise<void> {
@@ -119,7 +133,10 @@
     }
   }
 
-  onMount(chooseToken)
+  onMount(() => {
+    void chooseToken()
+    startRequestedProvider()
+  })
 </script>
 
 {#if page === 'admin'}
@@ -160,10 +177,10 @@
               {#if localLoginHidden}
                 <ProvidersOnlyForm />
               {:else}
-                <LoginForm {navigateUrl} {signUpDisabled} {useOTP} />
+                <LoginForm {navigateUrl} {signUpDisabled} {useOTP} {email} />
               {/if}
             {:else if page === 'signup'}
-              <SignupForm {navigateUrl} {signUpDisabled} {localLoginHidden} {useOTP} />
+              <SignupForm {navigateUrl} {signUpDisabled} {localLoginHidden} {useOTP} {email} />
             {:else if page === 'createWorkspace'}
               <CreateWorkspaceForm />
             {:else if page === 'password'}

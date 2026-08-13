@@ -56,7 +56,6 @@ export function RiveAnim({
   const scrubbed = progress != null;
   /** Reaplica o progresso assim que a duração da timeline fica disponível. */
   const [ready, setReady] = useState(0);
-  const [ratio, setRatio] = useState<string | null>(null);
 
   const { RiveComponent, rive } = useRive({
     src,
@@ -69,12 +68,8 @@ export function RiveAnim({
 
   // A proporção do artboard vira a da caixa, para que `contain` não deixe
   // barras e o que for posicionado em % sobre o canvas caia sobre o desenho.
-  useEffect(() => {
-    if (rive == null || !matchArtboard) return;
-
-    const { maxX, maxY } = rive.bounds;
-    if (maxX > 0 && maxY > 0) setRatio(`${maxX} / ${maxY}`);
-  }, [rive, matchArtboard]);
+  const { maxX = 0, maxY = 0 } = rive?.bounds ?? {};
+  const ratio = matchArtboard && maxX > 0 && maxY > 0 ? `${maxX} / ${maxY}` : null;
 
   useEffect(() => {
     const host = hostRef.current;

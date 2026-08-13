@@ -1,4 +1,4 @@
-# Assets da landing
+# Assets do site
 
 Coloque aqui os PNGs referenciados pela página (`src/app/page.tsx`). Enquanto o
 arquivo não existir, o componente `Asset` mostra um placeholder no lugar.

@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useEffect, useState } from "react";
 import { Asset } from "./asset";
 
@@ -64,14 +65,14 @@ export function SiteHeader() {
           gap: 34,
         }}
       >
-        <a href="/" aria-label="Teron — início" style={{ display: "block" }}>
+        <Link href="/" aria-label="Teron — início" style={{ display: "block" }}>
           <Asset
             src="/assets/teronwhite.svg"
             alt="Teron"
             ratio="595 / 550"
             style={{ height: 30, width: "auto", display: "block" }}
           />
-        </a>
+        </Link>
         <nav
           className="lp-desktop-only"
           style={{ gap: 26, fontSize: 14, fontWeight: 500 }}
@@ -131,7 +132,7 @@ export function SiteHeader() {
       {menuOpen && (
         <div className="lp-menu" role="dialog" aria-modal="true" aria-label="Menu">
           <div className="lp-menu-top">
-            <a
+            <Link
               href="/"
               aria-label="Teron — início"
               onClick={() => setMenuOpen(false)}
@@ -143,7 +144,7 @@ export function SiteHeader() {
                 ratio="595 / 550"
                 style={{ height: 30, width: "auto", display: "block" }}
               />
-            </a>
+            </Link>
             <button
               type="button"
               onClick={() => setMenuOpen(false)}

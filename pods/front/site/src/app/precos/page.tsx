@@ -1,13 +1,13 @@
 import type { Metadata } from "next";
 
-import { Asset } from "@/components/landing/asset";
-import { PricingContact } from "@/components/landing/pricing-contact";
-import { PricingIcon } from "@/components/landing/pricing-icon";
-import { PricingPlans } from "@/components/landing/pricing-plans";
-import { RevealObserver } from "@/components/landing/reveal-observer";
-import { Word, Words, WordsObserver } from "@/components/landing/scroll-words";
-import { SiteFooter } from "@/components/landing/site-footer";
-import { SiteHeader } from "@/components/landing/site-header";
+import { Asset } from "@/components/site/asset";
+import { PricingContact } from "@/components/site/pricing-contact";
+import { PricingIcon } from "@/components/site/pricing-icon";
+import { PricingPlans } from "@/components/site/pricing-plans";
+import { RevealObserver } from "@/components/site/reveal-observer";
+import { Word, Words, WordsObserver } from "@/components/site/scroll-words";
+import { SiteFooter } from "@/components/site/site-footer";
+import { SiteHeader } from "@/components/site/site-header";
 
 export const metadata: Metadata = {
   title: "Teron — Planos e preços",

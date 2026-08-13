@@ -1,14 +1,14 @@
-import { Asset } from "@/components/landing/asset";
-import { Bento } from "@/components/landing/bento";
-import { GithubSync } from "@/components/landing/github-sync";
-import { HeroCta } from "@/components/landing/hero-cta";
-import { Knowledge } from "@/components/landing/knowledge";
-import { LoopFadeVideo } from "@/components/landing/loop-fade-video";
-import { RevealObserver } from "@/components/landing/reveal-observer";
-import { RiveCard } from "@/components/landing/rive-card";
-import { SiteFooter } from "@/components/landing/site-footer";
-import { SiteHeader } from "@/components/landing/site-header";
-import { VideoBlock } from "@/components/landing/video-block";
+import { Asset } from "@/components/site/asset";
+import { Bento } from "@/components/site/bento";
+import { GithubSync } from "@/components/site/github-sync";
+import { HeroCta } from "@/components/site/hero-cta";
+import { Knowledge } from "@/components/site/knowledge";
+import { LoopFadeVideo } from "@/components/site/loop-fade-video";
+import { RevealObserver } from "@/components/site/reveal-observer";
+import { RiveCard } from "@/components/site/rive-card";
+import { SiteFooter } from "@/components/site/site-footer";
+import { SiteHeader } from "@/components/site/site-header";
+import { VideoBlock } from "@/components/site/video-block";
 
 const PROBLEMS = [
   {

@@ -34,6 +34,7 @@
   export let localLoginHidden = false
   export let navigateUrl: string | undefined = undefined
   export let useOTP = true // False only for dev/tests
+  export let email: string | undefined = undefined
 
   let fields: Array<Field>
   let form: Form
@@ -43,7 +44,7 @@
     fields = [
       { id: 'given-name', name: 'first', i18n: login.string.FirstName, short: true },
       { id: 'family-name', name: 'last', i18n: login.string.LastName, short: true },
-      { id: 'email', name: 'username', i18n: login.string.Email }
+      { id: 'email', name: 'username', i18n: login.string.Email, disabled: email !== undefined && email !== '' }
     ]
 
     if (withPassword) {
@@ -64,6 +65,10 @@
     username: '',
     password: '',
     password2: ''
+  }
+
+  $: if (email !== undefined && email !== '' && object.username === '') {
+    object.username = email
   }
 
   let status: Status<any> = OK
