@@ -25,11 +25,11 @@ function SocialLink({ title, href }: IconProps) {
 export function SocialIcons() {
   return (
     <div className="lp-social">
-      <SocialLink title="X" href="https://x.com/huly_io" />
-      <SocialLink title="LinkedIn" href="https://www.linkedin.com/company/huly-labs" />
+      <SocialLink title="X" href="https://x.com/teron_io" />
+      <SocialLink title="LinkedIn" href="https://www.linkedin.com/company/teron-labs" />
       <SocialLink title="GitHub" href="https://github.com/hcengineering" />
-      <SocialLink title="YouTube" href="https://www.youtube.com/@huly_io" />
-      <SocialLink title="Telegram" href="https://t.me/hulyio" />
+      <SocialLink title="YouTube" href="https://www.youtube.com/@teron_io" />
+      <SocialLink title="Telegram" href="https://t.me/teronio" />
     </div>
   );
 }

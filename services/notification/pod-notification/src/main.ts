@@ -28,7 +28,7 @@ export const main = async (ctx: MeasureContext): Promise<void> => {
 
   if (config.PushPublicKey !== undefined && config.PushPrivateKey !== undefined) {
     try {
-      const subj = config.PushSubject ?? 'mailto:hey@huly.io'
+      const subj = config.PushSubject ?? 'mailto:hey@teron.io'
       ctx.info('Setting VAPID details', {
         subject: subj,
         publicKeyLen: config.PushPublicKey.length,

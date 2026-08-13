@@ -66,10 +66,10 @@
   })
 
   const action = {
-    i18n: onboard.string.StartUsingHuly,
+    i18n: onboard.string.StartUsingTeron,
     func: async () => {
       if (account != null && isWorkspaceLoginInfo(account)) {
-        Analytics.handleEvent(OnboardEvents.StartHuly)
+        Analytics.handleEvent(OnboardEvents.StartTeron)
         navigateToWorkspace(account.workspaceUrl, account)
       }
     }

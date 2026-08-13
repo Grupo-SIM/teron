@@ -34,7 +34,7 @@ import {
 import { type QueueSourced, type FulltextDBConfiguration } from '@hcengineering/server-indexer'
 import { generateToken } from '@hcengineering/server-token'
 import { type Event } from '@hcengineering/communication-sdk-types'
-import { getWorkspaceClient as getHulylakeClient } from '@hcengineering/hulylake-client'
+import { getWorkspaceClient as getTeronlakeClient } from '@hcengineering/teronlake-client'
 
 import { WorkspaceIndexer } from './workspace'
 
@@ -58,7 +58,7 @@ export class WorkspaceManager {
     private readonly opt: {
       queue: PlatformQueue
       dbURL: string
-      hulylakeUrl: string
+      teronlakeUrl: string
       config: FulltextDBConfiguration
       externalStorage: StorageAdapter
       elasticIndexName: string
@@ -350,7 +350,7 @@ export class WorkspaceManager {
         this.opt.externalStorage,
         this.fulltextAdapter,
         this.contentAdapter,
-        getHulylakeClient(this.opt.hulylakeUrl, workspace, token ?? ''),
+        getTeronlakeClient(this.opt.teronlakeUrl, workspace, token ?? ''),
         (token) => this.getTransactorAPIEndpoint(token),
         this.opt.listener
       )

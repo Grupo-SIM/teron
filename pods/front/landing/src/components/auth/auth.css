@@ -1,6 +1,6 @@
 /*
  * Estilos das telas de acesso (`/entrar` e `/cadastro`), copiados de
- * huly.io/login e huly.io/signup — medidas, cores e camadas conferidas contra
+ * teron.io/login e teron.io/signup — medidas, cores e camadas conferidas contra
  * o HTML e o CSS servidos por eles.
  *
  * Ficam neste arquivo, e não em `globals.css`, porque só as duas rotas de
@@ -228,7 +228,7 @@
 
 /* Aro externo do botão, em três camadas de desfoque diferentes — os
    gradientes, os ângulos e os raios de desfoque são os das classes
-   `border-button-light` e `border-button-light-blur` do huly.io. A cópia
+   `border-button-light` e `border-button-light-blur` do teron.io. A cópia
    espelhada (`--l`) é a mesma coisa com `scaleX(-1)`: é a troca de opacidade
    entre as duas que dá a impressão de a luz andar de um lado a outro. */
 .auth-ring {
@@ -244,7 +244,7 @@
   /* Não é dica de desempenho: `will-change` fecha um contexto de empilhamento
      e prende aqui dentro os `z-index` das três camadas abaixo. Sem isso elas
      sobem por cima da cápsula (que vem depois no HTML) e o laranja, que devia
-     só encostar na borda, cobre o botão inteiro. O huly.io depende do mesmo
+     só encostar na borda, cobre o botão inteiro. O teron.io depende do mesmo
      efeito. */
   will-change: transform;
 }

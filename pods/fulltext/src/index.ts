@@ -104,7 +104,7 @@ if (accountsUrl === undefined) {
   process.exit(1)
 }
 
-const hulylakeUrl = process.env.HULYLAKE_URL ?? ''
+const teronlakeUrl = process.env.TERONLAKE_URL ?? ''
 
 const storageConfig: StorageConfiguration = storageConfigFromEnv()
 const externalStorage = buildStorageFromConfig(storageConfig)
@@ -118,7 +118,7 @@ const onClose = startIndexer(metricsContext, {
   externalStorage,
   elasticIndexName,
   dbURL,
-  hulylakeUrl,
+  teronlakeUrl,
   port: servicePort,
   serverSecret,
   accountsUrl

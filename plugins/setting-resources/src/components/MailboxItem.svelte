@@ -121,8 +121,8 @@
   }
 </script>
 
-<div class="hulyTableAttr-container" class:mt-6={mailboxIdx > 0}>
-  <div class="hulyTableAttr-header heading-medium-16" style="text-transform: unset">
+<div class="teronTableAttr-container" class:mt-6={mailboxIdx > 0}>
+  <div class="teronTableAttr-header heading-medium-16" style="text-transform: unset">
     <Icon icon={setting.icon.Mailbox} size="small" />
     <span style="user-select: text">{mailbox.mailbox}</span>
     <div class="buttons-group tertiary-textColor">
@@ -138,14 +138,14 @@
     </div>
   </div>
   <!-- TODO
-  <div class="hulyTableAttr-content withTitle">
+  <div class="teronTableAttr-content withTitle">
     <div class="flex-col column">
-      <div class="hulyTableAttr-content__title">
+      <div class="teronTableAttr-content__title">
         <span class="pl-2">
           Aliases
         </span>
       </div>
-      <div class="hulyTableAttr-content__wrapper flex-gap-1">
+      <div class="teronTableAttr-content__wrapper flex-gap-1">
         {#each mailbox.aliases ?? [] as alias}
           <NavItem
             title={alias}
@@ -174,12 +174,12 @@
       </div>
     </div>
     <div class="flex-col column">
-      <div class="hulyTableAttr-content__title">
+      <div class="teronTableAttr-content__title">
         <span class="pl-2">
           App passwords
         </span>
       </div>
-      <div class="hulyTableAttr-content__wrapper flex-gap-1">
+      <div class="teronTableAttr-content__wrapper flex-gap-1">
         {#each mailbox.appPasswords ?? [] as app}
           <NavItem
             title={app}

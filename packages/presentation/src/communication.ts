@@ -81,7 +81,7 @@ import { addNotification, NotificationSeverity, languageStore } from '@hcenginee
 import { getMetadata, translate } from '@hcengineering/platform'
 import view from '@hcengineering/view'
 import { get } from 'svelte/store'
-import { getWorkspaceClient as getHulylakeClient } from '@hcengineering/hulylake-client'
+import { getWorkspaceClient as getTeronlakeClient } from '@hcengineering/teronlake-client'
 import { v4 as uuid } from 'uuid'
 
 import { getCurrentWorkspaceUuid } from './file'
@@ -114,10 +114,10 @@ export async function setCommunicationClient (platformClient: PlatformClient): P
   const _client = new Client(platformClient)
 
   const token = getMetadata(presentation.metadata.Token) ?? ''
-  const hulylakeUrl = getMetadata(presentation.metadata.HulylakeUrl) ?? ''
-  const hulylake = getHulylakeClient(hulylakeUrl, getCurrentWorkspaceUuid(), token)
+  const teronlakeUrl = getMetadata(presentation.metadata.TeronlakeUrl) ?? ''
+  const teronlake = getTeronlakeClient(teronlakeUrl, getCurrentWorkspaceUuid(), token)
 
-  initLiveQueries(_client, hulylake, onDestroy)
+  initLiveQueries(_client, teronlake, onDestroy)
   client = _client
   onClientListeners.forEach((fn) => {
     fn()
@@ -453,8 +453,8 @@ class Client {
 
   private getSocialId (): SocialID {
     const me = getCurrentAccount()
-    const hulySocialId = me.fullSocialIds.find((it) => it.type === SocialIdType.HULY && it.verifiedOn !== undefined)
-    const id = hulySocialId?._id ?? me.primarySocialId
+    const teronSocialId = me.fullSocialIds.find((it) => it.type === SocialIdType.TERON && it.verifiedOn !== undefined)
+    const id = teronSocialId?._id ?? me.primarySocialId
     if (id == null || id === '') {
       throw new Error('Social id not found')
     }

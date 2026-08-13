@@ -88,7 +88,7 @@ interface ImageDimensions {
 
 const DEFAULT_TIMEOUT_MS = 10_000
 const DEFAULT_MAX_IMAGE_BYTES = 10 * 1024 * 1024 // 10MB
-const OEMBED_SERVICE_NAME = 'Huly Link Preview Service/1.0'
+const OEMBED_SERVICE_NAME = 'Teron Link Preview Service/1.0'
 
 // ============================================================================
 // Error Classes

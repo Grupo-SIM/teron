@@ -70,20 +70,20 @@
   }
 </script>
 
-<div class="hulyTableAttr-header font-medium-12">
+<div class="teronTableAttr-header font-medium-12">
   <Icon icon={contact.icon.User} size="small" />
   <span><Label label={core.string.Roles} /></span>
   <ButtonIcon kind="primary" icon={IconAdd} size="small" dataId={'btnAdd'} on:click={addRole} />
 </div>
-<div class="hulyTableAttr-content task">
+<div class="teronTableAttr-content task">
   {#each roles as role}
     <button
-      class="hulyTableAttr-content__row justify-start"
+      class="teronTableAttr-content__row justify-start"
       on:click|stopPropagation={() => {
         handleSelect(role)
       }}
     >
-      <div class="hulyTableAttr-content__row-label font-medium-14 cursor-pointer">
+      <div class="teronTableAttr-content__row-label font-medium-14 cursor-pointer">
         {role.name}
       </div>
     </button>

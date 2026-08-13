@@ -227,7 +227,7 @@
     <ModernEditbox bind:value={name} label={setting.string.EnumTitle} kind={'ghost'} size={'large'} width={'100%'} />
     <!-- svelte-ignore a11y-no-static-element-interactions -->
     <div
-      class="hulyTableAttr-container mt-6"
+      class="teronTableAttr-container mt-6"
       class:dragDropZone={dragover}
       on:dragover|preventDefault={() => {
         dragover = true
@@ -237,7 +237,7 @@
       }}
       on:drop|preventDefault|stopPropagation={fileDrop}
     >
-      <div class="hulyTableAttr-header font-medium-12">
+      <div class="teronTableAttr-header font-medium-12">
         <IconBulletList size={'small'} />
         <span><Label label={setting.string.Options} /></span>
         <div class="buttons-group tertiary-textColor">
@@ -268,7 +268,7 @@
         </div>
       </div>
       {#if values.length > 0 || newItem}
-        <div class="hulyTableAttr-content options">
+        <div class="teronTableAttr-content options">
           <EnumValuesList
             bind:values
             on:update={(e) => {
@@ -279,11 +279,11 @@
             }}
           />
           {#if newItem}
-            <div class="hulyTableAttr-content__row hovered">
-              <div class="hulyTableAttr-content__row-dragMenu">
+            <div class="teronTableAttr-content__row hovered">
+              <div class="teronTableAttr-content__row-dragMenu">
                 <IconMoreV2 size={'small'} />
               </div>
-              <div class="hulyTableAttr-content__row-label font-regular-14 accent grow">
+              <div class="teronTableAttr-content__row-label font-regular-14 accent grow">
                 <ModernEditbox
                   kind={'ghost'}
                   size={'small'}
@@ -301,7 +301,7 @@
                 />
               </div>
               {#if matched}
-                <div class="hulyChip-item error font-medium-12">
+                <div class="teronChip-item error font-medium-12">
                   <Label label={presentation.string.Match} />
                 </div>
               {/if}

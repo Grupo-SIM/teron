@@ -29,7 +29,7 @@
   let selectedTab: string | number = tabs[0].id
 </script>
 
-<div class="hulyComponent">
+<div class="teronComponent">
   <Header type={'type-panel'} freezeBefore>
     <svelte:fragment slot="beforeTitle">
       <ButtonIcon
@@ -56,7 +56,7 @@
     </svelte:fragment>
   </Header>
 
-  <div class="hulyComponent-content__column content">
+  <div class="teronComponent-content__column content">
     {#if selectedTab === 'general'}
       <ServerManagerGeneral />
     {:else if selectedTab === 'users'}

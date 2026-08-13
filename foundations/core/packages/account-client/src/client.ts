@@ -240,8 +240,8 @@ export interface AccountClient {
   mergeSpecifiedPersons: (primaryPerson: PersonUuid, secondaryPerson: PersonUuid) => Promise<void>
   mergeSpecifiedAccounts: (primaryAccount: AccountUuid, secondaryAccount: AccountUuid) => Promise<void>
   addEmailSocialId: (email: string) => Promise<OtpInfo>
-  addHulyAssistantSocialId: () => Promise<PersonId>
-  refreshHulyAssistantToken: () => Promise<void>
+  addTeronAssistantSocialId: () => Promise<PersonId>
+  refreshTeronAssistantToken: () => Promise<void>
   updatePasswordAgingRule: (days?: number) => Promise<void>
   checkPasswordAging: () => Promise<boolean>
 
@@ -1215,18 +1215,18 @@ class AccountClientImpl implements AccountClient {
     return await this.rpc(request)
   }
 
-  async addHulyAssistantSocialId (): Promise<PersonId> {
+  async addTeronAssistantSocialId (): Promise<PersonId> {
     const request = {
-      method: 'addHulyAssistantSocialId' as const,
+      method: 'addTeronAssistantSocialId' as const,
       params: {}
     }
 
     return await this.rpc(request)
   }
 
-  async refreshHulyAssistantToken (): Promise<void> {
+  async refreshTeronAssistantToken (): Promise<void> {
     const request = {
-      method: 'refreshHulyAssistantToken' as const,
+      method: 'refreshTeronAssistantToken' as const,
       params: {}
     }
 

@@ -72,7 +72,7 @@ export default function Home() {
           <div className="lp-hero-copy">
             {/* tamanho, peso, entrelinha e espaçamento vivem no
                 `globals.css` (`.lp-hero-copy h1/p`), onde os degraus do
-                huly.io precisam de media query. */}
+                teron.io precisam de media query. */}
             <h1 data-reveal style={{ margin: 0 }}>
               Tudo o que sua equipe precisa. Em um só lugar.
             </h1>

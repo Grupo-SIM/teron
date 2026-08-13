@@ -187,12 +187,12 @@
   }
 </script>
 
-<div class="hulyComponent-content__container columns">
+<div class="teronComponent-content__container columns">
   <Navigator {visibleSecondNav} {states} {transitions} />
-  <div class="hulyComponent-content__column content">
+  <div class="teronComponent-content__column content">
     {#if value}
       <Scroller align="center" padding="var(--spacing-3)" bottomPadding="var(--spacing-3)">
-        <div class="hulyComponent-content gap">
+        <div class="teronComponent-content gap">
           <div class="header flex-between">
             <EditBox
               bind:value={value.name}
@@ -237,7 +237,7 @@
               />
             </div>
           </div>
-          <div class="hulyComponent-content flex-col-center flex-gap-4">
+          <div class="teronComponent-content flex-col-center flex-gap-4">
             <StatesInlineEditor {states} {readonly} process={value} />
             <TransitionsInlineEditor {readonly} process={value} />
           </div>

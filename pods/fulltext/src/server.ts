@@ -84,7 +84,7 @@ export async function startIndexer (
     queue: PlatformQueue
     model: Tx[]
     dbURL: string
-    hulylakeUrl: string
+    teronlakeUrl: string
     config: FulltextDBConfiguration
     externalStorage: StorageAdapter
     elasticIndexName: string

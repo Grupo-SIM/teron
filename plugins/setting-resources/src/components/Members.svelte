@@ -86,16 +86,16 @@
   }
 </script>
 
-<div class="hulyComponent">
+<div class="teronComponent">
   <Header adaptive={'disabled'}>
     <Breadcrumb icon={setting.icon.Members} label={setting.string.Members} size={'large'} isCurrent />
     <svelte:fragment slot="search">
       <SearchInput bind:value={search} collapsed />
     </svelte:fragment>
   </Header>
-  <div class="hulyComponent-content__column content">
+  <div class="teronComponent-content__column content">
     <Scroller align={'center'} padding={'var(--spacing-3)'} bottomPadding={'var(--spacing-3)'}>
-      <div class="hulyComponent-content">
+      <div class="teronComponent-content">
         {#each employees as employee (employee._id)}
           {@const personUuid = employee.personUuid ?? undefined}
           {@const role = personUuid !== undefined ? workspaceMembers[personUuid] : undefined}

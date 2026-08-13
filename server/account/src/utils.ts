@@ -612,8 +612,8 @@ export async function isOtpValid (db: AccountDB, socialId: PersonId, code: strin
 }
 
 /**
- * Creates an account and a Huly social id for the specified person.
- * Returns the _id of the newly created Huly social id.
+ * Creates an account and a Teron social id for the specified person.
+ * Returns the _id of the newly created Teron social id.
  */
 export async function createAccount (
   db: AccountDB,
@@ -622,9 +622,9 @@ export async function createAccount (
   automatic = false,
   createdOn = Date.now()
 ): Promise<PersonId> {
-  // Create Huly social id and account
+  // Create Teron social id and account
   const socialId = await db.socialId.insertOne({
-    type: SocialIdType.HULY,
+    type: SocialIdType.TERON,
     value: personUuid,
     personUuid,
     ...(confirmed ? { verifiedOn: Date.now() } : {})
@@ -722,7 +722,7 @@ export async function signUpByGrant (
     await db.person.insertOne({ uuid: accountUuid, firstName, lastName: lastName ?? '' })
   }
 
-  // If there's no account there should be no Huly social id associated with the person if it existed
+  // If there's no account there should be no Teron social id associated with the person if it existed
   // also, there should be no confirmed social ids associated
   // so we can safely proceed to account creation
 
@@ -1124,7 +1124,7 @@ export async function createWorkspaceRecord (
   dataId?: WorkspaceDataId,
   pendingConfiguration?: WorkspaceConfiguration
 ): Promise<CreateWorkspaceRecordResult> {
-  const brandingKey = branding?.key ?? 'huly'
+  const brandingKey = branding?.key ?? 'teron'
   const regionInfo = getRegions().find((it) => it.region === region)
 
   if (regionInfo === undefined) {
@@ -1317,10 +1317,10 @@ export async function confirmEmail (
   return emailSocialId._id
 }
 
-export async function confirmHulyIds (ctx: MeasureContext, db: AccountDB, account: AccountUuid): Promise<void> {
-  const hulySocialIds = await db.socialId.find({ personUuid: account, type: SocialIdType.HULY, verifiedOn: null })
-  for (const hulySocialId of hulySocialIds) {
-    await db.socialId.update({ _id: hulySocialId._id }, { verifiedOn: Date.now() })
+export async function confirmTeronIds (ctx: MeasureContext, db: AccountDB, account: AccountUuid): Promise<void> {
+  const teronSocialIds = await db.socialId.find({ personUuid: account, type: SocialIdType.TERON, verifiedOn: null })
+  for (const teronSocialId of teronSocialIds) {
+    await db.socialId.update({ _id: teronSocialId._id }, { verifiedOn: Date.now() })
   }
 }
 
@@ -1607,7 +1607,7 @@ export async function loginOrSignUpWithProvider (
       await db.socialId.update({ key: emailSocialId.key }, { verifiedOn: Date.now() })
     }
 
-    await confirmHulyIds(ctx, db, personUuid as AccountUuid)
+    await confirmTeronIds(ctx, db, personUuid as AccountUuid)
     const extraToken: Record<string, string> = isAdminEmail(normalizedEmail) ? { admin: 'true' } : {}
     ctx.info('Provider login succeeded', { email, normalizedEmail, emailSocialId, socialId, ...extraToken })
 
@@ -1998,12 +1998,12 @@ export async function setTimezone (
 export const integrationServices = [
   'github',
   'telegram-bot',
-  'hulygram',
+  'terongram',
   'mailbox',
   'caldav',
   'gmail',
   'google-calendar',
-  'huly-mail',
+  'teron-mail',
   'ai-assistant',
   'tool'
 ]

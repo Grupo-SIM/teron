@@ -81,7 +81,7 @@ import { inboxId } from '@hcengineering/inbox'
 import { achievementId } from '@hcengineering/achievement'
 import communication, { communicationId } from '@hcengineering/communication'
 import { emojiId } from '@hcengineering/emoji'
-import { hulyMailId } from '@hcengineering/huly-mail'
+import { teronMailId } from '@hcengineering/teron-mail'
 import { aiAssistantId } from '@hcengineering/ai-assistant'
 import { ratingId } from '@hcengineering/rating'
 import billingPlugin, { billingId } from '@hcengineering/billing'
@@ -142,7 +142,7 @@ import '@hcengineering/emoji-assets'
 import '@hcengineering/media-assets'
 import '@hcengineering/communication-assets'
 import '@hcengineering/billing-assets'
-import '@hcengineering/huly-mail-assets'
+import '@hcengineering/teron-mail-assets'
 import '@hcengineering/ai-assistant-assets'
 import '@hcengineering/rating-assets'
 
@@ -300,8 +300,8 @@ function configureI18n (): void {
   addStringsLoader(emojiId, async (lang: string) => await import(`@hcengineering/emoji-assets/lang/${lang}.json`))
   addStringsLoader(billingId, async (lang: string) => await import(`@hcengineering/billing-assets/lang/${lang}.json`))
   addStringsLoader(
-    hulyMailId,
-    async (lang: string) => await import(`@hcengineering/huly-mail-assets/lang/${lang}.json`)
+    teronMailId,
+    async (lang: string) => await import(`@hcengineering/teron-mail-assets/lang/${lang}.json`)
   )
   addStringsLoader(
     aiAssistantId,
@@ -336,7 +336,7 @@ export async function configurePlatform (onWorkbenchConnect?: () => Promise<void
   console.log('loading configuration', config)
   console.log('loaded branding', myBranding)
 
-  const title = myBranding.title ?? 'Huly Desktop'
+  const title = myBranding.title ?? 'Teron Desktop'
   ipcMain.setTitle(title)
 
   configureAnalyticsProviders(config)
@@ -349,7 +349,7 @@ export async function configurePlatform (onWorkbenchConnect?: () => Promise<void
   setMetadata(presentation.metadata.DatalakeUrl, config.DATALAKE_URL ?? '')
   setMetadata(
     presentation.metadata.FileStorage,
-    createFileStorage(config.UPLOAD_URL, config.DATALAKE_URL, config.HULYLAKE_URL)
+    createFileStorage(config.UPLOAD_URL, config.DATALAKE_URL, config.TERONLAKE_URL)
   )
   setMetadata(presentation.metadata.CollaboratorUrl, config.COLLABORATOR_URL)
   setMetadata(presentation.metadata.PreviewUrl, config.PREVIEW_URL)
@@ -358,7 +358,7 @@ export async function configurePlatform (onWorkbenchConnect?: () => Promise<void
   setMetadata(presentation.metadata.MailUrl, config.MAIL_URL)
   setMetadata(recorder.metadata.StreamUrl, config.STREAM_URL ?? '')
   setMetadata(presentation.metadata.StatsUrl, config.STATS_URL)
-  setMetadata(presentation.metadata.HulylakeUrl, config.HULYLAKE_URL ?? '')
+  setMetadata(presentation.metadata.TeronlakeUrl, config.TERONLAKE_URL ?? '')
   setMetadata(presentation.metadata.PulseUrl, config.PULSE_URL ?? '')
 
   const disabledFeatures = (config.DISABLED_FEATURES ?? '').split(',').map(it => it.trim()).filter(it => it.length > 0)
@@ -381,7 +381,7 @@ export async function configurePlatform (onWorkbenchConnect?: () => Promise<void
     setMetadata(presentation.metadata.FrontVersion, config.VERSION)
   }
   setMetadata(telegram.metadata.TelegramURL, config.TELEGRAM_URL ?? 'http://localhost:8086')
-  setMetadata(telegram.metadata.BotUrl, config.TELEGRAM_BOT_URL ?? 'http://huly.local:4020')
+  setMetadata(telegram.metadata.BotUrl, config.TELEGRAM_BOT_URL ?? 'http://teron.local:4020')
   setMetadata(gmail.metadata.GmailURL, config.GMAIL_URL ?? 'http://localhost:8087')
   setMetadata(calendar.metadata.CalendarServiceURL, config.CALENDAR_URL ?? 'http://localhost:8095')
   setMetadata(calendar.metadata.PublicScheduleURL, config.PUBLIC_SCHEDULE_URL)
@@ -402,7 +402,7 @@ export async function configurePlatform (onWorkbenchConnect?: () => Promise<void
 
   setMetadata(billingPlugin.metadata.BillingURL, config.BILLING_URL ?? '')
   setMetadata(presentation.metadata.PaymentUrl, config.PAYMENT_URL ?? '')
-  setMetadata(presentation.metadata.SignupUrl, config.SIGNUP_URL ?? 'https://huly.io/signup')
+  setMetadata(presentation.metadata.SignupUrl, config.SIGNUP_URL ?? 'https://teron.io/signup')
 
   setMetadata(support.metadata.SupportLink, myBranding.support?.supportLink ?? supportLink)
   setMetadata(support.metadata.ReportBugLink, myBranding.support?.reportBugLink ?? reportBugLink)
@@ -511,7 +511,7 @@ export async function configurePlatform (onWorkbenchConnect?: () => Promise<void
   if ((config.BILLING_URL ?? '') !== '') {
     addLocation(billingId, () => import(/* webpackChunkName: "billing" */ '@hcengineering/billing-resources'))
   }
-  addLocation(hulyMailId, () => import(/* webpackChunkName: "huly-mail" */ '@hcengineering/huly-mail-resources'))
+  addLocation(teronMailId, () => import(/* webpackChunkName: "teron-mail" */ '@hcengineering/teron-mail-resources'))
   addLocation(
     aiAssistantId,
     () => import(/* webpackChunkName: "ai-assistant" */ '@hcengineering/ai-assistant-resources')

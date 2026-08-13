@@ -1,4 +1,4 @@
-# GitHub Copilot Instructions - Huly Core
+# GitHub Copilot Instructions - Teron Core
 
 **Type**: Rush monorepo (TypeScript)  
 **License**: EPL-2.0  

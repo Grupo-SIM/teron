@@ -79,7 +79,7 @@ import { achievementId } from '@hcengineering/achievement'
 import communication, { communicationId } from '@hcengineering/communication'
 import { emojiId } from '@hcengineering/emoji'
 import billingPlugin, { billingId } from '@hcengineering/billing'
-import { hulyMailId } from '@hcengineering/huly-mail'
+import { teronMailId } from '@hcengineering/teron-mail'
 import { aiAssistantId } from '@hcengineering/ai-assistant'
 import { ratingId } from '@hcengineering/rating'
 
@@ -139,7 +139,7 @@ import '@hcengineering/achievement-assets'
 import '@hcengineering/communication-assets'
 import '@hcengineering/emoji-assets'
 import '@hcengineering/billing-assets'
-import '@hcengineering/huly-mail-assets'
+import '@hcengineering/teron-mail-assets'
 import '@hcengineering/ai-assistant-assets'
 import '@hcengineering/rating-assets'
 
@@ -201,7 +201,7 @@ export interface Config {
   PAYMENT_URL?: string
   EXCLUDED_APPLICATIONS_FOR_ANONYMOUS?: string
   PULSE_URL?: string
-  HULYLAKE_URL?: string
+  TERONLAKE_URL?: string
   DISABLED_FEATURES?: string
   SIGNUP_URL?: string
 }
@@ -236,7 +236,7 @@ export type BrandingMap = Record<string, Branding>
 const clientType = process.env.CLIENT_TYPE
 const configs: Record<string, string> = {
   'dev-production': '/config-dev.json',
-  'dev-huly': '/config-huly.json',
+  'dev-teron': '/config-teron.json',
   'dev-bold': '/config.json',
   'dev-server': '/config.json',
   'dev-server-test': '/config-test.json',
@@ -406,8 +406,8 @@ function configureI18n(): void {
   addStringsLoader(emojiId, async (lang: string) => await import(`@hcengineering/emoji-assets/lang/${lang}.json`))
   addStringsLoader(billingId, async (lang: string) => await import(`@hcengineering/billing-assets/lang/${lang}.json`))
   addStringsLoader(
-    hulyMailId,
-    async (lang: string) => await import(`@hcengineering/huly-mail-assets/lang/${lang}.json`)
+    teronMailId,
+    async (lang: string) => await import(`@hcengineering/teron-mail-assets/lang/${lang}.json`)
   )
   addStringsLoader(
     aiAssistantId,
@@ -469,7 +469,7 @@ export async function configurePlatform() {
   }
 
   configureAnalytics(config)
-  // tryOpenInDesktopApp(config.APP_PROTOCOL ?? 'huly://')
+  // tryOpenInDesktopApp(config.APP_PROTOCOL ?? 'teron://')
 
   setMetadata(login.metadata.AccountsUrl, config.ACCOUNTS_URL)
   setMetadata(login.metadata.DisableSignUp, config.DISABLE_SIGNUP === 'true')
@@ -481,7 +481,7 @@ export async function configurePlatform() {
   setMetadata(presentation.metadata.DatalakeUrl, config.DATALAKE_URL)
   setMetadata(
     presentation.metadata.FileStorage,
-    createFileStorage(config.UPLOAD_URL, config.DATALAKE_URL, config.HULYLAKE_URL)
+    createFileStorage(config.UPLOAD_URL, config.DATALAKE_URL, config.TERONLAKE_URL)
   )
   setMetadata(presentation.metadata.CollaboratorUrl, config.COLLABORATOR_URL)
 
@@ -490,7 +490,7 @@ export async function configurePlatform() {
   setMetadata(presentation.metadata.StatsUrl, config.STATS_URL)
   setMetadata(presentation.metadata.LinkPreviewUrl, config.LINK_PREVIEW_URL)
   setMetadata(presentation.metadata.MailUrl, config.MAIL_URL)
-  setMetadata(presentation.metadata.SignupUrl, config.SIGNUP_URL ?? 'https://huly.io/signup')
+  setMetadata(presentation.metadata.SignupUrl, config.SIGNUP_URL ?? 'https://teron.io/signup')
 
   const disabledFeatures = (config.DISABLED_FEATURES ??'').split(',').map(it => it.trim()).filter(it => it.length > 0)
   setMetadata(presentation.metadata.DisabledFeatures, new Set(disabledFeatures))
@@ -508,7 +508,7 @@ export async function configurePlatform() {
     setMetadata(presentation.metadata.FrontVersion, config.VERSION)
   }
   setMetadata(telegram.metadata.TelegramURL, config.TELEGRAM_URL ?? 'http://localhost:8086')
-  setMetadata(telegram.metadata.BotUrl, config.TELEGRAM_BOT_URL ?? 'http://huly.local:4020')
+  setMetadata(telegram.metadata.BotUrl, config.TELEGRAM_BOT_URL ?? 'http://teron.local:4020')
   setMetadata(gmail.metadata.GmailURL, config.GMAIL_URL ?? 'http://localhost:8087')
   setMetadata(calendar.metadata.CalendarServiceURL, config.CALENDAR_URL ?? 'http://localhost:8095')
   setMetadata(calendar.metadata.PublicScheduleURL, config.PUBLIC_SCHEDULE_URL)
@@ -536,7 +536,7 @@ export async function configurePlatform() {
   setMetadata(presentation.metadata.PaymentUrl, config.PAYMENT_URL ?? '')
 
   setMetadata(presentation.metadata.PulseUrl, config.PULSE_URL)
-  setMetadata(presentation.metadata.HulylakeUrl, config.HULYLAKE_URL ?? '')
+  setMetadata(presentation.metadata.TeronlakeUrl, config.TERONLAKE_URL ?? '')
 
   setMetadata(support.metadata.SupportLink, myBranding.support?.supportLink ?? supportLink)
   setMetadata(support.metadata.ReportBugLink, myBranding.support?.reportBugLink ?? reportBugLink)
@@ -706,8 +706,8 @@ export async function configurePlatform() {
     )
   }
   addLocation(
-    hulyMailId,
-    async () => await import(/* webpackChunkName: "hulyMail" */ '@hcengineering/huly-mail-resources')
+    teronMailId,
+    async () => await import(/* webpackChunkName: "teronMail" */ '@hcengineering/teron-mail-resources')
   )
   addLocation(
     aiAssistantId,

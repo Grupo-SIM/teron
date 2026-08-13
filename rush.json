@@ -450,8 +450,8 @@
       "shouldPublish": true
     },
     {
-      "packageName": "@hcengineering/hulylake-client",
-      "projectFolder": "foundations/core/packages/hulylake-client",
+      "packageName": "@hcengineering/teronlake-client",
+      "projectFolder": "foundations/core/packages/teronlake-client",
       "shouldPublish": true
     },
     {
@@ -538,8 +538,8 @@
       "shouldPublish": true
     },
     {
-      "packageName": "@hcengineering/hulylake",
-      "projectFolder": "foundations/server/packages/hulylake",
+      "packageName": "@hcengineering/teronlake",
+      "projectFolder": "foundations/server/packages/teronlake",
       "shouldPublish": true
     },
     {
@@ -2572,8 +2572,8 @@
       "shouldPublish": false
     },
     {
-      "packageName": "@hcengineering/hulypulse-client",
-      "projectFolder": "packages/hulypulse-client",
+      "packageName": "@hcengineering/teronpulse-client",
+      "projectFolder": "packages/teronpulse-client",
       "shouldPublish": true
     },
     {
@@ -2657,23 +2657,23 @@
       "shouldPublish": false
     },
     {
-      "packageName": "@hcengineering/model-huly-mail",
-      "projectFolder": "models/huly-mail",
+      "packageName": "@hcengineering/model-teron-mail",
+      "projectFolder": "models/teron-mail",
       "shouldPublish": false
     },
     {
-      "packageName": "@hcengineering/huly-mail",
-      "projectFolder": "plugins/huly-mail",
+      "packageName": "@hcengineering/teron-mail",
+      "projectFolder": "plugins/teron-mail",
       "shouldPublish": false
     },
     {
-      "packageName": "@hcengineering/huly-mail-assets",
-      "projectFolder": "plugins/huly-mail-assets",
+      "packageName": "@hcengineering/teron-mail-assets",
+      "projectFolder": "plugins/teron-mail-assets",
       "shouldPublish": false
     },
     {
-      "packageName": "@hcengineering/huly-mail-resources",
-      "projectFolder": "plugins/huly-mail-resources",
+      "packageName": "@hcengineering/teron-mail-resources",
+      "projectFolder": "plugins/teron-mail-resources",
       "shouldPublish": false
     },
     {

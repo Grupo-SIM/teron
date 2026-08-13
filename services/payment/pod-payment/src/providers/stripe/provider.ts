@@ -56,7 +56,7 @@ export class StripeProvider implements PaymentProvider {
   private readonly stripe: StripeClient
   private readonly stripeApiKey: string
   private readonly webhookSecret: string
-  // Map: plan@type (Huly) -> priceId (Stripe)
+  // Map: plan@type (Teron) -> priceId (Stripe)
   private readonly subscriptionPlans: Record<string, string>
   private readonly frontUrl: string
   private readonly accountClient: AccountClient

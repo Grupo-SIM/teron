@@ -68,7 +68,7 @@ export interface Config {
   PULSE_URL?: string
   PASSWORD_STRICTNESS?: 'very_strict' | 'strict' | 'normal' | 'none'
   EXCLUDED_APPLICATIONS_FOR_ANONYMOUS?: string
-  HULYLAKE_URL?: string
+  TERONLAKE_URL?: string
   DISABLED_FEATURES?: string
   SIGNUP_URL?: string
 }

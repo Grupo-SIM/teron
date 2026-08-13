@@ -63,8 +63,8 @@
   }
 </script>
 
-<div class="hulyTableAttr-container">
-  <div class="hulyTableAttr-header font-medium-12">
+<div class="teronTableAttr-container">
+  <div class="teronTableAttr-header font-medium-12">
     <Icon icon={sectionIcon} size="small" />
     <span><Label label={card.string.MasterDetailViews} /></span>
     <ButtonIcon kind="primary" icon={IconAdd} size="small" dataId={'btnAddViewConfig'} on:click={addViewConfig} />
@@ -72,8 +72,8 @@
 
   {#if viewConfigs.length > 0}
     {#each viewConfigs as config, index}
-      <div class="hulyTableAttr-content task">
-        <div class="hulyTableAttr-content__row justify-between">
+      <div class="teronTableAttr-content task">
+        <div class="teronTableAttr-content__row justify-between">
           <div class="config-input">
             <RelatedTagSelect
               label={card.string.SelectType}

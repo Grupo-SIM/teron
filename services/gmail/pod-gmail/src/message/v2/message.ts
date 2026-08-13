@@ -54,8 +54,8 @@ export class MessageManagerV2 implements IMessageManager {
     me: string,
     options?: SyncOptions
   ): Promise<void> {
-    if (isHulyMessage(message.data.payload)) {
-      this.ctx.info('Skipping Huly message', { mailId: message.data.id, me })
+    if (isTeronMessage(message.data.payload)) {
+      this.ctx.info('Skipping Teron message', { mailId: message.data.id, me })
       return
     }
     const res = convertMessage(message, me)
@@ -93,13 +93,13 @@ function getHeaderValue (payload: gmail_v1.Schema$MessagePart | undefined, name:
   return headers?.find((header) => header.name?.toLowerCase() === name.toLowerCase())?.value ?? undefined
 }
 
-export function isHulyMessage (payload: gmail_v1.Schema$MessagePart | undefined): boolean {
-  const hulyHeader = getHeaderValue(payload, MailHeader.HulySent)
-  if (hulyHeader !== undefined) {
+export function isTeronMessage (payload: gmail_v1.Schema$MessagePart | undefined): boolean {
+  const teronHeader = getHeaderValue(payload, MailHeader.TeronSent)
+  if (teronHeader !== undefined) {
     return true
   }
-  const hulyMessage = getHeaderValue(payload, MailHeader.HulyMessageType)
-  return hulyMessage !== undefined
+  const teronMessage = getHeaderValue(payload, MailHeader.TeronMessageType)
+  return teronMessage !== undefined
 }
 
 function getPartsMessage (parts: gmail_v1.Schema$MessagePart[] | undefined, mime: string): string {

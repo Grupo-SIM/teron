@@ -12,9 +12,9 @@
 // limitations under the License.
 //
 
-export const TABLE_METADATA_TOKEN = 'huly-table-metadata:'
+export const TABLE_METADATA_TOKEN = 'teron-table-metadata:'
 export const TABLE_METADATA_MARKER = `<!-- ${TABLE_METADATA_TOKEN}`
-export const TABLE_METADATA_MIME_TYPE = 'application/x-huly-table-metadata'
+export const TABLE_METADATA_MIME_TYPE = 'application/x-teron-table-metadata'
 
 export function hasTableMetadataMarker (text: string): boolean {
   if (text == null || text.length === 0) {

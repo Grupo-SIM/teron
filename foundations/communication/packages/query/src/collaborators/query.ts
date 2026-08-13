@@ -25,7 +25,7 @@ import {
   RemoveCardEvent,
   RemoveCollaboratorsEvent
 } from '@hcengineering/communication-sdk-types'
-import { type HulylakeWorkspaceClient } from '@hcengineering/hulylake-client'
+import { type TeronlakeWorkspaceClient } from '@hcengineering/teronlake-client'
 
 import { QueryResult } from '../result'
 import { QueryOptions, type Query, type QueryId } from '../types'
@@ -36,7 +36,7 @@ export class CollaboratorsQuery implements Query<Collaborator, FindCollaborators
 
   constructor (
     private readonly client: FindClient,
-    private readonly hulylake: HulylakeWorkspaceClient,
+    private readonly teronlake: TeronlakeWorkspaceClient,
     public readonly id: QueryId,
     public readonly params: FindCollaboratorsParams,
     public readonly options: QueryOptions | undefined,

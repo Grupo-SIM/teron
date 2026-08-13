@@ -34,7 +34,7 @@ export class Settings {
 
   readServerUrl (): string {
     const url = this.extractUrl()
-    // Motivation: fix existing Huly installations (saved on disk URLs).
+    // Motivation: fix existing Teron installations (saved on disk URLs).
     return Settings.sanitizeUrl(url)
   }
 
@@ -69,13 +69,13 @@ export class Settings {
 
   private extractUrl (): string {
     if (this.isDev) {
-      return process.env.FRONT_URL ?? 'http://huly.local:8087'
+      return process.env.FRONT_URL ?? 'http://teron.local:8087'
     }
     return (
       (this.store as any).get(Settings.SETTINGS_KEY_SERVER) as string ??
       this.packedConfig?.server ??
       process.env.FRONT_URL ??
-      'https://huly.app'
+      'https://teron.app'
     )
   }
 

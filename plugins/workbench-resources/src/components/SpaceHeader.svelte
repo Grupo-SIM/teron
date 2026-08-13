@@ -125,5 +125,5 @@
     </svelte:fragment>
   </Header>
 {:else}
-  <div class="hulyHeader-container" />
+  <div class="teronHeader-container" />
 {/if}

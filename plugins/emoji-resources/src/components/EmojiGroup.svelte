@@ -37,8 +37,8 @@
       : $resultEmojis.filter((re) => re.key === group.id)
 </script>
 
-<div class="hulyPopupEmoji-group kind-{kind}" class:lazy>
-  <div id={group.id} class="hulyPopupEmoji-group__header categoryHeader">
+<div class="teronPopupEmoji-group kind-{kind}" class:lazy>
+  <div id={group.id} class="teronPopupEmoji-group__header categoryHeader">
     <Label label={searching && $resultEmojis.length === 0 ? plugin.string.NoResults : group.label} />
   </div>
   {#if lazy}
@@ -51,7 +51,7 @@
 </div>
 
 <style lang="scss">
-  .hulyPopupEmoji-group {
+  .teronPopupEmoji-group {
     display: flex;
     flex-direction: column;
     flex-wrap: nowrap;
@@ -94,7 +94,7 @@
     }
 
     &.kind-default {
-      .hulyPopupEmoji-group__header {
+      .teronPopupEmoji-group__header {
         background: var(--theme-popup-header);
 
         &::before {

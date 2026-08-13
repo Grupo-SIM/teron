@@ -20,7 +20,7 @@ import {
   type DocumentConverterOptions,
   type FileUploader,
   FrontFileUploader,
-  HulyFormatImporter,
+  TeronFormatImporter,
   importNotion,
   type Logger
 } from '@hcengineering/importer'
@@ -154,17 +154,17 @@ export function importTool (): void {
       })
     })
 
-  // import /home/anna/xored/huly/platform/dev/import-tool/src/huly/example-workspace --workspace ws1 --user user1 --password 1234
+  // import /home/anna/xored/teron/platform/dev/import-tool/src/teron/example-workspace --workspace ws1 --user user1 --password 1234
   program
     .command('import <dir>')
-    .description('import issues in Unified Huly Format')
+    .description('import issues in Unified Teron Format')
     .requiredOption('-u, --user <user>', 'user')
     .requiredOption('-p, --password <password>', 'password')
     .requiredOption('-w, --workspace <workspace>', 'workspace url where the documents should be imported to')
     .action(async (dir: string, cmd) => {
       const { workspace, user, password } = cmd
       await authorize(user, password, workspace, async (client, uploader) => {
-        const importer = new HulyFormatImporter(client, uploader, new ConsoleLogger())
+        const importer = new TeronFormatImporter(client, uploader, new ConsoleLogger())
         await importer.importFolder(dir)
       })
     })
@@ -173,7 +173,7 @@ export function importTool (): void {
     .command('convert-qms-docx <dir>')
     .requiredOption('-o, --out <dir>', 'out')
     .option('-c, --config <file>', 'configPath')
-    .description('convert QMS document into Unified Huly Format')
+    .description('convert QMS document into Unified Teron Format')
     .action(async (dir: string, cmd) => {
       const { out, configPath } = cmd
       const configSearchPath = configPath ?? join(dir, 'import.yaml')

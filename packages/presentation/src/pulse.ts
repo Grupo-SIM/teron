@@ -11,15 +11,15 @@
 // See the License for the specific language governing permissions and
 // limitations under the License
 
-import { HulypulseClient } from '@hcengineering/hulypulse-client'
+import { TeronpulseClient } from '@hcengineering/teronpulse-client'
 import { getMetadata } from '@hcengineering/platform'
 import presentation from './plugin'
 
 let currentWorkspaceUuid: string | undefined
 let currentToken: string | undefined
-let promise: Promise<HulypulseClient | undefined> | undefined
+let promise: Promise<TeronpulseClient | undefined> | undefined
 
-export async function createPulseClient (): Promise<HulypulseClient | undefined> {
+export async function createPulseClient (): Promise<TeronpulseClient | undefined> {
   const pulseUrl = getMetadata(presentation.metadata.PulseUrl) ?? ''
   const token = getMetadata(presentation.metadata.Token) ?? ''
   const workspaceUuid = getMetadata(presentation.metadata.WorkspaceUuid) ?? ''
@@ -39,7 +39,7 @@ export async function createPulseClient (): Promise<HulypulseClient | undefined>
   }
 
   promise = new Promise((resolve) => {
-    HulypulseClient.connect(`${pulseUrl}?token=${token}`)
+    TeronpulseClient.connect(`${pulseUrl}?token=${token}`)
       .then(resolve)
       .catch(() => {
         resolve(undefined)

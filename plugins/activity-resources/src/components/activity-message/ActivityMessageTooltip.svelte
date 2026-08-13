@@ -6,7 +6,7 @@
   export let value: ActivityMessage
 </script>
 
-<div class="hulyPopup-container autoWidth scroll" style:minWidth="20rem" style:maxWidth="40rem">
+<div class="teronPopup-container autoWidth scroll" style:minWidth="20rem" style:maxWidth="40rem">
   <ActivityMessagePresenter {value} withActions={false} hoverable={false} withShowMore={false} skipLabel />
 </div>
 

@@ -6,7 +6,7 @@ import { AuthButtonLights } from "./auth-decor";
 
 /*
  * Formulário do card: um campo de e-mail e o botão de ação. É só isso mesmo —
- * o huly.io pede o e-mail primeiro e resolve senha, código ou provedor no
+ * o teron.io pede o e-mail primeiro e resolve senha, código ou provedor no
  * passo seguinte, e as telas daqui seguem o mesmo caminho.
  *
  * Versão visual: o `submit` é barrado no `onSubmit`. O ponto de integração é

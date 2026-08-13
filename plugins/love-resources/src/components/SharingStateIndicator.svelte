@@ -40,7 +40,7 @@
 {#if $lkSessionConnected}
   {#if $screenSharingState === ScreenSharingState.Local}
     <button
-      class="hulyStatusBarButton mini positive positiveContent"
+      class="teronStatusBarButton mini positive positiveContent"
       class:pressed
       use:tooltip={{ label: love.string.Sharing, direction: 'bottom' }}
       on:click={handleShowPopup}
@@ -49,7 +49,7 @@
     </button>
   {:else}
     <button
-      class="hulyStatusBarButton mini disabled"
+      class="teronStatusBarButton mini disabled"
       class:pressed
       use:tooltip={{ label: love.string.Share, direction: 'bottom' }}
       on:click={handleShare}

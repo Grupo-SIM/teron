@@ -27,7 +27,7 @@ describe('rest-api-server', () => {
   const wsName = 'api-tests'
 
   beforeAll(async () => {
-    await loadServerConfig('http://huly.local:8083')
+    await loadServerConfig('http://teron.local:8083')
   }, 10000)
 
   async function connect (): Promise<PlatformClient> {
@@ -39,7 +39,7 @@ describe('rest-api-server', () => {
       connectionTimeout: 30000
     }
 
-    return await connectWs('http://huly.local:8083', options)
+    return await connectWs('http://teron.local:8083', options)
   }
 
   it('handles many duplicate create doc attempts without breaking subsequent requests', async () => {
@@ -49,7 +49,7 @@ describe('rest-api-server', () => {
     const issueId: Ref<Issue> = generateId()
 
     let project = await client.findOne(tracker.class.Project, {
-      identifier: 'HULY'
+      identifier: 'TERON'
     })
     if (project === undefined) {
       // Create a minimal project for this test if it does not exist yet.
@@ -60,14 +60,14 @@ describe('rest-api-server', () => {
 
       const projectId = generateId()
       const projectData: any = {
-        name: 'HULY',
+        name: 'TERON',
         description: '',
         private: false,
         members: [],
         owners: [],
         archived: false,
         autoJoin: false,
-        identifier: 'HULY',
+        identifier: 'TERON',
         sequence: 0,
         color: undefined,
         icon: undefined,

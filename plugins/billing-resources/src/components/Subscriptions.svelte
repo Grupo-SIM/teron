@@ -413,7 +413,7 @@
 
 {#if tiers.length > 0}
   <Scroller align={'center'} padding={'var(--spacing-3)'} bottomPadding={'var(--spacing-3)'}>
-    <div class="hulyComponent-content gapV-8">
+    <div class="teronComponent-content gapV-8">
       <div class="flex-col flex-gap-4">
         <div class="section-title">
           <Label label={plugin.string.ActivePlan} />

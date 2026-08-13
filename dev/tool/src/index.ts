@@ -32,7 +32,7 @@ import {
   type Account as OldAccount,
   type Workspace as OldWorkspace
 } from '@hcengineering/account-service'
-import { getWorkspaceClient as getHulylakeClient } from '@hcengineering/hulylake-client'
+import { getWorkspaceClient as getTeronlakeClient } from '@hcengineering/teronlake-client'
 import { setMetadata } from '@hcengineering/platform'
 import {
   createPostgreeDestroyAdapter,
@@ -2772,7 +2772,7 @@ export function devTool (
     .command('restore-v6-from-storage <workspace> <accsRoot>')
     .description('Restore a workspace from v6 backup storage with accounts info')
     .option('-r, --region <region>', 'Region to restore workspace to')
-    .option('-b, --branding <branding>', 'Branding to restore workspace with', 'huly')
+    .option('-b, --branding <branding>', 'Branding to restore workspace with', 'teron')
     .option('-s, --suffix <suffix>', 'Url suffix if conflicting', 'bold')
     .option('-f, --force', 'Force restore if the same uuid', false)
     .action(async (workspace, accsRoot, cmd: { suffix: string, region: string, branding: string, force: boolean }) => {
@@ -2864,13 +2864,13 @@ export function devTool (
     .option('-w, --workspace <workspace>', 'Workspace to migrate')
     .action(async (cmd: { workspace?: WorkspaceUuid }) => {
       const { dbUrl, txes } = prepareTools()
-      const hulylakeUrl = process.env.HULYLAKE_URL ?? ''
+      const teronlakeUrl = process.env.TERONLAKE_URL ?? ''
 
       const workspace = cmd.workspace
       console.log('Workspace', workspace)
 
-      if (hulylakeUrl === '') {
-        throw new Error('HULYLAKE_URL should be specified')
+      if (teronlakeUrl === '') {
+        throw new Error('TERONLAKE_URL should be specified')
       }
 
       const token = generateToken(systemAccountUuid, undefined, {
@@ -2892,7 +2892,7 @@ export function devTool (
           try {
             const ws = await accountDb.workspace.findOne({ uuid: wss.workspaceUuid })
             if (ws == null) continue
-            const hulylake = getHulylakeClient(hulylakeUrl, ws.uuid, token)
+            const teronlake = getTeronlakeClient(teronlakeUrl, ws.uuid, token)
 
             let pipeline: Pipeline | undefined
             try {
@@ -2931,7 +2931,7 @@ export function devTool (
               dbClient,
               client,
               pipeline.context.hierarchy,
-              hulylake,
+              teronlake,
               accountClient,
               personUuidBySocialId
             )

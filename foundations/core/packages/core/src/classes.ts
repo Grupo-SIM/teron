@@ -978,9 +978,9 @@ export enum SocialIdType {
   GOOGLE = 'google',
   PHONE = 'phone',
   OIDC = 'oidc',
-  HULY = 'huly',
+  TERON = 'teron',
   TELEGRAM = 'telegram',
-  HULY_ASSISTANT = 'huly-assistant'
+  TERON_ASSISTANT = 'teron-assistant'
 }
 
 export interface SocialId {

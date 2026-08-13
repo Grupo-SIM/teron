@@ -61,7 +61,7 @@
     : readonly
 </script>
 
-<div class="hulyComponent-content hulyComponent-content__container noShrink">
+<div class="teronComponent-content teronComponent-content__container noShrink">
   {#if dataProvider !== undefined && channel !== undefined}
     <ReverseChannelScrollView
       bind:selectedMessageId

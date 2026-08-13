@@ -46,7 +46,7 @@ export class DocumentContentPage extends CommonPage {
     this.page.locator('form[id="text-editor:string:Link"] button[type="submit"]')
 
   readonly buttonMoreActions = (): Locator =>
-    this.page.locator('div.hulyHeader-buttonsGroup button#btn-doc-title-open-more')
+    this.page.locator('div.teronHeader-buttonsGroup button#btn-doc-title-open-more')
 
   readonly buttonLockedInTitle = (): Locator => this.page.getByRole('button', { name: 'Locked' })
 

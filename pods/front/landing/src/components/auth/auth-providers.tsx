@@ -6,7 +6,7 @@
  * A linha da esquerda é um gradiente que acende para fora e a da direita é
  * chapada, como no original — as duas iguais achatariam o texto do meio.
  *
- * As marcas são as do huly.io: monocromáticas, num degradê de branco para
+ * As marcas são as do teron.io: monocromáticas, num degradê de branco para
  * branco a 60%. O "G" colorido do Google puxaria o olho para longe do botão
  * principal, que é onde a tela quer levar.
  *

@@ -121,7 +121,7 @@ export function startFront (ctx: MeasureContext, extraConfig?: Record<string, st
 
   const paymentUrl = process.env.PAYMENT_URL
 
-  const hulylakeUrl = process.env.HULYLAKE_URL
+  const teronlakeUrl = process.env.TERONLAKE_URL
 
   const datalakeUrl = process.env.DATALAKE_URL
 
@@ -156,7 +156,7 @@ export function startFront (ctx: MeasureContext, extraConfig?: Record<string, st
     billingUrl,
     paymentUrl,
     pulseUrl,
-    hulylakeUrl,
+    teronlakeUrl,
     datalakeUrl
   }
   console.log('Starting Front service with', config)

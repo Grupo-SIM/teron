@@ -1,4 +1,4 @@
-"""Isola o brilho animado do waves.mp4 do huly.
+"""Isola o brilho animado do waves.mp4 do teron.
 
 O vídeo é um plate claro estático (prateleiras, labels, painel) com swirls azuis
 girando por cima. O máximo por pixel ao longo dos 90 frames dá o plate "limpo" —
@@ -18,7 +18,7 @@ import numpy as np
 from PIL import Image, ImageFilter
 
 # O fonte não fica versionado (2.6 MB e só serve para gerar o resultado):
-#   curl -o wt-waves.mp4 https://huly.io/videos/pages/home/work-together/waves.mp4
+#   curl -o wt-waves.mp4 https://teron.io/videos/pages/home/work-together/waves.mp4
 SRC = "wt-waves.mp4"
 OUT = "public/assets/wt-glow.webm"
 W, H = 1280, 790

@@ -585,7 +585,7 @@ export async function getPersonInfo (
 ): Promise<PersonInfo> {
   const { account } = params
   const { extra } = decodeTokenVerbose(ctx, token)
-  verifyAllowedServices(['workspace', 'tool', 'gmail', 'huly-mail', 'export'], extra)
+  verifyAllowedServices(['workspace', 'tool', 'gmail', 'teron-mail', 'export'], extra)
 
   if (account == null || account === '') {
     throw new PlatformError(new Status(Severity.ERROR, platform.status.BadRequest, {}))
@@ -618,7 +618,7 @@ export async function addSocialIdToPerson (
 
   if (extra?.admin !== 'true') {
     verifyAllowedServices(
-      ['github', 'telegram-bot', 'gmail', 'tool', 'workspace', 'hulygram', 'google-calendar', 'ai-assistant'],
+      ['github', 'telegram-bot', 'gmail', 'tool', 'workspace', 'terongram', 'google-calendar', 'ai-assistant'],
       extra
     )
   }
@@ -952,7 +952,7 @@ export async function findFullSocialIds (
 ): Promise<SocialId[]> {
   const { socialIds } = params
   const { extra } = decodeTokenVerbose(ctx, token)
-  verifyAllowedServices(['gmail', 'tool', 'workspace', 'huly-mail', 'rating'], extra)
+  verifyAllowedServices(['gmail', 'tool', 'workspace', 'teron-mail', 'rating'], extra)
 
   if (socialIds == null || socialIds.length === 0) {
     throw new PlatformError(new Status(Severity.ERROR, platform.status.BadRequest, {}))

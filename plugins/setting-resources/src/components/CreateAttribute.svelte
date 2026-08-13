@@ -152,8 +152,8 @@
     <ButtonIcon icon={IconDelete} size={'small'} kind={'tertiary'} />
     <ButtonIcon icon={IconCopy} size={'small'} kind={'tertiary'} />
   </svelte:fragment>
-  <div class="hulyModal-content__titleGroup">
-    <div class="hulyChip-item font-medium-12">
+  <div class="teronModal-content__titleGroup">
+    <div class="teronChip-item font-medium-12">
       <Label label={setting.string.Custom} />
     </div>
     <div class="flex items-center">

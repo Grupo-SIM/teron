@@ -11,7 +11,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License
 
-import { type UnsubscribeCallback, type Callback } from '@hcengineering/hulypulse-client'
+import { type UnsubscribeCallback, type Callback } from '@hcengineering/teronpulse-client'
 import { type IntlString, getMetadata } from '@hcengineering/platform'
 import presentation, { createPulseClient } from '@hcengineering/presentation'
 import { type PersonId } from '@hcengineering/core'

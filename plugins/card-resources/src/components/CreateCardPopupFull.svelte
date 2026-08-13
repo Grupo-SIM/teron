@@ -158,7 +158,7 @@
   maxWidth="90vw"
   on:close
 >
-  <div class="hulyModal-content__titleGroup" style="padding: 0">
+  <div class="teronModal-content__titleGroup" style="padding: 0">
     <ModernEditbox
       bind:value={data.title}
       label={view.string.Title}
@@ -183,15 +183,15 @@
     />
   </div>
 
-  <div class="hulyModal-content__settingsSet">
+  <div class="teronModal-content__settingsSet">
     {#if changeType}
-      <div class="hulyModal-content__settingsSet-line">
+      <div class="teronModal-content__settingsSet-line">
         <span class="label"><Label label={card.string.MasterTag} /></span>
         <TypeSelector bind:value={type} excludeBaseTypes />
       </div>
     {/if}
     {#if (space == null || allowChangeSpace) && !(extension?.hideSpace ?? false)}
-      <div class="hulyModal-content__settingsSet-line">
+      <div class="teronModal-content__settingsSet-line">
         <span class="label"><Label label={core.string.Space} /></span>
         <SpaceSelector
           _class={card.class.CardSpace}

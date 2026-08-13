@@ -6,7 +6,7 @@ type RiveCardProps = {
   /** Texto em destaque no rodapé do card. */
   title: string;
   text: string;
-  /** `wide` usa a proporção 768x420 do huly.io; o padrão é 428x420. */
+  /** `wide` usa a proporção 768x420 do teron.io; o padrão é 428x420. */
   variant?: "wide" | "narrow";
   /** Vídeo opcional atrás da animação (fundo do card de notificações). */
   video?: string;

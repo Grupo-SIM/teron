@@ -213,7 +213,7 @@
      * your PR branch, and in this situation "rush change" will also automatically invoke "git fetch"
      * to retrieve the latest activity for the remote main branch.
      */
-    "url": "https://github.com/hcengineering/huly.server",
+    "url": "https://github.com/hcengineering/teron.server",
     /**
      * The default branch name. This tells "rush change" which remote branch to compare against.
      * The default value is "main"
@@ -339,7 +339,7 @@
     { "packageName": "@hcengineering/collaboration", "projectFolder": "packages/collaboration", "shouldPublish": true },
     { "packageName": "@hcengineering/server-core", "projectFolder": "packages/core", "shouldPublish": true },
     { "packageName": "@hcengineering/datalake", "projectFolder": "packages/datalake", "shouldPublish": true },
-    { "packageName": "@hcengineering/hulylake", "projectFolder": "packages/hulylake", "shouldPublish": true },
+    { "packageName": "@hcengineering/teronlake", "projectFolder": "packages/teronlake", "shouldPublish": true },
     { "packageName": "@hcengineering/elastic", "projectFolder": "packages/elastic", "shouldPublish": true },
     { "packageName": "@hcengineering/kafka", "projectFolder": "packages/kafka", "shouldPublish": true },
     { "packageName": "@hcengineering/middleware", "projectFolder": "packages/middleware", "shouldPublish": true },

@@ -20,7 +20,7 @@ const icons = require('../assets/icons.svg') as string // eslint-disable-line
 loadMetadata(contact.icon, {
   ContactApplication: `${icons}#contactapplication`,
   Phone: `${icons}#phone`,
-  Huly: `${icons}#huly`,
+  Teron: `${icons}#teron`,
   Email: `${icons}#email`,
   Discord: `${icons}#discord`,
   Facebook: `${icons}#facebook`,

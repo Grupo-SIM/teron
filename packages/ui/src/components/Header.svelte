@@ -92,7 +92,7 @@
     if (!doubleRow && element.clientWidth <= doubleRowWidth) doubleRow = true
     else if (doubleRow && element.clientWidth > doubleRowWidth) doubleRow = false
   }}
-  class="hulyHeader-container"
+  class="teronHeader-container"
   class:doubleRow={_doubleRow}
   class:topIndent
   class:clearPadding={$$slots.description}
@@ -100,7 +100,7 @@
   class:no-print={noPrint}
 >
   {#if _doubleRow}
-    <div class="hulyHeader-row">
+    <div class="teronHeader-row">
       {#if allowFullsize}
         <ButtonIcon
           icon={$deviceInfo.navigator.visible ? IconMaximize : IconMinimize}
@@ -109,17 +109,17 @@
           noPrint
           on:click={() => ($deviceInfo.navigator.visible = !$deviceInfo.navigator.visible)}
         />
-        <div class="hulyHeader-divider no-print" />
+        <div class="teronHeader-divider no-print" />
       {/if}
       {#if $$slots.beforeTitle && !hideBefore}
-        <div class="hulyHeader-buttonsGroup before mr-2 no-print" class:freezeBefore>
+        <div class="teronHeader-buttonsGroup before mr-2 no-print" class:freezeBefore>
           <slot name="beforeTitle" {doubleRow} />
         </div>
       {/if}
       <!-- svelte-ignore a11y-click-events-have-key-events -->
       <!-- svelte-ignore a11y-no-static-element-interactions -->
       <div
-        class="hulyHeader-titleGroup"
+        class="teronHeader-titleGroup"
         class:withDescription={$$slots.description && !hideDescription}
         class:notGrow={adaptive === 'autoExtra'}
         use:resizeObserver={(element) => {
@@ -129,8 +129,8 @@
         on:click
       >
         {#if $$slots.description && !hideDescription}
-          <div class="hulyHeader-titleGroup"><slot /></div>
-          <div class="hulyHeader-titleGroup"><slot name="description" /></div>
+          <div class="teronHeader-titleGroup"><slot /></div>
+          <div class="teronHeader-titleGroup"><slot name="description" /></div>
         {:else}
           <slot />
         {/if}
@@ -138,7 +138,7 @@
 
       {#if adaptive === 'autoExtra'}
         <div
-          class="hulyHeader-spaceFiller"
+          class="teronHeader-spaceFiller"
           bind:this={spaceFiller}
           use:resizeObserver={(element) => {
             if (headerProps.spaceWidth !== element.clientWidth) headerProps.spaceWidth = element.clientWidth
@@ -148,33 +148,33 @@
       {/if}
 
       {#if $$slots.actions && !hideActions && (adaptive === 'freezeActions' || adaptive === 'doubleRow' || adaptive === 'autoExtra')}
-        <div class="hulyHeader-buttonsGroup actions no-print">
+        <div class="teronHeader-buttonsGroup actions no-print">
           <slot name="actions" {doubleRow} />
         </div>
       {/if}
       {#if closeButton}
-        {#if type !== 'type-popup'}<div class="hulyHeader-divider no-print" />{/if}
+        {#if type !== 'type-popup'}<div class="teronHeader-divider no-print" />{/if}
         {#if closeOnEscape}
-          <div class="hulyHotKey-item no-print">Esc</div>
+          <div class="teronHotKey-item no-print">Esc</div>
         {/if}
         <ButtonIcon icon={IconClose} kind={'tertiary'} size={'small'} noPrint on:click={() => dispatch('close')} />
       {/if}
     </div>
-    <!-- <div class="hulyHeader-row__divider" /> -->
-    <div class="hulyHeader-row no-print" class:between={$$slots.search} class:reverse={!$$slots.search}>
+    <!-- <div class="teronHeader-row__divider" /> -->
+    <div class="teronHeader-row no-print" class:between={$$slots.search} class:reverse={!$$slots.search}>
       {#if $$slots.presence && !hidePresence}
-        <div class="hulyHeader-buttonsGroup presence no-print">
+        <div class="teronHeader-buttonsGroup presence no-print">
           <slot name="presence" {doubleRow} />
         </div>
       {/if}
       {#if $$slots.search}
-        <div class="hulyHeader-buttonsGroup search">
+        <div class="teronHeader-buttonsGroup search">
           <slot name="search" {doubleRow} />
         </div>
       {/if}
       {#if $$slots.extra && !hideExtra && (adaptive === 'doubleRow' || adaptive === 'autoExtra')}
         <div
-          class="hulyHeader-buttonsGroup extra"
+          class="teronHeader-buttonsGroup extra"
           class:overflow={overflowExtra}
           use:resizeObserver={(element) => {
             headerProps.extraOverflow = element.scrollWidth > element.clientWidth
@@ -185,7 +185,7 @@
         </div>
       {/if}
       {#if $$slots.actions && !hideActions && !(adaptive === 'freezeActions' || adaptive === 'doubleRow' || adaptive === 'autoExtra')}
-        <div class="hulyHeader-buttonsGroup actions flex-shrink">
+        <div class="teronHeader-buttonsGroup actions flex-shrink">
           <slot name="actions" {doubleRow} />
         </div>
       {/if}
@@ -199,17 +199,17 @@
         noPrint
         on:click={() => ($deviceInfo.navigator.visible = !$deviceInfo.navigator.visible)}
       />
-      <div class="hulyHeader-divider no-print" />
+      <div class="teronHeader-divider no-print" />
     {/if}
     {#if $$slots.beforeTitle && !hideBefore}
-      <div class="hulyHeader-buttonsGroup before mr-2 no-print">
+      <div class="teronHeader-buttonsGroup before mr-2 no-print">
         <slot name="beforeTitle" {doubleRow} />
       </div>
     {/if}
     <!-- svelte-ignore a11y-click-events-have-key-events -->
     <!-- svelte-ignore a11y-no-static-element-interactions -->
     <div
-      class="hulyHeader-titleGroup"
+      class="teronHeader-titleGroup"
       class:withDescription={$$slots.description && !hideDescription}
       class:notGrow={adaptive === 'autoExtra'}
       use:resizeObserver={(element) => {
@@ -228,7 +228,7 @@
 
     {#if adaptive === 'autoExtra'}
       <div
-        class="hulyHeader-spaceFiller"
+        class="teronHeader-spaceFiller"
         bind:this={spaceFiller}
         use:resizeObserver={(element) => {
           if (headerProps.spaceWidth !== element.clientWidth) headerProps.spaceWidth = element.clientWidth
@@ -238,21 +238,21 @@
     {/if}
 
     {#if $$slots.presence && !hidePresence}
-      <div class="hulyHeader-buttonsGroup presence no-print">
+      <div class="teronHeader-buttonsGroup presence no-print">
         <slot name="presence" {doubleRow} />
       </div>
     {/if}
 
     {#if $$slots.search && !hideSearch}
-      <div class="hulyHeader-buttonsGroup search no-print">
+      <div class="teronHeader-buttonsGroup search no-print">
         <slot name="search" {doubleRow} />
       </div>
-      {#if $$slots.actions && !hideActions}<div class="hulyHeader-divider no-print" />{/if}
+      {#if $$slots.actions && !hideActions}<div class="teronHeader-divider no-print" />{/if}
     {/if}
 
     {#if $$slots.extra && !hideExtra}
       <div
-        class="hulyHeader-buttonsGroup extra"
+        class="teronHeader-buttonsGroup extra"
         class:overflow={overflowExtra}
         use:resizeObserver={(element) => {
           headerProps.extraOverflow = element.scrollWidth > element.clientWidth
@@ -263,14 +263,14 @@
       </div>
     {/if}
     {#if $$slots.actions && !hideActions}
-      <div class="hulyHeader-buttonsGroup actions no-print">
+      <div class="teronHeader-buttonsGroup actions no-print">
         <slot name="actions" {doubleRow} />
       </div>
     {/if}
     {#if closeButton}
-      {#if type !== 'type-popup'}<div class="hulyHeader-divider no-print" />{/if}
+      {#if type !== 'type-popup'}<div class="teronHeader-divider no-print" />{/if}
       {#if closeOnEscape}
-        <div class="hulyHotKey-item no-print">Esc</div>
+        <div class="teronHotKey-item no-print">Esc</div>
       {/if}
       <ButtonIcon icon={IconClose} kind={'tertiary'} size={'small'} noPrint on:click={() => dispatch('close')} />
     {/if}

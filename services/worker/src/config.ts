@@ -24,7 +24,7 @@ export interface Config {
 }
 
 const config: Config = {
-  DbUrl: process.env.DB_URL ?? 'postgres://localhost:5432/huly',
+  DbUrl: process.env.DB_URL ?? 'postgres://localhost:5432/teron',
   PollInterval: process.env.POLL_INTERVAL != null ? Number(process.env.POLL_INTERVAL) : 20000,
   QueueRegion: process.env.QUEUE_REGION ?? '',
   QueueConfig: process.env.QUEUE_CONFIG ?? ''

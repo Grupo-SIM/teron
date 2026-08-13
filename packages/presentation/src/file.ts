@@ -36,8 +36,8 @@ export function generateFileId (): string {
 }
 
 /** @public */
-export function createFileStorage (uploadUrl: string, datalakeUrl?: string, hulylakeUrl?: string): FileStorage {
-  return createStorageClient({ uploadUrl, datalakeUrl, hulylakeUrl })
+export function createFileStorage (uploadUrl: string, datalakeUrl?: string, teronlakeUrl?: string): FileStorage {
+  return createStorageClient({ uploadUrl, datalakeUrl, teronlakeUrl })
 }
 
 /** @public */

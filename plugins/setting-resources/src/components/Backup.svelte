@@ -187,7 +187,7 @@
 
   function backupArchiveName (): string {
     const date = new Date().toISOString().slice(0, 10)
-    return `huly-backup-${workspaceId}-${date}.zip`
+    return `teron-backup-${workspaceId}-${date}.zip`
   }
 
   async function downloadFullBackup (): Promise<void> {
@@ -209,7 +209,7 @@
         entries.push({ name, data: new Uint8Array(await response.arrayBuffer()) })
       }
       // Ship restore instructions inside the archive so it can be restored
-      // into any other Huly setup directly.
+      // into any other Teron setup directly.
       const readme = generateRestoreReadme({ sourceWorkspace: workspaceId, fileCount: entries.length })
       entries.push({ name: 'RESTORE.md', data: new TextEncoder().encode(readme) })
       const zip = buildStoreZip(entries)
@@ -238,7 +238,7 @@
     const script = generateBackupScript({
       baseUrl: downloadBase,
       files,
-      outDir: `huly-backup-${workspaceId}`,
+      outDir: `teron-backup-${workspaceId}`,
       restoreReadme: generateRestoreReadme({ sourceWorkspace: workspaceId, fileCount: files.length })
     })
     void copyTextToClipboard(script).then(() => {
@@ -259,7 +259,7 @@
   $: blobs = (backupInfo?.extraBlobs ?? []).sort((a, b) => b.size - a.size).slice(0, 100)
 </script>
 
-<div class="hulyComponent flex-no-shrink">
+<div class="teronComponent flex-no-shrink">
   <Header adaptive={'disabled'}>
     <Breadcrumb icon={setting.icon.Setting} label={setting.string.Backup} size={'large'} isCurrent />
   </Header>

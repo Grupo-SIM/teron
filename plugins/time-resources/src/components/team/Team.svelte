@@ -90,7 +90,7 @@
   onDestroy(() => ($deviceInfo.replacedPanel = undefined))
 </script>
 
-<div class="hulyPanels-container">
+<div class="teronPanels-container">
   {#if $deviceInfo.navigator.visible}
     <TeamNavigator bind:selected={space} />
     <Separator
@@ -102,7 +102,7 @@
       short
     />
   {/if}
-  <div class="hulyComponent" bind:this={replacedPanel}>
+  <div class="teronComponent" bind:this={replacedPanel}>
     <Header adaptive={'disabled'}>
       <Breadcrumbs {items} currentOnly />
 

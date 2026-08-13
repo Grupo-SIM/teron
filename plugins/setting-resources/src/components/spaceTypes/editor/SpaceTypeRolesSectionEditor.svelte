@@ -56,7 +56,7 @@
 </script>
 
 {#if descriptor !== undefined}
-  <div class="hulyTableAttr-header font-medium-12">
+  <div class="teronTableAttr-header font-medium-12">
     <MembersIcon size="small" />
     <span><Label label={settingRes.string.Roles} /></span>
     <ButtonIcon
@@ -71,19 +71,19 @@
     />
   </div>
   {#if roles.length}
-    <div class="hulyTableAttr-content task">
+    <div class="teronTableAttr-content task">
       {#each roles as role}
         <button
-          class="hulyTableAttr-content__row justify-start"
+          class="teronTableAttr-content__row justify-start"
           on:click|stopPropagation={() => {
             handleRoleSelected(role._id)
           }}
         >
-          <div class="hulyTableAttr-content__row-icon-wrapper">
+          <div class="teronTableAttr-content__row-icon-wrapper">
             <PersonIcon size="small" />
           </div>
           {#if role.name !== ''}
-            <div class="hulyTableAttr-content__row-label font-medium-14">
+            <div class="teronTableAttr-content__row-label font-medium-14">
               {role.name}
             </div>
           {/if}

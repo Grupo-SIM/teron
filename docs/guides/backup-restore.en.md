@@ -1,13 +1,13 @@
 # Backup & Restore Guide
 
-Download a workspace backup and restore it into another Huly instance —
+Download a workspace backup and restore it into another Teron instance —
 whether that's a self-hosted deployment or one of the hosted options. This is
 the recommended way to move your data off a hosted workspace before it
 becomes unavailable.
 
 > [!TIP]
 > Don't want to run your own server? You can also move to one of the
-> existing hosted Huly forks instead of self-hosting. We're glad to help
+> existing hosted Teron forks instead of self-hosting. We're glad to help
 > with the data migration either way — just keep in mind that none of these
 > hosting options are free, since keeping servers running costs real money.
 > See [Need help?](#need-help) below to get in touch.
@@ -44,7 +44,7 @@ You have two ways to get the files:
 - **Copy download script** (+ **Copy token**) — copies a small shell script
   that downloads every file with `curl`. The script is safe to save or share:
   it does **not** contain your token — it reads it from the
-  `HULY_BACKUP_TOKEN` environment variable, or prompts for it when you run it.
+  `TERON_BACKUP_TOKEN` environment variable, or prompts for it when you run it.
 
 Either option produces a folder that the restore tool can consume directly
 (see Step 2).
@@ -66,10 +66,10 @@ individual files, e.g. to verify access or fetch a single snapshot.
 > above — if you need them on the destination, download each one individually
 > from that list before you migrate.
 
-## Step 2. Restore into a Huly instance
+## Step 2. Restore into a Teron instance
 
-You'll need a Huly platform you control to restore into — either
-[huly-selfhost](https://github.com/hcengineering/huly-selfhost), a
+You'll need a Teron platform you control to restore into — either
+[teron-selfhost](https://github.com/hcengineering/teron-selfhost), a
 self-hosted deployment built from this monorepo, or another hosted instance
 where you have admin access. Create the destination workspace first if it
 doesn't exist yet.
@@ -114,7 +114,7 @@ one-time code (OTP) — make sure the destination platform can send mail.
 
 ## Need help?
 
-Our team is happy to help with migration. Join the [Huly community](https://link.huly.io/slack) to ask questions and get updates, or email us directly at [artem@hardcoreeng.com](mailto:artem@hardcoreeng.com).
+Our team is happy to help with migration. Join the [Teron community](https://link.teron.io/slack) to ask questions and get updates, or email us directly at [artem@hardcoreeng.com](mailto:artem@hardcoreeng.com).
 
 ## Troubleshooting
 
@@ -130,5 +130,5 @@ Our team is happy to help with migration. Join the [Huly community](https://link
 
 ## See also
 
-- [huly-selfhost](https://github.com/hcengineering/huly-selfhost) — official
+- [teron-selfhost](https://github.com/hcengineering/teron-selfhost) — official
   self-hosted distribution.

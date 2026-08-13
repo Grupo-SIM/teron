@@ -43,7 +43,7 @@
   let _icon = icon ?? icons[0]
 </script>
 
-<div class="hulyPopup-container noPadding autoWidth maxWidth">
+<div class="teronPopup-container noPadding autoWidth maxWidth">
   <!-- svelte-ignore a11y-click-events-have-key-events -->
   <!-- svelte-ignore a11y-no-static-element-interactions -->
   {#if !showEmoji}
@@ -116,7 +116,7 @@
     margin: 0.25rem 0.75rem;
     font-size: 1.25rem;
   }
-  .hulyPopup-container.maxWidth {
+  .teronPopup-container.maxWidth {
     min-width: 25.5rem;
     max-width: 25.5rem;
     min-height: 12rem;

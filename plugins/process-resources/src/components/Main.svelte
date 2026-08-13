@@ -55,7 +55,7 @@
         : {}
 </script>
 
-<div class="hulyPanels-container">
+<div class="teronPanels-container">
   {#if $deviceInfo.navigator.visible}
     <Navigator {processes} {currentSpace} {specials} />
     <Separator
@@ -68,7 +68,7 @@
     />
   {/if}
 
-  <div class="hulyComponent" bind:this={replacedPanel}>
+  <div class="teronComponent" bind:this={replacedPanel}>
     <SpecialView
       _class={plugin.class.Execution}
       label={plugin.string.Processes}

@@ -339,7 +339,7 @@
   </div>
 
   <svelte:fragment slot="afterContent">
-    <div class="hulyModal-footer px-2">
+    <div class="teronModal-footer px-2">
       {#if state.state === 'ready'}
         <!-- Recording not started -->
         <ModernButton

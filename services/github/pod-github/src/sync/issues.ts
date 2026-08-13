@@ -292,7 +292,7 @@ export class IssueSyncManager extends IssueSyncManagerBase implements DocSyncMan
         external: issueExternal,
         externalVersion: githubExternalSyncVersion,
         lastModified: new Date(issueExternal.updatedAt).getTime(),
-        addHulyLink: true
+        addTeronLink: true
       })
 
       // We need trigger comments, if their sync data created before
@@ -320,7 +320,7 @@ export class IssueSyncManager extends IssueSyncManagerBase implements DocSyncMan
       return { needSync: githubSyncVersion }
     }
 
-    let needCreateConnectedAtHuly = info.addHulyLink === true
+    let needCreateConnectedAtTeron = info.addTeronLink === true
 
     if (info.repository == null && existing !== undefined) {
       if (this.client.getHierarchy().hasMixin(existing, github.mixin.GithubIssue)) {
@@ -398,13 +398,13 @@ export class IssueSyncManager extends IssueSyncManagerBase implements DocSyncMan
         url: issueExternal.url.toLowerCase(),
         githubNumber: issueExternal.number,
         lastModified: new Date(issueExternal.updatedAt).getTime(),
-        addHulyLink: false, // Do not need, since we create comment on Github about issue is connected.
+        addTeronLink: false, // Do not need, since we create comment on Github about issue is connected.
         current: {
           title: issueExternal.title,
           description: await this.provider.getMarkupSafe(container.container, issueExternal.body, this.stripGuestLink)
         }
       }
-      needCreateConnectedAtHuly = true
+      needCreateConnectedAtTeron = true
       await derivedClient.update(info, update)
       info.external = update.external
       info.externalVersion = update.externalVersion
@@ -439,8 +439,8 @@ export class IssueSyncManager extends IssueSyncManagerBase implements DocSyncMan
       }
     }
 
-    if (existing !== undefined && issueExternal !== undefined && needCreateConnectedAtHuly) {
-      await this.addHulyLink(info, syncResult, existing, issueExternal, container)
+    if (existing !== undefined && issueExternal !== undefined && needCreateConnectedAtTeron) {
+      await this.addTeronLink(info, syncResult, existing, issueExternal, container)
     }
 
     return {

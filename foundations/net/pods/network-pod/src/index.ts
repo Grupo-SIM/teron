@@ -5,7 +5,7 @@ import { NetworkServer } from '@hcengineering/network-server'
  * Main entry point for the network pod
  */
 async function main (): Promise<void> {
-  console.log('Starting Huly Network Pod...')
+  console.log('Starting Teron Network Pod...')
 
   // Create tick manager
   const tickManager = new TickManagerImpl(20)

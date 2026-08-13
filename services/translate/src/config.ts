@@ -26,7 +26,7 @@ export interface Config {
   QueueRegion: string
   Secret: string
   ServiceId: string
-  HulylakeUrl: string
+  TeronlakeUrl: string
   BillingUrl: string
 }
 
@@ -36,7 +36,7 @@ const config: Config = (() => {
     QueueConfig: process.env.QUEUE_CONFIG ?? '',
     QueueRegion: process.env.QUEUE_REGION ?? '',
     AccountsUrl: process.env.ACCOUNTS_URL ?? '',
-    HulylakeUrl: process.env.HULYLAKE_URL ?? '',
+    TeronlakeUrl: process.env.TERONLAKE_URL ?? '',
     ServiceId: process.env.SERVICE_ID ?? 'translate',
     OpenAIKey: process.env.OPENAI_API_KEY,
     OpenAIModel: (process.env.OPENAI_MODEL ?? 'gpt-4o-mini') as OpenAI.ChatModel,

@@ -30,7 +30,7 @@ When a timer expires, the service relays the exact `data` payload to the target 
 
 | Variable | Default | Description |
 | :--- | :--- | :--- |
-| `DB_URL` | `postgres://localhost:5432/huly` | Connection string for the PostgreSQL database. |
+| `DB_URL` | `postgres://localhost:5432/teron` | Connection string for the PostgreSQL database. |
 | `POLL_INTERVAL` | `5000` | Polling interval for expired events in milliseconds. |
 | `QUEUE_CONFIG` | - | Kafka bootstrap servers configuration. |
 | `QUEUE_REGION` | `cockroach` | Platform region configuration. |

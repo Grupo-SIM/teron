@@ -51,7 +51,7 @@
   }
 </script>
 
-<div class="hulyComponent">
+<div class="teronComponent">
   <Header adaptive={'disabled'}>
     <Breadcrumb icon={view.icon.Translate} label={contact.string.AutoTranslation} size={'large'} isCurrent />
   </Header>

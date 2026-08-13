@@ -274,16 +274,16 @@ class ClickupImporter {
 
   private convertChecklistsToMarkdown (clickup: string): string {
     const checklists = JSON.parse(clickup) as ClickupChecklist
-    let huly: string = '\n'
+    let teron: string = '\n'
     for (const [key, values] of Object.entries(checklists)) {
-      huly += `**${key}**\n`
+      teron += `**${key}**\n`
       for (const value of values) {
         // no way to check if item is checked, this info doesn't exported from ClickUp 🤯
-        huly += `* [ ] ${value} \n`
+        teron += `* [ ] ${value} \n`
       }
-      huly += '\n'
+      teron += '\n'
     }
-    return huly
+    return teron
   }
 
   private async fillPersonsByNames (): Promise<void> {

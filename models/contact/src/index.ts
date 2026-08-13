@@ -932,11 +932,11 @@ export function createModel (builder: Builder): void {
     contact.class.SocialIdentityProvider,
     core.space.Model,
     {
-      label: getEmbeddedLabel('Huly'),
-      icon: contact.icon.Huly,
-      type: SocialIdType.HULY
+      label: getEmbeddedLabel('Teron'),
+      icon: contact.icon.Teron,
+      type: SocialIdType.TERON
     },
-    contact.socialIdentityProvider.Huly
+    contact.socialIdentityProvider.Teron
   )
 
   builder.createDoc(

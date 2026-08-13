@@ -199,56 +199,56 @@
    * PNPM documentation: https://pnpm.io/package_json#pnpmoverrides
    */
   "globalOverrides": {
-    // DEV: Uncomment the lines below to use local huly.core, huly.server, and huly.utils packages
+    // DEV: Uncomment the lines below to use local teron.core, teron.server, and teron.utils packages
     // Then "rush update --full" to update the dependencies.
-    // NOTE:  It's configured to work if huly.core, huly.server, and huly.utils are placed adjacent to the platform. If you have them in a different location, you need to change the paths below.
-    // huly.core packages:
-    // "@hcengineering/account-client": "file:../../../huly.core/packages/account-client",
-    // "@hcengineering/analytics": "file:../../../huly.core/packages/analytics",
-    // "@hcengineering/analytics-service": "file:../../../huly.core/packages/analytics-service",
-    // "@hcengineering/api-client": "file:../../../huly.core/packages/api-client",
-    // "@hcengineering/client": "file:../../../huly.core/packages/client",
-    // "@hcengineering/client-resources": "file:../../../huly.core/packages/client-resources",
-    // "@hcengineering/collaborator-client": "file:../../../huly.core/packages/collaborator-client",
-    // "@hcengineering/core": "file:../../../huly.core/packages/core",
-    // "@hcengineering/hulylake-client": "file:../../../huly.core/packages/hulylake-client",
-    // "@hcengineering/model": "file:../../../huly.core/packages/model",
-    // "@hcengineering/platform": "file:../../../huly.core/packages/platform",
-    // "@hcengineering/query": "file:../../../huly.core/packages/query",
-    // "@hcengineering/rank": "file:../../../huly.core/packages/rank",
-    // "@hcengineering/retry": "file:../../../huly.core/packages/retry",
-    // "@hcengineering/rpc": "file:../../../huly.core/packages/rpc",
-    // "@hcengineering/storage": "file:../../../huly.core/packages/storage",
-    // "@hcengineering/text": "file:../../../huly.core/packages/text",
-    // "@hcengineering/text-core": "file:../../../huly.core/packages/text-core",
-    // "@hcengineering/text-html": "file:../../../huly.core/packages/text-html",
-    // "@hcengineering/text-markdown": "file:../../../huly.core/packages/text-markdown",
-    // "@hcengineering/text-ydoc": "file:../../../huly.core/packages/text-ydoc",
-    // "@hcengineering/token": "file:../../../huly.core/packages/token",
-    // "@hcengineering/measurements": "file:../../../huly.core/packages/measurements",
-    // "@hcengineering/measurements-otlp": "file:../../../huly.core/packages/measurements-otlp",
-    // "@hcengineering/postgres-base": "file:../../../huly.core/packages/postgres-base",
-    // huly.server packages:
-    // "@hcengineering/collaboration": "file:../../../huly.server/packages/collaboration",
-    // "@hcengineering/datalake": "file:../../../huly.server/packages/datalake",
-    // "@hcengineering/elastic": "file:../../../huly.server/packages/elastic",
-    // "@hcengineering/hulylake": "file:../../../huly.server/packages/hulylake",
-    // "@hcengineering/kafka": "file:../../../huly.server/packages/kafka",
-    // "@hcengineering/middleware": "file:../../../huly.server/packages/middleware",
-    // "@hcengineering/minio": "file:../../../huly.server/packages/minio",
-    // "@hcengineering/mongo": "file:../../../huly.server/packages/mongo",
-    // "@hcengineering/postgres": "file:../../../huly.server/packages/postgres",
-    // "@hcengineering/s3": "file:../../../huly.server/packages/s3",
-    // "@hcengineering/server": "file:../../../huly.server/packages/server",
-    // "@hcengineering/server-client": "file:../../../huly.server/packages/client",
-    // "@hcengineering/server-core": "file:../../../huly.server/packages/core",
-    // "@hcengineering/server-storage": "file:../../../huly.server/packages/server-storage"
+    // NOTE:  It's configured to work if teron.core, teron.server, and teron.utils are placed adjacent to the platform. If you have them in a different location, you need to change the paths below.
+    // teron.core packages:
+    // "@hcengineering/account-client": "file:../../../teron.core/packages/account-client",
+    // "@hcengineering/analytics": "file:../../../teron.core/packages/analytics",
+    // "@hcengineering/analytics-service": "file:../../../teron.core/packages/analytics-service",
+    // "@hcengineering/api-client": "file:../../../teron.core/packages/api-client",
+    // "@hcengineering/client": "file:../../../teron.core/packages/client",
+    // "@hcengineering/client-resources": "file:../../../teron.core/packages/client-resources",
+    // "@hcengineering/collaborator-client": "file:../../../teron.core/packages/collaborator-client",
+    // "@hcengineering/core": "file:../../../teron.core/packages/core",
+    // "@hcengineering/teronlake-client": "file:../../../teron.core/packages/teronlake-client",
+    // "@hcengineering/model": "file:../../../teron.core/packages/model",
+    // "@hcengineering/platform": "file:../../../teron.core/packages/platform",
+    // "@hcengineering/query": "file:../../../teron.core/packages/query",
+    // "@hcengineering/rank": "file:../../../teron.core/packages/rank",
+    // "@hcengineering/retry": "file:../../../teron.core/packages/retry",
+    // "@hcengineering/rpc": "file:../../../teron.core/packages/rpc",
+    // "@hcengineering/storage": "file:../../../teron.core/packages/storage",
+    // "@hcengineering/text": "file:../../../teron.core/packages/text",
+    // "@hcengineering/text-core": "file:../../../teron.core/packages/text-core",
+    // "@hcengineering/text-html": "file:../../../teron.core/packages/text-html",
+    // "@hcengineering/text-markdown": "file:../../../teron.core/packages/text-markdown",
+    // "@hcengineering/text-ydoc": "file:../../../teron.core/packages/text-ydoc",
+    // "@hcengineering/token": "file:../../../teron.core/packages/token",
+    // "@hcengineering/measurements": "file:../../../teron.core/packages/measurements",
+    // "@hcengineering/measurements-otlp": "file:../../../teron.core/packages/measurements-otlp",
+    // "@hcengineering/postgres-base": "file:../../../teron.core/packages/postgres-base",
+    // teron.server packages:
+    // "@hcengineering/collaboration": "file:../../../teron.server/packages/collaboration",
+    // "@hcengineering/datalake": "file:../../../teron.server/packages/datalake",
+    // "@hcengineering/elastic": "file:../../../teron.server/packages/elastic",
+    // "@hcengineering/teronlake": "file:../../../teron.server/packages/teronlake",
+    // "@hcengineering/kafka": "file:../../../teron.server/packages/kafka",
+    // "@hcengineering/middleware": "file:../../../teron.server/packages/middleware",
+    // "@hcengineering/minio": "file:../../../teron.server/packages/minio",
+    // "@hcengineering/mongo": "file:../../../teron.server/packages/mongo",
+    // "@hcengineering/postgres": "file:../../../teron.server/packages/postgres",
+    // "@hcengineering/s3": "file:../../../teron.server/packages/s3",
+    // "@hcengineering/server": "file:../../../teron.server/packages/server",
+    // "@hcengineering/server-client": "file:../../../teron.server/packages/client",
+    // "@hcengineering/server-core": "file:../../../teron.server/packages/core",
+    // "@hcengineering/server-storage": "file:../../../teron.server/packages/server-storage"
 
-    // huly.utils packages:
-    // "@hcengineering/platform-rig": "file:../../../huly.utils/packages/platform-rig",
-    // "@hcengineering/ui-test": "file:../../../huly.utils/packages/ui-test"
+    // teron.utils packages:
+    // "@hcengineering/platform-rig": "file:../../../teron.utils/packages/platform-rig",
+    // "@hcengineering/ui-test": "file:../../../teron.utils/packages/ui-test"
 
-    // huly.communication packages
+    // teron.communication packages
     // "@hcengineering/communication-types": "file:../../../communication/packages/types",
     // "@hcengineering/communication-sdk-types": "file:../../../communication/packages/sdk-types",
     // "@hcengineering/communication-shared": "file:../../../communication/packages/shared",

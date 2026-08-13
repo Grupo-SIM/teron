@@ -73,7 +73,7 @@
   <Loading />
 {:then _}
   <Scroller align={'center'} padding={'var(--spacing-3)'} bottomPadding={'var(--spacing-3)'}>
-    <div class="hulyComponent-content gapV-8">
+    <div class="teronComponent-content gapV-8">
       <Category icon={drivePlugin.icon.DriveApplication} label={drivePlugin.string.Drive}>
         <div class="row">
           <StatsCard label={billingPlugin.string.DriveSize} text={filesize(totalDatalakeSize, { spacer: ' ' })} />

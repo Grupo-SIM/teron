@@ -98,12 +98,12 @@
   defineSeparators('billingSettings', twoPanelsSeparators)
 </script>
 
-<div class="hulyComponent">
+<div class="teronComponent">
   <Header adaptive={'disabled'}>
     <Breadcrumb icon={plugin.icon.Billing} label={plugin.string.Billing} size={'large'} isCurrent />
   </Header>
-  <div class="hulyComponent-content__container columns">
-    <div class="hulyComponent-content__column navigation py-2">
+  <div class="teronComponent-content__container columns">
+    <div class="teronComponent-content__column navigation py-2">
       <Scroller shrink>
         {#each groups as group}
           <NavItem
@@ -126,7 +126,7 @@
     <Separator name="billingSettings" index={0} color={'var(--theme-divider-color)'} />
 
     {#if currentGroup != null}
-      <div class="hulyComponent-content__column content">
+      <div class="teronComponent-content__column content">
         <Component is={currentGroup.component} />
       </div>
     {/if}

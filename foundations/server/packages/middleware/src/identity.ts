@@ -28,7 +28,7 @@ import {
   type PipelineContext
 } from '@hcengineering/server-core'
 
-export const aiBotAccountEmail = 'huly.ai.bot@hc.engineering'
+export const aiBotAccountEmail = 'teron.ai.bot@hc.engineering'
 
 /**
  * @public

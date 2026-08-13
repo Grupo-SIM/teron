@@ -60,10 +60,10 @@
   }
 </script>
 
-<div class="hulyPopup-container noPadding autoWidth">
+<div class="teronPopup-container noPadding autoWidth">
   {#if haveSkins}
     {#if combinedEmoji && emojiParts?.length === 2}
-      <div class="hulyPopup-row disabled skins-row">
+      <div class="teronPopup-row disabled skins-row">
         {#each new Array(2) as _, index}
           <EmojiButton
             emoji={emojiParts[index]}
@@ -92,7 +92,7 @@
         {/each}
       </div>
     {:else}
-      <div class="hulyPopup-row disabled skins-row">
+      <div class="teronPopup-row disabled skins-row">
         {#each new Array((skins?.length ?? 5) + 1) as _, skin}
           <EmojiButton {emoji} skinTone={skin} preview on:select={(result) => dispatch('close', result.detail)} />
         {/each}
@@ -100,11 +100,11 @@
     {/if}
   {/if}
   {#if remove}
-    {#if haveSkins}<div class="hulyPopup-divider" />{/if}
-    <div class="hulyPopup-group">
-      <button class="hulyPopup-row" on:click={clickRemove}>
-        <div class="hulyPopup-row__icon red-color"><IconDelete size={'small'} /></div>
-        <span class="hulyPopup-row__label red-color"><Label label={emojiPlugin.string.Remove} /></span>
+    {#if haveSkins}<div class="teronPopup-divider" />{/if}
+    <div class="teronPopup-group">
+      <button class="teronPopup-row" on:click={clickRemove}>
+        <div class="teronPopup-row__icon red-color"><IconDelete size={'small'} /></div>
+        <span class="teronPopup-row__label red-color"><Label label={emojiPlugin.string.Remove} /></span>
       </button>
     </div>
   {/if}

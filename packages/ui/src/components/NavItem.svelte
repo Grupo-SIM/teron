@@ -77,7 +77,7 @@
 
 <!-- svelte-ignore a11y-mouse-events-have-key-events -->
 <button
-  class="hulyNavItem-container line-height-auto {type} {type === 'type-anchor-link'
+  class="teronNavItem-container line-height-auto {type} {type === 'type-anchor-link'
     ? 'font-regular-12'
     : 'font-regular-14'}"
   class:selected
@@ -104,7 +104,7 @@
 >
   {#if isFold}
     <button
-      class="hulyNavItem-chevron"
+      class="teronNavItem-chevron"
       class:isOpen
       style:margin-left={`${(levelReset ? 0 : level) * 1.25}rem`}
       disabled={empty}
@@ -116,25 +116,25 @@
     </button>
   {/if}
   {#if visibleIcon || (type === 'type-tag' && color)}
-    <div class="hulyNavItem-icon relative" class:withBackground class:w-auto={iconSize === 'x-small'}>
+    <div class="teronNavItem-icon relative" class:withBackground class:w-auto={iconSize === 'x-small'}>
       {#if $$slots.icon}
         <slot name="icon" />
       {:else if type !== 'type-tag' && visibleIcon}
         <Icon icon={visibleIcon} size={iconSize} {iconProps} />
       {:else if type === 'type-tag'}
-        <div style:background-color={color} class="hulyNavItem-icon__tag" />
+        <div style:background-color={color} class="teronNavItem-icon__tag" />
       {/if}
     </div>
   {/if}
   <span
     bind:this={labelEl}
     use:tooltip={shouldTooltip ? { label: label ?? getEmbeddedLabel(title ?? ''), direction: 'top' } : undefined}
-    class="{description ? 'hulyNavItem-wideLabel' : 'hulyNavItem-label'} overflow-label"
+    class="{description ? 'teronNavItem-wideLabel' : 'teronNavItem-label'} overflow-label"
     class:flex-grow={!(type === 'type-anchor-link')}
     style:color={type === 'type-tag' && selected ? color : null}
   >
     {#if description}
-      <span class="hulyNavItem-label font-medium-12 line-height-auto mr-0-5">
+      <span class="teronNavItem-label font-medium-12 line-height-auto mr-0-5">
         {#if label}<Label {label} />{/if}
         {#if title}{title}{/if}
         <slot />
@@ -148,19 +148,19 @@
   </span>
   {#if $$slots.extra}<slot name="extra" />{/if}
   {#if showMenu || $$slots.actions}
-    <div class="hulyNavItem-actions">
+    <div class="teronNavItem-actions">
       <slot name="actions" />
     </div>
   {/if}
   {#if count !== null}
-    <span class="hulyNavItem-count font-bold-12">
+    <span class="teronNavItem-count font-bold-12">
       {count}
     </span>
   {/if}
   <slot name="notify" />
 </button>
 {#if (isFold && (isOpen || (!isOpen && visible)) && !empty) || forciblyСollapsed}
-  <div class="hulyNavItem-dropbox">
+  <div class="teronNavItem-dropbox">
     {#if (!isOpen && visible) || forciblyСollapsed}
       <slot name="visible" {isOpen} />
     {:else}
@@ -170,7 +170,7 @@
 {/if}
 
 <style lang="scss">
-  .hulyNavItem-container {
+  .teronNavItem-container {
     overflow: hidden;
     display: flex;
     justify-content: stretch;
@@ -182,14 +182,14 @@
     border-radius: var(--small-BorderRadius);
     outline: none;
 
-    .hulyNavItem-chevron,
-    .hulyNavItem-icon {
+    .teronNavItem-chevron,
+    .teronNavItem-icon {
       display: flex;
       justify-content: center;
       align-items: center;
       flex-shrink: 0;
     }
-    .hulyNavItem-chevron {
+    .teronNavItem-chevron {
       margin: 0;
       margin-right: var(--spacing-0_75);
       padding: 0;
@@ -204,7 +204,7 @@
         pointer-events: none;
       }
     }
-    .hulyNavItem-icon {
+    .teronNavItem-icon {
       margin-right: var(--spacing-1);
       width: var(--global-min-Size);
       height: var(--global-min-Size);
@@ -225,15 +225,15 @@
         border-radius: var(--extra-small-BorderRadius);
       }
     }
-    .hulyNavItem-label,
-    .hulyNavItem-wideLabel {
+    .teronNavItem-label,
+    .teronNavItem-wideLabel {
       text-align: left;
       color: var(--global-primary-TextColor);
     }
-    .hulyNavItem-wideLabel {
+    .teronNavItem-wideLabel {
       font-size: 0.875rem;
     }
-    .hulyNavItem-actions {
+    .teronNavItem-actions {
       display: none;
       align-items: center;
       flex-shrink: 0;
@@ -241,7 +241,7 @@
       min-height: 0;
       gap: var(--spacing-0_25);
     }
-    .hulyNavItem-count {
+    .teronNavItem-count {
       margin: 0 var(--spacing-1);
       color: var(--global-tertiary-TextColor);
     }
@@ -253,7 +253,7 @@
       cursor: default;
       background-color: var(--global-ui-highlight-BackgroundColor);
 
-      .hulyNavItem-count {
+      .teronNavItem-count {
         color: var(--global-secondary-TextColor);
       }
     }
@@ -265,10 +265,10 @@
         &.indent {
           padding-left: var(--spacing-4);
         }
-        .hulyNavItem-icon {
+        .teronNavItem-icon {
           color: var(--global-accent-TextColor);
         }
-        .hulyNavItem-label:not(.description) {
+        .teronNavItem-label:not(.description) {
           color: var(--global-accent-TextColor);
         }
       }
@@ -276,7 +276,7 @@
     &.type-tag {
       padding: 0 var(--spacing-1_25);
 
-      .hulyNavItem-icon {
+      .teronNavItem-icon {
         width: 0.75rem;
         min-width: 0.75rem;
         margin-right: 0.625rem;
@@ -285,7 +285,7 @@
     &.type-object {
       padding: 0 var(--spacing-0_5);
 
-      .hulyNavItem-icon {
+      .teronNavItem-icon {
         margin-right: var(--spacing-0_75);
         width: var(--global-extra-small-Size);
         height: var(--global-extra-small-Size);
@@ -294,10 +294,10 @@
         border-radius: var(--extra-small-BorderRadius);
       }
       &.selected {
-        .hulyNavItem-label:not(.description) {
+        .teronNavItem-label:not(.description) {
           color: var(--global-accent-TextColor);
         }
-        .hulyNavItem-icon {
+        .teronNavItem-icon {
           color: var(--global-accent-TextColor);
         }
       }
@@ -307,42 +307,42 @@
       width: fit-content;
       min-height: 1.75rem;
 
-      .hulyNavItem-icon,
-      .hulyNavItem-label {
+      .teronNavItem-icon,
+      .teronNavItem-label {
         color: var(--global-secondary-TextColor);
       }
-      .hulyNavItem-label {
+      .teronNavItem-label {
         font-weight: 500;
       }
-      &.selected .hulyNavItem-icon,
-      &.selected .hulyNavItem-label {
+      &.selected .teronNavItem-icon,
+      &.selected .teronNavItem-label {
         color: var(--global-primary-TextColor);
       }
     }
     &.indent {
       padding-left: var(--spacing-4);
     }
-    &:hover .hulyNavItem-chevron:enabled {
+    &:hover .teronNavItem-chevron:enabled {
       color: var(--global-secondary-TextColor);
       background-color: var(--button-tertiary-hover-BackgroundColor);
     }
 
-    &:not(.noActions):hover .hulyNavItem-actions,
-    &:not(.noActions).showMenu .hulyNavItem-actions {
+    &:not(.noActions):hover .teronNavItem-actions,
+    &:not(.noActions).showMenu .teronNavItem-actions {
       display: flex;
     }
     &.disabled {
       cursor: not-allowed;
 
-      .hulyNavItem-icon {
+      .teronNavItem-icon {
         opacity: 0.5;
       }
-      .hulyNavItem-label {
+      .teronNavItem-label {
         color: rgb(var(--theme-caption-color) / 40%);
       }
     }
   }
-  .hulyNavItem-dropbox {
+  .teronNavItem-dropbox {
     display: flex;
     flex-direction: column;
     min-width: 0;

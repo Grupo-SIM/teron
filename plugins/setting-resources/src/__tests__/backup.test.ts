@@ -76,7 +76,7 @@ describe('generateBackupScript', () => {
 
   it('never embeds the token; reads it from env or prompts at runtime', () => {
     expect(script).not.toContain("TOKEN='")
-    expect(script).toContain('HULY_BACKUP_TOKEN')
+    expect(script).toContain('TERON_BACKUP_TOKEN')
     expect(script).toContain('read -rsp')
   })
 

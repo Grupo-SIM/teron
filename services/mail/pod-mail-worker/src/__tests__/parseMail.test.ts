@@ -48,7 +48,7 @@ describe('parseContent', () => {
     const result = await parseContent(mockContext, mtaMessage)
 
     // Verify content was parsed
-    expect(result.content).toContain('Attached huly.png')
+    expect(result.content).toContain('Attached teron.png')
 
     // Verify attachment was extracted
     expect(result.attachments.length).toBe(1)
@@ -62,7 +62,7 @@ describe('parseContent', () => {
 
     // Verify attachment data is a Buffer
     expect(Buffer.isBuffer(attachment.data)).toBe(true)
-    expect(attachment.name).toBe('huly.png')
+    expect(attachment.name).toBe('teron.png')
   })
 
   test('should parse email with 2 attachments', async () => {
@@ -83,7 +83,7 @@ describe('parseContent', () => {
     const result = await parseContent(mockContext, mtaMessage)
 
     // Verify content was parsed
-    expect(result.content).toContain('Send huly.png and cat.png')
+    expect(result.content).toContain('Send teron.png and cat.png')
 
     // Verify attachment was extracted
     expect(result.attachments.length).toBe(2)
@@ -97,7 +97,7 @@ describe('parseContent', () => {
 
     // Verify attachment data is a Buffer
     expect(Buffer.isBuffer(attachment.data)).toBe(true)
-    expect(attachment.name).toBe('huly.png')
+    expect(attachment.name).toBe('teron.png')
 
     const catAttachment = result.attachments[1]
     // Verify attachment data is a Buffer

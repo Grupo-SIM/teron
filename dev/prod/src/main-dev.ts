@@ -22,7 +22,7 @@ configurePlatform().then(() => {
   if (
     process.env.CLIENT_TYPE === 'dev-server' ||
     process.env.CLIENT_TYPE === 'dev-production' ||
-    process.env.CLIENT_TYPE === 'dev-huly' ||
+    process.env.CLIENT_TYPE === 'dev-teron' ||
     process.env.CLIENT_TYPE === 'dev-bold' ||
     process.env.CLIENT_TYPE === 'dev-server-test'
   ) {

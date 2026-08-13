@@ -86,7 +86,7 @@ describe('Api', () => {
     // Mock metadata
     mockMetadata = {
       accountsUrl: 'http://accounts',
-      hulylakeUrl: 'http://hulylake',
+      teronlakeUrl: 'http://teronlake',
       secret: 'test-secret',
       messagesPerBlob: 200
     }

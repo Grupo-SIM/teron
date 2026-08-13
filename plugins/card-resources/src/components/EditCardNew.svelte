@@ -153,8 +153,8 @@
 
   afterUpdate(() => {
     if (element !== undefined) {
-      titleEl = element.querySelector('.hulyHeader-titleGroup')
-      extraEl = element.querySelector('.hulyHeader-buttonsGroup.extra')
+      titleEl = element.querySelector('.teronHeader-titleGroup')
+      extraEl = element.querySelector('.teronHeader-buttonsGroup.extra')
     }
   })
 

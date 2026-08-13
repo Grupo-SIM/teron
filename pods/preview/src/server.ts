@@ -229,8 +229,8 @@ export async function createServer (ctx: MeasureContext, config: Config): Promis
 
   app.get('/', (_req, res) => {
     res.send(`
-      Huly&reg; Preview&trade; <a href="https://huly.io">https://huly.io</a>
-      © 2025 <a href="https://hulylabs.com">Huly Labs</a>
+      Teron&reg; Preview&trade; <a href="https://teron.io">https://teron.io</a>
+      © 2025 <a href="https://teronlabs.com">Teron Labs</a>
     `)
   })
 

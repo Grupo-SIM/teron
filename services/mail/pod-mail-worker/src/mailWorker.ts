@@ -36,7 +36,7 @@ import { AccountClient, MailboxOptions } from '@hcengineering/account-client'
 import { getAccountClient } from './client'
 import { getClient as getWorkspaceClient, releaseClient } from './workspaceClient'
 import { sendEmail } from './send'
-import { HulyMessageType, MailMessage } from './types'
+import { TeronMessageType, MailMessage } from './types'
 
 export class MailWorker {
   private queue: PlatformQueue | undefined
@@ -197,7 +197,7 @@ export class MailWorker {
         this.ctx.info('Message already sent, skipping', {
           workspaceUuid,
           messageId: message.messageId,
-          hulyMessageId: message._id
+          teronMessageId: message._id
         })
         return
       }
@@ -214,7 +214,7 @@ export class MailWorker {
           return
         }
         const channel = await workspaceClient.findOne<Card>(chat.masterTag.Thread, { _id: thread.parent })
-        if (channel === undefined || !this.isHulyMailChannel(channel)) {
+        if (channel === undefined || !this.isTeronMailChannel(channel)) {
           return
         }
 
@@ -283,7 +283,7 @@ export class MailWorker {
         subject,
         html,
         text,
-        headers: getMailHeadersRecord(HulyMessageType, message._id, email)
+        headers: getMailHeadersRecord(TeronMessageType, message._id, email)
       }
 
       await sendEmail(this.ctx, mailMessage, secret)
@@ -310,7 +310,7 @@ export class MailWorker {
     this.ctx.info('Mail worker closed')
   }
 
-  isHulyMailChannel (channel: Card): boolean {
+  isTeronMailChannel (channel: Card): boolean {
     const title = channel.title.toLowerCase()
     const domains = this.mailboxOptions?.availableDomains
     if (domains === undefined || domains.length === 0) {

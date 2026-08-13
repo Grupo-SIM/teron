@@ -71,7 +71,7 @@
 <svelte:window on:keydown={onKeyDown} />
 
 <div
-  class="hulyModal-container {type} {width ?? ''}"
+  class="teronModal-container {type} {width ?? ''}"
   class:hidden
   class:noTopIndent
   style={maxWidth ? `max-width: ${maxWidth};` : ''}
@@ -94,7 +94,7 @@
     </svelte:fragment>
   </Header>
   <slot name="beforeContent" />
-  <div class="hulyModal-content">
+  <div class="teronModal-content">
     {#if scrollableContent}
       <Scroller
         padding={padding ?? typePadding}
@@ -112,7 +112,7 @@
   </div>
   <slot name="afterContent" />
   {#if type !== 'type-component' && !hideFooter}
-    <div class="hulyModal-footer">
+    <div class="teronModal-footer">
       <ButtonBase
         type={'type-button'}
         kind={'primary'}

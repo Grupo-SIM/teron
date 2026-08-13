@@ -21,9 +21,9 @@ import {
   Attachment,
   EmailContact,
   EmailMessage,
-  HulyMailHeader,
-  HulyMessageIdHeader,
-  HulyMessageTypeHeader,
+  TeronMailHeader,
+  TeronMessageIdHeader,
+  TeronMessageTypeHeader,
   MailHeader
 } from './types'
 import { MessageExtra, MessageID } from '@hcengineering/communication-types'
@@ -205,9 +205,9 @@ export function getReplySubject (threadName: string | undefined): string | undef
 }
 
 export function getMailHeaders (messageType: string, messageId?: string | undefined): string[] {
-  const headers = [`${HulyMailHeader}: true\n`, `${HulyMessageTypeHeader}: ${messageType}\n`]
+  const headers = [`${TeronMailHeader}: true\n`, `${TeronMessageTypeHeader}: ${messageType}\n`]
   if (messageId !== undefined) {
-    headers.push(`${HulyMessageIdHeader}: ${messageId}\n`)
+    headers.push(`${TeronMessageIdHeader}: ${messageId}\n`)
   }
   return headers
 }
@@ -218,22 +218,22 @@ export function getMailHeadersRecord (
   email: string
 ): Record<string, string> {
   const headers: Record<string, string> = {
-    [HulyMailHeader]: 'true',
-    [HulyMessageTypeHeader]: messageType,
-    [MailHeader.Id]: getEmailMessageIdFromHulyId(messageId, email)
+    [TeronMailHeader]: 'true',
+    [TeronMessageTypeHeader]: messageType,
+    [MailHeader.Id]: getEmailMessageIdFromTeronId(messageId, email)
   }
   if (messageId !== undefined) {
-    headers[HulyMessageIdHeader] = messageId
+    headers[TeronMessageIdHeader] = messageId
   }
   return headers
 }
 
-export function isHulyMessage (headers: string[]): boolean {
+export function isTeronMessage (headers: string[]): boolean {
   return headers.some(
     (header) =>
-      header.startsWith(HulyMailHeader) ||
-      header.startsWith(HulyMessageIdHeader) ||
-      header.startsWith(HulyMessageTypeHeader)
+      header.startsWith(TeronMailHeader) ||
+      header.startsWith(TeronMessageIdHeader) ||
+      header.startsWith(TeronMessageTypeHeader)
   )
 }
 
@@ -245,13 +245,13 @@ export function getDomainFromEmail (email: string): string {
   return email.substring(atIndex + 1)
 }
 
-export function getEmailMessageIdFromHulyId (hulyId: string | undefined, email: string): string {
+export function getEmailMessageIdFromTeronId (teronId: string | undefined, email: string): string {
   const domain = getDomainFromEmail(email)
-  const id = hulyId ?? generateMessageId()
+  const id = teronId ?? generateMessageId()
   return `<${id}@${domain}>`
 }
 
-export function getHulyIdFromEmailMessageId (messageId: string, email: string): MessageID | undefined {
+export function getTeronIdFromEmailMessageId (messageId: string, email: string): MessageID | undefined {
   const domain = getDomainFromEmail(email)
 
   const cleanMessageId = messageId.replace(/^<|>$/g, '')
@@ -265,9 +265,9 @@ export function getHulyIdFromEmailMessageId (messageId: string, email: string): 
 }
 
 export function generateNewEmailId (email: string): string {
-  return getEmailMessageIdFromHulyId(generateMessageId(), email)
+  return getEmailMessageIdFromTeronId(generateMessageId(), email)
 }
 
-export function isHulyEmailMessageId (messageId: string, email: string): boolean {
-  return getHulyIdFromEmailMessageId(messageId, email) !== undefined
+export function isTeronEmailMessageId (messageId: string, email: string): boolean {
+  return getTeronIdFromEmailMessageId(messageId, email) !== undefined
 }

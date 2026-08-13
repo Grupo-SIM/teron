@@ -58,8 +58,8 @@
     {/if}
   </svelte:fragment>
 </Header>
-<div class="hulyModal-container noTopIndent type-aside">
-  <div class="hulyModal-content">
+<div class="teronModal-container noTopIndent type-aside">
+  <div class="teronModal-content">
     <Scroller>
       {#each $floors as _floor}
         <FloorPreview

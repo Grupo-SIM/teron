@@ -39,7 +39,7 @@
 </script>
 
 <Modal label={communication.string.PollResults} type="type-popup" width="large" hideFooter on:close>
-  <div class="hulyModal-content__titleGroup" style="padding: 0">
+  <div class="teronModal-content__titleGroup" style="padding: 0">
     <div class="title">
       {params.question}
     </div>

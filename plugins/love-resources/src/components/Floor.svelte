@@ -54,7 +54,7 @@
   }
 </script>
 
-<div class="hulyComponent">
+<div class="teronComponent">
   <Header adaptive={'disabled'}>
     <DropdownLabels
       {items}
@@ -79,7 +79,7 @@
       {/if}
     </svelte:fragment>
   </Header>
-  <div class="hulyComponent-content__column content">
+  <div class="teronComponent-content__column content">
     {#if viewlet?.$lookup?.descriptor?.component}
       <Component is={viewlet.$lookup.descriptor.component} props={{ floor, rooms }} on:open />
     {/if}

@@ -76,11 +76,11 @@
   }
 </script>
 
-<div class="hulyComponent">
+<div class="teronComponent">
   <Header adaptive={'disabled'}>
     <Breadcrumb icon={setting.icon.Views} label={setting.string.Spaces} size="large" isCurrent />
   </Header>
-  <div class="hulyComponent-content__column content">
+  <div class="teronComponent-content__column content">
     {#each roles as role}
       <div class="antiGrid-row">
         <div class="antiGrid-row__header">

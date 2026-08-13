@@ -140,7 +140,7 @@ describe('BroadcastMiddleware', () => {
       workspace,
       metadata: {
         accountsUrl: 'http://accounts',
-        hulylakeUrl: 'http://hulylake',
+        teronlakeUrl: 'http://teronlake',
         secret: 'secret',
         messagesPerBlob: 100
       },

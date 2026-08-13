@@ -12,7 +12,7 @@
 // limitations under the License.
 
 import { MeasureContext, systemAccountUuid, WorkspaceUuid } from '@hcengineering/core'
-import { type HulylakeWorkspaceClient, type JsonPatch, getWorkspaceClient } from '@hcengineering/hulylake-client'
+import { type TeronlakeWorkspaceClient, type JsonPatch, getWorkspaceClient } from '@hcengineering/teronlake-client'
 import { generateToken } from '@hcengineering/server-token'
 import {
   BlobID,
@@ -39,9 +39,9 @@ export class Storage {
 
   constructor (private readonly ctx: MeasureContext) {}
 
-  private getClient (ws: WorkspaceUuid): HulylakeWorkspaceClient {
+  private getClient (ws: WorkspaceUuid): TeronlakeWorkspaceClient {
     const token = generateToken(systemAccountUuid, ws, undefined, config.Secret)
-    return getWorkspaceClient(config.HulylakeUrl, ws, token)
+    return getWorkspaceClient(config.TeronlakeUrl, ws, token)
   }
 
   private async createMessageGroup (ws: WorkspaceUuid, cardId: CardID, blobId: BlobID, lang: string): Promise<void> {

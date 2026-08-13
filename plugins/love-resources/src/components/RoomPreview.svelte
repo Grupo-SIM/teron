@@ -153,8 +153,8 @@
   class:hovered
   class:disabled
   class:myOffice={$myInfo?.room === room._id}
-  style:--huly-floor-roomWidth={room.width + extraRow}
-  style:--huly-floor-roomHeight={room.height}
+  style:--teron-floor-roomWidth={room.width + extraRow}
+  style:--teron-floor-roomHeight={room.height}
   style:grid-column={`${room.x + 2} / span ${room.width + extraRow}`}
   style:grid-row={`${room.y + 2} / span ${room.height}`}
   style:grid-template-columns={`repeat(${room.width + extraRow}, 1fr)`}

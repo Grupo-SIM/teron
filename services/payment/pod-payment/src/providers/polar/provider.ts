@@ -54,7 +54,7 @@ export class PolarProvider implements PaymentProvider {
   readonly providerName = 'polar'
   private readonly polar: PolarClient
   private readonly webhookSecret: string
-  // Map: plan@type (Huly) -> productIds (Polar)
+  // Map: plan@type (Teron) -> productIds (Polar)
   private readonly subscriptionPlans: Record<string, string[]>
   private readonly frontUrl: string
   private readonly accountClient: AccountClient

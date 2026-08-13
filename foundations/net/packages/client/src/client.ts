@@ -78,7 +78,7 @@ interface ContainerRef {
 }
 
 /**
- * Huly Network client
+ * Teron Network client
  *
  * Some methods are omit clientId parameter.
  */

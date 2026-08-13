@@ -6,7 +6,7 @@ import {
   getRecipients,
   getMailHeaders,
   MailHeader,
-  getEmailMessageIdFromHulyId
+  getEmailMessageIdFromTeronId
 } from '@hcengineering/mail-common'
 import { Card } from '@hcengineering/card'
 import { MeasureContext, PersonId } from '@hcengineering/core'
@@ -35,7 +35,7 @@ export async function makeHTMLBodyV2 (
     'Content-Transfer-Encoding: 7bit\n',
     `To: ${to} \n`,
     `From: ${from} \n`,
-    `${MailHeader.Id}: ${getEmailMessageIdFromHulyId(message._id, from)}\n`,
+    `${MailHeader.Id}: ${getEmailMessageIdFromTeronId(message._id, from)}\n`,
     ...getMailHeaders(GmailMessageType, message._id)
   ]
 
@@ -64,12 +64,12 @@ export function isPlatformSentMessage (message: gmail_v1.Schema$Message): boolea
 
   // Check for custom platform headers
   const headers = message.payload.headers
-  const platformSentHeader = headers.find((h) => h.name === MailHeader.HulySent)
+  const platformSentHeader = headers.find((h) => h.name === MailHeader.TeronSent)
   if (platformSentHeader?.value === 'true') {
     return true
   }
-  const hulyMessageType = headers.find((h) => h.name === MailHeader.HulyMessageType)
-  if (hulyMessageType?.value != null) {
+  const teronMessageType = headers.find((h) => h.name === MailHeader.TeronMessageType)
+  if (teronMessageType?.value != null) {
     return true
   }
 

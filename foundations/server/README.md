@@ -1,12 +1,12 @@
-# Huly Server
+# Teron Server
 
-[![GitHub License](https://img.shields.io/github/license/hcengineering/huly.server?style=for-the-badge)](LICENSE)
+[![GitHub License](https://img.shields.io/github/license/hcengineering/teron.server?style=for-the-badge)](LICENSE)
 
 ⭐️ Your star shines on us. Star us on GitHub!
 
 ## About
 
-Huly Server is a collection of server-side packages extracted from the [Huly Platform](https://github.com/hcengineering/platform). This repository contains backend infrastructure components, storage adapters, and server-side utilities that power the Huly ecosystem.
+Teron Server is a collection of server-side packages extracted from the [Teron Platform](https://github.com/hcengineering/platform). This repository contains backend infrastructure components, storage adapters, and server-side utilities that power the Teron ecosystem.
 
 These packages provide essential server-side functionality including database adapters (MongoDB, PostgreSQL, Elasticsearch), storage providers (MinIO, S3), messaging infrastructure (Kafka), and collaborative editing capabilities. They are designed to be modular, scalable, and production-ready for building robust backend services.
 
@@ -33,7 +33,7 @@ This repository includes the following server packages:
 - [@hcengineering/minio](packages/minio) - MinIO storage provider for object storage
 - [@hcengineering/s3](packages/s3) - AWS S3 compatible storage provider
 - [@hcengineering/datalake](packages/datalake) - Data lake storage and management
-- [@hcengineering/hulylake](packages/hulylake) - Huly lake storage and management
+- [@hcengineering/teronlake](packages/teronlake) - Teron lake storage and management
 
 ### Infrastructure
 
@@ -202,7 +202,7 @@ Create a `.env` file in the `tests` directory with the following variables:
 
 ```env
 MONGO_URL=mongodb://localhost:27017
-POSTGRES_URL=postgresql://localhost:5432/huly
+POSTGRES_URL=postgresql://localhost:5432/teron
 ELASTIC_URL=http://localhost:9200
 MINIO_ENDPOINT=localhost
 MINIO_PORT=9000
@@ -211,10 +211,10 @@ KAFKA_BROKERS=localhost:9092
 
 ## Related Projects
 
-- [Huly Platform](https://github.com/hcengineering/platform) - The main Huly Platform repository
-- [Huly Core](https://github.com/hcengineering/huly.core) - Core packages and client libraries
-- [Huly Self-Host](https://github.com/hcengineering/huly-selfhost) - Self-hosting solution for Huly
-- [Huly Examples](https://github.com/hcengineering/huly-examples) - API usage examples
+- [Teron Platform](https://github.com/hcengineering/platform) - The main Teron Platform repository
+- [Teron Core](https://github.com/hcengineering/teron.core) - Core packages and client libraries
+- [Teron Self-Host](https://github.com/hcengineering/teron-selfhost) - Self-hosting solution for Teron
+- [Teron Examples](https://github.com/hcengineering/teron-examples) - API usage examples
 
 ## Contributing
 
@@ -226,8 +226,8 @@ Licensed under the [EPL-2.0](LICENSE) license.
 
 ## Additional Links
 
-- [Huly Website](https://huly.io/)
-- [Documentation](https://docs.huly.io/)
+- [Teron Website](https://teron.io/)
+- [Documentation](https://docs.teron.io/)
 - [Community](https://github.com/hcengineering/platform/discussions)
 
 © 2025 [Hardcore Engineering Inc](https://hardcoreeng.com/).

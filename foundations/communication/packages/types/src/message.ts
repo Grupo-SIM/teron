@@ -128,7 +128,7 @@ export interface ActivityAttributeUpdate {
 }
 
 // LinkPreview
-export const linkPreviewType = 'application/vnd.huly.link-preview' as const
+export const linkPreviewType = 'application/vnd.teron.link-preview' as const
 
 export interface LinkPreviewParams {
   url: string
@@ -173,7 +173,7 @@ export interface LinkPreviewAttachment extends BaseAttachment<LinkPreviewParams>
 export interface BlobAttachment extends BaseAttachment<BlobParams> {}
 
 export type AppletParams = Record<string, any>
-export type AppletType = `application/vnd.huly.applet.${string}`
+export type AppletType = `application/vnd.teron.applet.${string}`
 
 export interface AppletAttachment<T extends AppletParams = AppletParams> extends BaseAttachment<T> {
   mimeType: AppletType

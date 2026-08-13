@@ -1,33 +1,33 @@
-# Huly Platform
+# Teron Platform
 
-[![X (formerly Twitter) Follow](https://img.shields.io/twitter/follow/huly_io?style=for-the-badge)](https://x.com/huly_io)
+[![X (formerly Twitter) Follow](https://img.shields.io/twitter/follow/teron_io?style=for-the-badge)](https://x.com/teron_io)
 ![GitHub License](https://img.shields.io/github/license/hcengineering/platform?style=for-the-badge)
 
 ⭐️ Your star shines on us. Star us on GitHub!
 
 > [!IMPORTANT]
-> **Hosted Huly is shutting down — please migrate your data.**
+> **Hosted Teron is shutting down — please migrate your data.**
 >
-> The hosted Huly service is being discontinued because its hosting is no longer being funded. If you keep important data on the hosted platform, export and back it up, and migrate as soon as possible — we can help you move to either a [self-hosted setup](https://github.com/hcengineering/huly-selfhost) or a hosted option.
+> The hosted Teron service is being discontinued because its hosting is no longer being funded. If you keep important data on the hosted platform, export and back it up, and migrate as soon as possible — we can help you move to either a [self-hosted setup](https://github.com/hcengineering/teron-selfhost) or a hosted option.
 >
 > Not sure how? Follow the [backup & restore guide](docs/guides/backup-restore.en.md) for step-by-step instructions on downloading your backup and restoring it elsewhere.
 >
 > The service shutdown is expected on **July 20**. Please make sure to export and migrate your data before then rather than wait until the last day.
 >
-> Have questions or want updates? Join the [Huly community](https://link.huly.io/slack) to discuss migration and stay informed, or email us at [artem@hardcoreeng.com](mailto:artem@hardcoreeng.com) with any questions. This affects only the hosted **Huly** service — self-hosted deployments are not affected.
+> Have questions or want updates? Join the [Teron community](https://link.teron.io/slack) to discuss migration and stay informed, or email us at [artem@hardcoreeng.com](mailto:artem@hardcoreeng.com) with any questions. This affects only the hosted **Teron** service — self-hosted deployments are not affected.
 
 ## About
 
-The Huly Platform is a robust framework designed to accelerate the development of business applications, such as CRM systems.
+The Teron Platform is a robust framework designed to accelerate the development of business applications, such as CRM systems.
 This repository includes several applications, such as Chat, Project Management, CRM, HRM, and ATS.
-Various teams are building products on top of the Platform, including [Huly](https://huly.io) and [TraceX](https://tracex.co).
+Various teams are building products on top of the Platform, including [Teron](https://teron.io) and [TraceX](https://tracex.co).
 
-![Huly](https://repository-images.githubusercontent.com/392073243/6d27d5cc-38cd-4d88-affe-bb88b393180c)
+![Teron](https://repository-images.githubusercontent.com/392073243/6d27d5cc-38cd-4d88-affe-bb88b393180c)
 
 ## Self-Hosting
 
-If you're primarily interested in self-hosting Huly without the intention to modify or contribute to its development, please use [huly-selfhost](https://github.com/hcengineering/huly-selfhost).
-This project offers a convenient method to host Huly using `docker`, designed for ease of use and quick setup. Explore this option to effortlessly enjoy Huly on your own server.
+If you're primarily interested in self-hosting Teron without the intention to modify or contribute to its development, please use [teron-selfhost](https://github.com/hcengineering/teron-selfhost).
+This project offers a convenient method to host Teron using `docker`, designed for ease of use and quick setup. Explore this option to effortlessly enjoy Teron on your own server.
 
 ## Activity
 
@@ -35,9 +35,9 @@ This project offers a convenient method to host Huly using `docker`, designed fo
 
 ## API Client
 
-If you want to interact with Huly programmatically, check out our [API Client](https://github.com/hcengineering/huly.core/tree/main/packages/api-client) documentation. The API client provides a typed interface for all Huly operations and can be used to build integrations and custom applications.
+If you want to interact with Teron programmatically, check out our [API Client](https://github.com/hcengineering/teron.core/tree/main/packages/api-client) documentation. The API client provides a typed interface for all Teron operations and can be used to build integrations and custom applications.
 
-You can find API usage examples in the [Huly examples](https://github.com/hcengineering/huly-examples) repository.
+You can find API usage examples in the [Teron examples](https://github.com/hcengineering/teron-examples) repository.
 
 ## Changelog
 
@@ -45,7 +45,7 @@ For detailed information about changes, improvements, and bug fixes in each vers
 
 ## Versions
 
-The Huly Platform uses two types of version tags to distinguish between production-ready and development releases:
+The Teron Platform uses two types of version tags to distinguish between production-ready and development releases:
 
 - **Production Versions (`v*`)** - Stable releases for end users
   - Example: `v0.7.310`, `v0.7.307`, `v0.6.501`
@@ -65,7 +65,7 @@ For detailed information about the platform architecture, services, and their in
 
 ## Table of Contents
 
-- [Huly Platform](#huly-platform)
+- [Teron Platform](#teron-platform)
   - [About](#about)
   - [Self-Hosting](#self-hosting)
   - [Activity](#activity)
@@ -207,7 +207,7 @@ rush docker:up # Will set up all the containers
 
 Be aware `rush docker:build` will automatically execute all required phases like build, bundle, package.
 
-> **Note:** For resource-constrained machines, you can use the minified variants `rush docker:min` and `rush docker:up:min` to build and run only the required services (excludes hulypulse, redis, process, backup, rating, preview, link-preview, elastic, fulltext, payment, stats, print, sign, hulygun, hulykvs).
+> **Note:** For resource-constrained machines, you can use the minified variants `rush docker:min` and `rush docker:up:min` to build and run only the required services (excludes teronpulse, redis, process, backup, rating, preview, link-preview, elastic, fulltext, payment, stats, print, sign, terongun, teronkvs).
 
 Alternatively, you can just execute:
 
@@ -223,11 +223,11 @@ Add the following lines to your hosts file:
 - **Windows:** `C:\Windows\System32\drivers\etc\hosts`
 
 ```plain
-127.0.0.1 huly.local
-::1 huly.local
+127.0.0.1 teron.local
+::1 teron.local
 ```
 
-Accessing the URL <http://huly.local:8087> will lead you to the app in development mode.
+Accessing the URL <http://teron.local:8087> will lead you to the app in development mode.
 
 Limitations:
 

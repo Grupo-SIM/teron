@@ -356,8 +356,8 @@ export async function createServer (
 
   app.get('/', (_req, res) => {
     res.send(`
-      Huly® Datalake™ <a href="https://huly.io">https://huly.io</a>
-      © 2025 <a href="https://hulylabs.com">Huly Labs</a>
+      Teron® Datalake™ <a href="https://teron.io">https://teron.io</a>
+      © 2025 <a href="https://teronlabs.com">Teron Labs</a>
     `)
   })
 

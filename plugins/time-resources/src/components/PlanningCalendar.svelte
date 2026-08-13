@@ -177,7 +177,7 @@
 </script>
 
 <div
-  class="hulyComponent modal"
+  class="teronComponent modal"
   bind:this={element}
   use:resizeObserver={(element) => {
     showLabel = showLabel ? element.clientWidth > rem(3.5) + 399 : element.clientWidth > rem(3.5) + 400
@@ -220,7 +220,7 @@
       />
     </svelte:fragment>
   </Header>
-  <div class="hulyComponent-content__container">
+  <div class="teronComponent-content__container">
     <DayCalendar
       bind:this={dayCalendar}
       events={objects}

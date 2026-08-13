@@ -384,8 +384,8 @@ export class CommentSyncManager implements DocSyncManager {
     }
   }
 
-  isHulyLinkComment (message: string): boolean {
-    return message.includes('<p>Connected to') && message.includes('Huly&reg;')
+  isTeronLinkComment (message: string): boolean {
+    return message.includes('<p>Connected to') && message.includes('Teron&reg;')
   }
 
   private async createComment (
@@ -401,7 +401,7 @@ export class CommentSyncManager implements DocSyncManager {
       attachments: 0
     }
     // Check if it is Connected message.
-    if ((comment as any).performed_via_github_app !== undefined && this.isHulyLinkComment(comment.body)) {
+    if ((comment as any).performed_via_github_app !== undefined && this.isTeronLinkComment(comment.body)) {
       // No need to create comment on platform.
       return
     }

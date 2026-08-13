@@ -244,7 +244,7 @@
 
   $: resultSocialIdentities = [...sourceSocialIdentities, ...targetSocialIdentities]
   $: visibleResultSocialIdentities = resultSocialIdentities.filter(
-    (it) => it.type !== SocialIdType.HULY && it.type !== SocialIdType.HULY_ASSISTANT
+    (it) => it.type !== SocialIdType.TERON && it.type !== SocialIdType.TERON_ASSISTANT
   )
 
   const attributes = hierarchy.getAllAttributes(contact.mixin.Employee, core.class.Doc)

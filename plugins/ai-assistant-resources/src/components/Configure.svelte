@@ -25,7 +25,7 @@
   import { getIntegrationClient, getAccountClient } from '../utils'
   import aiAssistant from '../plugin'
   import { buildSocialIdString, getCurrentAccount, SocialIdType, type PersonId } from '@hcengineering/core'
-  import HulyAssistant from './icons/HulyAssistant.svelte'
+  import TeronAssistant from './icons/TeronAssistant.svelte'
 
   export let integration: Integration | undefined = undefined
 
@@ -38,13 +38,13 @@
     try {
       let socialId = await getSocialId()
       if (socialId == null) {
-        socialId = await accountClient.addHulyAssistantSocialId()
+        socialId = await accountClient.addTeronAssistantSocialId()
       }
 
       const integrationClient = await getIntegrationClient()
       if (integration === undefined) {
         integration = await integrationClient.connect(socialId)
-        await accountClient.refreshHulyAssistantToken()
+        await accountClient.refreshTeronAssistantToken()
       }
 
       integration = isWorkspaceIntegration(integration)
@@ -55,14 +55,14 @@
       dispatch('close')
     } catch (err: any) {
       isLoading = false
-      console.error('Failed to find/create huly assistant social id/integration:', err)
+      console.error('Failed to find/create teron assistant social id/integration:', err)
       Analytics.handleError(err)
     }
   })
 
   async function getSocialId (): Promise<PersonId | undefined> {
     const socialKey = buildSocialIdString({
-      type: SocialIdType.HULY_ASSISTANT,
+      type: SocialIdType.TERON_ASSISTANT,
       value: account.uuid
     })
     return await accountClient.findSocialIdBySocialKey(socialKey)
@@ -84,7 +84,7 @@
 >
   <svelte:fragment slot="title">
     <div class="flex-row-center gap-2">
-      <HulyAssistant size="medium" />
+      <TeronAssistant size="medium" />
       <span class="text-normal">
         <Label label={aiAssistant.string.Configure} />
       </span>

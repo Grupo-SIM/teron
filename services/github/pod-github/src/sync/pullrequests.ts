@@ -360,7 +360,7 @@ export class PullRequestSyncManager extends IssueSyncManagerBase implements DocS
       external: pullRequestExternal,
       externalVersion: githubExternalSyncVersion,
       derivedVersion: '',
-      addHulyLink: true,
+      addTeronLink: true,
       lastModified,
       lastGithubUser: account
     })
@@ -943,7 +943,7 @@ export class PullRequestSyncManager extends IssueSyncManagerBase implements DocS
     if (container?.container === undefined) {
       return { needSync: githubSyncVersion }
     }
-    const needCreateConnectedAtHuly = info.addHulyLink === true
+    const needCreateConnectedAtTeron = info.addTeronLink === true
 
     if (info.repository == null) {
       return { needSync: githubSyncVersion }
@@ -957,8 +957,8 @@ export class PullRequestSyncManager extends IssueSyncManagerBase implements DocS
 
     const syncResult = await this.syncToTarget(ctx, container, existing, pullRequestExternal, derivedClient, info)
 
-    if (existing !== undefined && pullRequestExternal !== undefined && needCreateConnectedAtHuly) {
-      await this.addHulyLink(info, syncResult, existing, pullRequestExternal, container)
+    if (existing !== undefined && pullRequestExternal !== undefined && needCreateConnectedAtTeron) {
+      await this.addTeronLink(info, syncResult, existing, pullRequestExternal, container)
     }
     return {
       ...syncResult

@@ -73,7 +73,7 @@
   <!-- svelte-ignore a11y-click-events-have-key-events -->
   <div
     bind:this={element}
-    class="hulyAvatar-container hulyAvatarSize-{size} {variant} {style}"
+    class="teronAvatar-container teronAvatarSize-{size} {variant} {style}"
     class:no-img={!hasImg && color}
     class:bordered={!hasImg && color === undefined}
     class:border={bColor !== undefined}
@@ -98,7 +98,7 @@
   <!-- svelte-ignore a11y-click-events-have-key-events -->
   <div
     bind:this={element}
-    class="hulyAvatar-container hulyAvatarSize-{size} {variant} {style}"
+    class="teronAvatar-container teronAvatarSize-{size} {variant} {style}"
     class:no-img={!hasImg && color}
     class:bordered={!hasImg && color === undefined}
     class:border={bColor !== undefined}
@@ -110,7 +110,7 @@
   >
     {#if url && !imgError}
       <img
-        class="hulyAvatarSize-{size} ava-image {disabled ? 'disabled' : ''} {style}"
+        class="teronAvatarSize-{size} ava-image {disabled ? 'disabled' : ''} {style}"
         src={url}
         {srcset}
         alt={''}

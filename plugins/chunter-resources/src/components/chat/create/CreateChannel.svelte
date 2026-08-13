@@ -95,7 +95,7 @@
   onCancel={handleCancel}
   on:close
 >
-  <div class="hulyModal-content__titleGroup" style="padding: 0">
+  <div class="teronModal-content__titleGroup" style="padding: 0">
     <ModernEditbox bind:value={channelName} label={chunter.string.NewChannel} size="large" kind="ghost" />
     <TextArea
       placeholder={chunter.string.TopicOptional}
@@ -106,8 +106,8 @@
       bind:value={topic}
     />
   </div>
-  <div class="hulyModal-content__settingsSet">
-    <div class="hulyModal-content__settingsSet-line">
+  <div class="teronModal-content__settingsSet">
+    <div class="teronModal-content__settingsSet-line">
       <span class="label"><Label label={chunter.string.Visibility} /></span>
       <ButtonMenu
         items={visibilityOptions}
@@ -121,14 +121,14 @@
         }}
       />
     </div>
-    <div class="hulyModal-content__settingsSet-line create-channel-join-line flex-col items-start w-full">
+    <div class="teronModal-content__settingsSet-line create-channel-join-line flex-col items-start w-full">
       <div class="flex-row-center gap-2 w-full justify-start">
         <span class="label"><Label label={core.string.AutoJoin} /></span>
         <Toggle data-id="channel-auto-join-toggle" bind:on={autoJoin} />
       </div>
       <span class="text-sm content-dark-color text-left w-full"><Label label={core.string.AutoJoinDescr} /></span>
     </div>
-    <div class="hulyModal-content__settingsSet-line create-channel-join-line flex-col items-start w-full">
+    <div class="teronModal-content__settingsSet-line create-channel-join-line flex-col items-start w-full">
       <div class="flex-row-center gap-2 w-full justify-start">
         <span class="label"><Label label={core.string.AutoJoinGuests} /></span>
         <Toggle
@@ -145,7 +145,7 @@
 </Modal>
 
 <style lang="scss">
-  .create-channel-join-line:global(.hulyModal-content__settingsSet-line) {
+  .create-channel-join-line:global(.teronModal-content__settingsSet-line) {
     justify-content: flex-start;
     align-items: flex-start;
   }

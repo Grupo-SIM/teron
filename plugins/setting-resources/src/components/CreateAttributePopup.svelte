@@ -143,8 +143,8 @@
   on:close
   canSave={!(type === undefined || name === undefined || name.trim().length === 0)}
 >
-  <div class="hulyModal-container">
-    <div class="hulyModal-content__titleGroup">
+  <div class="teronModal-container">
+    <div class="teronModal-content__titleGroup">
       <div class="flex items-center">
         <ButtonIcon
           icon={icon ?? setting.icon.Enums}

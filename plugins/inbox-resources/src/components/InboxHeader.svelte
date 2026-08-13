@@ -86,7 +86,7 @@
   }
 </script>
 
-<div class="hulyNavPanel-header withButton small inbox-header">
+<div class="teronNavPanel-header withButton small inbox-header">
   <span class="overflow-label"><Label label={inbox.string.Inbox} /></span>
   <div class="flex-row-center flex-gap-2">
     {#if clearing}

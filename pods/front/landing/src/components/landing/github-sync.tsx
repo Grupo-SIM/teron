@@ -1,7 +1,7 @@
 import type { ReactNode } from "react";
 
 /**
- * Seção de integração com o GitHub, no mesmo arranjo do huly.io: título curto,
+ * Seção de integração com o GitHub, no mesmo arranjo do teron.io: título curto,
  * a janela sob um brilho laranja/azul e a grade de seis recursos embaixo.
  *
  * A janela não é um print: é o `Terongit.mp4`, que alterna entre o quadro de

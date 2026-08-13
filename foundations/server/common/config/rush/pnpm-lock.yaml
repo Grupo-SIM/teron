@@ -363,12 +363,12 @@ importers:
         specifier: ^5.9.3
         version: 5.9.3
 
-  ../../packages/hulylake:
+  ../../packages/teronlake:
     dependencies:
       '@hcengineering/core':
         specifier: ^0.7.26
         version: 0.7.26
-      '@hcengineering/hulylake-client':
+      '@hcengineering/teronlake-client':
         specifier: ^0.7.18
         version: 0.7.18
       '@hcengineering/platform':
@@ -913,9 +913,9 @@ importers:
       '@hcengineering/datalake':
         specifier: workspace:^0.7.18
         version: link:../datalake
-      '@hcengineering/hulylake':
+      '@hcengineering/teronlake':
         specifier: workspace:^0.7.18
-        version: link:../hulylake
+        version: link:../teronlake
       '@hcengineering/minio':
         specifier: workspace:^0.7.18
         version: link:../minio
@@ -1591,7 +1591,7 @@ packages:
   '@hcengineering/core@0.7.26':
     resolution: {integrity: sha512-VUKnNnsl44VJCs/HWFP1KUVUti4/eS4YgLCVWaGjPUzwOiC0cHRGwW+7ukqAlb4b6jTD12Qwa9qdFF3qAPEz9A==}
 
-  '@hcengineering/hulylake-client@0.7.18':
+  '@hcengineering/teronlake-client@0.7.18':
     resolution: {integrity: sha512-i9xYd/Ooi/thJxj3hU1WrM26duuY0vfdbyMtoSf+Uxnmbs/Ugc3a64LiSMZTZJAf9FZP5bVtKq55fkKJ4h9/oQ==}
 
   '@hcengineering/measurements@0.7.19':
@@ -5559,7 +5559,7 @@ snapshots:
       '@hcengineering/platform': 0.7.20
       fast-equals: 5.3.2
 
-  '@hcengineering/hulylake-client@0.7.18':
+  '@hcengineering/teronlake-client@0.7.18':
     dependencies:
       '@hcengineering/core': 0.7.26
       '@hcengineering/retry': 0.7.18

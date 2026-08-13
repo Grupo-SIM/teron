@@ -27,6 +27,6 @@
   })
 </script>
 
-<div class="hulyPanels-container">
+<div class="teronPanels-container">
   <Hall />
 </div>

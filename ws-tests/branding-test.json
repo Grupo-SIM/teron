@@ -1,6 +1,6 @@
 {
-  "huly.local:8083": {
-    "key": "huly",
+  "teron.local:8083": {
+    "key": "teron",
     "title": "Platform",
     "protocol": "http",
     "languages": "en,ru,pt,es,zh,fr",

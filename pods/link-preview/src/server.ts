@@ -133,8 +133,8 @@ export async function createServer (ctx: MeasureContext, config: Config): Promis
 
   app.get('/', (_req, res) => {
     res.send(`
-      Huly&reg; Link Preview Service&trade; <a href="https://huly.io">https://huly.io</a>
-      &copy; 2026 <a href="https://hulylabs.com">Huly Labs</a>
+      Teron&reg; Link Preview Service&trade; <a href="https://teron.io">https://teron.io</a>
+      &copy; 2026 <a href="https://teronlabs.com">Teron Labs</a>
     `)
   })
 

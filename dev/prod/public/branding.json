@@ -1,6 +1,6 @@
 {
-  "huly.local:8080": {
-    "title": "Huly",
+  "teron.local:8080": {
+    "title": "Teron",
     "languages": "en,ru,pl,pt,pt-br,es,zh,fr,de,ja,ko,tr",
     "defaultLanguage": "en",
     "defaultApplication": "tracker",
@@ -10,26 +10,26 @@
     "links": [
       {
         "rel": "manifest",
-        "href": "/huly/site.webmanifest"
+        "href": "/teron/site.webmanifest"
       },
       {
         "rel": "icon",
-        "href": "/huly/favicon.svg",
+        "href": "/teron/favicon.svg",
         "type": "image/svg+xml"
       },
       {
         "rel": "shortcut icon",
-        "href": "/huly/favicon.ico",
+        "href": "/teron/favicon.ico",
         "sizes": "any"
       },
       {
         "rel": "apple-touch-icon",
-        "href": "/huly/apple-touch-icon.png"
+        "href": "/teron/apple-touch-icon.png"
       }
     ]
   },
-  "huly.local:8087": {
-    "title": "Huly",
+  "teron.local:8087": {
+    "title": "Teron",
     "languages": "en,ru,pl,pt,pt-br,es,zh,fr,de,ja,ko,tr",
     "defaultLanguage": "en",
     "defaultApplication": "tracker",
@@ -39,25 +39,25 @@
     "links": [
       {
         "rel": "manifest",
-        "href": "/huly/site.webmanifest"
+        "href": "/teron/site.webmanifest"
       },
       {
         "rel": "icon",
-        "href": "/huly/favicon.svg",
+        "href": "/teron/favicon.svg",
         "type": "image/svg+xml"
       },
       {
         "rel": "shortcut icon",
-        "href": "/huly/favicon.ico",
+        "href": "/teron/favicon.ico",
         "sizes": "any"
       },
       {
         "rel": "apple-touch-icon",
-        "href": "/huly/apple-touch-icon.png"
+        "href": "/teron/apple-touch-icon.png"
       }
     ]
   },
-  "huly.local:8081": {
+  "teron.local:8081": {
     "title": "TraceX",
     "languages": "en",
     "defaultLanguage": "en",
@@ -97,7 +97,7 @@
       }
     ]
   },
-  "huly.local:8088": {
+  "teron.local:8088": {
     "title": "TraceX",
     "languages": "en",
     "defaultLanguage": "en",

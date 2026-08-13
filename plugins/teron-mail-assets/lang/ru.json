@@ -1,0 +1,20 @@
+{
+  "string": {
+    "IntegrationLabel": "Teron Mail",
+    "IntegrationDescription": "Подключите свой почтовый ящик Teron для отправки, получения и управления электронной почтой",
+    "Connect": "Подключить",
+    "ConnectTeronMail": "Подключить почтовый ящик Teron",
+    "Cancel": "Отмена",
+    "Email": "Электронная почта",
+    "Status": "Статус",
+    "FailedToConnect": "Служба почты Teron недоступна",
+    "TotalMessages": "Всего сообщений:",
+    "Configure": "Настроить Teron Mail",
+    "ChannelSpace": "Пространство для канала сообщений",
+    "PersonSpaceInfo": "Почта будет доступна только вам",
+    "SharedSpaceInfo": "Почта будет доступна всем участникам пространства",
+    "Mailbox": "Почтовый ящик",
+    "MailboxesNotConfigured": "Не найдено почтовых ящиков",
+    "ConfigureMailBoxes": "Пожалуйста, добавьте почтовый ящик в разделе `Почтовые ящики`, чтобы начать"
+  }
+}

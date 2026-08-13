@@ -15,7 +15,7 @@
 
 import { LiveQueries } from '@hcengineering/communication-query'
 import type { FindClient } from '@hcengineering/communication-sdk-types'
-import { type HulylakeWorkspaceClient } from '@hcengineering/hulylake-client'
+import { type TeronlakeWorkspaceClient } from '@hcengineering/teronlake-client'
 
 export type { MessageQueryParams } from '@hcengineering/communication-query'
 
@@ -32,7 +32,7 @@ export function getOnDestroy (): (fn: () => void) => void {
 
 export function initLiveQueries (
   client: FindClient,
-  hulylake: HulylakeWorkspaceClient,
+  teronlake: TeronlakeWorkspaceClient,
   destroyFn?: (fn: () => void) => void
 ): void {
   if (lq != null) {
@@ -43,7 +43,7 @@ export function initLiveQueries (
     onDestroy = destroyFn
   }
 
-  lq = new LiveQueries(client, hulylake)
+  lq = new LiveQueries(client, teronlake)
 }
 
 export async function refreshLiveQueries (): Promise<void> {

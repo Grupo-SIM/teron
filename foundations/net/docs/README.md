@@ -1,6 +1,6 @@
-# Huly Network Documentation
+# Teron Network Documentation
 
-Welcome to the Huly Virtual Network documentation! This directory contains comprehensive guides for building distributed systems with Huly Network.
+Welcome to the Teron Virtual Network documentation! This directory contains comprehensive guides for building distributed systems with Teron Network.
 
 ## 📚 Documentation Index
 
@@ -69,10 +69,10 @@ Welcome to the Huly Virtual Network documentation! This directory contains compr
 
 ## 🔗 External Resources
 
-- [Main Repository](https://github.com/hcengineering/huly.net)
+- [Main Repository](https://github.com/hcengineering/teron.net)
 - [Examples Directory](../examples/)
 - [ZeroMQ Documentation](https://zeromq.org/documentation/)
-- [Huly Platform](https://github.com/hcengineering/platform)
+- [Teron Platform](https://github.com/hcengineering/platform)
 
 ## 🤝 Contributing to Documentation
 

@@ -43,11 +43,11 @@
   defineSeparators('spaceTypeEditor', secondNavSeparators)
 </script>
 
-<div class="hulyComponent-content__container columns">
+<div class="teronComponent-content__container columns">
   {#if visibleSecondNav}
-    <div class="hulyComponent-content__column">
-      <div class="hulyComponent-content__navHeader">
-        <div class="hulyComponent-content__navHeader-menu">
+    <div class="teronComponent-content__column">
+      <div class="teronComponent-content__navHeader">
+        <div class="teronComponent-content__navHeader-menu">
           <ButtonIcon kind="tertiary" icon={IconDescription} size="small" inheritColor />
         </div>
       </div>
@@ -63,11 +63,11 @@
     </div>
     <Separator name="spaceTypeEditor" index={0} color="transparent" />
   {/if}
-  <div class="hulyComponent-content__column content">
+  <div class="teronComponent-content__column content">
     <Scroller align="center" padding="var(--spacing-3)" bottomPadding="var(--spacing-3)">
-      <div class="hulyComponent-content gap">
+      <div class="teronComponent-content gap">
         {#each sections as section, i}
-          <div bind:this={sectionRefs[section.id]} class:hulyTableAttr-container={i}>
+          <div bind:this={sectionRefs[section.id]} class:teronTableAttr-container={i}>
             <Component
               is={section.component}
               disabled={readonly}

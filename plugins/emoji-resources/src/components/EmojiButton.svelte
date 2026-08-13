@@ -35,7 +35,7 @@
           : capitalizeFirstLetter(displayedEmoji?.label ?? '')
       )
     }}
-    class="hulyPopupEmoji-button"
+    class="teronPopupEmoji-button"
     class:preview
     class:selected
     class:skins={skins !== undefined}
@@ -59,7 +59,7 @@
 {/if}
 
 <style lang="scss">
-  .hulyPopupEmoji-button {
+  .teronPopupEmoji-button {
     display: flex;
     justify-content: center;
     align-items: center;

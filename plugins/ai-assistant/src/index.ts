@@ -31,7 +31,7 @@ export const aiAssistantId = 'ai-assistant' as Plugin
 export default plugin(aiAssistantId, {
   component: {
     Connect: '' as AnyComponent,
-    IconHulyAssistant: '' as AnyComponent,
+    IconTeronAssistant: '' as AnyComponent,
     Configure: '' as AnyComponent
   },
   integrationType: {

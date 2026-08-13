@@ -174,18 +174,18 @@
   }
 </script>
 
-<div class="hulyComponent">
+<div class="teronComponent">
   <Header adaptive={'disabled'}>
     <Breadcrumb icon={setting.icon.InviteSettings} label={settingRes.string.InviteSettings} size={'large'} isCurrent />
   </Header>
-  <div class="hulyComponent-content__column content">
+  <div class="teronComponent-content__column content">
     {#if loading}
       <div class="w-full h-full flex-col-center justify-center">
         <Loading />
       </div>
     {:else}
       <Scroller align={'center'} padding={'var(--spacing-3)'} bottomPadding={'var(--spacing-3)'}>
-        <div class="hulyComponent-content flex-col flex-gap-4">
+        <div class="teronComponent-content flex-col flex-gap-4">
           <div class="title"><Label label={settingRes.string.InviteSettings} /></div>
 
           <div class="settings-list mt-6">

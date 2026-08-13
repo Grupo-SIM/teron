@@ -56,7 +56,7 @@ const config: Config = (() => {
     FirstName: process.env.FIRST_NAME,
     LastName: process.env.LAST_NAME,
     AvatarPath: process.env.AVATAR_PATH ?? './assets/avatar.png',
-    AvatarName: process.env.AVATAR_NAME ?? 'huly_ai_bot_avatar',
+    AvatarName: process.env.AVATAR_NAME ?? 'teron_ai_bot_avatar',
     AvatarContentType: process.env.AVATAR_CONTENT_TYPE ?? 'image/png',
     Password: process.env.PASSWORD ?? 'password',
     OpenAIKey: process.env.OPENAI_API_KEY ?? '',

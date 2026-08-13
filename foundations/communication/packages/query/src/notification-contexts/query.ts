@@ -46,7 +46,7 @@ import {
   NotificationContextProcessor,
   NotificationProcessor
 } from '@hcengineering/communication-shared'
-import { type HulylakeWorkspaceClient } from '@hcengineering/hulylake-client'
+import { type TeronlakeWorkspaceClient } from '@hcengineering/teronlake-client'
 
 import { defaultQueryParams, NotificationContextQueryOptions, type PagedQuery, type QueryId } from '../types'
 import { QueryResult } from '../result'
@@ -65,7 +65,7 @@ export class NotificationContextsQuery implements PagedQuery<NotificationContext
 
   constructor (
     private readonly client: FindClient,
-    private readonly hulylake: HulylakeWorkspaceClient,
+    private readonly teronlake: TeronlakeWorkspaceClient,
     public readonly id: QueryId,
     public readonly params: FindNotificationContextParams,
     public readonly options: NotificationContextQueryOptions | undefined,
@@ -280,7 +280,7 @@ export class NotificationContextsQuery implements PagedQuery<NotificationContext
       return fromBuffer
     }
 
-    return (await loadMessages(this.hulylake, cardId, blobId, { cardId, id: messageId }, { attachments: true }))[0]
+    return (await loadMessages(this.teronlake, cardId, blobId, { cardId, id: messageId }, { attachments: true }))[0]
   }
 
   async loadMessages (contexts: NotificationContext[]): Promise<NotificationContext[]> {
@@ -293,7 +293,7 @@ export class NotificationContextsQuery implements PagedQuery<NotificationContext
           notifications.map(async (notification) => {
             const message = (
               await loadMessages(
-                this.hulylake,
+                this.teronlake,
                 context.cardId,
                 notification.blobId,
                 { cardId: context.cardId, id: notification.messageId },

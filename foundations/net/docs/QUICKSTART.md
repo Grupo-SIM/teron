@@ -1,6 +1,6 @@
 # Quick Start Guide
 
-Get started with Huly Virtual Network in under 10 minutes!
+Get started with Teron Virtual Network in under 10 minutes!
 
 ## ⚠️ Important Limitations
 
@@ -27,8 +27,8 @@ For production, use process monitoring (systemd, PM2, Kubernetes) to ensure quic
 
 ```bash
 # Clone the repository
-git clone https://github.com/hcengineering/huly.net.git
-cd huly.net
+git clone https://github.com/hcengineering/teron.net.git
+cd teron.net
 
 # Install dependencies
 node common/scripts/install-run-rush.js install
@@ -48,7 +48,7 @@ docker pull hardcoreeng/network-pod:latest
 
 # Run the network server
 docker run -d \
-  --name huly-network \
+  --name teron-network \
   -p 3737:3737 \
   hardcoreeng/network-pod:latest
 ```
@@ -384,7 +384,7 @@ For more help, see the [Troubleshooting Guide](TROUBLESHOOTING.md).
 - [Examples Directory](../examples/) - Complete working examples
 - [Core Concepts](CORE_CONCEPTS.md) - Architecture deep dive
 - [API Reference](API_CORE.md) - Detailed API documentation
-- [GitHub Repository](https://github.com/hcengineering/huly.net)
+- [GitHub Repository](https://github.com/hcengineering/teron.net)
 
 ---
 

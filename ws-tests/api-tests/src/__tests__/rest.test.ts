@@ -57,11 +57,11 @@ describe('rest-api-server', () => {
   let adminAccountClient: AccountClient
 
   beforeAll(async () => {
-    serverConfig = await loadServerConfig('http://huly.local:8083')
+    serverConfig = await loadServerConfig('http://teron.local:8083')
     const config = serverConfig
 
     apiWorkspace1 = await getWorkspaceToken(
-      'http://huly.local:8083',
+      'http://teron.local:8083',
       {
         email: 'user1',
         password: '1234',
@@ -71,7 +71,7 @@ describe('rest-api-server', () => {
     )
 
     apiWorkspace2 = await getWorkspaceToken(
-      'http://huly.local:8083',
+      'http://teron.local:8083',
       {
         email: 'user1',
         password: '1234',

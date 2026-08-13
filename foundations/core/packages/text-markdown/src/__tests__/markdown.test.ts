@@ -1179,7 +1179,7 @@ describe('markdownToMarkup -> markupToMarkdown', () => {
     },
     {
       name: 'Sub',
-      markdown: '<sub>View in Huly <a href="http://localhost:8080/guest/github?token=token">TSK-50</a></sub>'
+      markdown: '<sub>View in Teron <a href="http://localhost:8080/guest/github?token=token">TSK-50</a></sub>'
     }
     // {
     //   name: 'Malformed',

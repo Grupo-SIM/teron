@@ -145,7 +145,7 @@
         {clipPath}
       />
       <div
-        class="hulyAvatar-statusMarker {statusSize ?? size} {style}"
+        class="teronAvatar-statusMarker {statusSize ?? size} {style}"
         class:online={isOnline}
         class:offline={!isOnline}
       />

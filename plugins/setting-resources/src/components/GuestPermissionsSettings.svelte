@@ -273,7 +273,7 @@
   defineSeparators('guestPermissionsSettings', twoPanelsSeparators)
 </script>
 
-<div class="hulyComponent">
+<div class="teronComponent">
   <Header adaptive={'disabled'}>
     <Breadcrumb
       icon={setting.icon.GuestPermissions}
@@ -282,8 +282,8 @@
       isCurrent
     />
   </Header>
-  <div class="hulyComponent-content__container columns">
-    <div class="hulyComponent-content__column navigation py-2">
+  <div class="teronComponent-content__container columns">
+    <div class="teronComponent-content__column navigation py-2">
       <Scroller shrink>
         <NavItem
           icon={contact.icon.Person}
@@ -306,14 +306,14 @@
 
     <Separator name={'guestPermissionsSettings'} index={0} color={'var(--theme-divider-color)'} />
 
-    <div class="hulyComponent-content__column content">
+    <div class="teronComponent-content__column content">
       {#if loading}
         <div class="w-full h-full flex-col-center justify-center">
           <Loading />
         </div>
       {:else}
         <Scroller align={'center'} padding={'var(--spacing-3)'} bottomPadding={'var(--spacing-3)'}>
-          <div class="hulyComponent-content guestPermissionsRoot flex-col">
+          <div class="teronComponent-content guestPermissionsRoot flex-col">
             {#if guestPermissionsTab === 'anonymous'}
               <section class="section">
                 <div class="sectionHeader">

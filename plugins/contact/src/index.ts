@@ -295,7 +295,7 @@ export const contactPlugin = plugin(contactId, {
     Viber: '' as Ref<ChannelProvider>
   },
   socialIdentityProvider: {
-    Huly: '' as Ref<SocialIdentityProvider>,
+    Teron: '' as Ref<SocialIdentityProvider>,
     Email: '' as Ref<SocialIdentityProvider>,
     Phone: '' as Ref<SocialIdentityProvider>,
     Google: '' as Ref<SocialIdentityProvider>,
@@ -317,7 +317,7 @@ export const contactPlugin = plugin(contactId, {
     ContactApplication: '' as Asset,
     Phone: '' as Asset,
     Email: '' as Asset,
-    Huly: '' as Asset,
+    Teron: '' as Asset,
     Discord: '' as Asset,
     Facebook: '' as Asset,
     Instagram: '' as Asset,

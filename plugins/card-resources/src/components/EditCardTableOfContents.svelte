@@ -226,13 +226,13 @@
   const bottomPadding = getMetadata(communication.metadata.Enabled) === true ? 'var(--spacing-3)' : undefined
 </script>
 
-<div class="hulyComponent-content__container columns relative">
+<div class="teronComponent-content__container columns relative">
   {#if showOverlay}
     <div class="overlay">
       <Loading />
     </div>
   {/if}
-  <div class="hulyComponent-content__column content">
+  <div class="teronComponent-content__column content">
     <div class="toc-container" class:hidden={showOverlay}>
       <div class="toc">
         <TableOfContents
@@ -254,7 +254,7 @@
       bind:divScroll={scrollDiv}
       onScroll={handleScroll}
     >
-      <div class="hulyComponent-content withoutMaxWidth" class:gap={renderTopSections}>
+      <div class="teronComponent-content withoutMaxWidth" class:gap={renderTopSections}>
         {#each sections as section (section._id)}
           <div id={section._id} bind:this={sectionElement[section._id]} class="section">
             <Component

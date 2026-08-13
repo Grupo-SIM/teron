@@ -4,7 +4,7 @@
 
 /*
  * Camadas decorativas do card, na mesma ordem e nas mesmas posições do
- * huly.io. Nenhuma delas responde ao ponteiro nem entra na leitura: ficam
+ * teron.io. Nenhuma delas responde ao ponteiro nem entra na leitura: ficam
  * atrás do conteúdo (`z-index` negativo) e todas partem daqui para não se
  * misturarem ao formulário.
  *

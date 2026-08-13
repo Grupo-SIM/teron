@@ -95,7 +95,7 @@ import {
   loadMessagesGroups
 } from '@hcengineering/communication-shared'
 import { markdownToMarkup } from '@hcengineering/text-markdown'
-import { type HulylakeWorkspaceClient } from '@hcengineering/hulylake-client'
+import { type TeronlakeWorkspaceClient } from '@hcengineering/teronlake-client'
 
 export * from './types'
 export * from './utils'
@@ -238,7 +238,7 @@ export class FullTextIndexPipeline implements FullTextPipeline {
     readonly storageAdapter: StorageAdapter,
     readonly contentAdapter: ContentTextAdapter,
     readonly broadcastUpdate: (ctx: MeasureContext, classes: Ref<Class<Doc>>[]) => void,
-    readonly hulylake: HulylakeWorkspaceClient,
+    readonly teronlake: TeronlakeWorkspaceClient,
     readonly communicationApi?: CommunicationApi,
     readonly listener?: FulltextListener
   ) {
@@ -581,7 +581,7 @@ export class FullTextIndexPipeline implements FullTextPipeline {
     let lastPrint = platformNow()
     let messagesGroups = []
     try {
-      messagesGroups = await loadMessagesGroups(this.hulylake, card._id)
+      messagesGroups = await loadMessagesGroups(this.teronlake, card._id)
     } catch (err: any) {
       ctx.error('Failed to get message groups', {
         cardId: card._id,
@@ -599,7 +599,7 @@ export class FullTextIndexPipeline implements FullTextPipeline {
       }
       try {
         const messages = await loadMessages(
-          this.hulylake,
+          this.teronlake,
           groupInfo.blobId,
           { cardId: card._id },
           { attachments: true }
@@ -749,7 +749,7 @@ export class FullTextIndexPipeline implements FullTextPipeline {
       }
       return (
         await loadMessages(
-          this.hulylake,
+          this.teronlake,
           meta.blobId,
           {
             cardId,

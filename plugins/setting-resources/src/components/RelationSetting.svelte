@@ -108,7 +108,7 @@
   }
 </script>
 
-<div class="hulyComponent">
+<div class="teronComponent">
   <Header adaptive={'disabled'}>
     <Breadcrumb icon={settings.icon.Relations} label={core.string.Relations} size={'large'} isCurrent />
 
@@ -119,8 +119,8 @@
     </svelte:fragment>
   </Header>
 
-  <div class="hulyComponent-content__container columns">
-    <div class="hulyComponent-content__column">
+  <div class="teronComponent-content__container columns">
+    <div class="teronComponent-content__column">
       <div class="ulyComponent-content__navHeader flex-between trans-title flex-no-shrink bottom-divider p-3">
         <Button
           icon={view.icon.Add}

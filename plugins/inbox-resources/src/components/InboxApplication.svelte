@@ -213,7 +213,7 @@
   onDestroy(() => ($deviceInfo.replacedPanel = undefined))
 </script>
 
-<div class="hulyPanels-container inbox">
+<div class="teronPanels-container inbox">
   {#if $deviceInfo.navigator.visible}
     <div
       class="antiPanel-navigator {$deviceInfo.navigator.direction === 'horizontal'
@@ -221,9 +221,9 @@
         : 'landscape'} border-left inbox__navigator"
       class:fly={$deviceInfo.navigator.float}
     >
-      <div class="antiPanel-wrap__content hulyNavPanel-container">
+      <div class="antiPanel-wrap__content teronNavPanel-container">
         <InboxHeader />
-        <div class="antiPanel-wrap__content hulyNavPanel-container">
+        <div class="antiPanel-wrap__content teronNavPanel-container">
           <InboxNavigation {doc} {legacyContext} on:select={select} />
         </div>
       </div>
@@ -241,7 +241,7 @@
     />
   {/if}
 
-  <div bind:this={replacedPanelElement} class="hulyComponent inbox__panel">
+  <div bind:this={replacedPanelElement} class="teronComponent inbox__panel">
     {#if doc}
       {@const panel = client.getHierarchy().classHierarchyMixin(doc._class, view.mixin.ObjectPanel)}
       <Component

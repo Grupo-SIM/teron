@@ -1,5 +1,5 @@
 import { CONFIG_KIND as DATALAKE_CONFIG_KIND, DatalakeService, type DatalakeConfig } from '@hcengineering/datalake'
-import { CONFIG_KIND as HULYLAKE_CONFIG_KIND, HulylakeService, type HulylakeConfig } from '@hcengineering/hulylake'
+import { CONFIG_KIND as TERONLAKE_CONFIG_KIND, TeronlakeService, type TeronlakeConfig } from '@hcengineering/teronlake'
 import { CONFIG_KIND as MINIO_CONFIG_KIND, MinioConfig, MinioService, addMinioFallback } from '@hcengineering/minio'
 import { CONFIG_KIND as S3_CONFIG_KIND, S3Service, type S3Config } from '@hcengineering/s3'
 import { StorageAdapter, StorageConfiguration, type StorageConfig } from '@hcengineering/server-core'
@@ -98,12 +98,12 @@ export function createStorageFromConfig (config: StorageConfig): StorageAdapter 
       throw new Error('Endpoint value is not specified')
     }
     adapter = new DatalakeService(c)
-  } else if (kind === HULYLAKE_CONFIG_KIND) {
-    const c = config as HulylakeConfig
+  } else if (kind === TERONLAKE_CONFIG_KIND) {
+    const c = config as TeronlakeConfig
     if (c.endpoint == null) {
       throw new Error('Endpoint value is not specified')
     }
-    adapter = new HulylakeService(c)
+    adapter = new TeronlakeService(c)
   } else {
     throw new Error('Unsupported storage kind:' + kind)
   }

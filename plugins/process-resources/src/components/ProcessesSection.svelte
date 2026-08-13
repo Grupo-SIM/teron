@@ -117,7 +117,7 @@
   }
 </script>
 
-<div class="hulyTableAttr-header font-medium-12">
+<div class="teronTableAttr-header font-medium-12">
   <Icon icon={process.icon.Process} size="small" />
   <span><Label label={process.string.Processes} /></span>
   <div class="flex-row-center flex-gap-1">
@@ -132,15 +132,15 @@
   </div>
 </div>
 {#if processes.length}
-  <div class="hulyTableAttr-content task">
+  <div class="teronTableAttr-content task">
     {#each processes as val}
       <button
-        class="hulyTableAttr-content__row justify-start"
+        class="teronTableAttr-content__row justify-start"
         on:click|stopPropagation={() => {
           handleSelect(val._id)
         }}
       >
-        <div class="hulyTableAttr-content__row-label px-2 font-medium-14 cursor-pointer">
+        <div class="teronTableAttr-content__row-label px-2 font-medium-14 cursor-pointer">
           {val.name}
         </div>
       </button>

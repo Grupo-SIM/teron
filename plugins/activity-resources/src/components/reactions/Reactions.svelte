@@ -66,12 +66,12 @@
   }
 </script>
 
-<div class="hulyReactions-container">
+<div class="teronReactions-container">
   {#each [...reactionsPersons] as [emoji, emojiInfo]}
     <!-- svelte-ignore a11y-no-static-element-interactions -->
     <!-- svelte-ignore a11y-click-events-have-key-events -->
     <div
-      class="hulyReactions-button"
+      class="teronReactions-button"
       class:highlight={includesAny(emojiInfo.persons, me.socialIds)}
       class:cursor-pointer={!readonly}
       use:tooltip={{ component: ReactionsTooltip, props: { socialIds: emojiInfo.persons } }}
@@ -92,14 +92,14 @@
   {#if object && reactionsPersons.size > 0 && !readonly}
     <!-- svelte-ignore a11y-click-events-have-key-events -->
     <!-- svelte-ignore a11y-no-static-element-interactions -->
-    <div class="hulyReactions-button withoutBackground" class:opened on:click={openEmojiPalette}>
+    <div class="teronReactions-button withoutBackground" class:opened on:click={openEmojiPalette}>
       <IconAdd size="small" />
     </div>
   {/if}
 </div>
 
 <style lang="scss">
-  .hulyReactions-container {
+  .teronReactions-container {
     display: flex;
     flex-wrap: wrap;
     column-gap: 0.125rem;
@@ -114,7 +114,7 @@
       margin-left: 0.25rem;
     }
 
-    .hulyReactions-button {
+    .teronReactions-button {
       display: flex;
       justify-content: center;
       align-items: center;

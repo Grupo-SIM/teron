@@ -64,7 +64,7 @@
   onCancel={handleCancel}
   on:close
 >
-  <div class="hulyModal-content__titleGroup">
+  <div class="teronModal-content__titleGroup">
     <div class="search">
       <EditWithIcon
         icon={IconSearch}

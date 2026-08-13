@@ -30,7 +30,7 @@ export function createModel (builder: Builder): void {
     {
       label: aiAssistant.string.IntegrationLabel,
       description: aiAssistant.string.IntegrationDescription,
-      icon: aiAssistant.component.IconHulyAssistant,
+      icon: aiAssistant.component.IconTeronAssistant,
       allowMultiple: false,
       createComponent: aiAssistant.component.Connect,
       configureComponent: aiAssistant.component.Connect,

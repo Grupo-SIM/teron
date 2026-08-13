@@ -28,7 +28,7 @@
   const dispatch = createEventDispatcher()
 </script>
 
-<div class="hulyPopupEmoji-group__palette">
+<div class="teronPopupEmoji-group__palette">
   {#each emojis as emoji}
     <EmojiButton
       {emoji}
@@ -48,7 +48,7 @@
 </div>
 
 <style lang="scss">
-  .hulyPopupEmoji-group__palette {
+  .teronPopupEmoji-group__palette {
     display: flex;
     justify-content: space-between;
     flex-wrap: wrap;

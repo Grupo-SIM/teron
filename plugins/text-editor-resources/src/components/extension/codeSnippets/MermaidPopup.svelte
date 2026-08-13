@@ -35,7 +35,7 @@
         dispatch('close')
       }}
     />
-    <div class="hulyHeader-divider short no-line no-print" />
+    <div class="teronHeader-divider short no-line no-print" />
     <ButtonIcon
       icon={!fullSize ? IconMaximize : IconMinimize}
       kind={'tertiary'}
@@ -46,7 +46,7 @@
         dispatch('fullsize', fullSize)
       }}
     />
-    <div class="hulyHeader-divider short no-print" />
+    <div class="teronHeader-divider short no-print" />
   </svelte:fragment>
 
   <div class="mermaid-scroll">

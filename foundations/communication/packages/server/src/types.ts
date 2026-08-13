@@ -38,7 +38,7 @@ import { LowLevelClient } from './client'
 
 export interface Metadata {
   accountsUrl: string
-  hulylakeUrl: string
+  teronlakeUrl: string
   secret: string
   messagesPerBlob: number
 }

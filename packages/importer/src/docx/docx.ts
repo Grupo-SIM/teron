@@ -18,7 +18,7 @@ import { markupToMarkdown } from '@hcengineering/text-markdown'
 import { mkdir, readdir, readFile, writeFile } from 'fs/promises'
 import * as yaml from 'js-yaml'
 import { basename, dirname, extname, join, relative } from 'path'
-import { type HulyControlledDocumentHeader, type HulyDocumentTemplateHeader } from '../huly/huly'
+import { type TeronControlledDocumentHeader, type TeronDocumentTemplateHeader } from '../teron/teron'
 
 export interface DocumentConverterOptions {
   outputPath: string
@@ -32,7 +32,7 @@ export interface DocumentState {
   path: string
   root: string
   markup: MarkupNode
-  header?: HulyControlledDocumentHeader | HulyDocumentTemplateHeader
+  header?: TeronControlledDocumentHeader | TeronDocumentTemplateHeader
 }
 
 export interface DocumentPreprocessorOptions<T> {

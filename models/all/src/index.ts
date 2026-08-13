@@ -100,7 +100,7 @@ import { serverTimeId, createModel as serverTimeModel } from '@hcengineering/mod
 
 import aiAssistant, { aiAssistantId, createModel as aiAssistantModel } from '@hcengineering/model-ai-assistant'
 import documents, { documentsId, createModel as documentsModel } from '@hcengineering/model-controlled-documents'
-import { hulyMailId, createModel as hulyMailModel } from '@hcengineering/model-huly-mail'
+import { teronMailId, createModel as teronMailModel } from '@hcengineering/model-teron-mail'
 import { mailId, createModel as mailModel } from '@hcengineering/model-mail'
 import products, { productsId, createModel as productsModel } from '@hcengineering/model-products'
 import questions, { questionsId, createModel as questionsModel } from '@hcengineering/model-questions'
@@ -507,7 +507,7 @@ export default function buildModel (): Builder {
         enabled: true
       }
     ],
-    [hulyMailModel, hulyMailId],
+    [teronMailModel, teronMailId],
     [
       aiAssistantModel,
       aiAssistantId,

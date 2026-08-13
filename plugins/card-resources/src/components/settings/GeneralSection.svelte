@@ -167,8 +167,8 @@
     .some((it) => it !== masterTag._id && !h.isMixin(it) && h.getClass(it).extends === masterTag._id)
 </script>
 
-<div class="hulyComponent-content__column-group">
-  <div class="hulyComponent-content__header items-center">
+<div class="teronComponent-content__column-group">
+  <div class="teronComponent-content__header items-center">
     <div class="flex items-center flex-grow">
       <ButtonIcon
         icon={masterTag.icon === view.ids.IconWithEmoji ? IconWithEmoji : (masterTag.icon ?? card.icon.MasterTag)}

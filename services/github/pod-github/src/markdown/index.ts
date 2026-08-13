@@ -16,7 +16,7 @@
 import { MarkupNode, jsonToMarkup, markupToJSON, htmlToJSON } from '@hcengineering/text'
 import { MarkdownParser, storeNodes, storeMarks, MarkdownState } from '@hcengineering/text-markdown'
 import { GithubKit } from './extensions'
-import { hasHulyLink, hasHulyLinkText } from '../sync/guest'
+import { hasTeronLink, hasTeronLinkText } from '../sync/guest'
 
 /**
  * @public
@@ -30,8 +30,8 @@ export function parseMessageMarkdown (
   const extensions = [
     GithubKit.configure({
       sub: {
-        hasHulyText: hasHulyLinkText,
-        hasHulyLink: (href) => hasHulyLink(href, guestUrl)
+        hasTeronText: hasTeronLinkText,
+        hasTeronLink: (href) => hasTeronLink(href, guestUrl)
       }
     })
   ]

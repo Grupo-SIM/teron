@@ -276,7 +276,7 @@ export function start (
     billingUrl?: string
     paymentUrl?: string
     pulseUrl?: string
-    hulylakeUrl?: string
+    teronlakeUrl?: string
     datalakeUrl?: string
   },
   port: number,
@@ -355,7 +355,7 @@ export function start (
       BILLING_URL: config.billingUrl,
       PAYMENT_URL: config.paymentUrl,
       PULSE_URL: config.pulseUrl,
-      HULYLAKE_URL: config.hulylakeUrl,
+      TERONLAKE_URL: config.teronlakeUrl,
       DATALAKE_URL: config.datalakeUrl,
       ...(extraConfig ?? {})
     }

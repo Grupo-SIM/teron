@@ -11,7 +11,7 @@ import type {
 } from './types'
 
 /**
- * Interface to Huly network on server.
+ * Interface to Teron network on server.
  */
 export interface Network {
   /*

@@ -1,16 +1,16 @@
-# Huly Server - Copilot Context
+# Teron Server - Copilot Context
 
 ## Project Overview
 
-**Monorepo**: Rush-managed backend infrastructure for Huly Platform  
-**Stack**: TypeScript, Node.js v20.11.0+, pnpm 10.15.1, Rush 5.158.1, Jest  
+**Monorepo**: Rush-managed backend infrastructure for Teron Platform
+**Stack**: TypeScript, Node.js v20.11.0+, pnpm 10.15.1, Rush 5.158.1, Jest
 **License**: Eclipse Public License 2.0 (Hardcore Engineering Inc.)
 
 ## Package Categories
 
 - **Core**: core, server, client, middleware
 - **Database**: mongo, postgres, elastic
-- **Storage**: server-storage, minio, s3, datalake, hulylake
+- **Storage**: server-storage, minio, s3, datalake, teronlake
 - **Infrastructure**: kafka, collaboration
 
 Standard structure: `src/` → `lib/` (compiled), `tsconfig.json`, `jest.config.js`, `package.json` with `@hcengineering/` scope

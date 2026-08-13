@@ -1,14 +1,14 @@
-# Huly Core
+# Teron Core
 
-[![GitHub License](https://img.shields.io/github/license/hcengineering/huly.core?style=for-the-badge)](LICENSE)
+[![GitHub License](https://img.shields.io/github/license/hcengineering/teron.core?style=for-the-badge)](LICENSE)
 
 ⭐️ Your star shines on us. Star us on GitHub!
 
 ## About
 
-Huly Core is a collection of core packages extracted from the [Huly Platform](https://github.com/hcengineering/platform). This repository contains fundamental building blocks and libraries that power the Huly ecosystem, including core data models, client libraries, text processing engines, and platform utilities.
+Teron Core is a collection of core packages extracted from the [Teron Platform](https://github.com/hcengineering/platform). This repository contains fundamental building blocks and libraries that power the Teron ecosystem, including core data models, client libraries, text processing engines, and platform utilities.
 
-These packages are designed to be reusable, modular, and framework-agnostic, making them suitable for building custom applications on top of the Huly Platform or integrating Huly functionality into existing projects.
+These packages are designed to be reusable, modular, and framework-agnostic, making them suitable for building custom applications on top of the Teron Platform or integrating Teron functionality into existing projects.
 
 ## Packages
 
@@ -24,10 +24,10 @@ This repository includes the following core packages:
 
 - **[@hcengineering/client](packages/client)** - Client-side data access and synchronization layer
 - **[@hcengineering/client-resources](packages/client-resources)** - Shared client resources and utilities
-- **[@hcengineering/api-client](packages/api-client)** - API client for programmatic access to Huly Platform (WebSocket and REST)
+- **[@hcengineering/api-client](packages/api-client)** - API client for programmatic access to Teron Platform (WebSocket and REST)
 - **[@hcengineering/account-client](packages/account-client)** - Account management client
 - **[@hcengineering/collaborator-client](packages/collaborator-client)** - Real-time collaboration client
-- **[@hcengineering/hulylake-client](packages/hulylake-client)** - HulyLake data warehouse client
+- **[@hcengineering/teronlake-client](packages/teronlake-client)** - TeronLake data warehouse client
 - **[@hcengineering/analytics](packages/analytics)** - Analytics and tracking
 - **[@hcengineering/analytics-service](packages/analytics-service)** - Analytics service implementation
 
@@ -138,15 +138,15 @@ node ./common/scripts/bump.js -p projectName
 
 ## API Client Usage
 
-If you want to interact with Huly programmatically, check out the [API Client](packages/api-client/README.md) documentation. The API client provides a typed interface for all Huly operations and can be used to build integrations and custom applications.
+If you want to interact with Teron programmatically, check out the [API Client](packages/api-client/README.md) documentation. The API client provides a typed interface for all Teron operations and can be used to build integrations and custom applications.
 
-You can find API usage examples in the [Huly examples](https://github.com/hcengineering/huly-examples) repository.
+You can find API usage examples in the [Teron examples](https://github.com/hcengineering/teron-examples) repository.
 
 ## Related Projects
 
-- **[Huly Platform](https://github.com/hcengineering/platform)** - The main Huly Platform repository
-- **[Huly Self-Host](https://github.com/hcengineering/huly-selfhost)** - Self-hosting solution for Huly
-- **[Huly Examples](https://github.com/hcengineering/huly-examples)** - API usage examples
+- **[Teron Platform](https://github.com/hcengineering/platform)** - The main Teron Platform repository
+- **[Teron Self-Host](https://github.com/hcengineering/teron-selfhost)** - Self-hosting solution for Teron
+- **[Teron Examples](https://github.com/hcengineering/teron-examples)** - API usage examples
 
 ## Contributing
 
@@ -158,8 +158,8 @@ Licensed under the [EPL-2.0](LICENSE) license.
 
 ## Additional Links
 
-- [Huly Website](https://huly.io/)
-- [Documentation](https://docs.huly.io/)
+- [Teron Website](https://teron.io/)
+- [Documentation](https://docs.teron.io/)
 - [Community](https://github.com/hcengineering/platform/discussions)
 
 ---

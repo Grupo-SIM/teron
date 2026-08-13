@@ -86,7 +86,7 @@ export class MenuBar {
   }
 }
 
-export function buildHulyApplicationMenu (minimizeToTrayEnabled: boolean, autoLaunchEnabled: boolean): HTMLElement {
+export function buildTeronApplicationMenu (minimizeToTrayEnabled: boolean, autoLaunchEnabled: boolean): HTMLElement {
   const menuBuilder = new MenuBuilder()
 
   const MenuFileIndex = 0
@@ -331,7 +331,7 @@ class MenuBarManager {
       }
     )
 
-    this.view = buildHulyApplicationMenu(minimizeToTrayEnabled, autoLaunchEnabled)
+    this.view = buildTeronApplicationMenu(minimizeToTrayEnabled, autoLaunchEnabled)
   }
 
   public getView (): HTMLElement {

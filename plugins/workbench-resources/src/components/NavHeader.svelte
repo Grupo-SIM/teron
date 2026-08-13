@@ -21,7 +21,7 @@
   export let small: boolean = false
 </script>
 
-<div class="hulyNavPanel-header" class:withButton class:small>
+<div class="teronNavPanel-header" class:withButton class:small>
   <span class="overflow-label"><Label {label} /></span>
   <slot />
 </div>

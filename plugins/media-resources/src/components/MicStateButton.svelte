@@ -27,7 +27,7 @@
 
 {#if state != null}
   <button
-    class="hulyStatusBarButton mini positive {state.enabled ? 'positiveContent' : 'negativeContent'}"
+    class="teronStatusBarButton mini positive {state.enabled ? 'positiveContent' : 'negativeContent'}"
     use:tooltip={{ label: state.enabled ? media.string.TurnOffMic : media.string.TurnOnMic, direction: 'bottom' }}
     on:click={toggleMicState}
   >

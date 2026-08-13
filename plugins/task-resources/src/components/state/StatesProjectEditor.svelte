@@ -185,15 +185,15 @@
 {#each categories as cat (cat._id)}
   {@const states = groups.get(cat._id) ?? []}
   {@const prevIndex = getPrevIndex(groups, cat._id)}
-  <div class="hulyTableAttr-content class withTitle">
-    <div class="hulyTableAttr-content__title">
+  <div class="teronTableAttr-content class withTitle">
+    <div class="teronTableAttr-content__title">
       <Label label={cat.label} />
     </div>
-    <div class="hulyTableAttr-content__wrapper">
+    <div class="teronTableAttr-content__wrapper">
       {#if states.length === 0}
         <!-- Placeholder для пустой категории -->
         <button
-          class="hulyTableAttr-content__row disableMouseOver"
+          class="teronTableAttr-content__row disableMouseOver"
           style="height: 100%; min-height: 3rem;"
           draggable={false}
           on:drop|preventDefault={() => {
@@ -209,7 +209,7 @@
         <!-- svelte-ignore a11y-no-static-element-interactions -->
         <button
           bind:this={elements[prevIndex + i]}
-          class="hulyTableAttr-content__row"
+          class="teronTableAttr-content__row"
           class:selected={state._id === opened}
           draggable={!readonly}
           on:click={() => {
@@ -229,7 +229,7 @@
             selected = undefined
           }}
         >
-          <button class="hulyTableAttr-content__row-dragMenu" on:click|stopPropagation={() => {}}>
+          <button class="teronTableAttr-content__row-dragMenu" on:click|stopPropagation={() => {}}>
             <IconMoreV2 size={'small'} />
           </button>
           <ObjectPresenter
@@ -238,7 +238,7 @@
             value={state}
             props={{ projectType: type._id, taskType: taskType._id, kind: 'table-attrs', size: 'medium' }}
           />
-          <div class="hulyTableAttr-content__row-arrow">
+          <div class="teronTableAttr-content__row-arrow">
             <IconOpenedArrow size={'small'} />
           </div>
         </button>

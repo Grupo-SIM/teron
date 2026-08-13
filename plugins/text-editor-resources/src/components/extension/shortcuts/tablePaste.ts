@@ -29,11 +29,11 @@ export const TableMetadataPasteExtension = Extension.create({
 
 /**
  * Extract metadata from HTML comments in markdown or HTML text
- * Looks for pattern: <!-- huly-table-metadata:{json} -->
+ * Looks for pattern: <!-- teron-table-metadata:{json} -->
  * Returns both the metadata and the text with comment removed
  */
 function extractMetadataFromHtmlComments (text: string): { metadata: TableMetadata | null, cleanedText: string } {
-  // Look for HTML comment with pattern: <!-- huly-table-metadata:{json} -->
+  // Look for HTML comment with pattern: <!-- teron-table-metadata:{json} -->
   const commentRegex = new RegExp(`<!--\\s*${TABLE_METADATA_TOKEN}(.+?)\\s*-->`, 's')
   const match = text.match(commentRegex)
   if (match?.[1] !== undefined) {

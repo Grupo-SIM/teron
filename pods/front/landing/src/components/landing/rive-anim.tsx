@@ -25,7 +25,7 @@ type RiveAnimProps = {
   fit?: "cover" | "contain";
   /**
    * De 0 a 1: prende a animação ao scroll em vez de deixá-la em loop. O quadro
-   * exibido passa a ser função do progresso, como no huly.io.
+   * exibido passa a ser função do progresso, como no teron.io.
    */
   progress?: number;
   /**
@@ -80,7 +80,7 @@ export function RiveAnim({
     const host = hostRef.current;
     if (host == null || rive == null || scrubbed) return;
 
-    // Os arquivos do huly.io usam state machine; alguns só têm timeline solta.
+    // Os arquivos do teron.io usam state machine; alguns só têm timeline solta.
     const play = () => {
       const [machine] = rive.stateMachineNames;
       rive.play(machine ?? rive.animationNames[0]);

@@ -260,7 +260,7 @@
       {/if}
     {/if}
   </svelte:fragment>
-  <div class="hulyModal-content__titleGroup">
+  <div class="teronModal-content__titleGroup">
     <div class="flex items-center">
       <ButtonIcon
         icon={icon ?? setting.icon.Enums}

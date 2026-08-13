@@ -71,7 +71,7 @@ describe('Middlewares', () => {
 
     metadata = {
       accountsUrl: 'http://accounts.test',
-      hulylakeUrl: 'http://hulylake.test',
+      teronlakeUrl: 'http://teronlake.test',
       secret: 'test-secret',
       messagesPerBlob: 100
     }

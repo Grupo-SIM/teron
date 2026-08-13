@@ -1,0 +1,32 @@
+<!--
+// Copyright © 2025 Hardcore Engineering Inc.
+//
+// Licensed under the Eclipse Public License, Version 2.0 (the "License");
+// you may not use this file except in compliance with the License. You may
+// obtain a copy of the License at https://www.eclipse.org/legal/epl-2.0
+//
+// Unless required by applicable law or agreed to in writing, software
+// distributed under the License is distributed on an "AS IS" BASIS,
+// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+//
+// See the License for the specific language governing permissions and
+// limitations under the License.
+-->
+
+<script lang="ts">
+  export let size: 'small' | 'medium' | 'large' | undefined = undefined
+</script>
+
+<svg
+  xmlns="http://www.w3.org/2000/svg"
+  viewBox="0 0 595 550"
+  class={size !== undefined ? `svg-${size}` : null}
+  aria-hidden="true"
+>
+  <path
+    fill="currentColor"
+    fill-rule="evenodd"
+    clip-rule="evenodd"
+    d="M0.880133 153.883L344.133 153.755C342.458 155.172 341.71 155.404 338.643 155.842C327.019 157.517 316.658 161.822 307.509 163.497C302.818 163.368 287.483 169.708 282.998 171.641C280.627 172.647 279.983 173.033 277.637 174.09C236.838 192.415 199.363 230.766 188.1 274.942C186.192 282.468 183.332 294.762 183.46 303.834L183.383 549.766C208.461 548.761 254.982 535.642 276.348 519.92C289.828 509.997 293.746 508.657 305.395 496.002C311.169 489.713 310.112 492.342 317.432 482.368C342.149 448.733 352.252 408.707 351.711 366.284C350.989 308.602 351.917 248.421 351.427 189.941C351.35 179.219 352.587 163.368 351.736 153.832C386.453 151.873 457.924 157.157 485.63 150.971C505.347 146.589 531.198 135.146 544.884 121.46L551.791 115.043C555.683 110.945 560.296 105.841 563.389 101.047C563.75 100.48 564.755 98.8567 564.884 98.6505C565.348 98.0062 565.348 97.9546 565.967 97.2588C567.152 95.9443 566.482 96.7433 567.333 95.9185C572.745 93.702 584.884 57.6447 586.173 53.4694C588.055 47.3868 596.611 6.81917 593.879 1.09743C591.998 -0.78404 424.186 0.324225 407.407 0.324225H149.929C129.233 0.324225 117.3 1.45826 97.8147 6.71608C51.0614 19.3451 14.4113 62.6706 3.56059 111.434C1.93685 118.754 1.70489 123.986 0.673944 131.95C0.441981 133.806 -0.846699 151.461 0.905906 153.858L0.880133 153.883Z"
+  />
+</svg>

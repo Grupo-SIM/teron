@@ -173,7 +173,7 @@
   onDestroy(() => ($deviceInfo.replacedPanel = undefined))
 </script>
 
-<div class="hulyPanels-container chat">
+<div class="teronPanels-container chat">
   {#if $deviceInfo.navigator.visible}
     <div
       class="antiPanel-navigator {$deviceInfo.navigator.direction === 'horizontal'
@@ -181,7 +181,7 @@
         : 'landscape'} border-left chat__navigator"
       class:fly={$deviceInfo.navigator.float}
     >
-      <div class="antiPanel-wrap__content hulyNavPanel-container">
+      <div class="antiPanel-wrap__content teronNavPanel-container">
         <ChatNavigation
           card={getSelectedCard(selection)}
           type={getSelectedType(selection)}
@@ -205,7 +205,7 @@
       short
     />
   {/if}
-  <div bind:this={replacedPanelElement} class="hulyComponent chat__panel">
+  <div bind:this={replacedPanelElement} class="teronComponent chat__panel">
     {#if selection?.type === 'favorites'}
       {#key selection.type}
         <Favorites application={chatId} />

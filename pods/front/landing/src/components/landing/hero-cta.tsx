@@ -3,7 +3,7 @@
 import { usePillGlow } from "./use-pill-glow";
 
 /*
- * Réplica do botão "See in Action" do huly.io. O halo que segue o cursor mora
+ * Réplica do botão "See in Action" do teron.io. O halo que segue o cursor mora
  * em `usePillGlow` — as telas de acesso usam o mesmo botão.
  */
 type HeroCtaProps = {

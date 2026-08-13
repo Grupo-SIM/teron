@@ -48,11 +48,11 @@
   )
 </script>
 
-<div class="hulyComponent">
+<div class="teronComponent">
   <Header adaptive={'disabled'}>
     <Breadcrumb icon={setting.icon.Setting} label={setting.string.Configuration} size={'large'} isCurrent />
   </Header>
-  <div class="hulyComponent-content__column content">
+  <div class="teronComponent-content__column content">
     <div class="flex-row-center flex-wrap m-4 px-4">
       <Label label={setting.string.BetaWarning} />
     </div>

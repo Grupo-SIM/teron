@@ -17,14 +17,14 @@ import { type Resources } from '@hcengineering/platform'
 import type { Integration } from '@hcengineering/account-client'
 
 import Configure from './components/Configure.svelte'
-import IconHulyAssistant from './components/icons/HulyAssistant.svelte'
+import IconTeronAssistant from './components/icons/TeronAssistant.svelte'
 import { getIntegrationClient } from './utils'
 
 export default async (): Promise<Resources> => ({
   component: {
     Connect: Configure,
     Configure,
-    IconHulyAssistant
+    IconTeronAssistant
   },
   handler: {
     DisconnectHandler: async (integration: Integration): Promise<void> => {

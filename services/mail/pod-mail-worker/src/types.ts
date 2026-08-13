@@ -46,4 +46,4 @@ export interface MailMessage {
   }[]
 }
 
-export const HulyMessageType = 'huly-mail'
+export const TeronMessageType = 'teron-mail'

@@ -1,6 +1,6 @@
-# Huly Utils
+# Teron Utils
 
-Huly Utils is a monorepo managed by [Rush](https://rushjs.io/) that contains build tools to Huly platform.
+Teron Utils is a monorepo managed by [Rush](https://rushjs.io/) that contains build tools to Teron platform.
 This repository is structured to support scalable development and efficient collaboration.
 
 ## Repository Structure
@@ -31,8 +31,8 @@ packages/
 1. Clone the repository:
 
    ```bash
-   git clone https://github.com/hcengineering/huly.utils.git
-   cd huly.utils
+   git clone https://github.com/hcengineering/teron.utils.git
+   cd teron.utils
    ```
 
 2. Install dependencies using Rush:

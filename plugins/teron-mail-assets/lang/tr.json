@@ -1,0 +1,20 @@
+{
+  "string": {
+    "IntegrationLabel": "Teron Mail",
+    "IntegrationDescription": "E-posta göndermek, almak ve yönetmek için Teron posta kutunuzu bağlayın",
+    "Connect": "Bağlan",
+    "ConnectTeronMail": "Teron posta kutusunu bağla",
+    "Cancel": "İptal",
+    "Email": "E-posta",
+    "Status": "Durum",
+    "FailedToConnect": "Teron mail servisi kullanılamıyor",
+    "TotalMessages": "Toplam mesaj:",
+    "Configure": "Teron mail'i yapılandır",
+    "ChannelSpace": "Mesaj kanalı için alan",
+    "PersonSpaceInfo": "E-posta size açık olacak",
+    "SharedSpaceInfo": "E-posta tüm alan katılımcılarına açık olacak",
+    "Mailbox": "Posta kutusu",
+    "MailboxesNotConfigured": "Posta kutusu bulunamadı",
+    "ConfigureMailBoxes": "Başlamak için lütfen `Posta Kutuları` bölümünden bir posta kutusu ekleyin"
+  }
+}

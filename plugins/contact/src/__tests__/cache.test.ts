@@ -26,8 +26,8 @@ describe('ContactCache', () => {
       createdBy: personId,
       modifiedBy: personId,
       type: SocialIdType.EMAIL,
-      value: 'tester@huly.me',
-      key: 'email:tester@huly.me',
+      value: 'tester@teron.me',
+      key: 'email:tester@teron.me',
       collection: 'socialIds'
     }
 
@@ -101,8 +101,8 @@ describe('ContactCache', () => {
               modifiedBy: personId,
               attachedToClass: contact.class.Person,
               type: SocialIdType.EMAIL,
-              value: 'tester2@huly.me',
-              key: 'email:tester2@huly.me',
+              value: 'tester2@teron.me',
+              key: 'email:tester2@teron.me',
               collection: 'socialIds'
             }
           ]
@@ -175,8 +175,8 @@ describe('ContactCache', () => {
           attachedTo: personRef,
           attachedToClass: contact.class.Person,
           type: SocialIdType.EMAIL,
-          value: 'tester@huly.me',
-          key: 'email:tester@huly.me',
+          value: 'tester@teron.me',
+          key: 'email:tester@teron.me',
           collection: 'socialIds'
         }
       }

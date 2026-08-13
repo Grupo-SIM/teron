@@ -45,7 +45,7 @@
 
 <!-- svelte-ignore a11y-click-events-have-key-events -->
 <!-- svelte-ignore a11y-no-static-element-interactions -->
-<div class="hulyTableAttr-container flex-col-center box">
+<div class="teronTableAttr-container flex-col-center box">
   <div class="header w-full p-4">
     <Label label={plugin.string.States} />
   </div>

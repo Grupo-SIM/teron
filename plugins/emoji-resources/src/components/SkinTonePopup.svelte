@@ -19,13 +19,13 @@
   const skins: Emoji.Emoji[] = emojiSkins !== undefined ? [emoji, ...emojiSkins] : []
 </script>
 
-<div class="hulyPopup-container noPadding">
-  <div class="hulyPopup-group">
+<div class="teronPopup-container noPadding">
+  <div class="teronPopup-group">
     {#each skins as skin, index}
       {@const disabled = selected === index}
       {@const label = skinTones.get(index)}
       <button
-        class="hulyPopup-row withKeys"
+        class="teronPopup-row withKeys"
         class:noHover={disabled}
         on:click={() => {
           if (disabled) return undefined
@@ -33,8 +33,8 @@
         }}
       >
         <span style:font-size={'1.5rem'} class="emoji">{skin.emoji}</span>
-        {#if label}<span class="hulyPopup-row__label"><Label {label} /></span>{/if}
-        {#if disabled}<span class="hulyPopup-row__keys"><ModernCheckbox checked disabled /></span>{/if}
+        {#if label}<span class="teronPopup-row__label"><Label {label} /></span>{/if}
+        {#if disabled}<span class="teronPopup-row__keys"><ModernCheckbox checked disabled /></span>{/if}
       </button>
     {/each}
   </div>

@@ -77,7 +77,7 @@ jest.mock('@hcengineering/mail-common', () => ({
   isSyncedMessage: jest.fn().mockReturnValue(false),
   getMessageExtra: jest.fn().mockReturnValue({}),
   getMailHeaders: jest.fn().mockReturnValue([]),
-  isHulyMessage: jest.fn().mockReturnValue(false)
+  isTeronMessage: jest.fn().mockReturnValue(false)
 }))
 
 jest.mock('googleapis', () => ({

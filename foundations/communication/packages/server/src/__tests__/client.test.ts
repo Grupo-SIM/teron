@@ -12,7 +12,7 @@
 // limitations under the License.
 
 import { MeasureContext, WorkspaceUuid, PersonUuid, Account } from '@hcengineering/core'
-import { HulylakeWorkspaceClient, getWorkspaceClient } from '@hcengineering/hulylake-client'
+import { TeronlakeWorkspaceClient, getWorkspaceClient } from '@hcengineering/teronlake-client'
 import { getClient as getAccountClient } from '@hcengineering/account-client'
 import { loadMessages } from '@hcengineering/communication-shared'
 import {
@@ -30,7 +30,7 @@ import { Blob } from '../blob'
 import { Metadata } from '../types'
 
 // Mock dependencies
-jest.mock('@hcengineering/hulylake-client')
+jest.mock('@hcengineering/teronlake-client')
 jest.mock('@hcengineering/account-client')
 jest.mock('@hcengineering/communication-shared')
 jest.mock('@hcengineering/server-token', () => ({
@@ -42,7 +42,7 @@ describe('LowLevelClient', () => {
   let mockDbAdapter: jest.Mocked<DbAdapter>
   let mockBlob: jest.Mocked<Blob>
   let mockMetadata: Metadata
-  let mockLakeClient: jest.Mocked<HulylakeWorkspaceClient>
+  let mockLakeClient: jest.Mocked<TeronlakeWorkspaceClient>
   let mockAccountClient: any
   let mockCtx: jest.Mocked<MeasureContext>
   let mockAccount: Account
@@ -70,12 +70,12 @@ describe('LowLevelClient', () => {
     // Mock Metadata
     mockMetadata = {
       accountsUrl: 'http://accounts-url',
-      hulylakeUrl: 'http://hulylake-url',
+      teronlakeUrl: 'http://teronlake-url',
       secret: 'test-secret',
       messagesPerBlob: 100
     }
 
-    // Mock HulylakeWorkspaceClient
+    // Mock TeronlakeWorkspaceClient
     mockLakeClient = {
       find: jest.fn(),
       update: jest.fn()
@@ -114,7 +114,7 @@ describe('LowLevelClient', () => {
     it('should initialize LowLevelClient with correct parameters', () => {
       expect(client.db).toBe(mockDbAdapter)
       expect(client.blob).toBe(mockBlob)
-      expect(getWorkspaceClient).toHaveBeenCalledWith(mockMetadata.hulylakeUrl, workspace, 'mock-token')
+      expect(getWorkspaceClient).toHaveBeenCalledWith(mockMetadata.teronlakeUrl, workspace, 'mock-token')
     })
   })
 

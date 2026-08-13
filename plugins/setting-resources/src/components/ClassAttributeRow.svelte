@@ -49,21 +49,21 @@
   }
 </script>
 
-<button class="hulyTableAttr-content__row w-full" class:hovered class:selected on:contextmenu on:click>
-  <button class="hulyTableAttr-content__row-dragMenu">
+<button class="teronTableAttr-content__row w-full" class:hovered class:selected on:contextmenu on:click>
+  <button class="teronTableAttr-content__row-dragMenu">
     <IconMoreV2 size={'small'} />
   </button>
   {#if attribute.automationOnly === true}
-    <div class="hulyTableAttr-content__row-icon" use:tooltip={{ label: view.string.AutomationOnly }}>
+    <div class="teronTableAttr-content__row-icon" use:tooltip={{ label: view.string.AutomationOnly }}>
       <Icon icon={view.icon.Setting} size={'small'} />
     </div>
   {/if}
   {#if attribute.icon !== undefined && attribute.icon !== null}
-    <div class="hulyTableAttr-content__row-icon">
+    <div class="teronTableAttr-content__row-icon">
       <Icon icon={attribute.icon} size={'small'} />
     </div>
   {/if}
-  <div class="hulyTableAttr-content__row-label font-regular-14 grow" class:accent={!attribute.hidden}>
+  <div class="teronTableAttr-content__row-label font-regular-14 grow" class:accent={!attribute.hidden}>
     <Label label={attribute.label} />
     {#if attribute.required === true}
       <span class="required-marker font-medium-12" use:tooltip={{ label: setting.string.Required }}>*</span>
@@ -72,7 +72,7 @@
   {#if attributeMapper}
     <svelte:component this={attributeMapper.component} {...attributeMapper.props} {attribute} />
   {/if}
-  <div class="hulyTableAttr-content__row-type font-medium-12">
+  <div class="teronTableAttr-content__row-type font-medium-12">
     <Label label={attribute.type.label} />
     {#if attributeType !== undefined}
       : <Label label={attributeType} />
@@ -91,13 +91,13 @@
       {/if}
     {/if}
   </div>
-  <div class="hulyTableAttr-content__row-arrow">
+  <div class="teronTableAttr-content__row-arrow">
     <IconOpenedArrow size={'small'} />
   </div>
 </button>
 
 <style lang="scss">
-  .hulyTableAttr-content__row-label {
+  .teronTableAttr-content__row-label {
     display: flex;
     align-items: center;
     min-width: 0;

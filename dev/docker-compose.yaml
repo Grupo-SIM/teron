@@ -2,10 +2,10 @@ services:
   stream:
     image: 'hardcoreeng/stream'
     extra_hosts:
-      - 'huly.local:host-gateway'
+      - 'teron.local:host-gateway'
     container_name: stream
     environment:
-      - STREAM_ENDPOINT_URL=datalake://huly.local:4030
+      - STREAM_ENDPOINT_URL=datalake://teron.local:4030
       - STREAM_INSECURE=true
       - STREAM_SERVER_SECRET=secret
       - STREAM_MAX_PARALLEL_SCALING_COUNT=6
@@ -20,10 +20,10 @@ services:
   media:
     image: 'hardcoreeng/media'
     extra_hosts:
-      - 'huly.local:host-gateway'
+      - 'teron.local:host-gateway'
     container_name: media
     environment:
-      - ACCOUNTS_URL=http://huly.local:3000
+      - ACCOUNTS_URL=http://teron.local:3000
       - SECRET=secret
       - REGION=cockroach
       - QUEUE_CONFIG=${QUEUE_CONFIG}
@@ -31,7 +31,7 @@ services:
   preview:
     image: 'hardcoreeng/preview'
     extra_hosts:
-      - 'huly.local:host-gateway'
+      - 'teron.local:host-gateway'
     container_name: preview
     environment:
       - SECRET=secret
@@ -43,7 +43,7 @@ services:
   link-preview:
     image: 'hardcoreeng/link-preview'
     extra_hosts:
-      - 'huly.local:host-gateway'
+      - 'teron.local:host-gateway'
     container_name: link-preview
     environment:
       - SECRET=secret
@@ -54,7 +54,7 @@ services:
   cockroach:
     image: cockroachdb/cockroach:latest-v24.3
     extra_hosts:
-      - 'huly.local:host-gateway'
+      - 'teron.local:host-gateway'
     ports:
       - '26257:26257'
       - '8089:8080'
@@ -65,7 +65,7 @@ services:
   redpanda:
     image: docker.redpanda.com/redpandadata/redpanda:v24.3.6
     extra_hosts:
-      - 'huly.local:host-gateway'
+      - 'teron.local:host-gateway'
     command:
       - redpanda
       - start
@@ -97,7 +97,7 @@ services:
   redpanda_console:
     image: docker.redpanda.com/redpandadata/console:v2.8.3
     extra_hosts:
-      - 'huly.local:host-gateway'
+      - 'teron.local:host-gateway'
     entrypoint: /bin/sh
     command: -c 'echo "$$CONSOLE_CONFIG_FILE" > /tmp/config.yml; /app/console'
     environment:
@@ -121,7 +121,7 @@ services:
     image: 'minio/minio'
     command: server /data --address ":9000" --console-address ":9001"
     extra_hosts:
-      - 'huly.local:host-gateway'
+      - 'teron.local:host-gateway'
     expose:
       - 9000
       - 9001
@@ -140,7 +140,7 @@ services:
     expose:
       - 9200
     extra_hosts:
-      - 'huly.local:host-gateway'
+      - 'teron.local:host-gateway'
     volumes:
       - elastic:/usr/share/elasticsearch/data
     ports:
@@ -168,7 +168,7 @@ services:
   account:
     image: hardcoreeng/account
     extra_hosts:
-      - 'huly.local:host-gateway'
+      - 'teron.local:host-gateway'
     links:
       - stats
     ports:
@@ -180,29 +180,29 @@ services:
       - QUEUE_CONFIG=${QUEUE_CONFIG}
       - SERVER_SECRET=secret
       - ADMIN_EMAILS=admin,${PLATFORM_ADMIN_EMAILS}
-      - STATS_URL=http://huly.local:4900
+      - STATS_URL=http://teron.local:4900
       - WORKSPACE_LIMIT_PER_USER=10000
       - DB_URL=${DB_CR_URL}
       # - DB_NS=account-2
       # Pass only one region to disallow selection for new workspaces.
       - REGION_INFO=cockroach|CockroachDB
-      - TRANSACTOR_URL=ws://huly.local:3332;;cockroach,
+      - TRANSACTOR_URL=ws://teron.local:3332;;cockroach,
       - MAIL_URL=
       - STORAGE_CONFIG=${STORAGE_CONFIG}
-      - FRONT_URL=http://huly.local:8087
+      - FRONT_URL=http://teron.local:8087
       - LAST_NAME_FIRST=true
       # - WS_LIVENESS_DAYS=1
-      - ACCOUNTS_URL=http://huly.local:3000
+      - ACCOUNTS_URL=http://teron.local:3000
       - BRANDING_PATH=/var/cfg/branding.json
       # - DISABLE_SIGNUP=true
       - OTEL_EXPORTER_OTLP_ENDPOINT=http://jaeger:4318/v1/traces
-      - MAILBOX_DOMAINS=huly.dev.local
+      - MAILBOX_DOMAINS=teron.dev.local
       - MAILBOX_MAX_COUNT_PER_ACCOUNT=2
     restart: unless-stopped
   stats:
     image: hardcoreeng/stats
     extra_hosts:
-      - 'huly.local:host-gateway'
+      - 'teron.local:host-gateway'
     ports:
       - 4900:4900
     environment:
@@ -213,7 +213,7 @@ services:
   workspace_cockroach:
     image: hardcoreeng/workspace
     extra_hosts:
-      - 'huly.local:host-gateway'
+      - 'teron.local:host-gateway'
     links:
       - cockroach
       - minio
@@ -229,9 +229,9 @@ services:
       - SERVER_SECRET=secret
       - QUEUE_CONFIG=${QUEUE_CONFIG}
       - DB_URL=${DB_CR_URL}
-      - STATS_URL=http://huly.local:4900
+      - STATS_URL=http://teron.local:4900
       - STORAGE_CONFIG=${STORAGE_CONFIG}
-      - ACCOUNTS_URL=http://huly.local:3000
+      - ACCOUNTS_URL=http://teron.local:3000
       - ACCOUNTS_DB_URL=${DB_CR_URL}
       - BRANDING_PATH=/var/cfg/branding.json
       - BACKUP_STORAGE=${BACKUP_STORAGE_CONFIG}
@@ -243,7 +243,7 @@ services:
   collaborator:
     image: hardcoreeng/collaborator
     extra_hosts:
-      - 'huly.local:host-gateway'
+      - 'teron.local:host-gateway'
     links:
       - minio
       - transactor_cockroach
@@ -253,15 +253,15 @@ services:
     environment:
       - COLLABORATOR_PORT=3078
       - SECRET=secret
-      - ACCOUNTS_URL=http://huly.local:3000
+      - ACCOUNTS_URL=http://teron.local:3000
       - STORAGE_CONFIG=${STORAGE_CONFIG}
-      - STATS_URL=http://huly.local:4900
+      - STATS_URL=http://teron.local:4900
       - OTEL_EXPORTER_OTLP_ENDPOINT=http://jaeger:4318/v1/traces
     restart: unless-stopped
   front:
     image: hardcoreeng/front
     extra_hosts:
-      - 'huly.local:host-gateway'
+      - 'teron.local:host-gateway'
     links:
       - stats
     ports:
@@ -270,43 +270,43 @@ services:
     environment:
       - SERVER_PORT=8080
       - SERVER_SECRET=secret
-      - ACCOUNTS_URL=http://huly.local:3000
-      - STATS_URL=http://huly.local:4900
-      - FILES_URL=http://huly.local:4030/blob/:workspace/:blobId/:filename
+      - ACCOUNTS_URL=http://teron.local:3000
+      - STATS_URL=http://teron.local:4900
+      - FILES_URL=http://teron.local:4030/blob/:workspace/:blobId/:filename
       - UPLOAD_URL=/files
-      - PREVIEW_URL=http://huly.local:4040
-      - GMAIL_URL=http://huly.local:8093
-      - CALENDAR_URL=http://huly.local:8095
-      - TELEGRAM_URL=http://huly.local:8086
-      - REKONI_URL=http://huly.local:4004
-      - COLLABORATOR_URL=ws://huly.local:3078
+      - PREVIEW_URL=http://teron.local:4040
+      - GMAIL_URL=http://teron.local:8093
+      - CALENDAR_URL=http://teron.local:8095
+      - TELEGRAM_URL=http://teron.local:8086
+      - REKONI_URL=http://teron.local:4004
+      - COLLABORATOR_URL=ws://teron.local:3078
       - STORAGE_CONFIG=${STORAGE_CONFIG}
-      - GITHUB_URL=http://huly.local:3500
-      - PRINT_URL=http://huly.local:4005
-      - SIGN_URL=http://huly.local:4006
-      #      - ANALYTICS_COLLECTOR_URL=http://huly.local:4017
-      - DESKTOP_UPDATES_URL=https://dist.huly.io
+      - GITHUB_URL=http://teron.local:3500
+      - PRINT_URL=http://teron.local:4005
+      - SIGN_URL=http://teron.local:4006
+      #      - ANALYTICS_COLLECTOR_URL=http://teron.local:4017
+      - DESKTOP_UPDATES_URL=https://dist.teron.io
       - DESKTOP_UPDATES_CHANNEL=dev
       - DESKTOP_UPDATES_CHANNELS=dev;tracex:dev-tracex
-      - BRANDING_URL=http://huly.local:8087/branding.json
-      - STREAM_URL=http://huly.local:1080/recording
-      - PAYMENT_URL=http://huly.local:3040
+      - BRANDING_URL=http://teron.local:8087/branding.json
+      - STREAM_URL=http://teron.local:1080/recording
+      - PAYMENT_URL=http://teron.local:3040
       - COMMUNICATION_API_ENABLED=true
-      - BACKUP_URL=http://huly.local:4039/api/backup,
+      - BACKUP_URL=http://teron.local:4039/api/backup,
       - EXCLUDED_APPLICATIONS_FOR_ANONYMOUS=[]
       - DISABLED_FEATURES=auto-translate,mailboxes
       # - DISABLE_SIGNUP=true
       - OTEL_EXPORTER_OTLP_ENDPOINT=http://jaeger:4318/v1/traces
-      - PULSE_URL=ws://huly.local:8099/ws
-      - DATALAKE_URL=http://huly.local:4030
-      - HULYLAKE_URL=http://huly.local:8096
-      - EXPORT_URL=http://huly.local:4009
-      - LINK_PREVIEW_URL=http://huly.local:4041
+      - PULSE_URL=ws://teron.local:8099/ws
+      - DATALAKE_URL=http://teron.local:4030
+      - TERONLAKE_URL=http://teron.local:8096
+      - EXPORT_URL=http://teron.local:4009
+      - LINK_PREVIEW_URL=http://teron.local:4041
     restart: unless-stopped
   transactor_cockroach:
     image: hardcoreeng/transactor
     extra_hosts:
-      - 'huly.local:host-gateway'
+      - 'teron.local:host-gateway'
     links:
       - cockroach
       - minio
@@ -325,40 +325,40 @@ services:
       - REGION=cockroach
       - SERVER_SECRET=secret
       - ENABLE_COMPRESSION=true
-      - FULLTEXT_URL=http://huly.local:4702
-      - STATS_URL=http://huly.local:4900
+      - FULLTEXT_URL=http://teron.local:4702
+      - STATS_URL=http://teron.local:4900
       - DB_URL=${DB_CR_URL}
       - METRICS_CONSOLE=false
       - METRICS_FILE=metrics.txt
       - STORAGE_CONFIG=${STORAGE_CONFIG}
-      - FRONT_URL=http://huly.local:8087
+      - FRONT_URL=http://teron.local:8087
       - MAIL_URL=''
-      - ACCOUNTS_URL=http://huly.local:3000
+      - ACCOUNTS_URL=http://teron.local:3000
       - LAST_NAME_FIRST=true
       - BRANDING_PATH=/var/cfg/branding.json
-      - AI_BOT_URL=http://huly.local:4010
+      - AI_BOT_URL=http://teron.local:4010
       - COMMUNICATION_TIME_LOGGING_ENABLED=true
       - RATE_LIMIT_MAX=250 # 250 requests per 30 seconds
       - RATE_LIMIT_WINDOW=30000
-      - FILES_URL=http://huly.local:4030/blob/:workspace/:blobId/:filename
+      - FILES_URL=http://teron.local:4030/blob/:workspace/:blobId/:filename
       - COMMUNICATION_API_ENABLED=true
       - OTEL_EXPORTER_OTLP_ENDPOINT=http://jaeger:4318/v1/traces
-      - HYLYLAKE_URL=http://huly.local:8096
+      - HYLYLAKE_URL=http://teron.local:8096
     restart: unless-stopped
   rekoni:
     image: hardcoreeng/rekoni-service
     extra_hosts:
-      - 'huly.local:host-gateway'
+      - 'teron.local:host-gateway'
     restart: unless-stopped
     ports:
       - 4004:4004
     environment:
-      - STATS_URL=http://huly.local:4901
+      - STATS_URL=http://teron.local:4901
       - OTEL_EXPORTER_OTLP_ENDPOINT=http://jaeger:4318/v1/traces
   fulltext_cockroach:
     image: hardcoreeng/fulltext
     extra_hosts:
-      - 'huly.local:host-gateway'
+      - 'teron.local:host-gateway'
     depends_on:
       elastic:
         condition: service_healthy
@@ -375,19 +375,19 @@ services:
       - SERVER_SECRET=secret
       - QUEUE_CONFIG=${QUEUE_CONFIG}
       - DB_URL=${DB_CR_URL}
-      - FULLTEXT_DB_URL=http://huly.local:9200
+      - FULLTEXT_DB_URL=http://teron.local:9200
       - ELASTIC_INDEX_NAME=local_storage_index # Same index for simplicity
       - STORAGE_CONFIG=${STORAGE_CONFIG}
-      - STATS_URL=http://huly.local:4900
-      - REKONI_URL=http://huly.local:4004
-      - ACCOUNTS_URL=http://huly.local:3000
+      - STATS_URL=http://teron.local:4900
+      - REKONI_URL=http://teron.local:4004
+      - ACCOUNTS_URL=http://teron.local:3000
       - OTEL_EXPORTER_OTLP_ENDPOINT=http://jaeger:4318/v1/traces
-      - HULYLAKE_URL=http://huly.local:8096
+      - TERONLAKE_URL=http://teron.local:8096
       - COMMUNICATION_API_ENABLED=true
   print:
     image: hardcoreeng/print
     extra_hosts:
-      - 'huly.local:host-gateway'
+      - 'teron.local:host-gateway'
     restart: unless-stopped
     ports:
       - 4005:4005
@@ -396,14 +396,14 @@ services:
       - REGION=cockroach
       - QUEUE_CONFIG=${QUEUE_CONFIG}
       - STORAGE_CONFIG=${STORAGE_CONFIG}
-      - STATS_URL=http://huly.local:4900
-      - ACCOUNTS_URL=http://huly.local:3000
+      - STATS_URL=http://teron.local:4900
+      - ACCOUNTS_URL=http://teron.local:3000
       - OTEL_EXPORTER_OTLP_ENDPOINT=http://jaeger:4318/v1/traces
-      - FRONT_URL=http://huly.local:8087
+      - FRONT_URL=http://teron.local:8087
   sign:
     image: hardcoreeng/sign
     extra_hosts:
-      - 'huly.local:host-gateway'
+      - 'teron.local:host-gateway'
     restart: unless-stopped
     ports:
       - 4006:4006
@@ -416,37 +416,37 @@ services:
       - REGION=cockroach
       - QUEUE_CONFIG=${QUEUE_CONFIG}
       - STORAGE_CONFIG=${STORAGE_CONFIG}
-      - ACCOUNTS_URL=http://huly.local:3000
+      - ACCOUNTS_URL=http://teron.local:3000
       - CERTIFICATE_PATH=/var/cfg/certificate.p12
       - SERVICE_ID=sign-service
       - BRANDING_PATH=/var/cfg/branding.json
-      - STATS_URL=http://huly.local:4900
+      - STATS_URL=http://teron.local:4900
       - OTEL_EXPORTER_OTLP_ENDPOINT=http://jaeger:4318/v1/traces
   # aiBot:
   #   image: hardcoreeng/ai-bot
   #   ports:
   #     - 4010:4010
   #   extra_hosts:
-  #     - 'huly.local:host-gateway'
+  #     - 'teron.local:host-gateway'
   #   restart: unless-stopped
   #   environment:
   #     - SERVER_SECRET=secret
   #     - DB_URL=${DB_CR_URL}
   #     - QUEUE_CONFIG=${QUEUE_CONFIG}
-  #     - ACCOUNTS_URL=http://huly.local:3000
+  #     - ACCOUNTS_URL=http://teron.local:3000
   #     - STORAGE_CONFIG=${STORAGE_CONFIG}
   #     - FIRST_NAME=Jolie
   #     - LAST_NAME=AI
   #     - PASSWORD=password
   #     - AVATAR_PATH=./avatar.png
   #     - AVATAR_CONTENT_TYPE=.png
-  #     - STATS_URL=http://huly.local:4900
-  # #      - LOVE_ENDPOINT=http://huly.local:8096
+  #     - STATS_URL=http://teron.local:4900
+  # #      - LOVE_ENDPOINT=http://teron.local:8096
   # #      - OPENAI_API_KEY=token
   analytics:
     image: hardcoreeng/analytics-collector
     extra_hosts:
-      - 'huly.local:host-gateway'
+      - 'teron.local:host-gateway'
     restart: unless-stopped
     ports:
       - 4017:4017
@@ -454,8 +454,8 @@ services:
       - SECRET=secret
       - PORT=4017
       - SERVICE_ID=analytics-collector-service
-      - ACCOUNTS_URL=http://huly.local:3000
-      - STATS_URL=http://huly.local:4900
+      - ACCOUNTS_URL=http://teron.local:3000
+      - STATS_URL=http://teron.local:4900
       - OTEL_EXPORTER_OTLP_ENDPOINT=http://jaeger:4318/v1/traces
       # - POSTHOG_HOST=${POSTHOG_HOST}
       # - POSTHOG_API_KEY=${POSTHOG_API_KEY}
@@ -463,7 +463,7 @@ services:
   export:
     image: hardcoreeng/export
     extra_hosts:
-      - 'huly.local:host-gateway'
+      - 'teron.local:host-gateway'
     links:
       - minio
       - stats
@@ -474,15 +474,15 @@ services:
       - SECRET=secret
       - SERVICE_ID=export-service
       - DB_URL=${DB_CR_URL}
-      - STATS_URL=http://huly.local:4900
+      - STATS_URL=http://teron.local:4900
       - STORAGE_CONFIG=${STORAGE_CONFIG}
-      - ACCOUNTS_URL=http://huly.local:3000
+      - ACCOUNTS_URL=http://teron.local:3000
       - OTEL_EXPORTER_OTLP_ENDPOINT=http://jaeger:4318/v1/traces
     restart: unless-stopped
   datalake:
     image: hardcoreeng/datalake
     extra_hosts:
-      - 'huly.local:host-gateway'
+      - 'teron.local:host-gateway'
     depends_on:
       minio:
         condition: service_healthy
@@ -497,18 +497,18 @@ services:
     environment:
       - PORT=4030
       - SECRET=secret
-      - ACCOUNTS_URL=http://huly.local:3000
-      - STATS_URL=http://huly.local:4900
+      - ACCOUNTS_URL=http://teron.local:3000
+      - STATS_URL=http://teron.local:4900
       - DB_URL=${DB_CR_URL}
       - BUCKETS=blobs,eu|http://minio:9000?accessKey=minioadmin&secretKey=minioadmin
       - REGION=cockroach
       - QUEUE_CONFIG=${QUEUE_CONFIG}
       - OTEL_EXPORTER_OTLP_ENDPOINT=http://jaeger:4318/v1/traces
     restart: unless-stopped
-  hulylake:
-    image: hardcoreeng/hulylake
+  teronlake:
+    image: hardcoreeng/teronlake
     extra_hosts:
-      - 'huly.local:host-gateway'
+      - 'teron.local:host-gateway'
     depends_on:
       minio:
         condition: service_healthy
@@ -517,57 +517,57 @@ services:
     ports:
       - 8096:8096
     environment:
-      - HULY_TOKEN_SECRET=secret
-      - HULY_DB_CONNECTION=${DB_CR_URL}
+      - TERON_TOKEN_SECRET=secret
+      - TERON_DB_CONNECTION=${DB_CR_URL}
       - AWS_ENDPOINT_URL=http://minio:9000
       - AWS_REGION=local
       - AWS_ACCESS_KEY_ID=minioadmin
       - AWS_SECRET_ACCESS_KEY=minioadmin
     restart: unless-stopped
-  hulykvs:
-    image: hardcoreeng/hulykvs
+  teronkvs:
+    image: hardcoreeng/teronkvs
     depends_on:
       cockroach:
         condition: service_started
     extra_hosts:
-      - 'huly.local:host-gateway'
+      - 'teron.local:host-gateway'
     ports:
       - 8094:8094
     environment:
-      - HULY_DB_CONNECTION=${DB_CR_URL}
-      - HULY_TOKEN_SECRET=secret
+      - TERON_DB_CONNECTION=${DB_CR_URL}
+      - TERON_TOKEN_SECRET=secret
     restart: unless-stopped
-  hulygun:
-    image: hardcoreeng/hulygun
+  terongun:
+    image: hardcoreeng/terongun
     depends_on:
       redpanda:
         condition: service_started
       account:
         condition: service_started
     extra_hosts:
-      - 'huly.local:host-gateway'
+      - 'teron.local:host-gateway'
     environment:
-      - HULY_LOG=debug
-      - HULY_KAFKA_BOOTSTRAP=redpanda:9092
-      - HULY_TOKEN_SECRET=secret
-      - HULY_ACCOUNT_SERVICE=http://huly.local:3000
+      - TERON_LOG=debug
+      - TERON_KAFKA_BOOTSTRAP=redpanda:9092
+      - TERON_TOKEN_SECRET=secret
+      - TERON_ACCOUNT_SERVICE=http://teron.local:3000
     restart: unless-stopped
-  hulypulse:
-    image: hardcoreeng/hulypulse
+  teronpulse:
+    image: hardcoreeng/teronpulse
     depends_on:
       redis:
         condition: service_started
     ports:
       - 8099:8099
     environment:
-      - HULY_REDIS_URLS=redis://redis:6379
-      - HULY_BIND_PORT=8099
+      - TERON_REDIS_URLS=redis://redis:6379
+      - TERON_BIND_PORT=8099
     restart: unless-stopped
 
   process-service:
     image: hardcoreeng/process
     extra_hosts:
-      - 'huly.local:host-gateway'
+      - 'teron.local:host-gateway'
     depends_on:
       redpanda:
         condition: service_started
@@ -575,14 +575,14 @@ services:
         condition: service_started
     environment:
       - SECRET=secret
-      - ACCOUNTS_URL=http://huly.local:3000
+      - ACCOUNTS_URL=http://teron.local:3000
       - QUEUE_CONFIG=${QUEUE_CONFIG}
       - QUEUE_REGION=cockroach
     restart: unless-stopped
   time-machine:
     image: hardcoreeng/worker
     extra_hosts:
-      - 'huly.local:host-gateway'
+      - 'teron.local:host-gateway'
     depends_on:
       redpanda:
         condition: service_started
@@ -598,7 +598,7 @@ services:
   #  translate:
   #    image: hardcoreeng/translate
   #    extra_hosts:
-  #      - 'huly.local:host-gateway'
+  #      - 'teron.local:host-gateway'
   #    depends_on:
   #      redpanda:
   #        condition: service_started
@@ -606,8 +606,8 @@ services:
   #        condition: service_started
   #    environment:
   #      - SECRET=secret
-  #      - ACCOUNTS_URL=http://huly.local:3000
-  #      - HULYLAKE_URL=http://huly.local:8096
+  #      - ACCOUNTS_URL=http://teron.local:3000
+  #      - TERONLAKE_URL=http://teron.local:8096
   #      - QUEUE_CONFIG=${QUEUE_CONFIG}
   #      - QUEUE_REGION=cockroach
   #      - OPENAI_API_KEY=
@@ -615,7 +615,7 @@ services:
   backup-cockroach:
     image: hardcoreeng/backup
     extra_hosts:
-      - 'huly.local:host-gateway'
+      - 'teron.local:host-gateway'
     depends_on:
       minio:
         condition: service_healthy
@@ -627,9 +627,9 @@ services:
         condition: service_started
     environment:
       - SECRET=secret
-      - ACCOUNTS_URL=http://huly.local:3000
+      - ACCOUNTS_URL=http://teron.local:3000
       - ACCOUNTS_DB_URL=${DB_CR_URL}
-      - STATS_URL=http://huly.local:4900
+      - STATS_URL=http://teron.local:4900
       - DB_URL=${DB_CR_URL}
       - REGION=cockroach
       - BUCKET_NAME=backups
@@ -643,7 +643,7 @@ services:
   backup-api:
     image: hardcoreeng/backup-api
     extra_hosts:
-      - 'huly.local:host-gateway'
+      - 'teron.local:host-gateway'
     depends_on:
       minio:
         condition: service_healthy
@@ -656,8 +656,8 @@ services:
     environment:
       - PORT=4039
       - SECRET=secret
-      - ACCOUNTS_URL=http://huly.local:3000
-      - STATS_URL=http://huly.local:4900
+      - ACCOUNTS_URL=http://teron.local:3000
+      - STATS_URL=http://teron.local:4900
       - BUCKET_NAME=backups
       - STORAGE=minio|minio?accessKey=minioadmin&secretKey=minioadmin
       - OTEL_EXPORTER_OTLP_ENDPOINT=http://jaeger:4318/v1/traces
@@ -666,7 +666,7 @@ services:
   rating_cockroach:
     image: hardcoreeng/rating
     extra_hosts:
-      - 'huly.local:host-gateway'
+      - 'teron.local:host-gateway'
     links:
       - cockroach
       - minio
@@ -679,19 +679,19 @@ services:
       - QUEUE_CONFIG=${QUEUE_CONFIG}
       - REGION=cockroach
       - SERVER_SECRET=secret
-      - STATS_URL=http://huly.local:4900
+      - STATS_URL=http://teron.local:4900
       - DB_URL=${DB_CR_URL}
       - STORAGE_CONFIG=${STORAGE_CONFIG}
-      - ACCOUNTS_URL=http://huly.local:3000
+      - ACCOUNTS_URL=http://teron.local:3000
       - COMMUNICATION_TIME_LOGGING_ENABLED=true
       - COMMUNICATION_API_ENABLED=true
       - OTEL_EXPORTER_OTLP_ENDPOINT=http://jaeger:4318/v1/traces
-      - HYLYLAKE_URL=http://huly.local:8096
+      - HYLYLAKE_URL=http://teron.local:8096
     restart: unless-stopped
   jaeger:
     image: jaegertracing/all-in-one:latest
     extra_hosts:
-      - 'huly.local:host-gateway'
+      - 'teron.local:host-gateway'
     ports:
       - 16686:16686 # Web UI
       - 4317:4317

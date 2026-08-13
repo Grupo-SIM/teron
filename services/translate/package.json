@@ -63,7 +63,7 @@
     "@hcengineering/communication-types": "workspace:^0.7.426",
     "@hcengineering/contact": "workspace:^0.7.426",
     "@hcengineering/core": "workspace:^0.7.426",
-    "@hcengineering/hulylake-client": "workspace:^0.7.426",
+    "@hcengineering/teronlake-client": "workspace:^0.7.426",
     "@hcengineering/kafka": "workspace:^0.7.426",
     "@hcengineering/platform": "workspace:^0.7.426",
     "@hcengineering/retry": "workspace:^0.7.426",

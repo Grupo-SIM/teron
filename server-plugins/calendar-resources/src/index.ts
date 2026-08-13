@@ -138,7 +138,7 @@ async function createCalendar (control: TriggerControl, account: AccountUuid, so
     calendar.class.Calendar,
     calendar.space.Calendar,
     {
-      name: 'HULY',
+      name: 'TERON',
       hidden: false,
       visibility: 'public',
       user: socialId,

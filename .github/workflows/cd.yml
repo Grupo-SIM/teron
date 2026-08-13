@@ -207,8 +207,8 @@ jobs:
             context: pods/fulltext
           - image: gmail
             context: services/gmail/pod-gmail
-          - image: hulypulse
-            context: foundations/hulypulse
+          - image: teronpulse
+            context: foundations/teronpulse
           - image: love
             context: services/love
           - image: mail

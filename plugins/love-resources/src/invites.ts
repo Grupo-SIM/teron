@@ -16,7 +16,7 @@
 import { AccountRole, getCurrentAccount, type Ref } from '@hcengineering/core'
 import { getCurrentEmployee, type Person } from '@hcengineering/contact'
 import { type PopupResult, showPopup } from '@hcengineering/ui'
-import { type UnsubscribeCallback } from '@hcengineering/hulypulse-client'
+import { type UnsubscribeCallback } from '@hcengineering/teronpulse-client'
 import presentation, { createPulseClient } from '@hcengineering/presentation'
 import { getMetadata } from '@hcengineering/platform'
 import { get } from 'svelte/store'

@@ -1,5 +1,5 @@
 /**
- * Grid de cards da seção "Plataforma", com o mesmo arranjo do huly.io:
+ * Grid de cards da seção "Plataforma", com o mesmo arranjo do teron.io:
  * duas colunas de cards que quebram em linhas — tarefas/planner em cima,
  * anotações/tempo real embaixo, calendário/chat/projetos à direita.
  */

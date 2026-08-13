@@ -361,8 +361,8 @@ export async function createServer (ctx: MeasureContext, config: Config): Promis
   })
 
   app.get('/', (req, res) => {
-    res.send(`Huly&reg; Backup&trade; <a href="https://huly.io">https://huly.io</a>
-      &copy; 2024 <a href="https://hulylabs.com">Huly Labs</a>`)
+    res.send(`Teron&reg; Backup&trade; <a href="https://teron.io">https://teron.io</a>
+      &copy; 2024 <a href="https://teronlabs.com">Teron Labs</a>`)
   })
 
   const sendErrorToAnalytics = (err: any): boolean => {
@@ -422,8 +422,8 @@ export async function createServer (ctx: MeasureContext, config: Config): Promis
 
   app.get('/', (_req, res) => {
     res.send(`
-      Huly® Datalake™ <a href="https://huly.io">https://huly.io</a>
-      © 2025 <a href="https://hulylabs.com">Huly Labs</a>
+      Teron® Datalake™ <a href="https://teron.io">https://teron.io</a>
+      © 2025 <a href="https://teronlabs.com">Teron Labs</a>
     `)
   })
 

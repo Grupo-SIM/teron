@@ -6,7 +6,7 @@ import { AuthProviders } from "./auth-providers";
 import "./auth.css";
 
 /*
- * Moldura das telas de acesso, copiada de huly.io/login e huly.io/signup: um
+ * Moldura das telas de acesso, copiada de teron.io/login e teron.io/signup: um
  * card escuro sozinho no meio da tela, com o link de volta no canto e os
  * documentos legais no rodapé.
  *

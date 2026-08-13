@@ -114,7 +114,7 @@ export class IssuesPage extends CommonTrackerPage {
   assignedTab = (): Locator => this.page.locator('[data-id="tab-assigned"]')
   createdTab = (): Locator => this.page.locator('[data-id="tab-created"]')
   subscribedTab = (): Locator => this.page.locator('[data-id="tab-subscribed"]')
-  issueListPanel = (): Locator => this.page.locator('.hulyComponent')
+  issueListPanel = (): Locator => this.page.locator('.teronComponent')
   notTrackButton = (): Locator =>
     this.page
       .locator('span.labelOnPanel', { hasText: 'Collaborators' })

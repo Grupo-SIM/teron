@@ -1,4 +1,4 @@
-.hulyButton {
+.teronButton {
   display: inline-flex;
   justify-content: center;
   align-items: center;
@@ -267,15 +267,15 @@
 }
 
 // StatusBar Button
-.hulyStatusBarButton,
-.hulyStatusBarButton .hulyStatusBarButton-icons {
+.teronStatusBarButton,
+.teronStatusBarButton .teronStatusBarButton-icons {
   display: flex;
   align-items: center;
   flex-wrap: nowrap;
   min-width: 0;
   min-height: 0;
 }
-.hulyStatusBarButton {
+.teronStatusBarButton {
   overflow: hidden;
   gap: var(--spacing-1);
   padding: var(--spacing-0_25) var(--spacing-0_25) var(--spacing-0_25) var(--spacing-1);
@@ -802,8 +802,8 @@
   }
 }
 
-// Huly SplitButton
-.hulySplitButton-container {
+// Teron SplitButton
+.teronSplitButton-container {
   display: flex;
   align-items: stretch;
   flex-shrink: 0;
@@ -834,13 +834,13 @@
   button.pressed {
     z-index: 1;
   }
-  .hulySplitButton-main {
+  .teronSplitButton-main {
     display: flex;
     align-items: center;
     gap: var(--spacing-1);
     min-width: 0;
   }
-  .hulySplitButton-second {
+  .teronSplitButton-second {
     margin: 0;
     padding: 0;
 
@@ -854,26 +854,26 @@
   &.large {
     height: var(--global-large-Size);
 
-    .hulySplitButton-main {
+    .teronSplitButton-main {
       padding: 0 var(--spacing-1) 0 var(--spacing-2);
     }
-    .hulySplitButton-second {
+    .teronSplitButton-second {
       width: var(--global-small-Size);
     }
-    &.separate .hulySplitButton-main {
+    &.separate .teronSplitButton-main {
       padding: 0 var(--spacing-1_25) 0 var(--spacing-2);
     }
   }
   &.medium {
     height: var(--global-medium-Size);
 
-    .hulySplitButton-main {
+    .teronSplitButton-main {
       padding: 0 var(--spacing-0_75) 0 var(--spacing-1_5);
     }
-    .hulySplitButton-second {
+    .teronSplitButton-second {
       width: var(--global-small-Size);
     }
-    &.separate .hulySplitButton-main {
+    &.separate .teronSplitButton-main {
       padding: 0 var(--spacing-1_25) 0 var(--spacing-1_5);
     }
   }
@@ -909,13 +909,13 @@
       width: var(--spacing-2);
       height: var(--spacing-2);
     }
-    .hulySplitButton-main {
+    .teronSplitButton-main {
       padding: 0 var(--spacing-0_5) 0 var(--spacing-1);
     }
-    .hulySplitButton-second {
+    .teronSplitButton-second {
       width: var(--global-extra-small-Size);
     }
-    &.separate .hulySplitButton-main {
+    &.separate .teronSplitButton-main {
       padding: 0 var(--spacing-0_75) 0 var(--spacing-1);
     }
   }
@@ -935,10 +935,10 @@
       width: var(--spacing-1_5);
       height: var(--spacing-1_5);
     }
-    .hulySplitButton-main {
+    .teronSplitButton-main {
       padding: 0 var(--spacing-0_75);
     }
-    .hulySplitButton-second {
+    .teronSplitButton-second {
       width: var(--global-min-Size);
     }
   }
@@ -962,16 +962,16 @@
         height: var(--spacing-1_25);
       }
     }
-    .hulySplitButton-main {
+    .teronSplitButton-main {
       padding: 0 var(--spacing-0_5);
     }
-    .hulySplitButton-second {
+    .teronSplitButton-second {
       width: var(--global-min-Size);
     }
   }
-  &.small .hulySplitButton-main,
-  &.extra-small .hulySplitButton-main,
-  &.min .hulySplitButton-main {
+  &.small .teronSplitButton-main,
+  &.extra-small .teronSplitButton-main,
+  &.min .teronSplitButton-main {
     gap: var(--spacing-0_5);
   }
 
@@ -1063,7 +1063,7 @@
   }
 
   &.separate {
-    .hulySplitButton-second {
+    .teronSplitButton-second {
       position: relative;
 
       &::after {
@@ -1076,13 +1076,13 @@
         opacity: 0.2;
       }
     }
-    &.secondary .hulySplitButton-second::after {
+    &.secondary .teronSplitButton-second::after {
       background-color: var(--theme-caption-color);
     }
-    &.primary .hulySplitButton-second::after {
+    &.primary .teronSplitButton-second::after {
       background-color: var(--primary-button-color);
     }
-    &:not(.no-focus):focus-within .hulySplitButton-second::after {
+    &:not(.no-focus):focus-within .teronSplitButton-second::after {
       content: none;
     }
   }

@@ -352,7 +352,7 @@
         disabled={filteredChannels.length === 0 || isLoading}
         on:click={showActionsPopup}
       />
-      <div class="hulyHeader-divider" />
+      <div class="teronHeader-divider" />
       <div class="search-container">
         <FilterButton
           categories={filterCategories}
@@ -364,7 +364,7 @@
         />
         <SearchInput bind:value={searchQuery} collapsed />
       </div>
-      <div class="hulyHeader-divider" />
+      <div class="teronHeader-divider" />
     </div>
   </svelte:fragment>
   <div class="channels-config">

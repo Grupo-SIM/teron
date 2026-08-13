@@ -50,7 +50,7 @@
 </script>
 
 <div
-  class="hulySplitButton-container {kind} {size}"
+  class="teronSplitButton-container {kind} {size}"
   class:no-focus={noFocus}
   class:disabled
   class:separate
@@ -62,7 +62,7 @@
   {:else}
     <button
       use:tooltip={showTooltip}
-      class="hulySplitButton-main"
+      class="teronSplitButton-main"
       class:no-focus={noFocus}
       class:accent
       class:pressed
@@ -86,7 +86,7 @@
     </button>
     <button
       use:tooltip={secondShowTooltip}
-      class="hulySplitButton-second"
+      class="teronSplitButton-second"
       class:pressed={secondPressed}
       class:no-focus={noFocus}
       {disabled}

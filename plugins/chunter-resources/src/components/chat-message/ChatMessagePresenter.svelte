@@ -244,7 +244,7 @@
     {viewlet}
     {parentMessage}
     {person}
-    socialId={socialId?.type !== 'huly' ? socialId : undefined}
+    socialId={socialId?.type !== 'teron' ? socialId : undefined}
     {showNotify}
     {isHighlighted}
     {isSelected}

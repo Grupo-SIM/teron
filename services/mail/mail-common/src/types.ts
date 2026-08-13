@@ -90,9 +90,9 @@ export interface MailRecipients {
 
 export const COMMUNICATION_DOMAIN = 'communication' as OperationDomain
 
-export const HulyMailHeader = 'Huly-Sent'
-export const HulyMessageIdHeader = 'Huly-Message-Id'
-export const HulyMessageTypeHeader = 'Huly-Message-Type'
+export const TeronMailHeader = 'Teron-Sent'
+export const TeronMessageIdHeader = 'Teron-Message-Id'
+export const TeronMessageTypeHeader = 'Teron-Message-Type'
 
 export enum MailHeader {
   Id = 'Message-ID',
@@ -100,6 +100,6 @@ export enum MailHeader {
   Subject = 'Subject',
   From = 'From',
   To = 'To',
-  HulySent = 'Huly-Sent',
-  HulyMessageType = 'Huly-Message-Type'
+  TeronSent = 'Teron-Sent',
+  TeronMessageType = 'Teron-Message-Type'
 }

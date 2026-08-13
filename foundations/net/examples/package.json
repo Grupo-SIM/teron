@@ -1,7 +1,7 @@
 {
   "name": "@hcengineering/network-examples",
   "version": "0.7.10",
-  "description": "Examples for Huly Virtual Network",
+  "description": "Examples for Teron Virtual Network",
   "private": true,
   "main": "index.js",
   "scripts": {
@@ -14,7 +14,7 @@
     "run:ha": "ts-node ha-stateless-container-example.ts"
   },
   "keywords": [
-    "huly",
+    "teron",
     "network",
     "examples"
   ],

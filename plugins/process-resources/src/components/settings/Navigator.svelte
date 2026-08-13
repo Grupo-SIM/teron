@@ -32,7 +32,7 @@
 </script>
 
 {#if visibleSecondNav}
-  <div class="hulyComponent-content__column pt-4">
+  <div class="teronComponent-content__column pt-4">
     {#each states as state (state._id)}
       <div class="state">
         {state.title}

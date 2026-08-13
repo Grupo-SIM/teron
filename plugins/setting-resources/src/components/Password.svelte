@@ -101,7 +101,7 @@
   })
 </script>
 
-<div class="hulyComponent">
+<div class="teronComponent">
   <Header adaptive={'disabled'}>
     <Breadcrumb
       icon={setting.icon.Password}

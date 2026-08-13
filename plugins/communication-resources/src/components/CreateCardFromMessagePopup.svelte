@@ -121,12 +121,12 @@
   onCancel={() => dispatch('close')}
   on:close
 >
-  <div class="hulyModal-content__titleGroup" style="padding: 0">
+  <div class="teronModal-content__titleGroup" style="padding: 0">
     <ModernEditbox bind:value={title} label={getEmbeddedLabel('Title')} size="large" kind="ghost" />
   </div>
 
-  <div class="hulyModal-content__settingsSet">
-    <div class="hulyModal-content__settingsSet-line">
+  <div class="teronModal-content__settingsSet">
+    <div class="teronModal-content__settingsSet-line">
       <span class="label"><Label label={cardPlugin.string.MasterTag} /></span>
       <NestedDropdown
         items={classes}

@@ -88,7 +88,7 @@ const config: Config = (() => {
     WebhookSecret: process.env[envMap.WebhookSecret] ?? 'secret',
     EnterpriseHostname: process.env[envMap.EnterpriseHostname],
     Port: parseInt(process.env[envMap.Port] ?? '3500'),
-    BotName: process.env[envMap.BotName] ?? 'ao-huly-dev[bot]',
+    BotName: process.env[envMap.BotName] ?? 'ao-teron-dev[bot]',
 
     CollaboratorURL: process.env[envMap.CollaboratorURL],
 

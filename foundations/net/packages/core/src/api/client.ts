@@ -18,7 +18,7 @@ export interface RequestHandler {
 }
 
 /**
- * Interface to Huly network.
+ * Interface to Teron network.
  *
  * Identification is generated during instantions of client.
  *

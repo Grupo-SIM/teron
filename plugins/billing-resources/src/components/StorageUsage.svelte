@@ -255,7 +255,7 @@
 </script>
 
 <Scroller align={'center'} padding={'var(--spacing-3)'} bottomPadding={'var(--spacing-3)'}>
-  <div class="hulyComponent-content gapV-4 storage-usage">
+  <div class="teronComponent-content gapV-4 storage-usage">
     {#if !canManage}
       <div class="access-denied text-md">
         <Label label={plugin.string.StorageAccessDenied} />

@@ -99,7 +99,7 @@
     {/if}
   {/each}
 {:else if kind === 'content' && category === undefined}
-  <div class="hulyComponent" />
+  <div class="teronComponent" />
 {:else if category}
   <Component is={category.component} props={{ kind: 'content', ...category.props }} on:change />
 {/if}

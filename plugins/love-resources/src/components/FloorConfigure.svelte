@@ -302,7 +302,7 @@
   })
 </script>
 
-<div class="hulyComponent">
+<div class="teronComponent">
   <Header adaptive={'disabled'}>
     <DropdownLabels
       {items}
@@ -315,7 +315,7 @@
     />
     <svelte:fragment slot="actions">
       <ButtonIcon icon={IconAdd} size={'small'} on:click={addRoom} />
-      <div class="hulyHeader-divider short" />
+      <div class="teronHeader-divider short" />
       <ModernButton
         label={lovePlg.string.FinalizeEditing}
         kind={'primary'}
@@ -324,7 +324,7 @@
       />
     </svelte:fragment>
   </Header>
-  <div class="hulyComponent-content__column content">
+  <div class="teronComponent-content__column content">
     <Scroller bind:divScroll padding={'1rem'} bottomPadding={'1rem'} horizontal>
       <FloorGrid
         bind:floorContainer

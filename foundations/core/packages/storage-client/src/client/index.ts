@@ -15,7 +15,7 @@
 
 import { DatalakeStorage } from './datalake'
 import { FrontStorage } from './front'
-import { HulylakeStorage } from './hulylake'
+import { TeronlakeStorage } from './teronlake'
 
 import { FileStorage } from '../types'
 
@@ -23,21 +23,21 @@ import { FileStorage } from '../types'
 export interface FileStorageConfig {
   uploadUrl: string
   datalakeUrl?: string
-  hulylakeUrl?: string
+  teronlakeUrl?: string
 }
 
 /** @public */
 export function createFileStorage (config: FileStorageConfig): FileStorage {
-  const { uploadUrl, datalakeUrl, hulylakeUrl } = config
+  const { uploadUrl, datalakeUrl, teronlakeUrl } = config
 
   if (datalakeUrl !== undefined && datalakeUrl !== '') {
     console.debug('Using Datalake storage')
     return new DatalakeStorage(datalakeUrl)
   }
 
-  if (hulylakeUrl !== undefined && hulylakeUrl !== '') {
-    console.debug('Using Hulylake storage')
-    return new HulylakeStorage(hulylakeUrl)
+  if (teronlakeUrl !== undefined && teronlakeUrl !== '') {
+    console.debug('Using Teronlake storage')
+    return new TeronlakeStorage(teronlakeUrl)
   }
 
   console.debug('Using Front storage')

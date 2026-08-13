@@ -20,7 +20,7 @@ import {
   createMessages,
   getProducer,
   getMessageExtra,
-  isHulyMessage,
+  isTeronMessage,
   generateNewEmailId,
   MailHeader
 } from '@hcengineering/mail-common'
@@ -29,7 +29,7 @@ import { createRestTxOperations } from '@hcengineering/api-client'
 
 import { mailServiceToken, baseConfig, kvsClient } from './client'
 import config from './config'
-import { MtaMessage, HulyMessageType } from './types'
+import { MtaMessage, TeronMessageType } from './types'
 import { getHeader, parseContent } from './utils'
 import { decodeEncodedWords } from './decode'
 
@@ -45,7 +45,7 @@ export async function handleMtaHook (req: Request, res: Response, ctx: MeasureCo
     const mta: MtaMessage = req.body
 
     const headers: string[] = mta.message.headers.map((header) => header[0].trim()) ?? []
-    if (isHulyMessage(headers)) {
+    if (isTeronMessage(headers)) {
       return
     }
 
@@ -91,7 +91,7 @@ export async function handleMtaHook (req: Request, res: Response, ctx: MeasureCo
       incoming: true,
       modifiedOn: date,
       sendOn: date,
-      extra: getMessageExtra(HulyMessageType, true)
+      extra: getMessageExtra(TeronMessageType, true)
     }
 
     const accountClient = getAccountClient(config.accountsUrl, mailServiceToken)

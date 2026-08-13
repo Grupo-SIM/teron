@@ -63,8 +63,8 @@ const config: Config = {
     throw Error('QUEUE_CONFIG env var is not set')
   })(),
   queueRegion: process.env.QUEUE_REGION ?? '',
-  communicationTopic: process.env.COMMUNICATION_TOPIC ?? 'hulygun',
-  serviceId: process.env.SERVICE_ID ?? 'huly-mail',
+  communicationTopic: process.env.COMMUNICATION_TOPIC ?? 'terongun',
+  serviceId: process.env.SERVICE_ID ?? 'teron-mail',
   mailUrl: (() => {
     if (process.env.MAIL_URL !== undefined) {
       return process.env.MAIL_URL
@@ -72,7 +72,7 @@ const config: Config = {
     throw Error('MAIL_URL env var is not set')
   })(),
   mailAuth: process.env.MAIL_AUTH ?? '',
-  footerMessage: process.env.FOOTER_MESSAGE ?? '<br><br><p>Sent via <a href="https://huly.io">Huly</a></p>',
+  footerMessage: process.env.FOOTER_MESSAGE ?? '<br><br><p>Sent via <a href="https://teron.io">Teron</a></p>',
   outgoingSyncStartDate: new Date(process.env.OUTGOING_SYNC_START_DATE ?? '2025-08-20T00:00:00.000Z')
 }
 

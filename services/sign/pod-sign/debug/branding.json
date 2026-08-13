@@ -1,17 +1,17 @@
 {
-  "huly.local:8080": {
-    "title": "Huly",
+  "teron.local:8080": {
+    "title": "Teron",
     "language": "en"
   },
-  "huly.local:8087": {
-    "title": "Huly",
+  "teron.local:8087": {
+    "title": "Teron",
     "language": "en"
   },
-  "huly.local:8081": {
+  "teron.local:8081": {
     "title": "TraceX",
     "language": "en"
   },
-  "huly.local:8088": {
+  "teron.local:8088": {
     "title": "TraceX",
     "language": "en"
   }

@@ -3,7 +3,7 @@
 import { useEffect, useRef } from "react";
 
 /*
- * Halo do botão-pílula do huly.io: a luz laranja acompanha o cursor dentro do
+ * Halo do botão-pílula do teron.io: a luz laranja acompanha o cursor dentro do
  * botão. `--btn-r`/`--btn-l` cruzam a opacidade das duas camadas do halo
  * externo — uma com o gradiente normal (quente à direita), outra espelhada
  * (`scaleX(-1)`, quente à esquerda) — para que o brilho pareça vir do lado

@@ -82,11 +82,11 @@
   }
 </script>
 
-<div class="hulyComponent">
+<div class="teronComponent">
   <Header adaptive={'disabled'}>
     <Breadcrumb icon={training.icon.Training} label={training.string.Trainings} size="large" isCurrent />
   </Header>
-  <div class="hulyComponent-content__column content">
+  <div class="teronComponent-content__column content">
     {#if space === null || spaceType === null || roles === null || rolesAssignment === null}
       <Loading />
     {:else}

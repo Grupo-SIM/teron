@@ -3,7 +3,7 @@ do_drop=
 #export do_drop=--drop
 
 postfix=
-#postfix='-huly'
+#postfix='-teron'
 
 trap "exit" INT
 

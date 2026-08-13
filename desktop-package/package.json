@@ -2,7 +2,7 @@
   "name": "desktop",
   "version": "0.7.0",
   "main": "dist/main/electron.js",
-  "author": "Hardcore Engineering <hey@huly.io>",
+  "author": "Hardcore Engineering <hey@teron.io>",
   "template": "@hcengineering/default-package",
   "scripts": {
     "_phase:package": "rushx package",
@@ -37,12 +37,12 @@
     "electron-squirrel-startup": "~1.0.0",
     "dotenv": "^16.4.5"
   },
-  "homepage": "https://huly.io/",
-  "productName": "Huly Desktop",
-  "description": "Huly Desktop experience",
+  "homepage": "https://teron.io/",
+  "productName": "Teron Desktop",
+  "description": "Teron Desktop experience",
   "build": {
-    "productName": "Huly",
-    "appId": "hc.hcengineering.Huly",
+    "productName": "Teron",
+    "appId": "hc.hcengineering.Teron",
     "directories": {
       "output": "deploy"
     },
@@ -51,7 +51,7 @@
     ],
     "mac": {
       "category": "public.app-category.utilities",
-      "artifactName": "Huly-macos-${version}-${arch}.${ext}",
+      "artifactName": "Teron-macos-${version}-${arch}.${ext}",
       "target": "default",
       "icon": "./src/AppIcon.icns",
       "hardenedRuntime": true,
@@ -60,7 +60,7 @@
       "notarize": false,
       "publish": {
         "provider": "generic",
-        "url": "https://dist.huly.io",
+        "url": "https://dist.teron.io",
         "channel": "latest"
       }
     },
@@ -69,12 +69,12 @@
         "zip",
         "nsis"
       ],
-      "artifactName": "Huly-windows-${version}.${ext}",
+      "artifactName": "Teron-windows-${version}.${ext}",
       "verifyUpdateCodeSignature": false,
       "icon": "./src/AppIcon.ico",
       "publish": {
         "provider": "generic",
-        "url": "https://dist.huly.io",
+        "url": "https://dist.teron.io",
         "channel": "latest"
       },
       "extraResources": [
@@ -93,7 +93,7 @@
       "uninstallerIcon": "./src/AppIcon.ico"
     },
     "linux": {
-      "artifactName": "Huly-linux-${version}.${ext}",
+      "artifactName": "Teron-linux-${version}.${ext}",
       "target": [
         "AppImage",
         "deb",
@@ -103,7 +103,7 @@
       "category": "Utility",
       "publish": {
         "provider": "generic",
-        "url": "https://dist.huly.io",
+        "url": "https://dist.teron.io",
         "channel": "latest"
       }
     }

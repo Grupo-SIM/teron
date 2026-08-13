@@ -84,7 +84,7 @@
   })
 </script>
 
-<div class="hulyComponent">
+<div class="teronComponent">
   <Header adaptive={'disabled'}>
     <Breadcrumb icon={setting.icon.Mailbox} label={setting.string.Mailboxes} size="large" isCurrent />
     <svelte:fragment slot="actions">
@@ -110,12 +110,12 @@
       {/if}
     </svelte:fragment>
   </Header>
-  <div class="hulyComponent-content__container columns">
-    <div class="hulyComponent-content__column p-6">
+  <div class="teronComponent-content__container columns">
+    <div class="teronComponent-content__column p-6">
       {#if boxesLoading || optionsLoading}
         <Loading />
       {:else if mailboxOptions !== undefined && mailboxOptions.availableDomains.length === 0}
-        <div class="hulyComponent-content__empty">
+        <div class="teronComponent-content__empty">
           <Label label={setting.string.MailboxNoDomains} />
         </div>
       {:else}

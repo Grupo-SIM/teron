@@ -73,7 +73,7 @@ import {
   checkInvite,
   cleanEmail,
   confirmEmail,
-  confirmHulyIds,
+  confirmTeronIds,
   createAccount,
   createWorkspaceRecord,
   doJoinByInvite,
@@ -326,7 +326,7 @@ export async function signUp (
   } else {
     ctx.warn('Please provide MAIL_URL to enable sign up email confirmations.')
     await confirmEmail(ctx, db, account, email)
-    await confirmHulyIds(ctx, db, account)
+    await confirmTeronIds(ctx, db, account)
   }
 
   void setTimezone(ctx, db, account, null, meta)
@@ -451,7 +451,7 @@ export async function validateOtp (
 
         ctx.info('OTP signup success', emailSocialId)
       } else {
-        await confirmHulyIds(ctx, db, targetAccount.uuid)
+        await confirmTeronIds(ctx, db, targetAccount.uuid)
 
         ctx.info('OTP login/verification success', emailSocialId)
       }
@@ -1347,7 +1347,7 @@ export async function signUpJoin (
   }
 
   ctx.warn('Please provide MAIL_URL to enable sign up email confirmations.')
-  await confirmHulyIds(ctx, db, account)
+  await confirmTeronIds(ctx, db, account)
 
   return await doJoinByInvite(
     ctx,
@@ -1376,7 +1376,7 @@ export async function confirm (
 
   const socialId = await confirmEmail(ctx, db, account, email)
 
-  await confirmHulyIds(ctx, db, account)
+  await confirmTeronIds(ctx, db, account)
 
   const person = await db.person.findOne({ uuid: account })
   if (person == null) {
@@ -1828,7 +1828,7 @@ export async function generate2faSecret (
   }
 
   const secret = generateTotpSecret()
-  const app = branding?.title ?? getMetadata(accountPlugin.metadata.ProductName) ?? 'Huly'
+  const app = branding?.title ?? getMetadata(accountPlugin.metadata.ProductName) ?? 'Teron'
   const url = getTotpUrl(emailSocialId.value, app, secret)
 
   return { secret, url }
@@ -2523,7 +2523,7 @@ export async function ensurePerson (
 ): Promise<{ uuid: PersonUuid, socialId: PersonId }> {
   const { account, workspace, extra } = decodeTokenVerbose(ctx, token)
   const allowedService = verifyAllowedServices(
-    ['tool', 'workspace', 'schedule', 'mail', 'github', 'hulygram'],
+    ['tool', 'workspace', 'schedule', 'mail', 'github', 'terongram'],
     extra,
     false
   )
@@ -2636,7 +2636,7 @@ async function getMailboxSecret (
   }
 ): Promise<MailboxSecret | null> {
   const { extra } = decodeTokenVerbose(ctx, token)
-  verifyAllowedServices(['huly-mail'], extra, false)
+  verifyAllowedServices(['teron-mail'], extra, false)
   return await db.mailboxSecret.findOne({ mailbox: params.mailbox })
 }
 
@@ -2750,7 +2750,7 @@ async function addEmailSocialId (
   return await sendOtp(ctx, db, branding, targetSocialId)
 }
 
-async function addHulyAssistantSocialId (
+async function addTeronAssistantSocialId (
   ctx: MeasureContext,
   db: AccountDB,
   branding: Branding | null,
@@ -2758,10 +2758,10 @@ async function addHulyAssistantSocialId (
 ): Promise<PersonId> {
   const { account } = decodeTokenVerbose(ctx, token)
 
-  return await addSocialIdBase(db, account, SocialIdType.HULY_ASSISTANT, account, true)
+  return await addSocialIdBase(db, account, SocialIdType.TERON_ASSISTANT, account, true)
 }
 
-export async function refreshHulyAssistantToken (
+export async function refreshTeronAssistantToken (
   ctx: MeasureContext,
   db: AccountDB,
   branding: Branding | null,
@@ -2769,12 +2769,12 @@ export async function refreshHulyAssistantToken (
 ): Promise<void> {
   const { account } = decodeTokenVerbose(ctx, token)
 
-  const assistantSocialId = await db.socialId.findOne({ type: SocialIdType.HULY_ASSISTANT, personUuid: account })
+  const assistantSocialId = await db.socialId.findOne({ type: SocialIdType.TERON_ASSISTANT, personUuid: account })
   if (assistantSocialId == null) {
     throw new PlatformError(
       new Status(Severity.ERROR, platform.status.SocialIdNotFound, {
         value: account,
-        type: SocialIdType.HULY_ASSISTANT
+        type: SocialIdType.TERON_ASSISTANT
       })
     )
   }
@@ -2831,12 +2831,12 @@ export async function releaseSocialId (
   }
 
   if (!allowedService) {
-    // User should always have at least one Huly and one "login" social id
+    // User should always have at least one Teron and one "login" social id
     // so do not allow releasing last ones
     const socialIds = await db.socialId.find({ personUuid, verifiedOn: { $gt: 0 }, isDeleted: { $ne: true } })
     const afterRemoval = socialIds.filter((it) => it.type !== type || it.value !== value)
 
-    if (afterRemoval.filter((it) => it.type === SocialIdType.HULY).length === 0) {
+    if (afterRemoval.filter((it) => it.type === SocialIdType.TERON).length === 0) {
       throw new PlatformError(new Status(Severity.ERROR, platform.status.Forbidden, {}))
     }
 
@@ -3350,8 +3350,8 @@ export type AccountMethods =
   | 'getAccountInfo'
   | 'isReadOnlyGuest'
   | 'addEmailSocialId'
-  | 'addHulyAssistantSocialId'
-  | 'refreshHulyAssistantToken'
+  | 'addTeronAssistantSocialId'
+  | 'refreshTeronAssistantToken'
   | 'releaseSocialId'
   | 'deleteAccount'
   | 'canMergeSpecifiedPersons'
@@ -3418,8 +3418,8 @@ export function getMethods (hasSignUp: boolean = true): Partial<Record<AccountMe
     ensurePerson: wrap(ensurePerson),
     exchangeGuestToken: wrap(exchangeGuestToken),
     addEmailSocialId: wrap(addEmailSocialId),
-    addHulyAssistantSocialId: wrap(addHulyAssistantSocialId),
-    refreshHulyAssistantToken: wrap(refreshHulyAssistantToken),
+    addTeronAssistantSocialId: wrap(addTeronAssistantSocialId),
+    refreshTeronAssistantToken: wrap(refreshTeronAssistantToken),
     releaseSocialId: wrap(releaseSocialId),
     deleteAccount: wrap(deleteAccount),
     canMergeSpecifiedPersons: wrap(canMergeSpecifiedPersons),

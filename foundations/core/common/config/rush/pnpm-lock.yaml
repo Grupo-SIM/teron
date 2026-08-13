@@ -523,7 +523,7 @@ importers:
         specifier: ^5.9.3
         version: 5.9.3
 
-  ../../packages/hulylake-client:
+  ../../packages/teronlake-client:
     dependencies:
       '@hcengineering/core':
         specifier: workspace:^0.7.26

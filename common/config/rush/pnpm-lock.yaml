@@ -282,15 +282,15 @@ importers:
       '@hcengineering/hr-resources':
         specifier: workspace:^0.7.426
         version: link:../plugins/hr-resources
-      '@hcengineering/huly-mail':
+      '@hcengineering/teron-mail':
         specifier: workspace:^0.7.426
-        version: link:../plugins/huly-mail
-      '@hcengineering/huly-mail-assets':
+        version: link:../plugins/teron-mail
+      '@hcengineering/teron-mail-assets':
         specifier: workspace:^0.7.426
-        version: link:../plugins/huly-mail-assets
-      '@hcengineering/huly-mail-resources':
+        version: link:../plugins/teron-mail-assets
+      '@hcengineering/teron-mail-resources':
         specifier: workspace:^0.7.426
-        version: link:../plugins/huly-mail-resources
+        version: link:../plugins/teron-mail-resources
       '@hcengineering/image-cropper':
         specifier: workspace:^0.7.426
         version: link:../plugins/image-cropper
@@ -1336,15 +1336,15 @@ importers:
       '@hcengineering/hr-resources':
         specifier: workspace:^0.7.426
         version: link:../../plugins/hr-resources
-      '@hcengineering/huly-mail':
+      '@hcengineering/teron-mail':
         specifier: workspace:^0.7.426
-        version: link:../../plugins/huly-mail
-      '@hcengineering/huly-mail-assets':
+        version: link:../../plugins/teron-mail
+      '@hcengineering/teron-mail-assets':
         specifier: workspace:^0.7.426
-        version: link:../../plugins/huly-mail-assets
-      '@hcengineering/huly-mail-resources':
+        version: link:../../plugins/teron-mail-assets
+      '@hcengineering/teron-mail-resources':
         specifier: workspace:^0.7.426
-        version: link:../../plugins/huly-mail-resources
+        version: link:../../plugins/teron-mail-resources
       '@hcengineering/image-cropper':
         specifier: workspace:^0.7.426
         version: link:../../plugins/image-cropper
@@ -1958,9 +1958,9 @@ importers:
       '@hcengineering/elastic':
         specifier: workspace:^0.7.426
         version: link:../../foundations/server/packages/elastic
-      '@hcengineering/hulylake-client':
+      '@hcengineering/teronlake-client':
         specifier: workspace:^0.7.426
-        version: link:../../foundations/core/packages/hulylake-client
+        version: link:../../foundations/core/packages/teronlake-client
       '@hcengineering/kafka':
         specifier: workspace:^0.7.426
         version: link:../../foundations/server/packages/kafka
@@ -2358,9 +2358,9 @@ importers:
       '@hcengineering/communication-types':
         specifier: workspace:^0.7.426
         version: link:../types
-      '@hcengineering/hulylake-client':
+      '@hcengineering/teronlake-client':
         specifier: workspace:^0.7.426
-        version: link:../../../core/packages/hulylake-client
+        version: link:../../../core/packages/teronlake-client
       fast-equals:
         specifier: ^5.2.2
         version: 5.3.2
@@ -2486,9 +2486,9 @@ importers:
       '@hcengineering/communication-types':
         specifier: workspace:^0.7.426
         version: link:../types
-      '@hcengineering/hulylake-client':
+      '@hcengineering/teronlake-client':
         specifier: workspace:^0.7.426
-        version: link:../../../core/packages/hulylake-client
+        version: link:../../../core/packages/teronlake-client
       fast-equals:
         specifier: ^5.2.2
         version: 5.3.2
@@ -2678,9 +2678,9 @@ importers:
       '@hcengineering/core':
         specifier: workspace:^0.7.426
         version: link:../../../core/packages/core
-      '@hcengineering/hulylake-client':
+      '@hcengineering/teronlake-client':
         specifier: workspace:^0.7.426
-        version: link:../../../core/packages/hulylake-client
+        version: link:../../../core/packages/teronlake-client
       '@hcengineering/server-token':
         specifier: workspace:^0.7.426
         version: link:../../../core/packages/token
@@ -2757,9 +2757,9 @@ importers:
       '@hcengineering/communication-types':
         specifier: workspace:^0.7.426
         version: link:../types
-      '@hcengineering/hulylake-client':
+      '@hcengineering/teronlake-client':
         specifier: workspace:^0.7.426
-        version: link:../../../core/packages/hulylake-client
+        version: link:../../../core/packages/teronlake-client
     devDependencies:
       '@hcengineering/platform-rig':
         specifier: workspace:^0.7.426
@@ -3366,7 +3366,7 @@ importers:
         specifier: ^5.9.3
         version: 5.9.3
 
-  ../../foundations/core/packages/hulylake-client:
+  ../../foundations/core/packages/teronlake-client:
     dependencies:
       '@hcengineering/core':
         specifier: workspace:^0.7.426
@@ -4887,14 +4887,14 @@ importers:
         specifier: ^5.9.3
         version: 5.9.3
 
-  ../../foundations/server/packages/hulylake:
+  ../../foundations/server/packages/teronlake:
     dependencies:
       '@hcengineering/core':
         specifier: workspace:^0.7.426
         version: link:../../../core/packages/core
-      '@hcengineering/hulylake-client':
+      '@hcengineering/teronlake-client':
         specifier: workspace:^0.7.426
-        version: link:../../../core/packages/hulylake-client
+        version: link:../../../core/packages/teronlake-client
       '@hcengineering/platform':
         specifier: workspace:^0.7.426
         version: link:../../../core/packages/platform
@@ -5440,9 +5440,9 @@ importers:
       '@hcengineering/datalake':
         specifier: workspace:^0.7.426
         version: link:../datalake
-      '@hcengineering/hulylake':
+      '@hcengineering/teronlake':
         specifier: workspace:^0.7.426
-        version: link:../hulylake
+        version: link:../teronlake
       '@hcengineering/minio':
         specifier: workspace:^0.7.426
         version: link:../minio
@@ -6019,9 +6019,9 @@ importers:
       '@hcengineering/model-hr':
         specifier: workspace:^0.7.426
         version: link:../hr
-      '@hcengineering/model-huly-mail':
+      '@hcengineering/model-teron-mail':
         specifier: workspace:^0.7.426
-        version: link:../huly-mail
+        version: link:../teron-mail
       '@hcengineering/model-inbox':
         specifier: workspace:^0.7.426
         version: link:../inbox
@@ -8420,17 +8420,17 @@ importers:
         specifier: ^5.9.3
         version: 5.9.3
 
-  ../../models/huly-mail:
+  ../../models/teron-mail:
     dependencies:
       '@hcengineering/core':
         specifier: workspace:^0.7.426
         version: link:../../foundations/core/packages/core
-      '@hcengineering/huly-mail':
+      '@hcengineering/teron-mail':
         specifier: workspace:^0.7.426
-        version: link:../../plugins/huly-mail
-      '@hcengineering/huly-mail-resources':
+        version: link:../../plugins/teron-mail
+      '@hcengineering/teron-mail-resources':
         specifier: workspace:^0.7.426
-        version: link:../../plugins/huly-mail-resources
+        version: link:../../plugins/teron-mail-resources
       '@hcengineering/model':
         specifier: workspace:^0.7.426
         version: link:../../foundations/core/packages/model
@@ -14121,7 +14121,7 @@ importers:
         specifier: ^5.9.3
         version: 5.9.3
 
-  ../../packages/hulypulse-client:
+  ../../packages/teronpulse-client:
     dependencies:
       '@hcengineering/core':
         specifier: workspace:^0.7.426
@@ -14715,12 +14715,12 @@ importers:
       '@hcengineering/emoji':
         specifier: workspace:^0.7.426
         version: link:../../plugins/emoji
-      '@hcengineering/hulylake-client':
+      '@hcengineering/teronlake-client':
         specifier: workspace:^0.7.426
-        version: link:../../foundations/core/packages/hulylake-client
-      '@hcengineering/hulypulse-client':
+        version: link:../../foundations/core/packages/teronlake-client
+      '@hcengineering/teronpulse-client':
         specifier: workspace:^0.7.426
-        version: link:../hulypulse-client
+        version: link:../teronpulse-client
       '@hcengineering/notification':
         specifier: workspace:^0.7.426
         version: link:../../plugins/notification
@@ -21752,7 +21752,7 @@ importers:
         specifier: ^5.9.3
         version: 5.9.3
 
-  ../../plugins/huly-mail:
+  ../../plugins/teron-mail:
     dependencies:
       '@hcengineering/core':
         specifier: workspace:^0.7.426
@@ -21807,11 +21807,11 @@ importers:
         specifier: ^5.9.3
         version: 5.9.3
 
-  ../../plugins/huly-mail-assets:
+  ../../plugins/teron-mail-assets:
     dependencies:
-      '@hcengineering/huly-mail':
+      '@hcengineering/teron-mail':
         specifier: workspace:^0.7.426
-        version: link:../huly-mail
+        version: link:../teron-mail
       '@hcengineering/platform':
         specifier: workspace:^0.7.426
         version: link:../../foundations/core/packages/platform
@@ -21859,7 +21859,7 @@ importers:
         specifier: ^5.9.3
         version: 5.9.3
 
-  ../../plugins/huly-mail-resources:
+  ../../plugins/teron-mail-resources:
     dependencies:
       '@hcengineering/account-client':
         specifier: workspace:^0.7.426
@@ -21879,9 +21879,9 @@ importers:
       '@hcengineering/core':
         specifier: workspace:^0.7.426
         version: link:../../foundations/core/packages/core
-      '@hcengineering/huly-mail':
+      '@hcengineering/teron-mail':
         specifier: workspace:^0.7.426
-        version: link:../huly-mail
+        version: link:../teron-mail
       '@hcengineering/integration-client':
         specifier: workspace:^0.7.426
         version: link:../../packages/integration-client
@@ -23174,9 +23174,9 @@ importers:
       '@hcengineering/emoji-resources':
         specifier: workspace:^0.7.426
         version: link:../emoji-resources
-      '@hcengineering/hulypulse-client':
+      '@hcengineering/teronpulse-client':
         specifier: workspace:^0.7.426
-        version: link:../../packages/hulypulse-client
+        version: link:../../packages/teronpulse-client
       '@hcengineering/login':
         specifier: workspace:^0.7.426
         version: link:../login
@@ -24306,9 +24306,9 @@ importers:
       '@hcengineering/core':
         specifier: workspace:^0.7.426
         version: link:../../foundations/core/packages/core
-      '@hcengineering/hulypulse-client':
+      '@hcengineering/teronpulse-client':
         specifier: workspace:^0.7.426
-        version: link:../../packages/hulypulse-client
+        version: link:../../packages/teronpulse-client
       '@hcengineering/platform':
         specifier: workspace:^0.7.426
         version: link:../../foundations/core/packages/platform
@@ -30685,9 +30685,9 @@ importers:
       '@hcengineering/elastic':
         specifier: workspace:^0.7.426
         version: link:../../foundations/server/packages/elastic
-      '@hcengineering/hulylake-client':
+      '@hcengineering/teronlake-client':
         specifier: workspace:^0.7.426
-        version: link:../../foundations/core/packages/hulylake-client
+        version: link:../../foundations/core/packages/teronlake-client
       '@hcengineering/kafka':
         specifier: workspace:^0.7.426
         version: link:../../foundations/server/packages/kafka
@@ -36490,9 +36490,9 @@ importers:
       '@hcengineering/drive':
         specifier: workspace:^0.7.426
         version: link:../../plugins/drive
-      '@hcengineering/hulylake-client':
+      '@hcengineering/teronlake-client':
         specifier: workspace:^0.7.426
-        version: link:../../foundations/core/packages/hulylake-client
+        version: link:../../foundations/core/packages/teronlake-client
       '@hcengineering/platform':
         specifier: workspace:^0.7.426
         version: link:../../foundations/core/packages/platform
@@ -41456,9 +41456,9 @@ importers:
       '@hcengineering/core':
         specifier: workspace:^0.7.426
         version: link:../../foundations/core/packages/core
-      '@hcengineering/hulylake-client':
+      '@hcengineering/teronlake-client':
         specifier: workspace:^0.7.426
-        version: link:../../foundations/core/packages/hulylake-client
+        version: link:../../foundations/core/packages/teronlake-client
       '@hcengineering/kafka':
         specifier: workspace:^0.7.426
         version: link:../../foundations/server/packages/kafka

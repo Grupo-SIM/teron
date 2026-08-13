@@ -20,7 +20,7 @@ import { decodeToken } from '@hcengineering/server-token'
  */
 export async function start (ctx: MeasureContext, brandingMap: BrandingMap): Promise<() => Promise<void>> {
   // Create an authenticated Octokit client authenticated as a GitHub App
-  ctx.info('Running Huly Github integration', { appId: config.AppID, clientID: config.ClientID })
+  ctx.info('Running Teron Github integration', { appId: config.AppID, clientID: config.ClientID })
 
   setMetadata(serverCore.metadata.FrontUrl, config.FrontURL)
   setMetadata(serverClient.metadata.Endpoint, config.AccountsURL)

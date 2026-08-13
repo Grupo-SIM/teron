@@ -95,7 +95,7 @@
 </script>
 
 <div
-  class="hulyNavGroup-container"
+  class="teronNavGroup-container"
   class:nested={type === 'nested' || type === 'nested-selectable'}
   class:selectable={type === 'nested-selectable' || type === 'selectable-header'}
   class:selectableHeader={type === 'selectable-header'}
@@ -103,7 +103,7 @@
   class:noDivider
 >
   <button
-    class="hulyNavGroup-header"
+    class="teronNavGroup-header"
     class:isOpen={(isOpen || visible) && !empty}
     class:highlighted
     class:selected
@@ -116,15 +116,15 @@
     on:drop
   >
     {#if isFold && !empty}
-      <button class="hulyNavGroup-header__chevron" class:collapsed={!isOpen} on:click={toggle}>
+      <button class="teronNavGroup-header__chevron" class:collapsed={!isOpen} on:click={toggle}>
         <IconDown size={'small'} />
       </button>
     {/if}
     <!-- svelte-ignore a11y-no-static-element-interactions -->
     <!-- svelte-ignore a11y-click-events-have-key-events -->
-    <div class="hulyNavGroup-header__label font-medium-12" on:click={handleMenuClicked}>
+    <div class="teronNavGroup-header__label font-medium-12" on:click={handleMenuClicked}>
       {#if visibleIcon}
-        <div class="hulyNavGroup-header__icon" class:folder={folderIcon}>
+        <div class="teronNavGroup-header__icon" class:folder={folderIcon}>
           <Icon icon={visibleIcon} size={iconSize} {iconProps} />
         </div>
       {/if}
@@ -142,7 +142,7 @@
     <div class="flex-grow" />
     {#if $$slots.extra}<slot name="extra" />{/if}
     {#if tools || $$slots.tools}
-      <div class="hulyNavGroup-header__tools">
+      <div class="teronNavGroup-header__tools">
         {#if tools}
           <Component
             is={tools}
@@ -156,16 +156,16 @@
       </div>
     {/if}
     {#if $$slots.actions}
-      <div class="hulyNavGroup-header__actions">
+      <div class="teronNavGroup-header__actions">
         <slot name="actions" />
       </div>
     {/if}
     {#if selected && type === 'nested-selectable'}
-      <div class="hulyNavGroup-header__arrow"><IconOpenedArrow size={'small'} /></div>
+      <div class="teronNavGroup-header__arrow"><IconOpenedArrow size={'small'} /></div>
     {/if}
   </button>
   {#if !empty}
-    <div {id} class="hulyNavGroup-content">
+    <div {id} class="teronNavGroup-content">
       {#if (!isOpen && visible) || forciblyСollapsed}
         <slot name="visible" {isOpen} />
       {:else}

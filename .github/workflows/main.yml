@@ -278,7 +278,7 @@ jobs:
           DOCKER_BUILDKIT: 1
       - name: Configure /etc/hosts
         run: |
-          sudo echo "127.0.0.1 huly.local" | sudo tee -a /etc/hosts
+          sudo echo "127.0.0.1 teron.local" | sudo tee -a /etc/hosts
       - name: Prepare server
         run: |
           cd ./tests
@@ -410,7 +410,7 @@ jobs:
           DOCKER_BUILDKIT: 1
       - name: Configure /etc/hosts
         run: |
-          sudo echo "127.0.0.1 huly.local" | sudo tee -a /etc/hosts
+          sudo echo "127.0.0.1 teron.local" | sudo tee -a /etc/hosts
       - name: Prepare server
         run: |
           cd ./tests
@@ -507,7 +507,7 @@ jobs:
           DOCKER_BUILDKIT: 1
       - name: Configure /etc/hosts
         run: |
-          sudo echo "127.0.0.1 huly.local" | sudo tee -a /etc/hosts
+          sudo echo "127.0.0.1 teron.local" | sudo tee -a /etc/hosts
       - name: Prepare server
         run: |
           cd ./qms-tests
@@ -591,7 +591,7 @@ jobs:
           DOCKER_BUILDKIT: 1
       - name: Configure /etc/hosts
         run: |
-          sudo echo "127.0.0.1 huly.local" | sudo tee -a /etc/hosts
+          sudo echo "127.0.0.1 teron.local" | sudo tee -a /etc/hosts
       - name: Prepare server
         run: |
           cd ./ws-tests
@@ -822,23 +822,23 @@ jobs:
       - name: Upload MacOS
         uses: actions/upload-artifact@v6
         with:
-          name: Huly-MacOS-x64
-          path: ./desktop-package/deploy/Huly-macos-*-x64.dmg
+          name: Teron-MacOS-x64
+          path: ./desktop-package/deploy/Teron-macos-*-x64.dmg
       - name: Upload MacOS arm64
         uses: actions/upload-artifact@v6
         with:
-          name: Huly-MacOS-arm64
-          path: ./desktop-package/deploy/Huly-macos-*-arm64.dmg
+          name: Teron-MacOS-arm64
+          path: ./desktop-package/deploy/Teron-macos-*-arm64.dmg
       - name: Upload Windows
         uses: actions/upload-artifact@v6
         with:
-          name: Huly-Windows
-          path: ./desktop-package/deploy/Huly-windows-*.zip
+          name: Teron-Windows
+          path: ./desktop-package/deploy/Teron-windows-*.zip
       - name: Upload Linux
         uses: actions/upload-artifact@v6
         with:
-          name: Huly-Linux
-          path: ./desktop-package/deploy/Huly-linux-*.zip
+          name: Teron-Linux
+          path: ./desktop-package/deploy/Teron-linux-*.zip
 
   qms-dist-build:
     # if: ${{ github.ref == 'refs/heads/main' || startsWith(github.ref, 'refs/tags/v') || startsWith(github.ref, 'refs/tags/s') }}

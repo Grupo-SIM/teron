@@ -21,7 +21,7 @@ importers:
       '@hcengineering/communication-types':
         specifier: workspace:^0.7.12
         version: link:../types
-      '@hcengineering/hulylake-client':
+      '@hcengineering/teronlake-client':
         specifier: ^0.7.17
         version: 0.7.17
       fast-equals:
@@ -149,7 +149,7 @@ importers:
       '@hcengineering/communication-types':
         specifier: workspace:^0.7.12
         version: link:../types
-      '@hcengineering/hulylake-client':
+      '@hcengineering/teronlake-client':
         specifier: ^0.7.17
         version: 0.7.17
       fast-equals:
@@ -341,7 +341,7 @@ importers:
       '@hcengineering/core':
         specifier: ^0.7.19
         version: 0.7.19
-      '@hcengineering/hulylake-client':
+      '@hcengineering/teronlake-client':
         specifier: ^0.7.17
         version: 0.7.17
       '@hcengineering/server-token':
@@ -420,7 +420,7 @@ importers:
       '@hcengineering/communication-types':
         specifier: workspace:^0.7.12
         version: link:../types
-      '@hcengineering/hulylake-client':
+      '@hcengineering/teronlake-client':
         specifier: ^0.7.17
         version: 0.7.17
     devDependencies:
@@ -1065,7 +1065,7 @@ packages:
   '@hcengineering/core@0.7.19':
     resolution: {integrity: sha512-BMkVkVXMU8qmbR2KAeMZ3YIMfa07/AzdCEY7PNn7dfAZyc63vrLz+Jl0CPvN7cq9p6x/WBkMfS+eKFwtvhZIUA==}
 
-  '@hcengineering/hulylake-client@0.7.17':
+  '@hcengineering/teronlake-client@0.7.17':
     resolution: {integrity: sha512-TPqdc5nd7xV73Y1B2EJ7GxpWazp9ACV1AqHlm6ebYwU1CzXQvbuJxF68itbHmPiNiCmmuiDruJmjnyLGwL18Kw==}
 
   '@hcengineering/measurements@0.7.18':
@@ -3667,7 +3667,7 @@ snapshots:
       '@hcengineering/platform': 0.7.17
       fast-equals: 5.3.2
 
-  '@hcengineering/hulylake-client@0.7.17':
+  '@hcengineering/teronlake-client@0.7.17':
     dependencies:
       '@hcengineering/core': 0.7.19
       '@hcengineering/retry': 0.7.17

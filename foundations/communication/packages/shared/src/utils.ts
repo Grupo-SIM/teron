@@ -37,7 +37,7 @@ import {
   TranslatedMessagesDoc,
   WithTotal
 } from '@hcengineering/communication-types'
-import { type HulylakeWorkspaceClient } from '@hcengineering/hulylake-client'
+import { type TeronlakeWorkspaceClient } from '@hcengineering/teronlake-client'
 
 const COUNTER_BITS = 10n
 const RANDOM_BITS = 10n
@@ -68,7 +68,7 @@ export function generateMessageId (): MessageID {
 }
 
 export function isAppletAttachment (attachment: Attachment): attachment is AppletAttachment {
-  return attachment.mimeType.startsWith('application/vnd.huly.applet.')
+  return attachment.mimeType.startsWith('application/vnd.teron.applet.')
 }
 
 export function isLinkPreviewAttachmentType (mimeType: string): boolean {
@@ -76,7 +76,7 @@ export function isLinkPreviewAttachmentType (mimeType: string): boolean {
 }
 
 export function isAppletAttachmentType (mimeType: string): boolean {
-  return mimeType.startsWith('application/vnd.huly.applet.')
+  return mimeType.startsWith('application/vnd.teron.applet.')
 }
 
 export function isBlobAttachmentType (mimeType: string): boolean {
@@ -97,7 +97,7 @@ export function withTotal<T> (objects: T[], total?: number): WithTotal<T> {
   return Object.assign(objects, { total: length })
 }
 
-export async function loadMessagesGroups (client: HulylakeWorkspaceClient, cardId: CardID): Promise<MessagesGroup[]> {
+export async function loadMessagesGroups (client: TeronlakeWorkspaceClient, cardId: CardID): Promise<MessagesGroup[]> {
   const res = await client.getJson<MessagesGroupsDoc>(`${cardId}/messages/groups`, {
     maxRetries: 3,
     isRetryable: () => true,
@@ -125,7 +125,7 @@ function deserializeMessageGroup (group: MessagesGroupDoc): MessagesGroup {
 }
 
 export async function loadMessages (
-  client: HulylakeWorkspaceClient,
+  client: TeronlakeWorkspaceClient,
   blobId: BlobID,
   params: FindMessagesParams,
   options?: FindMessagesOptions

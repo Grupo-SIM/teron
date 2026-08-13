@@ -31,13 +31,13 @@ const devServerTest = clientType === 'dev-server-test'
 const devServerWorker = clientType === 'dev-worker'
 const devServerWorkerLocal = clientType === 'dev-worker-local'
 const devProduction = clientType === 'dev-production'
-const devProductionHuly = clientType === 'dev-huly'
+const devProductionTeron = clientType === 'dev-teron'
 const devProductionBold = clientType === 'dev-bold'
 const dev =
   (process.env.CLIENT_TYPE ?? '') === 'dev' ||
   devServer ||
   devProduction ||
-  devProductionHuly ||
+  devProductionTeron ||
   devProductionBold ||
   devServerWorker ||
   devServerWorkerLocal ||
@@ -52,23 +52,23 @@ const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPl
 
 const devProxy = {
   '/account': {
-    target: 'http://huly.local:3000',
+    target: 'http://teron.local:3000',
     changeOrigin: true,
     pathRewrite: { '^/account': '' },
     logLevel: 'debug'
   },
   '/files': {
-    target: 'http://huly.local:8087',
+    target: 'http://teron.local:8087',
     changeOrigin: true,
     logLevel: 'debug'
   },
   '/api/v1': {
-    target: 'http://huly.local:8087',
+    target: 'http://teron.local:8087',
     changeOrigin: true,
     logLevel: 'debug'
   },
   '/rekoni/recognize': {
-    target: 'http://huly.local:4004',
+    target: 'http://teron.local:4004',
     changeOrigin: true,
     pathRewrite: { '^/rekoni/recognize': '/recognize' },
     logLevel: 'debug'
@@ -77,49 +77,49 @@ const devProxy = {
 
 const devProxyTest = {
   '/account': {
-    target: 'http://huly.local:3003',
+    target: 'http://teron.local:3003',
     changeOrigin: true,
     pathRewrite: { '^/account': '' },
     logLevel: 'debug'
   },
   '/files': {
-    target: 'http://huly.local:8083',
+    target: 'http://teron.local:8083',
     changeOrigin: true,
     logLevel: 'debug'
   },
   '/api/v1': {
-    target: 'http://huly.local:8083',
+    target: 'http://teron.local:8083',
     changeOrigin: true,
     logLevel: 'debug'
   },
   '/rekoni/recognize': {
-    target: 'http://huly.local:4004',
+    target: 'http://teron.local:4004',
     changeOrigin: true,
     pathRewrite: { '^/rekoni/recognize': '/recognize' },
     logLevel: 'debug'
   }
 }
 
-const devHulyProxy = {
+const devTeronProxy = {
   '/account': {
-    target: 'https://account.huly.app/',
+    target: 'https://account.teron.app/',
     changeOrigin: true,
     pathRewrite: { '^/account': '' },
     logLevel: 'debug'
   },
   '/api/v1': {
-    target: 'http://huly.app',
+    target: 'http://teron.app',
     changeOrigin: true,
     logLevel: 'debug'
   },
   '/files': {
-    target: 'https://huly.app/files',
+    target: 'https://teron.app/files',
     changeOrigin: true,
     pathRewrite: { '^/files': '' },
     logLevel: 'debug'
   },
   '/rekoni/recognize': {
-    target: 'https://rekoni.huly.app',
+    target: 'https://rekoni.teron.app',
     changeOrigin: true,
     pathRewrite: { '^/rekoni/recognize': '/recognize' },
     logLevel: 'debug'
@@ -180,7 +180,7 @@ const proxy = {
   'dev-server-test': devProxyTest,
   'dev-production': devFrontProxy,
   'dev-bold': devBoldProxy,
-  'dev-huly': devHulyProxy
+  'dev-teron': devTeronProxy
 }
 
 /**

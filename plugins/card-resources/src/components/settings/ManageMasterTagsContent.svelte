@@ -135,7 +135,7 @@
 </script>
 
 <div
-  class="hulyComponent"
+  class="teronComponent"
   use:resizeObserver={(element) => {
     visibleSecondNav = element.clientWidth > 720
   }}
