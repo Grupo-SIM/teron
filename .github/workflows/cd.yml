@@ -71,18 +71,15 @@ jobs:
         run: |
           targets=(
             @hcengineering/pod-account
-            @hcengineering/pod-calendar
             @hcengineering/pod-collaborator
             @hcengineering/pod-front
             @hcengineering/pod-fulltext
-            @hcengineering/pod-gmail
             @hcengineering/pod-love
             @hcengineering/pod-mail
             @hcengineering/pod-notification
             @hcengineering/pod-print
             @hcengineering/rekoni-service
             @hcengineering/pod-stats
-            @hcengineering/pod-telegram
             @hcengineering/pod-server
             @hcengineering/pod-workspace
             @hcengineering/prod
@@ -99,18 +96,15 @@ jobs:
         run: |
           targets=(
             @hcengineering/pod-account
-            @hcengineering/pod-calendar
             @hcengineering/pod-collaborator
             @hcengineering/pod-front
             @hcengineering/pod-fulltext
-            @hcengineering/pod-gmail
             @hcengineering/pod-love
             @hcengineering/pod-mail
             @hcengineering/pod-notification
             @hcengineering/pod-print
             @hcengineering/rekoni-service
             @hcengineering/pod-stats
-            @hcengineering/pod-telegram
             @hcengineering/pod-server
             @hcengineering/pod-workspace
           )
@@ -153,14 +147,11 @@ jobs:
             pods/server
             pods/stats
             pods/workspace
-            services/calendar/pod-calendar
-            services/gmail/pod-gmail
             services/love
             services/mail/pod-mail
             services/notification/pod-notification
             services/print/pod-print
             services/rekoni
-            services/telegram/pod-telegram
           )
 
           for context in "${contexts[@]}"; do
@@ -197,16 +188,12 @@ jobs:
         include:
           - image: account
             context: pods/account
-          - image: calendar
-            context: services/calendar/pod-calendar
           - image: collaborator
             context: pods/collaborator
           - image: front
             context: pods/front
           - image: fulltext
             context: pods/fulltext
-          - image: gmail
-            context: services/gmail/pod-gmail
           - image: teronpulse
             context: foundations/teronpulse
           - image: love
@@ -221,8 +208,6 @@ jobs:
             context: services/rekoni
           - image: stats
             context: pods/stats
-          - image: telegram
-            context: services/telegram/pod-telegram
           - image: transactor
             context: pods/server
           - image: workspace
