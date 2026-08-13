@@ -194,8 +194,8 @@ jobs:
             context: pods/front
           - image: fulltext
             context: pods/fulltext
-          - image: teronpulse
-            context: foundations/teronpulse
+          - image: hulypulse
+            context: foundations/hulypulse
           - image: love
             context: services/love
           - image: mail

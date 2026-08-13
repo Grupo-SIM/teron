@@ -112,8 +112,8 @@ async fn engine(
     for h in headers {
         if let Some((mut k, v)) = h.split_once(':') {
             k = k.trim();
-            if k != "IF-MATCH" && k != "IF-NON-MATCH" && k != "TERON-TTL" {
-                panic!("Only `IF-MATCH`, `IF-NON-MATCH`, `TERON-TTL` headers allowed");
+            if k != "IF-MATCH" && k != "IF-NON-MATCH" && k != "HULY-TTL" {
+                panic!("Only `IF-MATCH`, `IF-NON-MATCH`, `HULY-TTL` headers allowed");
             }
             req = req.header(k, v.trim());
         } else {
@@ -203,7 +203,7 @@ async fn put_and_get() {
     // test If-Match
     delete_any(&base, &client, workspace, key).await;
     // delete only tag
-    put(&base, &client, workspace, key, data, &["TERON-TTL: 2"]).await;
+    put(&base, &client, workspace, key, data, &["HULY-TTL: 2"]).await;
     delete_not(
         &base,
         &client,
@@ -224,7 +224,7 @@ async fn put_and_get() {
     get_not(&base, &client, workspace, key).await;
 
     // update with tag
-    put(&base, &client, workspace, key, data, &["TERON-TTL: 2"]).await;
+    put(&base, &client, workspace, key, data, &["HULY-TTL: 2"]).await;
     // replace with match
     put(
         &base,
@@ -318,15 +318,15 @@ async fn put_and_get() {
     .await;
     get_not(&base, &client, &workspace, &key).await;
 
-    // let r = engine("put", &base, &client, &workspace, &key, "Next Another Data", &["TERON-TTL: 2","IF-NON-MATCH: c7bcabf6b98a220f2f4888a18d01568d"]).await;
+    // let r = engine("put", &base, &client, &workspace, &key, "Next Another Data", &["HULY-TTL: 2","IF-NON-MATCH: c7bcabf6b98a220f2f4888a18d01568d"]).await;
     // println!("ALL: {:?}", r);
 
     // test TTL
     delete_any(&base, &client, workspace, key).await;
-    put(&base, &client, workspace, key, data, &["TERON-TTL: 7"]).await;
+    put(&base, &client, workspace, key, data, &["HULY-TTL: 7"]).await;
     let ttl = get_ttl(&base, &client, workspace, key).await;
     assert!(ttl == 7 || ttl == 6, "TTL should be 7 (ok, may by 6)");
-    put(&base, &client, workspace, key, data, &["TERON-TTL: 1"]).await;
+    put(&base, &client, workspace, key, data, &["HULY-TTL: 1"]).await;
     let ttl = get_ttl(&base, &client, workspace, key).await;
     assert!(ttl == 1 || ttl == 0, "TTL should be 1 (ok, may by 0)");
     // wait for 1.05 seconds

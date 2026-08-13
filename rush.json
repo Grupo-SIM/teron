@@ -2572,8 +2572,8 @@
       "shouldPublish": false
     },
     {
-      "packageName": "@hcengineering/teronpulse-client",
-      "projectFolder": "packages/teronpulse-client",
+      "packageName": "@hcengineering/hulypulse-client",
+      "projectFolder": "packages/hulypulse-client",
       "shouldPublish": true
     },
     {

@@ -1,5 +1,5 @@
 {
-  "name": "@hcengineering/teronpulse-client",
+  "name": "@hcengineering/hulypulse-client",
   "version": "0.7.426",
   "main": "lib/index.js",
   "svelte": "src/index.ts",

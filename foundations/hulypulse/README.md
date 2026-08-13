@@ -1,6 +1,6 @@
-# Teronpulse
+# Hulypulse
 
-Teronpulse is a service that enables clients to share information on a “whiteboard”. Clients connected to the same “whiteboard” see data provided by other clients to the whiteboard.
+Hulypulse is a service that enables clients to share information on a “whiteboard”. Clients connected to the same “whiteboard” see data provided by other clients to the whiteboard.
 
 The service is exposed as REST and WebSocket API.
 
@@ -58,8 +58,8 @@ Size of data is limited to some reasonable size
     - Content-Type: application/json
     - Content-Length: optional
     - Headers: TTL or absolute expiration time
-	- `TERON-TTL` — autodelete in N seconds
-	- or `TERON-EXPIRE-AT` — autodelete in UnixTime
+	- `HULY-TTL` — autodelete in N seconds
+	- or `HULY-EXPIRE-AT` — autodelete in UnixTime
 	- default max_ttl = 3600 (settings in config/default.toml)
     - Conditional Headers:
 	- `If-Match: *` — update only if the key exists
@@ -194,7 +194,7 @@ Size of data is limited to some reasonable size
     - ```max_size = 100``` Max value size in bytes
 
 ## Special cargo build options
-    - "auth" (default) - use teron-authorization
+    - "auth" (default) - use huly-authorization
     Disable auth:
         cargo build --no-default-features
     Enable auth:
@@ -202,53 +202,53 @@ Size of data is limited to some reasonable size
 
 ## Running
 
-Pre-build docker images is available at: hardcoreeng/service_teronpulse:{tag}.
+Pre-build docker images is available at: hardcoreeng/service_hulypulse:{tag}.
 
 You can use the following command to run the image locally:
 ```bash
-docker run -p 8095:8095 -it --rm hardcoreeng/service_teronpulse:{tag}
+docker run -p 8095:8095 -it --rm hardcoreeng/service_hulypulse:{tag}
 ```
 
 Run from source using Redis:
 ```bash
-TERON_REDIS_URLS=redis://teron.local:6379 cargo run
+HULY_REDIS_URLS=redis://teron.local:6379 cargo run
 ```
 
 Run from source in in-memory mode:
 ```bash
-TERON_BACKEND=memory cargo run
+HULY_BACKEND=memory cargo run
 ```
 
 If you want to run the service as a part of local teron development environment use the following command:
 ```bash
- export TERON_REDIS_URLS="redis://teron.local:6379"
- docker run --rm -it --network dev_default -p 8095:8095 hardcoreeng/service_teronpulse:{tag}
+ export HULY_REDIS_URLS="redis://teron.local:6379"
+ docker run --rm -it --network dev_default -p 8095:8095 hardcoreeng/service_hulypulse:{tag}
 ```
-This will run Teronpulse in the same network as the rest of teron services, and set the redis connection string to the one matching the local dev redis instance.
+This will run Hulypulse in the same network as the rest of teron services, and set the redis connection string to the one matching the local dev redis instance.
 
-You can then access teronpulse at http://localhost:8095.
+You can then access hulypulse at http://localhost:8095.
 
 
 ## Authetication
-Teronpulse uses bearer JWT token authetication. At the moment, it will accept any token signed by the teronpulse secret. The secret is set in the environment variable TERON_TOKEN_SECRET variable.
+Hulypulse uses bearer JWT token authetication. At the moment, it will accept any token signed by the hulypulse secret. The secret is set in the environment variable HULY_TOKEN_SECRET variable.
 
 ## Configuration
-The following environment variables are used to configure teronpulse:
-   - ```TERON_BIND_HOST```: host to bind the server to (default: 0.0.0.0)
-   - ```TERON_BIND_PORT```: port to bind the server to (default: 8094)
-   - ```TERON_TOKEN_SECRET```: secret used to sign JWT tokens (default: secret)
-   - ```TERON_BACKEND```: storage backend "redis" or "memory" (default: "redis")
-   - ```TERON_REDIS_URLS```: redis connection string (default: redis://teron.local:6379)
-   - ```TERON_REDIS_PASSWORD```: redis password (default: "&lt;invalid&gt;")
-   - ```TERON_REDIS_MODE```: redis mode "direct" or "sentinel" (default: "direct")
-   - ```TERON_REDIS_SERVICE```: redis service (default: "mymaster")
-   - ```TERON_MAX_TTL```: maximum storage time (default: 3600)
-   - TODO: ```TERON_PAYLOAD_SIZE_LIMIT```: maximum size of the payload (default: 2Mb)
+The following environment variables are used to configure hulypulse:
+   - ```HULY_BIND_HOST```: host to bind the server to (default: 0.0.0.0)
+   - ```HULY_BIND_PORT```: port to bind the server to (default: 8094)
+   - ```HULY_TOKEN_SECRET```: secret used to sign JWT tokens (default: secret)
+   - ```HULY_BACKEND```: storage backend "redis" or "memory" (default: "redis")
+   - ```HULY_REDIS_URLS```: redis connection string (default: redis://teron.local:6379)
+   - ```HULY_REDIS_PASSWORD```: redis password (default: "&lt;invalid&gt;")
+   - ```HULY_REDIS_MODE```: redis mode "direct" or "sentinel" (default: "direct")
+   - ```HULY_REDIS_SERVICE```: redis service (default: "mymaster")
+   - ```HULY_MAX_TTL```: maximum storage time (default: 3600)
+   - TODO: ```HULY_PAYLOAD_SIZE_LIMIT```: maximum size of the payload (default: 2Mb)
 
 ## Todo (in no particular order)
 - [ ] Optional value encryption
 - [ ] Support for open telemetry
-- [ ] Concurrency control for database migration (several instances of teronpulse are updated at the same time)
+- [ ] Concurrency control for database migration (several instances of hulypulse are updated at the same time)
 - [ ] TLS support
 - [ ] Liveness/readiness probe endpoint
 

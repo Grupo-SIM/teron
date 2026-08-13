@@ -552,16 +552,16 @@ services:
       - TERON_TOKEN_SECRET=secret
       - TERON_ACCOUNT_SERVICE=http://teron.local:3000
     restart: unless-stopped
-  teronpulse:
-    image: hardcoreeng/teronpulse
+  hulypulse:
+    image: hardcoreeng/hulypulse
     depends_on:
       redis:
         condition: service_started
     ports:
       - 8099:8099
     environment:
-      - TERON_REDIS_URLS=redis://redis:6379
-      - TERON_BIND_PORT=8099
+      - HULY_REDIS_URLS=redis://redis:6379
+      - HULY_BIND_PORT=8099
     restart: unless-stopped
 
   process-service:

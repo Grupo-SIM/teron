@@ -133,7 +133,7 @@ fn default_corr() -> String {
 }
 
 #[cfg(feature = "auth")]
-use teronrs::services::jwt::Claims;
+use hulyrs::services::jwt::Claims;
 
 #[cfg(feature = "auth")]
 async fn wrong_workspace(

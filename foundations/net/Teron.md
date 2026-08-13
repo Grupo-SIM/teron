@@ -29,10 +29,10 @@ flowchart
 
   parsonal-ws:user1 -..->|tx| transactor:ws1
 
-  transactor:ws1 -..->|event's| TeronPulse
+  transactor:ws1 -..->|event's| HulyPulse
   transactor:ws1 -..->|event's| parsonal-ws:user1
 
-  TeronPulse <--> Client
+  HulyPulse <--> Client
 
   Client <--> Endpoint
 
@@ -46,7 +46,7 @@ flowchart
 
   Indexer -..-> QueryDB
 
-  Indexer -..->|indexed tx| TeronPulse
+  Indexer -..->|indexed tx| HulyPulse
 
   Indexer -..->|indexed tx| parsonal-ws:user1
 

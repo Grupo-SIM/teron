@@ -12,7 +12,7 @@
 // limitations under the License
 
 import { type Employee, type Person } from '@hcengineering/contact'
-import { type UnsubscribeCallback, type Callback } from '@hcengineering/teronpulse-client'
+import { type UnsubscribeCallback, type Callback } from '@hcengineering/hulypulse-client'
 import { type Class, type Doc, type Ref } from '@hcengineering/core'
 import { getMetadata } from '@hcengineering/platform'
 import presentation, { createPulseClient } from '@hcengineering/presentation'

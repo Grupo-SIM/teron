@@ -1,6 +1,6 @@
-# TeronpulseClient
+# HulypulseClient
 
-A TypeScript/Node.js client for the Teronpulse WebSocket server.
+A TypeScript/Node.js client for the Hulypulse WebSocket server.
 Supports automatic reconnection, request–response correlation, `get` / `put` / `delete`, and subscriptions.
 
 ---
@@ -109,11 +109,11 @@ or, if needed internally:
 ## Usage Example
 
 ```ts
-import { TeronpulseClient } from "./teronpulse_client.js"
+import { HulypulseClient } from "./hulypulse_client.js"
 
 async function main() {
   // connect
-  const client = await TeronpulseClient.connect("wss://teronpulse_mem.lleo.me/ws")
+  const client = await HulypulseClient.connect("wss://hulypulse_mem.lleo.me/ws")
 
   // subscribe to updates
   const cb = (msg, key, index) => {

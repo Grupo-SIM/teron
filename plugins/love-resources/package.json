@@ -66,7 +66,7 @@
     "@hcengineering/emoji-resources": "workspace:^0.7.426",
     "@hcengineering/theme": "workspace:^0.7.426",
     "@hcengineering/account-client": "workspace:^0.7.426",
-    "@hcengineering/teronpulse-client": "workspace:^0.7.426",
+    "@hcengineering/hulypulse-client": "workspace:^0.7.426",
     "@livekit/krisp-noise-filter": "^0.3.0",
     "@livekit/track-processors": "^0.5.6",
     "livekit-client": "^2.15.6",

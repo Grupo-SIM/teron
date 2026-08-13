@@ -1,4 +1,4 @@
-name: Teronpulse
+name: Hulypulse
 
 on:
   workflow_dispatch:
@@ -30,5 +30,5 @@ jobs:
         with:
           file: Dockerfile
           push: true
-          tags: "${{ vars.DOCKER_USER }}/service_teronpulse:${{ env.VERSION }},${{ vars.DOCKER_USER }}/service_teronpulse:latest"
+          tags: "${{ vars.DOCKER_USER }}/service_hulypulse:${{ env.VERSION }},${{ vars.DOCKER_USER }}/service_hulypulse:latest"
           platforms: linux/amd64,linux/arm64

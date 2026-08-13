@@ -95,7 +95,7 @@ type ProtocolMessage =
   | SubscribesList
   | InfoMessage
 
-export class TeronpulseClient implements Disposable {
+export class HulypulseClient implements Disposable {
   private ws: WebSocket | null = null
   private closed_manually = false
   private reconnectTimeout: any | undefined
@@ -192,7 +192,7 @@ export class TeronpulseClient implements Disposable {
                 clearTimeout(pending.send_timeout)
                 this.pending.delete(id)
                 if ('error' in msg) {
-                  if (typeof msg.error === 'string' && TeronpulseClient.isConnectionLikeError(msg.error)) {
+                  if (typeof msg.error === 'string' && HulypulseClient.isConnectionLikeError(msg.error)) {
                     console.warn('Pulse server reported connection-like error; reconnecting')
                     this.reconnect()
                   }
@@ -279,8 +279,8 @@ export class TeronpulseClient implements Disposable {
     this.ws?.close()
   }
 
-  static async connect (url: string | URL): Promise<TeronpulseClient> {
-    const client = new TeronpulseClient(url)
+  static async connect (url: string | URL): Promise<HulypulseClient> {
+    const client = new HulypulseClient(url)
     await client.connect()
     return client
   }

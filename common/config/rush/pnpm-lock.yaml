@@ -14121,7 +14121,7 @@ importers:
         specifier: ^5.9.3
         version: 5.9.3
 
-  ../../packages/teronpulse-client:
+  ../../packages/hulypulse-client:
     dependencies:
       '@hcengineering/core':
         specifier: workspace:^0.7.426
@@ -14718,9 +14718,9 @@ importers:
       '@hcengineering/teronlake-client':
         specifier: workspace:^0.7.426
         version: link:../../foundations/core/packages/teronlake-client
-      '@hcengineering/teronpulse-client':
+      '@hcengineering/hulypulse-client':
         specifier: workspace:^0.7.426
-        version: link:../teronpulse-client
+        version: link:../hulypulse-client
       '@hcengineering/notification':
         specifier: workspace:^0.7.426
         version: link:../../plugins/notification
@@ -23174,9 +23174,9 @@ importers:
       '@hcengineering/emoji-resources':
         specifier: workspace:^0.7.426
         version: link:../emoji-resources
-      '@hcengineering/teronpulse-client':
+      '@hcengineering/hulypulse-client':
         specifier: workspace:^0.7.426
-        version: link:../../packages/teronpulse-client
+        version: link:../../packages/hulypulse-client
       '@hcengineering/login':
         specifier: workspace:^0.7.426
         version: link:../login
@@ -24306,9 +24306,9 @@ importers:
       '@hcengineering/core':
         specifier: workspace:^0.7.426
         version: link:../../foundations/core/packages/core
-      '@hcengineering/teronpulse-client':
+      '@hcengineering/hulypulse-client':
         specifier: workspace:^0.7.426
-        version: link:../../packages/teronpulse-client
+        version: link:../../packages/hulypulse-client
       '@hcengineering/platform':
         specifier: workspace:^0.7.426
         version: link:../../foundations/core/packages/platform

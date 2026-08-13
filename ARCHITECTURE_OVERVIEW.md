@@ -33,7 +33,7 @@ The Teron platform consists of **30+ microservices** working together in a distr
 | Service | Port | Description |
 |---------|------|-------------|
 | **collaborator** | 3078 | Real-time document collaboration using Y.js CRDT. Enables simultaneous editing with conflict resolution. |
-| **teronpulse** | 8099 | WebSocket notification server. Handles real-time push notifications to connected clients. |
+| **hulypulse** | 8099 | WebSocket notification server. Handles real-time push notifications to connected clients. |
 | **terongun** | - | Event processor. Consumes and processes events from Redpanda for real-time updates. |
 
 ### Media Services
@@ -77,7 +77,7 @@ The Teron platform consists of **30+ microservices** working together in a distr
 | **elastic** | 9200 | Elasticsearch search engine. Stores full-text search indexes managed by fulltext service. |
 | **minio** | 9000, 9001 | S3-compatible object storage. Stores binary files, attachments, images, and blobs in buckets (blobs, eu, backups). |
 | **redpanda** | 9092, 19092 | Kafka-compatible event streaming. Provides reliable async messaging between services. |
-| **redis** | 6379 | In-memory cache and pub/sub. Used by TeronPulse for real-time notifications. |
+| **redis** | 6379 | In-memory cache and pub/sub. Used by HulyPulse for real-time notifications. |
 
 ### Monitoring & Observability
 
@@ -93,7 +93,7 @@ The Teron platform consists of **30+ microservices** working together in a distr
 - **Primary Database**: All services → CockroachDB (main application data)
 - **Search Index**: Fulltext → Elasticsearch
 - **Object Storage**: Services → MinIO (S3 API)
-- **Cache/Pub-Sub**: TeronPulse → Redis
+- **Cache/Pub-Sub**: HulyPulse → Redis
 - **Real-time Updates**: Client ↔ Transactor (WebSocket), Client ↔ Collaborator (WebSocket)
 
 ---
@@ -131,7 +131,7 @@ graph TB
     
     subgraph "Real-time"
         Collaborator[Collaborator<br/>:3078<br/>Doc Sync]
-        Pulse[TeronPulse<br/>:8099<br/>WebSocket]
+        Pulse[HulyPulse<br/>:8099<br/>WebSocket]
         Gun[TeronGun<br/>Events]
     end
     
@@ -376,7 +376,7 @@ sequenceDiagram
 | rekoni | hardcoreeng/rekoni-service | 4004 | Document intelligence | stats |
 | **Real-time** | | | | |
 | collaborator | hardcoreeng/collaborator | 3078 | Real-time document collaboration | account, datalake, transactor |
-| teronpulse | hardcoreeng/teronpulse | 8099 | WebSocket notifications | redis |
+| hulypulse | hardcoreeng/hulypulse | 8099 | WebSocket notifications | redis |
 | terongun | hardcoreeng/terongun | - | Event processor | redpanda, account |
 | **Media** | | | | |
 | stream | hardcoreeng/stream | 1080 | Video streaming | datalake, redpanda |
@@ -481,7 +481,7 @@ sequenceDiagram
 - `BACKUP_STORAGE`: `${BACKUP_STORAGE_CONFIG}`
 - `INTERVAL`: `60` - Backup interval in seconds
 
-### Redis Configuration (TeronPulse)
+### Redis Configuration (HulyPulse)
 - `TERON_REDIS_URLS`: `redis://redis:6379`
 - `TERON_BIND_PORT`: `8099`
 

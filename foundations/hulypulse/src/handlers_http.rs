@@ -228,7 +228,7 @@ impl TryIntoHeaderValue for TtlSecsHeader {
 
 impl header::Header for TtlSecsHeader {
     fn name() -> HeaderName {
-        HeaderName::from_static("teron-ttl")
+        HeaderName::from_static("huly-ttl")
     }
 
     fn parse<M: actix_web::HttpMessage>(msg: &M) -> Result<Self, ParseError> {
@@ -261,7 +261,7 @@ impl TryIntoHeaderValue for TtlExpiresAtHeader {
 
 impl header::Header for TtlExpiresAtHeader {
     fn name() -> HeaderName {
-        HeaderName::from_static("teron-expire-at")
+        HeaderName::from_static("huly-expire-at")
     }
 
     fn parse<M: actix_web::HttpMessage>(msg: &M) -> Result<Self, ParseError> {

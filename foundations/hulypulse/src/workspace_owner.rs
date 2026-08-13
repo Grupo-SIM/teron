@@ -14,7 +14,7 @@
 //
 
 use actix_web::{HttpMessage, HttpRequest};
-use teronrs::services::jwt::Claims;
+use hulyrs::services::jwt::Claims;
 use serde_json::json;
 use std::{fs, path::Path, sync::LazyLock};
 use uuid::Uuid;

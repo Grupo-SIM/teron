@@ -15,12 +15,12 @@
 
 <script lang="ts">
   import { onDestroy, onMount } from 'svelte'
-  import { TeronpulseClient } from '@hcengineering/teronpulse-client'
+  import { HulypulseClient } from '@hcengineering/hulypulse-client'
   import { createPulseClient } from '@hcengineering/presentation'
 
   let parentElement: HTMLDivElement
 
-  let pulseclient: TeronpulseClient | undefined
+  let pulseclient: HulypulseClient | undefined
 
   onMount(async () => {
     pulseclient = await createPulseClient()

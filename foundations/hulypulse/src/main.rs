@@ -32,7 +32,7 @@ use actix_web::{
 };
 
 #[cfg(feature = "auth")]
-use teronrs::services::jwt::{Claims, actix::ServiceRequestExt};
+use hulyrs::services::jwt::{Claims, actix::ServiceRequestExt};
 
 #[cfg(feature = "auth")]
 use secrecy::ExposeSecret;

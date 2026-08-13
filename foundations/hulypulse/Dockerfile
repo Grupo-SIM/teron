@@ -29,7 +29,7 @@ RUN \
 FROM debian:12-slim
 
 ARG TARGET
-COPY --from=builder /tmp/build/target/*/release/teronpulse /usr/local/bin/teronpulse
+COPY --from=builder /tmp/build/target/*/release/hulypulse /usr/local/bin/hulypulse
 RUN apt-get update && apt-get install -y ca-certificates && rm -rf /var/lib/apt/lists/*
 
-ENTRYPOINT ["/usr/local/bin/teronpulse"]
+ENTRYPOINT ["/usr/local/bin/hulypulse"]

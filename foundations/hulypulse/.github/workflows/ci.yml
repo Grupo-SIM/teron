@@ -38,7 +38,7 @@ jobs:
         run: cargo build --locked
 
       - name: Clippy
-        run: cargo clippy --bin teronpulse --all-features -- -D warnings
+        run: cargo clippy --bin hulypulse --all-features -- -D warnings
 
       - name: Unit tests
-        run: cargo test --bin teronpulse --locked
+        run: cargo test --bin hulypulse --locked
