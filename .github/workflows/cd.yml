@@ -40,9 +40,20 @@ jobs:
           path: |
             common/temp/install-run
             common/temp/pnpm-store
-          key: ${{ runner.os }}-rush-dependencies-${{ hashFiles('.nvmrc', 'rush.json', 'common/config/rush/pnpm-lock.yaml', 'common/config/rush/pnpm-config.json') }}
+            common/temp/node_modules
+            common/temp/*.flag
+            common/temp/*.json
+            common/temp/*.yaml
+            */node_modules
+            */*/node_modules
+            */*/*/node_modules
+            */*/*/*/node_modules
+          key: ${{ runner.os }}-rush-dependencies-${{ hashFiles('.nvmrc') }}-${{ hashFiles('rush.json', 'common/config/rush/pnpm-lock.yaml', 'common/config/rush/pnpm-config.json', 'common/config/rush/common-versions.json', 'common/config/rush/.pnpmfile.cjs') }}
+          restore-keys: |
+            ${{ runner.os }}-rush-dependencies-${{ hashFiles('.nvmrc') }}-
 
       - name: Install root workspace dependencies
+        if: steps.rush-dependencies-cache.outputs.cache-hit != 'true'
         run: node common/scripts/install-run-rush.js install
 
       - name: Save Rush and pnpm cache
@@ -52,13 +63,23 @@ jobs:
           path: |
             common/temp/install-run
             common/temp/pnpm-store
+            common/temp/node_modules
+            common/temp/*.flag
+            common/temp/*.json
+            common/temp/*.yaml
+            */node_modules
+            */*/node_modules
+            */*/*/node_modules
+            */*/*/*/node_modules
           key: ${{ steps.rush-dependencies-cache.outputs.cache-primary-key }}
 
       - name: Restore Rush build cache
         id: rush-build-cache
         uses: actions/cache/restore@v5
         with:
-          path: common/temp/build-cache
+          path: |
+            common/temp/build-cache
+            dev/prod/.build_dev
           key: ${{ runner.os }}-rush-build-${{ github.sha }}-${{ github.run_id }}-${{ github.run_attempt }}
           restore-keys: |
             ${{ runner.os }}-rush-build-${{ github.sha }}-
@@ -119,15 +140,16 @@ jobs:
       - name: Package frontend assets
         env:
           NODE_OPTIONS: --max-old-space-size=4096
-        run: |
-          node common/scripts/install-run-rush.js package -v --only @hcengineering/prod
-          node common/scripts/install-run-rush.js package -v --only @hcengineering/pod-front
+          USE_CACHE: "true"
+        run: node common/scripts/install-run-rush.js package -v --only @hcengineering/prod --only @hcengineering/pod-front
 
       - name: Save Rush build cache
         if: always() && steps.rush-build-cache.outputs.cache-hit != 'true'
         uses: actions/cache/save@v5
         with:
-          path: common/temp/build-cache
+          path: |
+            common/temp/build-cache
+            dev/prod/.build_dev
           key: ${{ steps.rush-build-cache.outputs.cache-primary-key }}
 
       - name: Download workspace initialization scripts
@@ -194,8 +216,6 @@ jobs:
             context: pods/front
           - image: fulltext
             context: pods/fulltext
-          - image: hulypulse
-            context: foundations/hulypulse
           - image: love
             context: services/love
           - image: mail
@@ -232,4 +252,23 @@ jobs:
           context: ${{ matrix.context }}
           dockerfile: ${{ matrix.context }}/Dockerfile
           cache-scope: ${{ matrix.image }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+  publish-hulypulse:
+    name: Build and publish hulypulse image
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Build and publish image
+        uses: hyoretsu/gh-actions/ghcr@main
+        with:
+          image: ${{ github.repository }}_hulypulse
+          context: foundations/hulypulse
+          dockerfile: foundations/hulypulse/Dockerfile
+          cache-scope: hulypulse
           password: ${{ secrets.GITHUB_TOKEN }}
