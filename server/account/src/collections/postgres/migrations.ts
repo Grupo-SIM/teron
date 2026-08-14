@@ -114,7 +114,7 @@ function getV1Migration (ns: string, flavor: DBFlavor): [string, string] {
     ${flavor === 'postgres' ? 'CREATE EXTENSION IF NOT EXISTS pgcrypto;' : '-- pgcrypto not needed for CockroachDB'}
 
     /* ======= T Y P E S ======= */
-    CREATE TYPE ${ns}.social_id_type AS ENUM ('email', 'github', 'google', 'phone', 'oidc', 'teron', 'telegram');
+    CREATE TYPE ${ns}.social_id_type AS ENUM ('email', 'github', 'google', 'phone', 'oidc', 'huly', 'telegram');
     CREATE TYPE ${ns}.location AS ENUM ('kv', 'weur', 'eeur', 'wnam', 'enam', 'apac');
     CREATE TYPE ${ns}.workspace_role AS ENUM ('OWNER', 'MAINTAINER', 'USER', 'GUEST', 'DOCGUEST');
 
@@ -585,23 +585,23 @@ function getV16Migration (ns: string, flavor: DBFlavor): [string, string] {
   const addValueSql =
     flavor === 'postgres'
       ? `
-    -- Add teron-assistant value to social_id_type enum (PostgreSQL)
+    -- Add huly-assistant value to social_id_type enum (PostgreSQL)
     DO $$     BEGIN
         IF NOT EXISTS (
             SELECT 1 FROM pg_enum
-            WHERE enumlabel = 'teron-assistant'
+            WHERE enumlabel = 'huly-assistant'
             AND enumtypid = (SELECT oid FROM pg_type WHERE typname = 'social_id_type' AND typnamespace = (SELECT oid FROM pg_namespace WHERE nspname = '${ns}'))
         ) THEN
-            ALTER TYPE ${ns}.social_id_type ADD VALUE 'teron-assistant';
+            ALTER TYPE ${ns}.social_id_type ADD VALUE 'huly-assistant';
         END IF;
     END $$;
     `
       : `
-    -- Add teron-assistant value to social_id_type enum (CockroachDB)
-    ALTER TYPE ${ns}.social_id_type ADD VALUE IF NOT EXISTS 'teron-assistant';
+    -- Add huly-assistant value to social_id_type enum (CockroachDB)
+    ALTER TYPE ${ns}.social_id_type ADD VALUE IF NOT EXISTS 'huly-assistant';
     `
 
-  return ['account_db_v16_add_teron_assistant_social_id_type', addValueSql]
+  return ['account_db_v16_add_huly_assistant_social_id_type', addValueSql]
 }
 
 function getV17Migration (ns: string, flavor: DBFlavor): [string, string] {

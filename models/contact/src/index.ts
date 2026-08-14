@@ -934,7 +934,7 @@ export function createModel (builder: Builder): void {
     {
       label: getEmbeddedLabel('Teron'),
       icon: contact.icon.Teron,
-      type: SocialIdType.TERON
+      type: SocialIdType.HULY
     },
     contact.socialIdentityProvider.Teron
   )

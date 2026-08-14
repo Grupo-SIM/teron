@@ -73,7 +73,7 @@ import {
   checkInvite,
   cleanEmail,
   confirmEmail,
-  confirmTeronIds,
+  confirmHulyIds,
   createAccount,
   createWorkspaceRecord,
   doJoinByInvite,
@@ -326,7 +326,7 @@ export async function signUp (
   } else {
     ctx.warn('Please provide MAIL_URL to enable sign up email confirmations.')
     await confirmEmail(ctx, db, account, email)
-    await confirmTeronIds(ctx, db, account)
+    await confirmHulyIds(ctx, db, account)
   }
 
   void setTimezone(ctx, db, account, null, meta)
@@ -451,7 +451,7 @@ export async function validateOtp (
 
         ctx.info('OTP signup success', emailSocialId)
       } else {
-        await confirmTeronIds(ctx, db, targetAccount.uuid)
+        await confirmHulyIds(ctx, db, targetAccount.uuid)
 
         ctx.info('OTP login/verification success', emailSocialId)
       }
@@ -1347,7 +1347,7 @@ export async function signUpJoin (
   }
 
   ctx.warn('Please provide MAIL_URL to enable sign up email confirmations.')
-  await confirmTeronIds(ctx, db, account)
+  await confirmHulyIds(ctx, db, account)
 
   return await doJoinByInvite(
     ctx,
@@ -1376,7 +1376,7 @@ export async function confirm (
 
   const socialId = await confirmEmail(ctx, db, account, email)
 
-  await confirmTeronIds(ctx, db, account)
+  await confirmHulyIds(ctx, db, account)
 
   const person = await db.person.findOne({ uuid: account })
   if (person == null) {
@@ -2758,7 +2758,7 @@ async function addTeronAssistantSocialId (
 ): Promise<PersonId> {
   const { account } = decodeTokenVerbose(ctx, token)
 
-  return await addSocialIdBase(db, account, SocialIdType.TERON_ASSISTANT, account, true)
+  return await addSocialIdBase(db, account, SocialIdType.HULY_ASSISTANT, account, true)
 }
 
 export async function refreshTeronAssistantToken (
@@ -2769,12 +2769,12 @@ export async function refreshTeronAssistantToken (
 ): Promise<void> {
   const { account } = decodeTokenVerbose(ctx, token)
 
-  const assistantSocialId = await db.socialId.findOne({ type: SocialIdType.TERON_ASSISTANT, personUuid: account })
+  const assistantSocialId = await db.socialId.findOne({ type: SocialIdType.HULY_ASSISTANT, personUuid: account })
   if (assistantSocialId == null) {
     throw new PlatformError(
       new Status(Severity.ERROR, platform.status.SocialIdNotFound, {
         value: account,
-        type: SocialIdType.TERON_ASSISTANT
+        type: SocialIdType.HULY_ASSISTANT
       })
     )
   }
@@ -2836,7 +2836,7 @@ export async function releaseSocialId (
     const socialIds = await db.socialId.find({ personUuid, verifiedOn: { $gt: 0 }, isDeleted: { $ne: true } })
     const afterRemoval = socialIds.filter((it) => it.type !== type || it.value !== value)
 
-    if (afterRemoval.filter((it) => it.type === SocialIdType.TERON).length === 0) {
+    if (afterRemoval.filter((it) => it.type === SocialIdType.HULY).length === 0) {
       throw new PlatformError(new Status(Severity.ERROR, platform.status.Forbidden, {}))
     }
 

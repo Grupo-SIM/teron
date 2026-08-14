@@ -62,7 +62,7 @@
 
   async function getSocialId (): Promise<PersonId | undefined> {
     const socialKey = buildSocialIdString({
-      type: SocialIdType.TERON_ASSISTANT,
+      type: SocialIdType.HULY_ASSISTANT,
       value: account.uuid
     })
     return await accountClient.findSocialIdBySocialKey(socialKey)
