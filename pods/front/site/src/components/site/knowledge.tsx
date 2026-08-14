@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState, type PointerEvent, type RefObject } from "react";
+import { Localized, defaultLocale, type Locale } from "@/i18n/site";
 import { RiveAnim } from "./rive-anim";
 
 type Author = "blue" | "orange";
@@ -145,7 +146,7 @@ const EASE = 0.78;
  */
 const FACE = { from: 0.22, to: 0.72 };
 
-export function Knowledge() {
+export function Knowledge({ locale = defaultLocale }: { locale?: Locale }) {
   const railRef = useRef<HTMLDivElement>(null);
   const cardRef = useRef<HTMLDivElement>(null);
   const docRef = useRef<HTMLDivElement>(null);
@@ -319,7 +320,7 @@ export function Knowledge() {
   const tools = mark > 0.95;
 
   return (
-    <section id="conhecimento" className="lp-know">
+    <Localized locale={locale}><section id="conhecimento" className="lp-know">
       <div className="lp-know-inner">
         <div className="lp-know-art" data-reveal ref={railRef}>
           {/*
@@ -425,6 +426,6 @@ export function Knowledge() {
           </div>
         </div>
       </div>
-    </section>
+    </section></Localized>
   );
 }

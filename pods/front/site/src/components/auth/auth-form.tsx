@@ -1,6 +1,7 @@
 "use client";
 
 import { usePillGlow } from "@/components/site/use-pill-glow";
+import { Localized, defaultLocale, type Locale } from "@/i18n/site";
 
 import { AuthButtonLights } from "./auth-decor";
 
@@ -22,13 +23,14 @@ type AuthFormProps = {
   submitLabel: string;
   /** Entrada correspondente no fluxo de autenticação original. */
   flowHref: "/login" | "/login/signup";
+  locale?: Locale;
 };
 
-export function AuthForm({ submitLabel, flowHref }: AuthFormProps) {
+export function AuthForm({ submitLabel, flowHref, locale = defaultLocale }: AuthFormProps) {
   const wrapRef = usePillGlow<HTMLDivElement>();
 
   return (
-    <form className="auth-form" method="get" action={flowHref}>
+    <Localized locale={locale}><form className="auth-form" method="get" action={flowHref}>
       <label className="auth-label" htmlFor="email">
         E-mail
       </label>
@@ -65,6 +67,6 @@ export function AuthForm({ submitLabel, flowHref }: AuthFormProps) {
           <AuthButtonLights />
         </div>
       </div>
-    </form>
+    </form></Localized>
   );
 }

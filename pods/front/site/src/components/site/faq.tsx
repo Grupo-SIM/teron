@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { Localized, defaultLocale, type Locale } from "@/i18n/site";
 
 const FAQS = [
   {
@@ -29,12 +30,12 @@ const FAQS = [
   },
 ];
 
-export function Faq() {
+export function Faq({ locale = defaultLocale }: { locale?: Locale }) {
   // um item por vez, como no acordeão original
   const [open, setOpen] = useState<number | null>(null);
 
   return (
-    <section id="faq" className="lp-faq">
+    <Localized locale={locale}><section id="faq" className="lp-faq">
       <a href="/cadastro" className="lp-faq-cta">
         Começar agora
       </a>
@@ -74,6 +75,6 @@ export function Faq() {
           </div>
         </div>
       </div>
-    </section>
+    </section></Localized>
   );
 }

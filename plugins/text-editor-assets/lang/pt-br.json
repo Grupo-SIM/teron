@@ -76,6 +76,17 @@
     "Subscript": "Subscript",
     "Superscript": "Superscript",
     "Mathematics": "Mathematics",
-    "MathematicsBlock": "Mathematics block"
+    "MathematicsBlock": "Mathematics block",
+    "MergeCells": "Mesclar células",
+    "SplitCells": "Dividir células",
+    "CategoryCell": "Células",
+    "SelectTable": "Selecionar tabela",
+    "MermaidDiargram": "Diagrama",
+    "Comment": "Comentário",
+    "AddComment": "Adicionar comentário",
+    "AddCommentPlaceholder": "Adicione um comentário...",
+    "SetCellHighlightColor": "Definir cor da célula",
+    "SetTextColor": "Definir cor do texto",
+    "LatestVersion": "Mais recente"
   }
 }

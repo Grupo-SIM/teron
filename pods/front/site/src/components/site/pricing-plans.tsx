@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { Localized, defaultLocale, type Locale } from "@/i18n/site";
 
 /*
  * Régua horizontal de planos.
@@ -63,7 +64,7 @@ const PLANS: Plan[] = [
   },
 ];
 
-export function PricingPlans() {
+export function PricingPlans({ locale = defaultLocale }: { locale?: Locale }) {
   const railRef = useRef<HTMLDivElement>(null);
   const [active, setActive] = useState(0);
   /*
@@ -144,7 +145,7 @@ export function PricingPlans() {
   };
 
   return (
-    <div className="lp-pr-rail-wrap">
+    <Localized locale={locale}><div className="lp-pr-rail-wrap">
       <h2 className="lp-pr-sr">Planos da Teron</h2>
       <div ref={railRef} className="lp-pr-rail">
         <div className="lp-pr-track">
@@ -200,9 +201,14 @@ export function PricingPlans() {
                     <span className="lp-pr-amount">Grátis</span>
                   ) : plan.price ? (
                     <>
-                      <span className="lp-pr-amount">R$ {plan.price.int}</span>
+                      <span className="lp-pr-amount">
+                        {locale === "en-US" ? "BRL" : "R$"} {plan.price.int}
+                      </span>
                       {plan.price.cents ? (
-                        <span className="lp-pr-cents">,{plan.price.cents}</span>
+                        <span className="lp-pr-cents">
+                          {locale === "en-US" ? "." : ","}
+                          {plan.price.cents}
+                        </span>
                       ) : null}
                       <span className="lp-pr-per">{plan.price.per}</span>
                     </>
@@ -249,7 +255,7 @@ export function PricingPlans() {
           })}
         </div>
       </div>
-    </div>
+    </div></Localized>
   );
 }
 

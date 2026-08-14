@@ -37,6 +37,7 @@
     deviceOptionsStore as deviceInfo,
     getCurrentResolvedLocation,
     locationToUrl,
+    Label,
     Menu,
     navigate,
     showPopup
@@ -248,7 +249,7 @@
     >
       {#if getCurrentEmployee() === core.employee.System}
         <div class="ml-2 flex-col">
-          <div class="overflow-label fs-bold">System</div>
+          <div class="overflow-label fs-bold"><Label label={core.string.System} /></div>
         </div>
       {:else}
         {#if person}

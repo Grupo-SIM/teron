@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 
 import { LegalPage, LegalSection } from "@/components/site/legal-page";
+import { Localized, defaultLocale, type Locale } from "@/i18n/site";
 
 export const metadata: Metadata = {
   title: "Teron — Política de Privacidade",
@@ -9,9 +10,9 @@ export const metadata: Metadata = {
     "Como a Teron coleta, usa, compartilha e protege dados pessoais, e como exercer os direitos previstos na LGPD.",
 };
 
-export default function PrivacidadePage() {
+export function PrivacidadeContent({ locale = defaultLocale }: { locale?: Locale }) {
   return (
-    <LegalPage
+    <Localized locale={locale}><LegalPage
       title="Política de Privacidade"
       updatedAt="11 de agosto de 2026"
       intro="Esta Política explica quais dados pessoais a Teron trata, para quê, com quem compartilha e como você exerce seus direitos. Ela segue a Lei Geral de Proteção de Dados (Lei nº 13.709/2018)."
@@ -213,6 +214,10 @@ export default function PrivacidadePage() {
           <Link href="/termos">Termos de Serviço</Link>.
         </p>
       </LegalSection>
-    </LegalPage>
+    </LegalPage></Localized>
   );
+}
+
+export default function PrivacidadePage() {
+  return <PrivacidadeContent />;
 }

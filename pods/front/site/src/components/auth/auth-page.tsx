@@ -1,6 +1,7 @@
 import Link from "next/link";
 
 import { Asset } from "@/components/site/asset";
+import { Localized, defaultLocale, type Locale } from "@/i18n/site";
 
 import { AuthDecor } from "./auth-decor";
 import { AuthForm } from "./auth-form";
@@ -40,11 +41,11 @@ const COPY = {
   },
 } as const satisfies Record<AuthVariant, unknown>;
 
-export function AuthPage({ variant }: { variant: AuthVariant }) {
+export function AuthPage({ variant, locale = defaultLocale }: { variant: AuthVariant; locale?: Locale }) {
   const copy = COPY[variant];
 
   return (
-    <div className="auth-page">
+    <Localized locale={locale}><div className="auth-page">
       <header className="auth-topbar">
         <Link href="/" className="auth-home">
           <BackArrow />
@@ -81,7 +82,7 @@ export function AuthPage({ variant }: { variant: AuthVariant }) {
           <Link href="/privacidade">Política de Privacidade</Link>
         </div>
       </section>
-    </div>
+    </div></Localized>
   );
 }
 

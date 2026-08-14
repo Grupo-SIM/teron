@@ -65,6 +65,13 @@
     "AddRelation": "Adicionar relação",
     "PersonId": "ID de pessoa",
     "AccountId": "Conta",
-    "Version": "Versão"
+    "Version": "Versão",
+    "TypedSpace": "Espaço tipado",
+    "SpaceType": "Tipo de espaço",
+    "ShortDescription": "Descrição curta",
+    "Descriptor": "Descritor",
+    "TargetClass": "Classe de destino",
+    "Role": "Função",
+    "Roles": "Funções"
   }
 }

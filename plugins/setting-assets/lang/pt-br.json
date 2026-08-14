@@ -240,6 +240,15 @@
     "ShowQRCode": "Mostrar código QR",
     "EnterVerificationCode": "Inserir código de verificação",
     "OverrideAttribute": "Sobrescrever atributo",
-    "Required": "Obrigatório"
+    "Required": "Obrigatório",
+    "SpaceTypes": "Tipos de espaço",
+    "NewSpaceType": "Novo tipo de espaço",
+    "SpaceTypeTitle": "Título do tipo de espaço",
+    "General": "Geral",
+    "Description": "Descrição",
+    "CountSpaces": "{count, plural, =0 {Nenhum espaço} =1 {# espaço} other {# espaços}}",
+    "Roles": "Funções",
+    "RoleName": "Nome da função",
+    "Permissions": "Permissões"
   }
 }

@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import { Localized, defaultLocale, type Locale } from "@/i18n/site";
 
 /**
  * Seção de integração com o GitHub, no mesmo arranjo do teron.io: título curto,
@@ -116,9 +117,9 @@ const FEATURES = [
   },
 ];
 
-export function GithubSync() {
+export function GithubSync({ locale = defaultLocale }: { locale?: Locale }) {
   return (
-    <section id="github" className="lp-gh">
+    <Localized locale={locale}><section id="github" className="lp-gh">
       <div className="lp-gh-inner">
         <h2 data-reveal className="lp-gh-title">
           Sincronize com o GitHub.
@@ -177,6 +178,6 @@ export function GithubSync() {
           ))}
         </ul>
       </div>
-    </section>
+    </section></Localized>
   );
 }

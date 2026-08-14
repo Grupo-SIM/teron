@@ -1,8 +1,8 @@
 {
   "teron.local:8080": {
     "title": "Teron",
-    "languages": "en,ru,pl,pt,pt-br,es,zh,fr,de,ja,ko,tr",
-    "defaultLanguage": "en",
+    "languages": "pt-br,en",
+    "defaultLanguage": "pt-br",
     "defaultApplication": "tracker",
     "defaultSpace": "tracker:project:DefaultProject",
     "lastNameFirst": "true",
@@ -30,8 +30,8 @@
   },
   "teron.local:8087": {
     "title": "Teron",
-    "languages": "en,ru,pl,pt,pt-br,es,zh,fr,de,ja,ko,tr",
-    "defaultLanguage": "en",
+    "languages": "pt-br,en",
+    "defaultLanguage": "pt-br",
     "defaultApplication": "tracker",
     "defaultSpace": "tracker:project:DefaultProject",
     "defaultSpecial": "issues",

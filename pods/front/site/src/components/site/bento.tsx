@@ -1,11 +1,13 @@
+import { Localized, defaultLocale, type Locale } from "@/i18n/site";
+
 /**
  * Grid de cards da seção "Plataforma", com o mesmo arranjo do teron.io:
  * duas colunas de cards que quebram em linhas — tarefas/planner em cima,
  * anotações/tempo real embaixo, calendário/chat/projetos à direita.
  */
-export function Bento() {
+export function Bento({ locale = defaultLocale }: { locale?: Locale }) {
   return (
-    <div className="lp-bento">
+    <Localized locale={locale}><div className="lp-bento">
       <ul className="lp-bento-col lp-bento-col-a">
         <li className="lp-bento-card lp-bento-tasks">
           <p className="lp-bento-txt">
@@ -156,6 +158,6 @@ export function Bento() {
           />
         </li>
       </ul>
-    </div>
+    </div></Localized>
   );
 }

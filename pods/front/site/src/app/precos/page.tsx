@@ -8,6 +8,7 @@ import { RevealObserver } from "@/components/site/reveal-observer";
 import { Word, Words, WordsObserver } from "@/components/site/scroll-words";
 import { SiteFooter } from "@/components/site/site-footer";
 import { SiteHeader } from "@/components/site/site-header";
+import { Localized, defaultLocale, type Locale } from "@/i18n/site";
 
 export const metadata: Metadata = {
   title: "Teron — Planos e preços",
@@ -44,9 +45,9 @@ const CUSTOM =
 
 const CONTACT = "Pronto para conversar e receber uma proposta personalizada?";
 
-export default function PrecosPage() {
+export function PrecosContent({ locale = defaultLocale }: { locale?: Locale }) {
   return (
-    <div className="lp-pr-page">
+    <Localized locale={locale}><div className="lp-pr-page">
       {/* O texto nasce apagado esperando o efeito; sem JS ele precisa acender
           sozinho, senão a página inteira fica ilegível. */}
       <noscript>
@@ -220,6 +221,10 @@ export default function PrecosPage() {
       </main>
 
       <SiteFooter />
-    </div>
+    </div></Localized>
   );
+}
+
+export default function PrecosPage() {
+  return <PrecosContent />;
 }

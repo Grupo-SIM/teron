@@ -1,4 +1,5 @@
 import type { ReactNode } from "react";
+import { Localized, defaultLocale, type Locale } from "@/i18n/site";
 
 import { SiteFooter } from "./site-footer";
 import { SiteHeader } from "./site-header";
@@ -14,6 +15,7 @@ type LegalPageProps = {
   updatedAt: string;
   intro: string;
   children: ReactNode;
+  locale?: Locale;
 };
 
 export function LegalPage({
@@ -21,9 +23,10 @@ export function LegalPage({
   updatedAt,
   intro,
   children,
+  locale = defaultLocale,
 }: LegalPageProps) {
   return (
-    <div className="lp-legal-page">
+    <Localized locale={locale}><div className="lp-legal-page">
       <SiteHeader />
 
       <main className="lp-legal">
@@ -34,7 +37,7 @@ export function LegalPage({
       </main>
 
       <SiteFooter />
-    </div>
+    </div></Localized>
   );
 }
 

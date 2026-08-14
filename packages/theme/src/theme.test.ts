@@ -4,7 +4,7 @@
 // Licensed under the Eclipse Public License v2.0 (SPDX: EPL-2.0).
 //
 
-import { getCurrentTheme, ThemeVariant } from './index'
+import { getCurrentTheme, setDefaultLanguage, ThemeVariant } from './index'
 
 describe('forced application theme', () => {
   it('ignores a stored light preference', () => {
@@ -44,6 +44,44 @@ describe('forced application theme', () => {
       } else {
         Reflect.deleteProperty(globalThis, 'matchMedia')
       }
+    }
+  })
+})
+
+describe('default application language', () => {
+  it('sets pt-br when no preference has been saved', () => {
+    const previousLocalStorage = Object.getOwnPropertyDescriptor(globalThis, 'localStorage')
+    const setItem = jest.fn()
+    try {
+      Object.defineProperty(globalThis, 'localStorage', {
+        configurable: true,
+        value: { getItem: jest.fn(() => null), setItem }
+      })
+
+      setDefaultLanguage('pt-br')
+
+      expect(setItem).toHaveBeenCalledWith('lang', 'pt-br')
+    } finally {
+      if (previousLocalStorage !== undefined) Object.defineProperty(globalThis, 'localStorage', previousLocalStorage)
+      else Reflect.deleteProperty(globalThis, 'localStorage')
+    }
+  })
+
+  it('preserves an existing language preference', () => {
+    const previousLocalStorage = Object.getOwnPropertyDescriptor(globalThis, 'localStorage')
+    const setItem = jest.fn()
+    try {
+      Object.defineProperty(globalThis, 'localStorage', {
+        configurable: true,
+        value: { getItem: jest.fn(() => 'en'), setItem }
+      })
+
+      setDefaultLanguage('pt-br')
+
+      expect(setItem).not.toHaveBeenCalled()
+    } finally {
+      if (previousLocalStorage !== undefined) Object.defineProperty(globalThis, 'localStorage', previousLocalStorage)
+      else Reflect.deleteProperty(globalThis, 'localStorage')
     }
   })
 })

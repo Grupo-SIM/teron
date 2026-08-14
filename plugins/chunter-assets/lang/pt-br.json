@@ -121,7 +121,7 @@
     "JoinChannel": "Participar no canal",
     "YouJoinedChannel": "Entrou no canal",
     "AndMore": "e mais {count}",
-    "IsTyping": "está digitando...",
+    "IsTyping": "{count, plural, =1 {está digitando...} other {estão digitando...}}",
     "ThreadIn": "Conversa em {name}",
     "TranslateMessage": "Traduzir mensagem",
     "Translate": "Traduzir",
@@ -132,6 +132,7 @@
     "ViewingArchivedChannel": "Você está vendo um canal arquivado",
     "OpenChatInSidebar": "Abrir chat na barra lateral",
     "NoThreadsYet": "Não há conversas ainda.",
-    "SummarizeMessages": "Resumir discussão"
+    "SummarizeMessages": "Resumir discussão",
+    "ResolveThread": "Resolver"
   }
 }

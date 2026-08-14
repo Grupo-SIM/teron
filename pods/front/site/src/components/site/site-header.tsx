@@ -1,7 +1,10 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { usePathname } from "next/navigation";
+import { useEffect, useState, type MouseEvent } from "react";
+import { DocumentLocale } from "@/i18n/document-locale";
+import { Localized, defaultLocale, type Locale } from "@/i18n/site";
 import { Asset } from "./asset";
 
 type SiteSession =
@@ -27,9 +30,22 @@ const LINKS = [
   { href: "/precos", label: "Preços" },
 ];
 
-export function SiteHeader() {
+export function SiteHeader({ locale = defaultLocale }: { locale?: Locale }) {
   const [menuOpen, setMenuOpen] = useState(false);
   const [session, setSession] = useState<SiteSession | null>(null);
+  const pathname = usePathname();
+  const nextLocale: Locale = locale === "pt-BR" ? "en-US" : "pt-BR";
+  const languageHref =
+    nextLocale === "en-US"
+      ? `/en-US${pathname === "/" ? "" : pathname}`
+      : pathname.replace(/^\/en-US(?=\/|$)/, "") || "/";
+
+  const switchLanguage = (event: MouseEvent<HTMLAnchorElement>) => {
+    event.preventDefault();
+    const url = new URL(window.location.href);
+    url.pathname = languageHref;
+    window.location.assign(url.toString());
+  };
 
   useEffect(() => {
     const controller = new AbortController();
@@ -70,7 +86,7 @@ export function SiteHeader() {
   }, [menuOpen]);
 
   return (
-    <header
+    <Localized locale={locale}><><DocumentLocale locale={locale} /><header
       style={{
         position: "absolute",
         top: 0,
@@ -113,6 +129,9 @@ export function SiteHeader() {
           className="lp-desktop-only"
           style={{ alignItems: "center", gap: 18 }}
         >
+          <a href={languageHref} onClick={switchLanguage} className="lp-link-plain" style={{ fontSize: 13 }}>
+            {nextLocale}
+          </a>
           {session?.authenticated ? (
             <WorkspaceLink href={session.workspaceHref} />
           ) : session === null ? null : (
@@ -200,6 +219,9 @@ export function SiteHeader() {
           </nav>
 
           <div className="lp-menu-actions">
+            <a href={languageHref} onClick={switchLanguage} className="lp-menu-btn">
+              {nextLocale}
+            </a>
             {session?.authenticated ? (
               <a
                 href={session.workspaceHref}
@@ -229,13 +251,13 @@ export function SiteHeader() {
           </div>
         </div>
       )}
-    </header>
+    </header></></Localized>
   );
 }
 
-function WorkspaceLink({ href }: { href: string }) {
+function WorkspaceLink({ href, locale = defaultLocale }: { href: string; locale?: Locale }) {
   return (
-    <a
+    <Localized locale={locale}><a
       href={href}
       className="lp-btn-white"
       style={{
@@ -246,6 +268,6 @@ function WorkspaceLink({ href }: { href: string }) {
       }}
     >
       Ir para o workspace
-    </a>
+    </a></Localized>
   );
 }

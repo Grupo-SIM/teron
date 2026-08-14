@@ -70,6 +70,12 @@
     await loadPluginStrings($currentLanguage, set)
     setOptions(getCurrentFontSize(), getCurrentTheme(), language, getCurrentEmoji())
   }
+
+  const getHtmlLanguage = (language: string): string => {
+    if (language === 'pt-br') return 'pt-BR'
+    if (language === 'en') return 'en-US'
+    return language
+  }
   const setEmoji = (emoji: string, set = true) => {
     currentEmoji.set(emoji)
     if (set) {
@@ -100,7 +106,7 @@
   })
 
   const setDocumentLanguage = (): void => {
-    document.documentElement.lang = $currentLanguage
+    document.documentElement.lang = getHtmlLanguage($currentLanguage)
   }
 
   onMount(() => {

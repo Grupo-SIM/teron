@@ -9,6 +9,7 @@ import { RiveCard } from "@/components/site/rive-card";
 import { SiteFooter } from "@/components/site/site-footer";
 import { SiteHeader } from "@/components/site/site-header";
 import { VideoBlock } from "@/components/site/video-block";
+import { Localized, defaultLocale, type Locale } from "@/i18n/site";
 
 const PROBLEMS = [
   {
@@ -47,9 +48,9 @@ const CAPABILITIES = [
   },
 ];
 
-export default function Home() {
+export function HomeContent({ locale = defaultLocale }: { locale?: Locale }) {
   return (
-    <div
+    <Localized locale={locale}><div
       style={{
         position: "relative",
         background: "#000",
@@ -432,6 +433,10 @@ export default function Home() {
       </section>
 
       <SiteFooter />
-    </div>
+    </div></Localized>
   );
+}
+
+export default function Home() {
+  return <HomeContent />;
 }

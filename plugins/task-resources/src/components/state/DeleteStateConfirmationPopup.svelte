@@ -4,7 +4,8 @@
   import { getEmbeddedLabel } from '@hcengineering/platform'
   import { createQuery } from '@hcengineering/presentation'
   import task, { TaskType } from '@hcengineering/task'
-  import { ButtonMenu } from '@hcengineering/ui'
+  import { ButtonMenu, Label } from '@hcengineering/ui'
+  import plugin from '../../plugin'
 
   export let object: Status
   export let taskType: TaskType
@@ -41,12 +42,9 @@
   <div class="flex-grow mt-4">
     {#if total > 0}
       <div class="flex-grow justify-between">
-        <span class="fs-title">
-          A status {object.name} is in use by {total} tasks.
-        </span>
+        <span class="fs-title"><Label label={plugin.string.UpdateTasksStatusRequest} params={{ total }} /></span>
       </div>
       <div class="flex-grow justify-between mt-2">
-        <span> A new status should be selected. </span>
         <ButtonMenu
           {items}
           {selected}
@@ -58,8 +56,6 @@
           }}
         />
       </div>
-    {:else}
-      <span> It is safe to delete status, it is not used. </span>
     {/if}
   </div>
 </DeleteConfirmationPopup>

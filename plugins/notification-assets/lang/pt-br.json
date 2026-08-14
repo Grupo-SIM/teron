@@ -53,9 +53,12 @@
     "PushNotificationsDescription": "Receba notificações pessoais no desktop.",
     "Sound": "Som",
     "SoundNotificationsDescription": "Receba notificações sonoras para eventos.",
-    "CommonNotificationCollectionAdded":  "{senderName} adicionou {collection}",
+    "CommonNotificationCollectionAdded": "{senderName} adicionou {collection}",
     "CommonNotificationCollectionRemoved": "{senderName} removeu {collection}",
     "NoAccessToObject": "Você não tem mais acesso a este objeto",
-    "ViewIn": "Ver em {app}"
+    "ViewIn": "Ver em {app}",
+    "YouRemovedCollaborators": "Você foi removido dos colaboradores",
+    "Unsubscribe": "Cancelar inscrição",
+    "Unreads": "Não lidas"
   }
 }

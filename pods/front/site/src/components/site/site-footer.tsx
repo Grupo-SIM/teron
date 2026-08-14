@@ -1,14 +1,16 @@
 import Link from "next/link";
 
+import { Localized, defaultLocale, type Locale } from "@/i18n/site";
+
 import { Asset } from "./asset";
 
 /**
  * Rodapé do site. Vive fora da página porque agora é usado também em
  * `/precos`, e duas cópias divergiriam na primeira mudança de link.
  */
-export function SiteFooter() {
+export function SiteFooter({ locale = defaultLocale }: { locale?: Locale }) {
   return (
-    <footer style={{ padding: "40px 24px 40px" }}>
+    <Localized locale={locale}><footer style={{ padding: "40px 24px 40px" }}>
       <div style={{ maxWidth: 1240, margin: "0 auto" }}>
         <div style={{ textAlign: "center", marginBottom: 40 }}>
           <Asset
@@ -33,6 +35,6 @@ export function SiteFooter() {
           <span>Feito com paixão e Teron</span>
         </div>
       </div>
-    </footer>
+    </footer></Localized>
   );
 }

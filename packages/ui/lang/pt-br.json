@@ -47,7 +47,7 @@
         "DueDatePopupOverdueTitle": "Venceu em {value}",
         "DueDatePopupDescription": "{value, plural, =0 {Hoje} =1 {Amanhã} other {# dias restantes}}",
         "DueDatePopupOverdueDescription": "{value, plural, =1 {1 dia em atraso} other {# dias em atraso}}",
-        "English": "English",
+        "English": "Inglês (EUA)",
         "Russian": "Русский",
         "Polish": "Polski",
         "Portuguese": "Português",

@@ -12,7 +12,7 @@
 <!-- limitations under the License. -->
 
 <script lang="ts">
-  import { Applet } from '@hcengineering/communication'
+  import communication, { Applet } from '@hcengineering/communication'
   import { createEventDispatcher } from 'svelte'
   import { Label } from '@hcengineering/ui'
   import presentation from '@hcengineering/presentation'
@@ -27,7 +27,7 @@
 </script>
 
 <div class="flex-row-center attachment-container">
-  <div class="flex-center icon">Poll</div>
+  <div class="flex-center icon"><Label label={communication.string.Poll} /></div>
 
   <div class="flex-col info-container">
     <div class="name overflow-label">

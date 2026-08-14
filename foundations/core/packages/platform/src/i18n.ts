@@ -34,6 +34,12 @@ const loaders = new Map<Plugin, Loader>()
 const translations = new Map<string, Map<Plugin, Messages | Status>>()
 const cache = new Map<string, Map<IntlString, IntlMessageFormat | Status>>()
 const englishTranslationsForMissing = new Map<Plugin, Messages | Status>()
+
+function getIntlLocale (locale: string): string {
+  if (locale === 'pt-br') return 'pt-BR'
+  if (locale === 'en') return 'en-US'
+  return locale
+}
 /**
  * @public
  * @param plugin -
@@ -209,7 +215,7 @@ export async function translate<P extends Record<string, any>> (
       localCache.set(message, translation)
       return message
     }
-    const compiledNew = new IntlMessageFormat(translation, locale, undefined, { ignoreTag: true })
+    const compiledNew = new IntlMessageFormat(translation, getIntlLocale(locale), undefined, { ignoreTag: true })
     localCache.set(message, compiledNew)
     return compiledNew.format(params)
   } catch (err) {

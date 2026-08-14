@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { Localized, defaultLocale, type Locale } from "@/i18n/site";
 
 /**
  * Bloco do escritório virtual: a arte de fundo (`video-block.png`) com a
@@ -12,7 +13,7 @@ import { useEffect, useRef, useState } from "react";
  * bastante para cobrir o que estava queimado na arte. Cabeçalho e controles
  * eram parte da imagem e voltam aqui como HTML.
  */
-export function VideoBlock() {
+export function VideoBlock({ locale = defaultLocale }: { locale?: Locale }) {
   const hostRef = useRef<HTMLDivElement>(null);
   const [load, setLoad] = useState(false);
 
@@ -36,7 +37,7 @@ export function VideoBlock() {
   }, []);
 
   return (
-    <div className="lp-office" ref={hostRef}>
+    <Localized locale={locale}><div className="lp-office" ref={hostRef}>
       {/* eslint-disable-next-line @next/next/no-img-element -- arte solta em public */}
       <img className="lp-office-plate" src="/assets/video-block.png" alt="" />
 
@@ -102,6 +103,6 @@ export function VideoBlock() {
           </span>
         </div>
       </div>
-    </div>
+    </div></Localized>
   );
 }

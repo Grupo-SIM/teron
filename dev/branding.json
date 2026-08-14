@@ -3,21 +3,21 @@
     "key": "teron-dev",
     "title": "Teron",
     "protocol": "http",
-    "language": "en",
+    "language": "pt-br",
     "lastNameFirst": "true"
   },
   "teron.local:8087": {
     "key": "teron",
     "title": "Teron",
     "protocol": "http",
-    "language": "en",
+    "language": "pt-br",
     "lastNameFirst": "true"
   },
   "host.docker.internal:8087": {
     "key": "teron-docker",
     "title": "Teron",
     "protocol": "http",
-    "language": "en",
+    "language": "pt-br",
     "lastNameFirst": "true"
   },
   "teron.local:8081": {

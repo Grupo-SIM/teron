@@ -89,6 +89,8 @@
     "NoFilesYet": "Ainda não há arquivos neste espaço de trabalho.",
     "UnknownLocation": "Arquivo independente",
     "StorageAccessDenied": "Apenas proprietários e mantenedores do espaço de trabalho podem gerenciar o armazenamento.",
-    "Refresh": "Atualizar"
+    "Refresh": "Atualizar",
+    "SubscriptionOperationFailed": "Falha na operação da assinatura",
+    "SubscriptionErrorMessage": "Algo deu errado. Tente novamente ou entre em contato com o suporte."
   }
 }

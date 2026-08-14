@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 
 import { LegalPage, LegalSection } from "@/components/site/legal-page";
+import { Localized, defaultLocale, type Locale } from "@/i18n/site";
 
 export const metadata: Metadata = {
   title: "Teron — Termos de Serviço",
@@ -9,9 +10,9 @@ export const metadata: Metadata = {
     "Condições de uso da plataforma Teron: conta, planos e cobrança, uso aceitável, propriedade do conteúdo e encerramento.",
 };
 
-export default function TermosPage() {
+export function TermosContent({ locale = defaultLocale }: { locale?: Locale }) {
   return (
-    <LegalPage
+    <Localized locale={locale}><LegalPage
       title="Termos de Serviço"
       updatedAt="11 de agosto de 2026"
       intro="Estes Termos regem o uso da Teron — a plataforma de trabalho que reúne projetos, tarefas, documentos e comunicação em um só lugar. Ao criar uma conta ou usar a plataforma, você concorda com o que está escrito aqui."
@@ -190,6 +191,10 @@ export default function TermosPage() {
           <a href="mailto:jbmidiadigital@gmail.com">jbmidiadigital@gmail.com</a>.
         </p>
       </LegalSection>
-    </LegalPage>
+    </LegalPage></Localized>
   );
+}
+
+export default function TermosPage() {
+  return <TermosContent />;
 }

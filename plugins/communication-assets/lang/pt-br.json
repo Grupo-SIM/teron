@@ -93,6 +93,7 @@
     "Translate": "Traduzir",
     "WriteMessageEllipsis": "Escreva uma mensagem...",
     "EditMessageEllipsis": "Editar mensagem...",
-    "ArrowDownMessages": "↓ Últimas mensagens"
+    "ArrowDownMessages": "↓ Últimas mensagens",
+    "ThreadWasRemoved": "Esta conversa foi removida."
   }
 }
