@@ -8,9 +8,19 @@ const manrope = Manrope({
 });
 
 export const metadata: Metadata = {
+  applicationName: "Teron",
   title: "Teron — Tudo o que sua equipe precisa. Em um só lugar.",
   description:
     "Centralize projetos, tarefas, reuniões e comunicação em uma única plataforma para sua equipe produzir mais.",
+  manifest: "/teron/site.webmanifest",
+  icons: {
+    icon: [
+      { url: "/teron/favicon.svg", type: "image/svg+xml" },
+      { url: "/teron/favicon.ico", sizes: "any" },
+    ],
+    shortcut: "/teron/favicon.ico",
+    apple: "/teron/apple-touch-icon.png",
+  },
 };
 
 export default function RootLayout({ children }: LayoutProps<"/">) {
