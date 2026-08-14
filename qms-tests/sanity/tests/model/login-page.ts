@@ -20,7 +20,7 @@ export class LoginPage {
   }
 
   async goto (): Promise<void> {
-    await (await this.page.goto(`${PlatformURI}/login/login`))?.finished()
+    await (await this.page.goto(`${PlatformURI}/entrar/login`))?.finished()
   }
 
   async login (email: string, password: string): Promise<void> {

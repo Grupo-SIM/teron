@@ -15,6 +15,7 @@
 -->
 <script lang="ts">
   import { concatLink } from '@hcengineering/core'
+  import { loginRoute, signupRoute } from '@hcengineering/login'
   import { getMetadata, setMetadata } from '@hcengineering/platform'
   import presentation from '@hcengineering/presentation'
   import {
@@ -69,7 +70,10 @@
 
   function updatePageLoc (loc: Location): void {
     const token = getMetadata(presentation.metadata.Token)
-    page = (loc.path[1] as Pages) ?? (token != null ? 'selectWorkspace' : 'login')
+    page =
+      loc.path[0] === signupRoute
+        ? 'signup'
+        : ((loc.path[1] as Pages) ?? (token != null ? 'selectWorkspace' : 'login'))
     if (page === 'join' && loc.query?.autoJoin !== undefined) {
       page = 'autoJoin'
     }

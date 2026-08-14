@@ -38,7 +38,7 @@ import {
   type WorkspaceInfoWithStatus,
   type WorkspaceUserOperation
 } from '@hcengineering/core'
-import { loginId } from '@hcengineering/login'
+import { loginRoute, signupRoute } from '@hcengineering/login'
 import platform, {
   OK,
   PlatformError,
@@ -426,9 +426,7 @@ export async function selectWorkspace (
   } catch (err: any) {
     if (err instanceof PlatformError && err.status.code === platform.status.Unauthorized) {
       const loc = getCurrentLocation()
-      loc.path[0] = 'login'
-      loc.path[1] = 'login'
-      loc.path.length = 2
+      loc.path = [loginRoute]
       navigate(loc)
       return [unknownStatus('Please login'), null, true]
     } else if (err instanceof PlatformError) {
@@ -623,9 +621,7 @@ export async function getInviteLink (
 ): Promise<string> {
   const inviteId = await getInviteLinkId(expHours, mask, limit ?? -1, role)
   const loc = getCurrentLocation()
-  loc.path[0] = loginId
-  loc.path[1] = 'join'
-  loc.path.length = 2
+  loc.path = [loginRoute, 'join']
   loc.query = {
     inviteId
   }
@@ -868,8 +864,7 @@ async function handleStatusError (message: string, err: Status): Promise<void> {
 
 export function getLoc (path: Pages): Location {
   const loc = getCurrentLocation()
-  loc.path[1] = path
-  loc.path.length = 2
+  loc.path = path === 'login' ? [loginRoute] : path === 'signup' ? [signupRoute] : [loginRoute, path]
   return loc
 }
 

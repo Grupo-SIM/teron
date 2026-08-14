@@ -424,7 +424,7 @@ export function start (
 
       const workspaces = await accountClient.getUserWorkspaces()
       const workspace = workspaces.sort((a, b) => (b.lastVisit ?? 0) - (a.lastVisit ?? 0))[0]
-      const workspaceHref = workspace !== undefined ? `/workbench/${encodeURIComponent(workspace.url)}` : '/login/selectWorkspace'
+      const workspaceHref = workspace !== undefined ? `/workbench/${encodeURIComponent(workspace.url)}` : '/entrar/selectWorkspace'
 
       res.json({ authenticated: true, workspaceHref })
     } catch {
@@ -438,6 +438,28 @@ export function start (
   console.log('serving static files from', dist)
   const siteDist = join(dist, 'site')
   const siteIndex = join(siteDist, 'index.html')
+
+  // Preserve old external links while keeping authentication URLs in Portuguese.
+  app.get('*', (request, response, next) => {
+    const path = request.path.replace(/\/+$/, '')
+    let target: string | undefined
+
+    if (path === '/signup' || path === '/login/signup') {
+      target = '/cadastro'
+    } else if (path === '/login') {
+      target = '/entrar'
+    } else if (path.startsWith('/login/')) {
+      target = `/entrar/${path.slice('/login/'.length)}`
+    }
+
+    if (target === undefined) {
+      next()
+      return
+    }
+
+    const query = request.originalUrl.slice(request.path.length)
+    response.redirect(308, `${target}${query}`)
+  })
 
   let brandingUrl: URL | undefined
   if (config.brandingUrl !== undefined) {
@@ -466,7 +488,7 @@ export function start (
     // `route.html` or `route/index.html`, depending on trailing-slash settings.
     //
     // Só entra quem tem arquivo correspondente no export, então as rotas da
-    // aplicação (`/login`, `/workbench`, ...) seguem intactas.
+    // aplicação (`/entrar`, `/cadastro`, `/workbench`, ...) seguem intactas.
     app.get('*', (request, response, next) => {
       if (request.method !== 'GET' || extname(request.path) !== '') {
         next()
@@ -474,6 +496,11 @@ export function start (
       }
       const route = request.path.replace(/\/+$/, '')
       if (route === '') {
+        next()
+        return
+      }
+      const startsAuthFlow = request.query.email !== undefined || request.query.provider !== undefined
+      if ((route === '/entrar' || route === '/cadastro') && startsAuthFlow) {
         next()
         return
       }

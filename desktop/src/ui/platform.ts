@@ -48,7 +48,7 @@ import { hrId } from '@hcengineering/hr'
 import { imageCropperId } from '@hcengineering/image-cropper'
 import { inventoryId } from '@hcengineering/inventory'
 import { leadId } from '@hcengineering/lead'
-import login, { loginId } from '@hcengineering/login'
+import login, { loginId, loginRoute, signupRoute } from '@hcengineering/login'
 import notification, { notificationId } from '@hcengineering/notification'
 import onboard, { onboardId } from '@hcengineering/onboard'
 import presence, { presenceId } from '@hcengineering/presence'
@@ -402,7 +402,7 @@ export async function configurePlatform (onWorkbenchConnect?: () => Promise<void
 
   setMetadata(billingPlugin.metadata.BillingURL, config.BILLING_URL ?? '')
   setMetadata(presentation.metadata.PaymentUrl, config.PAYMENT_URL ?? '')
-  setMetadata(presentation.metadata.SignupUrl, config.SIGNUP_URL ?? 'https://teron.io/signup')
+  setMetadata(presentation.metadata.SignupUrl, config.SIGNUP_URL ?? 'https://teron.io/cadastro')
 
   setMetadata(support.metadata.SupportLink, myBranding.support?.supportLink ?? supportLink)
   setMetadata(support.metadata.ReportBugLink, myBranding.support?.reportBugLink ?? reportBugLink)
@@ -421,6 +421,8 @@ export async function configurePlatform (onWorkbenchConnect?: () => Promise<void
     new Map([
       [workbenchId, workbench.component.WorkbenchApp],
       [loginId, login.component.LoginApp],
+      [loginRoute, login.component.LoginApp],
+      [signupRoute, login.component.LoginApp],
       [onboardId, onboard.component.OnboardApp],
       [calendarId, calendar.component.ConnectApp],
       [guestId, guest.component.GuestApp],

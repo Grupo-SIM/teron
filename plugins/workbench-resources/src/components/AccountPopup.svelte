@@ -22,7 +22,7 @@
   import contactResources from '@hcengineering/contact-resources/src/plugin'
   import core, { AccountRole, getCurrentAccount, hasAccountRole } from '@hcengineering/core'
   import rating, { type PersonRating } from '@hcengineering/rating'
-  import login, { loginId } from '@hcengineering/login'
+  import login, { loginRoute } from '@hcengineering/login'
   import presentation, {
     createQuery,
     getCurrentWorkspaceUrl,
@@ -178,7 +178,7 @@
           const loc = getCurrentResolvedLocation()
           loc.fragment = undefined
           loc.query = undefined
-          loc.path[0] = loginId
+          loc.path[0] = loginRoute
           loc.path[1] = 'selectWorkspace'
           loc.path.length = 2
           navigate(loc)
@@ -193,7 +193,7 @@
           icon: setting.icon.InviteWorkspace,
           label: view.string.ReadOnlyJoinWorkspace,
           action: async () => {
-            navigate({ path: ['login', 'join'], query: { workspace: getCurrentWorkspaceUrl() } })
+            navigate({ path: [loginRoute, 'join'], query: { workspace: getCurrentWorkspaceUrl() } })
           },
           group: 'end'
         })
@@ -213,7 +213,7 @@
       label: hasAccountRole(account, AccountRole.DocGuest) ? setting.string.Signout : login.string.LogIn,
       action: async () => {
         await logOut()
-        navigate({ path: [loginId] })
+        navigate({ path: [loginRoute] })
         Analytics.handleEvent('workbench.SignOut')
         Analytics.logout()
       },

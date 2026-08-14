@@ -110,9 +110,9 @@ export async function handleProviderAuth (
         type: providerType,
         user
       })
-      return concatLink(branding?.front ?? frontUrl, '/login')
+      return concatLink(branding?.front ?? frontUrl, '/entrar')
     } else {
-      const origin = concatLink(branding?.front ?? frontUrl, '/login/auth')
+      const origin = concatLink(branding?.front ?? frontUrl, '/entrar/auth')
       const queryObj: any = { token: loginInfo.token }
       if (state.autoJoin === true) {
         queryObj.autoJoin = state.autoJoin

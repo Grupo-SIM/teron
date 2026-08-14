@@ -13,7 +13,7 @@
 // limitations under the License.
 //
 
-import { loginId } from '@hcengineering/login'
+import { loginRoute } from '@hcengineering/login'
 import { loveId } from '@hcengineering/love'
 import { timeId } from '@hcengineering/time'
 
@@ -169,7 +169,7 @@ window.addEventListener('DOMContentLoaded', () => {
     const loc = getCurrentResolvedLocation()
     loc.fragment = undefined
     loc.query = undefined
-    loc.path[0] = loginId
+    loc.path[0] = loginRoute
     loc.path[1] = 'selectWorkspace'
     loc.path.length = 2
     navigate(loc)
@@ -177,7 +177,7 @@ window.addEventListener('DOMContentLoaded', () => {
 
   ipcMain.on(CommandLogout, () => {
     void logOut().then(() => {
-      navigate({ path: [loginId] })
+      navigate({ path: [loginRoute] })
     })
   })
 
@@ -239,7 +239,7 @@ window.addEventListener('DOMContentLoaded', () => {
 
   ipcMain.handleAuth((token) => {
     const authLoc = {
-      path: ['login', 'auth'],
+      path: [loginRoute, 'auth'],
       query: { token }
     }
 

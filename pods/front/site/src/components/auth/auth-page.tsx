@@ -9,7 +9,7 @@ import { AuthProviders } from "./auth-providers";
 import "./auth.css";
 
 /*
- * Moldura das telas de acesso, copiada de teron.io/login e teron.io/signup: um
+ * Moldura das telas de acesso, disponível em `/entrar` e `/cadastro`: um
  * card escuro sozinho no meio da tela, com o link de volta no canto e os
  * documentos legais no rodapé.
  *
@@ -28,7 +28,7 @@ const COPY = {
     switchText: "Não tem uma conta?",
     switchLabel: "Cadastre-se",
     switchHref: "/cadastro",
-    flowHref: "/login",
+    flowHref: "/entrar",
   },
   signup: {
     title: "Criar nova conta",
@@ -37,7 +37,7 @@ const COPY = {
     switchText: "Já tem uma conta?",
     switchLabel: "Entrar",
     switchHref: "/entrar",
-    flowHref: "/login/signup",
+    flowHref: "/cadastro",
   },
 } as const satisfies Record<AuthVariant, unknown>;
 

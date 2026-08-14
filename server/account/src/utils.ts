@@ -1257,7 +1257,7 @@ export async function sendEmailConfirmation (
     ...(extra ?? {})
   })
 
-  const link = concatLink(front, `/login/confirm?id=${token}`)
+  const link = concatLink(front, `/entrar/confirm?id=${token}`)
 
   const name = branding?.title ?? getMetadata(accountPlugin.metadata.ProductName)
   const lang = branding?.language

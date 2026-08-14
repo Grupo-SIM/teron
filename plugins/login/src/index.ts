@@ -25,6 +25,8 @@ export type { LoginInfo, WorkspaceLoginInfo, OtpInfo, RegionInfo } from '@hcengi
  * @public
  */
 export const loginId = 'login' as Plugin
+export const loginRoute = 'entrar' as Plugin
+export const signupRoute = 'cadastro' as Plugin
 
 export const pages = [
   'login',

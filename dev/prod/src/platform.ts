@@ -39,7 +39,7 @@ import { hrId } from '@hcengineering/hr'
 import { imageCropperId } from '@hcengineering/image-cropper'
 import { inventoryId } from '@hcengineering/inventory'
 import { leadId } from '@hcengineering/lead'
-import login, { loginId } from '@hcengineering/login'
+import login, { loginId, loginRoute, signupRoute } from '@hcengineering/login'
 import love, { loveId } from '@hcengineering/love'
 import notification, { notificationId } from '@hcengineering/notification'
 import onboard, { onboardId } from '@hcengineering/onboard'
@@ -490,7 +490,7 @@ export async function configurePlatform() {
   setMetadata(presentation.metadata.StatsUrl, config.STATS_URL)
   setMetadata(presentation.metadata.LinkPreviewUrl, config.LINK_PREVIEW_URL)
   setMetadata(presentation.metadata.MailUrl, config.MAIL_URL)
-  setMetadata(presentation.metadata.SignupUrl, config.SIGNUP_URL ?? 'https://teron.io/signup')
+  setMetadata(presentation.metadata.SignupUrl, config.SIGNUP_URL ?? 'https://teron.io/cadastro')
 
   const disabledFeatures = (config.DISABLED_FEATURES ??'').split(',').map(it => it.trim()).filter(it => it.length > 0)
   setMetadata(presentation.metadata.DisabledFeatures, new Set(disabledFeatures))
@@ -554,6 +554,8 @@ export async function configurePlatform() {
     new Map([
       [workbenchId, workbench.component.WorkbenchApp],
       [loginId, login.component.LoginApp],
+      [loginRoute, login.component.LoginApp],
+      [signupRoute, login.component.LoginApp],
       [onboardId, onboard.component.OnboardApp],
       [githubId, github.component.ConnectApp],
       [calendarId, calendar.component.ConnectApp],

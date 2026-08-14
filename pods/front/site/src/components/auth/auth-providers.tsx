@@ -13,12 +13,12 @@ import { Localized, defaultLocale, type Locale } from "@/i18n/site";
  * principal, que é onde a tela quer levar.
  *
  * Os links entram pela SPA para que ela use a URL de contas configurada no
- * ambiente e conclua o OAuth pelo mesmo fluxo do login original.
+ * ambiente e conclua o OAuth pelo fluxo de autenticação da aplicação.
  */
 type AuthProvidersProps = {
   /** Prefixo do rótulo: "Entrar" em `/entrar`, "Cadastrar" em `/cadastro`. */
   action: string;
-  flowHref: "/login" | "/login/signup";
+  flowHref: "/entrar" | "/cadastro";
   locale?: Locale;
 };
 

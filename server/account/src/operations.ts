@@ -819,7 +819,7 @@ export async function createAccessLink (
       exp: expiration,
       nbf: notBefore
     })
-    let path = `/login/auth?token=${accessToken}`
+    let path = `/entrar/auth?token=${accessToken}`
     if (navigateUrl != null) {
       path += `&navigateUrl=${encodeURIComponent(navigateUrl.trim())}`
     }
@@ -889,7 +889,7 @@ export async function createInviteLink (
     role,
     autoJoin
   })
-  let path = `/login/join?inviteId=${inviteId}`
+  let path = `/entrar/join?inviteId=${inviteId}`
   if (autoJoin === true) {
     path += `&autoJoin&firstName=${encodeURIComponent((firstName ?? '').trim())}`
 
@@ -981,7 +981,7 @@ export async function resendInvite (
     inviteId = await createInvite(ctx, db, branding, token, { exp: newExp, email, limit: 1, role })
   }
   const front = getFrontUrl(branding)
-  const link = concatLink(front, `/login/join?inviteId=${inviteId}`)
+  const link = concatLink(front, `/entrar/join?inviteId=${inviteId}`)
 
   const inviteEmail = await getInviteEmail(branding, email, link, workspace, expHours, true)
   await sendEmail(inviteEmail, ctx)
@@ -1521,7 +1521,7 @@ export async function requestPasswordReset (
     restoreEmail: normalizedEmail
   })
 
-  const link = concatLink(front, `/login/recovery?id=${token}`)
+  const link = concatLink(front, `/entrar/recovery?id=${token}`)
   const lang = branding?.language
   const text = await translate(accountPlugin.string.RecoveryText, { link }, lang)
   const html = await translate(accountPlugin.string.RecoveryHTML, { link }, lang)
@@ -1591,7 +1591,7 @@ export async function requestPasswordSetup (
   const { mailURL, mailAuth } = getMailUrl()
   const front = getFrontUrl(branding)
   const resetToken = generateToken(accountUuid, undefined, { restoreEmail: emailSocialId.value })
-  const link = concatLink(front, `/login/recovery?id=${resetToken}`)
+  const link = concatLink(front, `/entrar/recovery?id=${resetToken}`)
   const lang = branding?.language
   const text = await translate(accountPlugin.string.PasswordSetupText, { link }, lang)
   const html = await translate(accountPlugin.string.PasswordSetupHTML, { link }, lang)

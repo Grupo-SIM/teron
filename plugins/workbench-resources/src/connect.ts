@@ -20,7 +20,7 @@ import core, {
   SocialIdType,
   type WorkspaceInfoWithStatus
 } from '@hcengineering/core'
-import login, { loginId, type Pages } from '@hcengineering/login'
+import login, { loginRoute, type Pages } from '@hcengineering/login'
 import platform, {
   broadcastEvent,
   getMetadata,
@@ -96,7 +96,7 @@ export async function connect (title: string): Promise<Client | undefined> {
       }
     } else {
       navigate({
-        path: [loginId]
+        path: [loginRoute]
       })
       return
     }
@@ -121,7 +121,7 @@ export async function connect (title: string): Promise<Client | undefined> {
       )
       // something went wrong with selecting workspace with the selected token
       await logOut()
-      navigate({ path: [loginId] })
+      navigate({ path: [loginRoute] })
       return
     }
     break
@@ -154,7 +154,7 @@ export async function connect (title: string): Promise<Client | undefined> {
         `Error fetching workspace ${wsUrl}. It might no longer exist or be inaccessible. Please try to log in again.`
       )
       navigate({
-        path: [loginId]
+        path: [loginRoute]
       })
       return
     }
@@ -179,7 +179,7 @@ export async function connect (title: string): Promise<Client | undefined> {
       if (workspace == null) {
         // something went wrong, workspace not exist, redirect to login
         navigate({
-          path: [loginId]
+          path: [loginRoute]
         })
         return
       }
@@ -204,7 +204,7 @@ export async function connect (title: string): Promise<Client | undefined> {
     console.error('Something of the vital auth info is missing. Please try to log in again.')
     const navigateUrl = encodeURIComponent(JSON.stringify(loc))
     navigate({
-      path: [loginId],
+      path: [loginRoute],
       query: { navigateUrl }
     })
     return
@@ -287,7 +287,7 @@ export async function connect (title: string): Promise<Client | undefined> {
             case platform.status.WorkspaceArchived: {
               const selectWorkspace: Pages = 'selectWorkspace'
               navigate({
-                path: [loginId, selectWorkspace],
+                path: [loginRoute, selectWorkspace],
                 query: {}
               })
               break
@@ -301,7 +301,7 @@ export async function connect (title: string): Promise<Client | undefined> {
                     action: () => {
                       const selectWorkspace: Pages = 'selectWorkspace'
                       navigate({
-                        path: [loginId, selectWorkspace],
+                        path: [loginRoute, selectWorkspace],
                         query: {}
                       })
                     }
@@ -311,7 +311,7 @@ export async function connect (title: string): Promise<Client | undefined> {
                     action: () => {
                       const changePassword: Pages = 'changePassword'
                       navigate({
-                        path: [loginId, changePassword],
+                        path: [loginRoute, changePassword],
                         query: {}
                       })
                     }
@@ -334,7 +334,7 @@ export async function connect (title: string): Promise<Client | undefined> {
             case platform.status.Unauthorized: {
               void logOut().then(() => {
                 navigate({
-                  path: [loginId],
+                  path: [loginRoute],
                   query: {}
                 })
               })
@@ -474,7 +474,7 @@ export async function connect (title: string): Promise<Client | undefined> {
     if (employee == null) {
       console.log('Failed to ensure employee')
       navigate({
-        path: [loginId],
+        path: [loginRoute],
         query: {}
       })
       return

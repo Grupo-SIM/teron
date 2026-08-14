@@ -51,7 +51,7 @@ export function registerGoogle (
       measureCtx.info('Auth state', { state })
       const branding = getBranding(brandings, state?.branding)
       measureCtx.info('With branding', { branding })
-      const failureRedirect = concatLink(branding?.front ?? frontUrl, '/login')
+      const failureRedirect = concatLink(branding?.front ?? frontUrl, '/entrar')
       measureCtx.info('With failure redirect', { failureRedirect })
       await passport.authenticate('google', {
         failureRedirect,

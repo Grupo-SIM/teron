@@ -16,7 +16,7 @@
   import contact, { combineName, getFirstName, getLastName } from '@hcengineering/contact'
   import { ChannelsEditor, EditableAvatar, myEmployeeStore } from '@hcengineering/contact-resources'
   import { AccountRole, getCurrentAccount, SocialIdType } from '@hcengineering/core'
-  import login, { loginId } from '@hcengineering/login'
+  import login, { loginRoute } from '@hcengineering/login'
   import platform, { getResource, PlatformError } from '@hcengineering/platform'
   import { AttributeEditor, createQuery, getClient, hasResource, MessageBox } from '@hcengineering/presentation'
   import {
@@ -87,10 +87,10 @@
 
           if (loginInfo?.token != null) {
             await logIn(loginInfo)
-            navigate({ path: [loginId, 'selectWorkspace'] })
+            navigate({ path: [loginRoute, 'selectWorkspace'] })
           } else {
             await logOut()
-            navigate({ path: [loginId] })
+            navigate({ path: [loginRoute] })
           }
         } catch (err: any) {
           if (

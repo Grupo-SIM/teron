@@ -10,7 +10,7 @@ import { AuthButtonLights } from "./auth-decor";
  * o teron.io pede o e-mail primeiro e resolve senha, código ou provedor no
  * passo seguinte, e as telas daqui seguem o mesmo caminho.
  *
- * O envio segue como GET para o fluxo original e preserva o e-mail na query.
+ * O envio segue como GET para o fluxo da aplicação e preserva o e-mail na query.
  * A SPA assume dali em diante senha, OTP, cadastro e seleção de workspace.
  *
  * O botão repete a montagem do original: dois aros borrados espelhados por
@@ -21,8 +21,8 @@ import { AuthButtonLights } from "./auth-decor";
 type AuthFormProps = {
   /** Rótulo do botão principal, ex.: "Entrar". */
   submitLabel: string;
-  /** Entrada correspondente no fluxo de autenticação original. */
-  flowHref: "/login" | "/login/signup";
+  /** Entrada localizada correspondente no fluxo de autenticação. */
+  flowHref: "/entrar" | "/cadastro";
   locale?: Locale;
 };
 

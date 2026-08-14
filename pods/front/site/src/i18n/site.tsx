@@ -324,6 +324,7 @@ function translateText(text: string, locale: Locale): string {
 
 function localizedHref(href: string, locale: Locale): string {
   if (locale === "pt-BR" || !href.startsWith("/") || href.startsWith("/en-US")) return href;
+  if (/^\/(entrar|cadastro)\?.*\bprovider=/.test(href)) return href;
   if (/^\/(api|login|workbench|auth)(\/|$)/.test(href)) return href;
   return `/en-US${href}`;
 }

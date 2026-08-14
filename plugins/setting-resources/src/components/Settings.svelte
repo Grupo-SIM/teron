@@ -14,7 +14,7 @@
 -->
 <script lang="ts">
   import { AccountRole, getCurrentAccount, hasAccountRole } from '@hcengineering/core'
-  import login, { loginId } from '@hcengineering/login'
+  import login, { loginRoute } from '@hcengineering/login'
   import { getClient, createQuery, isDisabled } from '@hcengineering/presentation'
   import settingPlg from '../plugin'
   import setting, { SettingsCategory, SettingsEvents } from '@hcengineering/setting'
@@ -107,13 +107,13 @@
   }
   function signOut (): void {
     void logOut()
-    navigate({ path: [loginId] })
+    navigate({ path: [loginRoute] })
     Analytics.handleEvent(SettingsEvents.SignOut)
     Analytics.logout()
   }
   function selectWorkspace (): void {
     Analytics.handleEvent(SettingsEvents.SelectWorkspace)
-    navigate({ path: [loginId, 'selectWorkspace'] })
+    navigate({ path: [loginRoute, 'selectWorkspace'] })
   }
   function inviteWorkspace (): void {
     Analytics.handleEvent(SettingsEvents.InviteToWorkspace)
