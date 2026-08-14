@@ -25,7 +25,7 @@ import express, { Request, Response } from 'express'
 import fileUpload, { UploadedFile } from 'express-fileupload'
 import expressStaticGzip from 'express-static-gzip'
 import morgan from 'morgan'
-import { extname, join, normalize, resolve } from 'path'
+import { extname, join, normalize, resolve, sep } from 'path'
 import { cwd } from 'process'
 import sharp, { type Sharp } from 'sharp'
 import { getClient as getAccountClient } from '@hcengineering/account-client'
@@ -43,6 +43,12 @@ const KEEP_ALIVE_MAX = 1000
 const KEEP_ALIVE_HEADERS = {
   Connection: 'keep-alive',
   'Keep-Alive': `timeout=${KEEP_ALIVE_TIMEOUT}, max=${KEEP_ALIVE_MAX}`
+}
+
+function getCookieValue (request: Request, name: string): string | undefined {
+  const cookies = request.headers.cookie?.split(';') ?? []
+  const cookie = cookies.find((value) => value.trim().startsWith(`${name}=`))
+  return cookie?.trim().slice(name.length + 1)
 }
 
 async function storageUpload (
@@ -396,6 +402,38 @@ export function start (
     }
   })
 
+  // The public site cannot read the account cookie because it is HttpOnly.
+  // Expose only the information the header needs, keeping the token server-side.
+  // eslint-disable-next-line @typescript-eslint/no-misused-promises
+  app.get('/api/v1/site/session', async (req, res) => {
+    res.set('Cache-Control', cacheControlNoCache)
+
+    const token = getCookieValue(req, 'account-metadata-Token')
+    if (token === undefined || token === '') {
+      res.json({ authenticated: false })
+      return
+    }
+
+    try {
+      const accountClient = getAccountClient(config.accountsUrlInternal ?? config.accountsUrl, token)
+      const loginInfo = await accountClient.getLoginInfoByToken()
+      if (loginInfo === null || 'request' in loginInfo) {
+        res.json({ authenticated: false })
+        return
+      }
+
+      const workspaces = await accountClient.getUserWorkspaces()
+      const workspace = workspaces.sort((a, b) => (b.lastVisit ?? 0) - (a.lastVisit ?? 0))[0]
+      const workspaceHref = workspace !== undefined ? `/workbench/${encodeURIComponent(workspace.url)}` : '/login/selectWorkspace'
+
+      res.json({ authenticated: true, workspaceHref })
+    } catch {
+      // An expired or otherwise invalid cookie is equivalent to a signed-out
+      // visitor here. The account service remains responsible for validation.
+      res.json({ authenticated: false })
+    }
+  })
+
   const dist = resolve(process.env.PUBLIC_DIR ?? cwd(), 'dist')
   console.log('serving static files from', dist)
   const siteDist = join(dist, 'site')
@@ -423,6 +461,41 @@ export function start (
         }
       })
     })
+    // Resolve public pages before the static middleware can redirect a path
+    // that also exists as a directory. Next exports routes as either
+    // `route.html` or `route/index.html`, depending on trailing-slash settings.
+    //
+    // Só entra quem tem arquivo correspondente no export, então as rotas da
+    // aplicação (`/login`, `/workbench`, ...) seguem intactas.
+    app.get('*', (request, response, next) => {
+      if (request.method !== 'GET' || extname(request.path) !== '') {
+        next()
+        return
+      }
+      const route = request.path.replace(/\/+$/, '')
+      if (route === '') {
+        next()
+        return
+      }
+      const pages = [normalize(join(siteDist, `${route}.html`)), normalize(join(siteDist, route, 'index.html'))]
+      const page = pages.find(
+        (candidate) => candidate.startsWith(`${siteDist}${sep}`) && fs.existsSync(candidate)
+      )
+      if (page === undefined) {
+        next()
+        return
+      }
+      response.sendFile(page, {
+        etag: true,
+        lastModified: true,
+        cacheControl: false,
+        headers: {
+          'Cache-Control': cacheControlNoCache,
+          'Keep-Alive': `timeout=${KEEP_ALIVE_TIMEOUT}`
+        }
+      })
+    })
+
     app.use(
       expressStaticGzip(siteDist, {
         serveStatic: {
@@ -442,39 +515,6 @@ export function start (
         }
       })
     )
-
-    // O export estático do Next grava cada rota como um arquivo irmão
-    // (`/precos` -> `precos.html`), e o middleware acima só entrega arquivos
-    // pedidos pelo nome exato. Esta ponte permite incorporar todas as páginas
-    // presentes no site sem manter uma lista de rotas no servidor.
-    //
-    // Só entra quem tem arquivo correspondente no export, então as rotas da
-    // aplicação (`/login`, `/workbench`, ...) seguem intactas.
-    app.get('*', (request, response, next) => {
-      if (request.method !== 'GET' || extname(request.path) !== '') {
-        next()
-        return
-      }
-      const route = request.path.replace(/\/+$/, '')
-      if (route === '') {
-        next()
-        return
-      }
-      const page = normalize(join(siteDist, `${route}.html`))
-      if (!page.startsWith(siteDist) || !fs.existsSync(page)) {
-        next()
-        return
-      }
-      response.sendFile(page, {
-        etag: true,
-        lastModified: true,
-        cacheControl: false,
-        headers: {
-          'Cache-Control': cacheControlNoCache,
-          'Keep-Alive': `timeout=${KEEP_ALIVE_TIMEOUT}`
-        }
-      })
-    })
   } else {
     console.warn('public site was not found, keeping the application fallback for /', { siteIndex })
   }

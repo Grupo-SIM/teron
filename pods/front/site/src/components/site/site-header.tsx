@@ -4,6 +4,10 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { Asset } from "./asset";
 
+type SiteSession =
+  | { authenticated: false }
+  | { authenticated: true; workspaceHref: string };
+
 /*
  * Uma entrada por seção da página, na ordem em que elas aparecem — o topo serve
  * de índice, e link que pula para trás confunde quem está lendo de cima a
@@ -25,6 +29,27 @@ const LINKS = [
 
 export function SiteHeader() {
   const [menuOpen, setMenuOpen] = useState(false);
+  const [session, setSession] = useState<SiteSession | null>(null);
+
+  useEffect(() => {
+    const controller = new AbortController();
+
+    fetch("/api/v1/site/session", {
+      credentials: "same-origin",
+      signal: controller.signal,
+    })
+      .then(async (response) => {
+        if (!response.ok) throw new Error("Unable to load the site session");
+        return (await response.json()) as SiteSession;
+      })
+      .then(setSession)
+      .catch((error: unknown) => {
+        if (error instanceof DOMException && error.name === "AbortError") return;
+        setSession({ authenticated: false });
+      });
+
+    return () => controller.abort();
+  }, []);
 
   // menu em tela cheia: trava o scroll do fundo e fecha no Esc
   useEffect(() => {
@@ -88,25 +113,31 @@ export function SiteHeader() {
           className="lp-desktop-only"
           style={{ alignItems: "center", gap: 18 }}
         >
-          <a
-            href="/entrar"
-            className="lp-link-plain"
-            style={{ fontSize: 14, fontWeight: 600 }}
-          >
-            Log in
-          </a>
-          <a
-            href="/cadastro"
-            className="lp-btn-white"
-            style={{
-              fontSize: 14,
-              fontWeight: 700,
-              padding: "8px 16px",
-              borderRadius: 8,
-            }}
-          >
-            Sign up
-          </a>
+          {session?.authenticated ? (
+            <WorkspaceLink href={session.workspaceHref} />
+          ) : session === null ? null : (
+            <>
+              <a
+                href="/entrar"
+                className="lp-link-plain"
+                style={{ fontSize: 14, fontWeight: 600 }}
+              >
+                Entrar
+              </a>
+              <a
+                href="/cadastro"
+                className="lp-btn-white"
+                style={{
+                  fontSize: 14,
+                  fontWeight: 700,
+                  padding: "8px 16px",
+                  borderRadius: 8,
+                }}
+              >
+                Cadastre-se
+              </a>
+            </>
+          )}
         </div>
         <button
           type="button"
@@ -169,23 +200,52 @@ export function SiteHeader() {
           </nav>
 
           <div className="lp-menu-actions">
-            <a
-              href="/entrar"
-              onClick={() => setMenuOpen(false)}
-              className="lp-menu-btn"
-            >
-              Entrar
-            </a>
-            <a
-              href="/cadastro"
-              onClick={() => setMenuOpen(false)}
-              className="lp-menu-btn"
-            >
-              Começar agora
-            </a>
+            {session?.authenticated ? (
+              <a
+                href={session.workspaceHref}
+                onClick={() => setMenuOpen(false)}
+                className="lp-menu-btn"
+              >
+                Ir para o workspace
+              </a>
+            ) : session === null ? null : (
+              <>
+                <a
+                  href="/entrar"
+                  onClick={() => setMenuOpen(false)}
+                  className="lp-menu-btn"
+                >
+                  Entrar
+                </a>
+                <a
+                  href="/cadastro"
+                  onClick={() => setMenuOpen(false)}
+                  className="lp-menu-btn"
+                >
+                  Começar agora
+                </a>
+              </>
+            )}
           </div>
         </div>
       )}
     </header>
+  );
+}
+
+function WorkspaceLink({ href }: { href: string }) {
+  return (
+    <a
+      href={href}
+      className="lp-btn-white"
+      style={{
+        fontSize: 14,
+        fontWeight: 700,
+        padding: "8px 16px",
+        borderRadius: 8,
+      }}
+    >
+      Ir para o workspace
+    </a>
   );
 }
