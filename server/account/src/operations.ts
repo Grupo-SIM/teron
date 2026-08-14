@@ -40,6 +40,7 @@ import platform, { getMetadata, PlatformError, Severity, Status, translate } fro
 import { decodeToken, decodeTokenVerbose, generateToken, type PermissionsGrant } from '@hcengineering/server-token'
 
 import { isAdminEmail } from './admin'
+import { renderBrandedEmail } from './email'
 import { accountPlugin } from './plugin'
 import { type AccountServiceMethods, getServiceMethods } from './serviceOperations'
 import {
@@ -1524,7 +1525,7 @@ export async function requestPasswordReset (
   const link = concatLink(front, `/entrar/recovery?id=${token}`)
   const lang = branding?.language
   const text = await translate(accountPlugin.string.RecoveryText, { link }, lang)
-  const html = await translate(accountPlugin.string.RecoveryHTML, { link }, lang)
+  const html = renderBrandedEmail(await translate(accountPlugin.string.RecoveryHTML, { link }, lang))
   const subject = await translate(accountPlugin.string.RecoverySubject, {}, lang)
 
   const response = await fetch(concatLink(mailURL, '/send'), {
@@ -1594,7 +1595,7 @@ export async function requestPasswordSetup (
   const link = concatLink(front, `/entrar/recovery?id=${resetToken}`)
   const lang = branding?.language
   const text = await translate(accountPlugin.string.PasswordSetupText, { link }, lang)
-  const html = await translate(accountPlugin.string.PasswordSetupHTML, { link }, lang)
+  const html = renderBrandedEmail(await translate(accountPlugin.string.PasswordSetupHTML, { link }, lang))
   const subject = await translate(accountPlugin.string.PasswordSetupSubject, {}, lang)
 
   const response = await fetch(concatLink(mailURL, '/send'), {
