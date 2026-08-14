@@ -414,6 +414,43 @@ describe('account operations', () => {
       )
       nowSpy.mockRestore()
     })
+
+    test('should prioritize Unlimited over other active tier subscriptions', async () => {
+      ;(mockDb.getWorkspaceRole as jest.Mock).mockResolvedValue(AccountRole.Owner)
+      ;(mockDb.subscription.find as jest.Mock).mockResolvedValue([
+        {
+          id: 'unlimited-subscription',
+          workspaceUuid: mockWorkspace.uuid,
+          type: 'tier',
+          status: 'active',
+          plan: 'unlimited',
+          updatedOn: 1
+        },
+        {
+          id: 'newer-business-subscription',
+          workspaceUuid: mockWorkspace.uuid,
+          type: 'tier',
+          status: 'active',
+          plan: 'business',
+          seatLimit: 1,
+          periodEnd: Date.now() - 1,
+          updatedOn: 2
+        }
+      ])
+
+      const result = await getWorkspaceEntitlement(mockCtx, mockDb, mockBranding, mockToken, {})
+
+      expect(result).toEqual(
+        expect.objectContaining({
+          plan: 'unlimited',
+          status: 'active',
+          accessMode: 'full',
+          seatLimit: undefined,
+          availableSeats: undefined,
+          readOnlyAfter: undefined
+        })
+      )
+    })
   })
 
   describe('createInviteLink', () => {

@@ -54,6 +54,7 @@
     acc[plan] = tier
     return acc
   }, {})
+  const selectableTiers = tiers.filter((tier) => getTypeAndPlan(tier._id).plan !== 'unlimited')
 
   export let isReadOnly: boolean = false
 
@@ -177,7 +178,9 @@
       entitlement = currentEntitlement
       currentSubscription = subscriptions
         .filter((p) => p.type === 'tier')
-        .sort((a, b) => b.updatedOn - a.updatedOn)[0]
+        .sort(
+          (a, b) => Number(b.plan === 'unlimited') - Number(a.plan === 'unlimited') || b.updatedOn - a.updatedOn
+        )[0]
       const plan = currentSubscription?.plan
       currentTier = plan !== undefined ? tierByPlan[plan] : undefined
     } catch (err) {
@@ -426,7 +429,7 @@
         </div>
         <Scroller contentDirection="horizontal" buttons={false} showOverflowArrows shrink={false} noFade={false}>
           <div class="flex-row-top flex-gap-4 flex-no-shrink mb-3">
-            {#each tiers as tier}
+            {#each selectableTiers as tier}
               {@const color =
                 tier.color !== null && tier.color !== undefined && tier.color.length > 0
                   ? getPlatformColorByName(tier.color, $themeStore.dark)

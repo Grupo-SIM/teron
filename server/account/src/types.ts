@@ -311,7 +311,7 @@ export interface SubscriptionEvent {
   createdOn: Timestamp
 }
 
-export type WorkspaceSubscriptionPlan = 'free' | 'business'
+export type WorkspaceSubscriptionPlan = 'free' | 'business' | 'unlimited'
 export type WorkspaceAccessMode = 'full' | 'read-only'
 
 export interface WorkspaceEntitlement {

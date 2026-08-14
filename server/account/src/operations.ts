@@ -69,6 +69,7 @@ import {
   SubscriptionStatus,
   SubscriptionType,
   type WorkspaceEntitlement,
+  type WorkspaceSubscriptionPlan,
   type Query,
   type InviteInfo
 } from './types'
@@ -147,7 +148,8 @@ const FREE_TRIAL_MS = 30 * 24 * 60 * 60 * 1000
 const LEGACY_BUSINESS_PLANS = new Set(['rare', 'epic', 'legendary'])
 const BILLABLE_ROLES = new Set([AccountRole.Owner, AccountRole.Maintainer, AccountRole.User, AccountRole.Guest])
 
-function effectivePlan (plan: string): 'free' | 'business' {
+function effectivePlan (plan: string): WorkspaceSubscriptionPlan {
+  if (plan === 'unlimited') return 'unlimited'
   return plan === 'business' || LEGACY_BUSINESS_PLANS.has(plan) ? 'business' : 'free'
 }
 
@@ -165,7 +167,7 @@ async function getEntitlement (
     .filter((it) =>
       [SubscriptionStatus.Active, SubscriptionStatus.Trialing, SubscriptionStatus.PastDue].includes(it.status)
     )
-    .sort((a, b) => b.updatedOn - a.updatedOn)[0]
+    .sort((a, b) => Number(b.plan === 'unlimited') - Number(a.plan === 'unlimited') || b.updatedOn - a.updatedOn)[0]
 
   const members = db.getWorkspaceMembers != null ? await db.getWorkspaceMembers(workspaceUuid) : []
   const memberSeats = members.filter((it) => BILLABLE_ROLES.has(it.role)).length
@@ -2512,7 +2514,10 @@ export async function getLoginWithWorkspaceInfo (
         : userWorkspaces.map((it, idx) => {
           const workspaceTiers = tierSubscriptions
             .filter((subscription) => subscription.workspaceUuid === it.uuid)
-            .sort((a, b) => b.updatedOn - a.updatedOn)
+            .sort(
+              (a, b) =>
+                Number(b.plan === 'unlimited') - Number(a.plan === 'unlimited') || b.updatedOn - a.updatedOn
+            )
           const tier =
             workspaceTiers.find((subscription) =>
               [SubscriptionStatus.Active, SubscriptionStatus.Trialing, SubscriptionStatus.PastDue].includes(

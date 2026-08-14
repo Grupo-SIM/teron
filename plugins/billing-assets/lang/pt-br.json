@@ -28,6 +28,8 @@
         "FreeDescription": "Pessoas ilimitadas por 30 dias e acesso somente leitura depois.",
         "Business": "Empresas",
         "BusinessDescription": "Workspace pago com vagas contratadas por período de cobrança.",
+        "Unlimited": "Unlimited",
+        "UnlimitedDescription": "Acesso integral legado, sem expiração ou limite de vagas.",
     "UnlimitedUsers": "Usuários ilimitados",
     "UnlimitedObjects": "Objetos Teron ilimitados",
     "ChangePlan": "Alterar plano",

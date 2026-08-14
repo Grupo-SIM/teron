@@ -81,6 +81,21 @@ export function createModel (builder: Builder): void {
     billing.tier.Business
   )
 
+  builder.createDoc(
+    billing.class.Tier,
+    core.space.Model,
+    {
+      label: billing.string.Unlimited,
+      description: billing.string.UnlimitedDescription,
+      storageLimitGB: 1_000_000_000,
+      trafficLimitGB: 1_000_000_000,
+      priceMonthly: 0,
+      index: 2,
+      color: 'Grass'
+    },
+    billing.tier.Unlimited
+  )
+
   builder.createDoc(presentation.class.ComponentPointExtension, core.space.Model, {
     extension: workbench.extensions.WorkbenchExtensions,
     component: billing.component.WorkbenchExtension

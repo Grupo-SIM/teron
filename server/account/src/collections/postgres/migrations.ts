@@ -911,6 +911,58 @@ function getV27Migration (ns: string, flavor: DBFlavor): [string, string] {
     WHERE EXISTS (SELECT 1 FROM ${ns}.workspace w WHERE w.created_by = a.uuid)
       AND a.free_trial_used_on IS NULL;
 
+    -- This release grandfathers every workspace that already exists into an
+    -- internal Unlimited tier. Workspaces created after this migration still
+    -- receive the regular 30-day Free trial.
+    INSERT INTO ${ns}.subscription (
+      id, workspace_uuid, account_uuid, provider, provider_subscription_id,
+      type, status, plan, created_on, updated_on
+    )
+    SELECT
+      CONCAT('unlimited:', w.uuid::TEXT),
+      w.uuid,
+      COALESCE(
+        w.billing_account,
+        w.created_by,
+        (SELECT m.account_uuid FROM ${ns}.workspace_members m
+          WHERE m.workspace_uuid = w.uuid
+          ORDER BY CASE WHEN m.role = 'OWNER' THEN 0 ELSE 1 END
+          LIMIT 1)
+      ),
+      'internal',
+      CONCAT('unlimited:', w.uuid::TEXT),
+      'tier',
+      'active',
+      'unlimited',
+      current_epoch_ms(),
+      current_epoch_ms()
+    FROM ${ns}.workspace w
+    WHERE COALESCE(
+      w.billing_account,
+      w.created_by,
+      (SELECT m.account_uuid FROM ${ns}.workspace_members m
+        WHERE m.workspace_uuid = w.uuid
+        ORDER BY CASE WHEN m.role = 'OWNER' THEN 0 ELSE 1 END
+        LIMIT 1)
+    ) IS NOT NULL
+      AND NOT EXISTS (
+        SELECT 1 FROM ${ns}.subscription s
+        WHERE s.workspace_uuid = w.uuid
+          AND s.type = 'tier'
+          AND s.plan = 'unlimited'
+          AND s.status IN ('active', 'trialing', 'past_due')
+          AND s.id <> CONCAT('unlimited:', w.uuid::TEXT)
+      )
+    ON CONFLICT (id) DO UPDATE SET
+      status = 'active',
+      plan = 'unlimited',
+      period_start = NULL,
+      period_end = NULL,
+      trial_end = NULL,
+      seat_limit = NULL,
+      next_seat_limit = NULL,
+      updated_on = current_epoch_ms();
+
     INSERT INTO ${ns}.subscription_event (
       id, subscription_id, workspace_uuid, event_type, period_start, period_end,
       seat_limit, next_seat_limit, created_on

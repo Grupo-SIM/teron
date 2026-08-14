@@ -58,6 +58,8 @@ export const billingPlugin = plugin(billingId, {
     FreeDescription: '' as IntlString,
     Business: '' as IntlString,
     BusinessDescription: '' as IntlString,
+    Unlimited: '' as IntlString,
+    UnlimitedDescription: '' as IntlString,
     UpgradePlan: '' as IntlString,
     LimitReached: '' as IntlString,
     LimitsExceededShort: '' as IntlString,
@@ -75,6 +77,7 @@ export const billingPlugin = plugin(billingId, {
   tier: {
     Free: '' as Ref<Tier>,
     Business: '' as Ref<Tier>,
+    Unlimited: '' as Ref<Tier>,
     Common: '' as Ref<Tier>,
     Rare: '' as Ref<Tier>,
     Epic: '' as Ref<Tier>,

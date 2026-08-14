@@ -28,6 +28,8 @@
     "FreeDescription": "Unlimited people for 30 days, then read-only access.",
     "Business": "Business",
     "BusinessDescription": "Paid workspace with a contracted number of seats per billing period.",
+    "Unlimited": "Unlimited",
+    "UnlimitedDescription": "Grandfathered full access without expiration or seat limits.",
     "UnlimitedUsers": "Unlimited users",
     "UnlimitedObjects": "Unlimited Teron objects",
     "ChangePlan": "Change plan",

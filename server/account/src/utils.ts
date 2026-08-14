@@ -189,7 +189,9 @@ async function findTierSubscriptions (db: AccountDB, workspaceUuid: WorkspaceUui
 }
 
 function selectTierSubscription (tiers: Subscription[]): Subscription | undefined {
-  const sorted = tiers.sort((a, b) => b.updatedOn - a.updatedOn)
+  const sorted = tiers.sort(
+    (a, b) => Number(b.plan === 'unlimited') - Number(a.plan === 'unlimited') || b.updatedOn - a.updatedOn
+  )
   return (
     sorted.find((it) =>
       [SubscriptionStatus.Active, SubscriptionStatus.Trialing, SubscriptionStatus.PastDue].includes(it.status)

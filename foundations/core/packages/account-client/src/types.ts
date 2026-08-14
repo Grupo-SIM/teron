@@ -253,7 +253,7 @@ export interface Subscription {
  */
 export type SubscriptionData = Omit<Subscription, 'createdOn' | 'updatedOn'>
 
-export type WorkspaceSubscriptionPlan = 'free' | 'business'
+export type WorkspaceSubscriptionPlan = 'free' | 'business' | 'unlimited'
 export type WorkspaceAccessMode = 'full' | 'read-only'
 
 /** Effective subscription state used by access control and billing UI. */

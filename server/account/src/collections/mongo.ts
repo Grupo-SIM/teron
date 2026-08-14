@@ -697,6 +697,67 @@ export class MongoAccountDB implements AccountDB {
               { $set: { freeTrialUsedOn: now, freeTrialWorkspaceUuid: workspace.uuid } }
             )
           }
+
+          // Existing workspaces are grandfathered into Unlimited in the same
+          // migration that introduces Free and Business.
+          const existing = await this.subscription.findOne({
+            workspaceUuid: workspace.uuid,
+            type: 'tier' as any,
+            plan: 'unlimited'
+          })
+          if (existing != null) {
+            await this.subscription.update({ id: existing.id }, { status: 'active' as any, updatedOn: now })
+            await this.subscription.collection.updateOne(
+              { id: existing.id },
+              {
+                $unset: {
+                  periodStart: '',
+                  periodEnd: '',
+                  trialEnd: '',
+                  seatLimit: '',
+                  nextSeatLimit: ''
+                }
+              }
+            )
+            if (!(await this.subscriptionEvent.exists({ subscriptionId: existing.id }))) {
+              await this.subscriptionEvent.insertOne({
+                id: `migration:${existing.id}`,
+                subscriptionId: existing.id,
+                workspaceUuid: workspace.uuid,
+                eventType: 'created',
+                createdOn: now
+              })
+            }
+          } else {
+            const members = await this.getWorkspaceMembers(workspace.uuid)
+            const accountUuid =
+              workspace.billingAccount ??
+              workspace.createdBy ??
+              members.find((it) => it.role === AccountRole.Owner)?.person ??
+              members[0]?.person
+            if (accountUuid == null) continue
+
+            const id = `unlimited:${workspace.uuid}`
+            await this.subscription.insertOne({
+              id,
+              workspaceUuid: workspace.uuid,
+              accountUuid: accountUuid as AccountUuid,
+              provider: 'internal',
+              providerSubscriptionId: id,
+              type: 'tier' as any,
+              status: 'active' as any,
+              plan: 'unlimited',
+              createdOn: now,
+              updatedOn: now
+            })
+            await this.subscriptionEvent.insertOne({
+              id: `migration:${id}`,
+              subscriptionId: id,
+              workspaceUuid: workspace.uuid,
+              eventType: 'created',
+              createdOn: now
+            })
+          }
         }
       }
     }
