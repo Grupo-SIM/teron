@@ -6,12 +6,17 @@ on:
       - main
   workflow_dispatch:
 
+concurrency:
+  group: cd
+  cancel-in-progress: true
+
 env:
+  DOCKER_CONTEXT_IMAGE: docker.io/${{ github.repository }}_workspace:build-context
   INIT_SCRIPTS_BRANCH: main
 
 jobs:
-  publish:
-    name: Build and publish images
+  prepare:
+    name: Prepare shared Docker build context
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -161,145 +166,109 @@ jobs:
           unzip -q init.zip -d pods/workspace
           mv "pods/workspace/init-${INIT_SCRIPTS_BRANCH}" pods/workspace/init
 
-      - name: Build and publish account image
-        uses: hyoretsu/gh-actions/ghcr@main
+      - name: Stage generated Docker context files
+        run: |
+          contexts=(
+            pods/account
+            pods/collaborator
+            pods/front
+            pods/fulltext
+            pods/server
+            pods/stats
+            pods/workspace
+            services/github/pod-github
+            services/love
+            services/mail/pod-mail
+            services/notification/pod-notification
+            services/print/pod-print
+            services/rekoni
+          )
+
+          for context in "${contexts[@]}"; do
+            for output in bundle dist init lib; do
+              if [ -d "$context/$output" ]; then
+                mkdir -p "docker-contexts/$context"
+                cp -a "$context/$output" "docker-contexts/$context/$output"
+              fi
+            done
+          done
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v4
         with:
-          image: ${{ github.repository }}_account
-          context: pods/account
-          dockerfile: pods/account/Dockerfile
-          cache-scope: account
           registry: docker.io
           password: ${{ secrets.DOCKERHUB_TOKEN }}
           username: ${{ secrets.DOCKERHUB_USERNAME }}
 
-      - name: Build and publish collaborator image
-        uses: hyoretsu/gh-actions/ghcr@main
+      - name: Push shared Docker build context
+        run: |
+          docker build --tag "$DOCKER_CONTEXT_IMAGE" --file - docker-contexts <<'DOCKERFILE'
+          FROM alpine:3.21
+          COPY . /docker-contexts
+          DOCKERFILE
+          docker push "$DOCKER_CONTEXT_IMAGE"
+
+  publish:
+    name: Build and publish ${{ matrix.image }} image
+    needs: prepare
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - image: account
+            context: pods/account
+          - image: collaborator
+            context: pods/collaborator
+          - image: front
+            context: pods/front
+          - image: fulltext
+            context: pods/fulltext
+          - image: github
+            context: services/github/pod-github
+          - image: love
+            context: services/love
+          - image: mail
+            context: services/mail/pod-mail
+          - image: notification
+            context: services/notification/pod-notification
+          - image: print
+            context: services/print/pod-print
+          - image: rekoni-service
+            context: services/rekoni
+          - image: stats
+            context: pods/stats
+          - image: transactor
+            context: pods/server
+          - image: workspace
+            context: pods/workspace
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v4
         with:
-          image: ${{ github.repository }}_collaborator
-          context: pods/collaborator
-          dockerfile: pods/collaborator/Dockerfile
-          cache-scope: collaborator
           registry: docker.io
           password: ${{ secrets.DOCKERHUB_TOKEN }}
           username: ${{ secrets.DOCKERHUB_USERNAME }}
 
-      - name: Build and publish front image
-        uses: hyoretsu/gh-actions/ghcr@main
-        with:
-          image: ${{ github.repository }}_front
-          context: pods/front
-          dockerfile: pods/front/Dockerfile
-          cache-scope: front
-          registry: docker.io
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
+      - name: Restore shared Docker build context
+        run: |
+          docker pull "$DOCKER_CONTEXT_IMAGE"
+          context_container=$(docker create "$DOCKER_CONTEXT_IMAGE")
+          trap 'docker rm -f "$context_container"' EXIT
+          docker cp "${context_container}:/docker-contexts/." .
 
-      - name: Build and publish fulltext image
+      - name: Build and publish image
         uses: hyoretsu/gh-actions/ghcr@main
         with:
-          image: ${{ github.repository }}_fulltext
-          context: pods/fulltext
-          dockerfile: pods/fulltext/Dockerfile
-          cache-scope: fulltext
-          registry: docker.io
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
-
-      - name: Build and publish github image
-        uses: hyoretsu/gh-actions/ghcr@main
-        with:
-          image: ${{ github.repository }}_github
-          context: services/github/pod-github
-          dockerfile: services/github/pod-github/Dockerfile
-          cache-scope: github
-          registry: docker.io
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
-
-      - name: Build and publish love image
-        uses: hyoretsu/gh-actions/ghcr@main
-        with:
-          image: ${{ github.repository }}_love
-          context: services/love
-          dockerfile: services/love/Dockerfile
-          cache-scope: love
-          registry: docker.io
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
-
-      - name: Build and publish mail image
-        uses: hyoretsu/gh-actions/ghcr@main
-        with:
-          image: ${{ github.repository }}_mail
-          context: services/mail/pod-mail
-          dockerfile: services/mail/pod-mail/Dockerfile
-          cache-scope: mail
-          registry: docker.io
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
-
-      - name: Build and publish notification image
-        uses: hyoretsu/gh-actions/ghcr@main
-        with:
-          image: ${{ github.repository }}_notification
-          context: services/notification/pod-notification
-          dockerfile: services/notification/pod-notification/Dockerfile
-          cache-scope: notification
-          registry: docker.io
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
-
-      - name: Build and publish print image
-        uses: hyoretsu/gh-actions/ghcr@main
-        with:
-          image: ${{ github.repository }}_print
-          context: services/print/pod-print
-          dockerfile: services/print/pod-print/Dockerfile
-          cache-scope: print
-          registry: docker.io
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
-
-      - name: Build and publish rekoni-service image
-        uses: hyoretsu/gh-actions/ghcr@main
-        with:
-          image: ${{ github.repository }}_rekoni-service
-          context: services/rekoni
-          dockerfile: services/rekoni/Dockerfile
-          cache-scope: rekoni-service
-          registry: docker.io
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
-
-      - name: Build and publish stats image
-        uses: hyoretsu/gh-actions/ghcr@main
-        with:
-          image: ${{ github.repository }}_stats
-          context: pods/stats
-          dockerfile: pods/stats/Dockerfile
-          cache-scope: stats
-          registry: docker.io
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
-
-      - name: Build and publish transactor image
-        uses: hyoretsu/gh-actions/ghcr@main
-        with:
-          image: ${{ github.repository }}_transactor
-          context: pods/server
-          dockerfile: pods/server/Dockerfile
-          cache-scope: transactor
-          registry: docker.io
-          password: ${{ secrets.DOCKERHUB_TOKEN }}
-          username: ${{ secrets.DOCKERHUB_USERNAME }}
-
-      - name: Build and publish workspace image
-        uses: hyoretsu/gh-actions/ghcr@main
-        with:
-          image: ${{ github.repository }}_workspace
-          context: pods/workspace
-          dockerfile: pods/workspace/Dockerfile
-          cache-scope: workspace
+          image: ${{ github.repository }}_${{ matrix.image }}
+          context: ${{ matrix.context }}
+          dockerfile: ${{ matrix.context }}/Dockerfile
+          cache-scope: ${{ matrix.image }}
           registry: docker.io
           password: ${{ secrets.DOCKERHUB_TOKEN }}
           username: ${{ secrets.DOCKERHUB_USERNAME }}
