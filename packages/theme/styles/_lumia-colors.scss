@@ -43,37 +43,39 @@
 
 /* Dark Theme */
 .theme-dark {
-  --global-ui-BackgroundColor: #6098F20D;
-  --global-ui-BorderColor: #6098F21A;
-  --global-ui-hover-BackgroundColor: #6098F21A;
-  --global-ui-active-BackgroundColor: #6098F226;
-  --global-ui-highlight-BackgroundColor: #6098F20D;
-  --global-ui-hover-highlight-BackgroundColor: #6098F226;
+  --global-ui-hover-OverlayColor: #FFFFFF14;
+  --global-ui-active-OverlayColor: #FFFFFF1A;
+  --global-ui-BackgroundColor: #FFFFFF0D;
+  --global-ui-BorderColor: #FFFFFF1A;
+  --global-ui-hover-BackgroundColor: #FFFFFF1A;
+  --global-ui-active-BackgroundColor: #FFFFFF14;
+  --global-ui-highlight-BackgroundColor: #FFFFFF0D;
+  --global-ui-hover-highlight-BackgroundColor: #FFFFFF14;
   --global-surface-01-BackgroundColor: #0E0F11;
   --global-surface-01-BorderColor: #292A2D;
   --global-surface-01-hover-BackgroundColor: #161719;
   --global-surface-02-BackgroundColor: #161719;
   --global-surface-02-BorderColor: #292A2D;
   --global-surface-03-hover-BackgroundColor: #1B1C1E;
-  --global-subtle-ui-BorderColor: #6098F20D;
-  --global-subtle-BackgroundColor: #2058B8;
+  --global-subtle-ui-BorderColor: #FFFFFF0D;
+  --global-subtle-BackgroundColor: #0E0F11;
   --global-popover-BackgroundColor: #222326;
   --global-popover-hover-BackgroundColor: #2A2B2E;
   --global-popover-BorderColor: #FFFFFF14;
   --global-primary-LinkColor: #6098F2;
-  --global-primary-IconColor: #F2F2F6;
-  --global-primary-TextColor: #F2F2F6;
-  --global-secondary-TextColor: #C0BFC4;
-  --global-tertiary-TextColor: #979AA1;
+  --global-primary-IconColor: #C0BFC4;
+  --global-primary-TextColor: #C0BFC4;
+  --global-secondary-TextColor: #979AA1;
+  --global-tertiary-TextColor: #79777E;
   --global-disabled-TextColor: #5E5C63;
-  --global-accent-TextColor: #6098F2;
+  --global-accent-TextColor: #F2F2F6;
   --global-error-TextColor: #FF6359;
   --global-focus-BorderColor: #6098F2;
   --global-focus-inset-BorderColor: #161719;
   --global-popover-ShadowColor: #0E0F1180;
   --global-modal-ShadowColor: #0E0F11A6;
   --global-accent-SkyText: #80ACF0;
-  --global-accent-BackgroundColor: #2869D8;
+  --global-accent-BackgroundColor: #2A2B2E;
   --global-on-nuance-TextColor: #0E0F11;
 
   --global-no-priority-PriorityColor: #979AA1;
@@ -94,39 +96,41 @@
   --border-talk-indication-secondary: #1B1C1E;
 
   /** Buttons **/
-  --button-subtle-LabelColor: #fff;
-  --button-subtle-IconColor: #fff;
+  --button-subtle-LabelColor: #C0BFC4;
+  --button-subtle-IconColor: #C0BFC4;
   --button-disabled-BackgroundColor: #d1d5de0d;
   --button-primary-loading-LabelColor: #6098F2;
   --button-secondary-BackgroundColor: #d1d5de0d;
   --button-secondary-BorderColor: #d1d5de1a;
-  --button-secondary-hover-BackgroundColor: #6098F21A;
+  --button-secondary-hover-BackgroundColor: #FFFFFF1A;
   --button-secondary-active-BackgroundColor: #d1d5de26;
   --button-tertiary-hover-BackgroundColor: #d1d5de1a;
   --button-tertiary-active-BackgroundColor: #d1d5de26;
   --button-menu-active-BorderColor: #d9dee6;
 
   /** Editbox **/
-  --input-BackgroundColor: #6098F20D;
-  --input-hover-BackgroundColor: #6098F21A;
-  --input-BorderColor: #6098F20D;
-  --input-TextColor: #F2F2F6;
-  --input-LabelColor: #F2F2F6;
-  --input-filled-LabelColor: #979AA1;
-  --input-PlaceholderColor: #979AA1;
+  --input-BackgroundColor: #FFFFFF0D;
+  --input-hover-BackgroundColor: #FFFFFF1A;
+  --input-BorderColor: #FFFFFF0D;
+  --input-TextColor: #C0BFC4;
+  --input-LabelColor: #C0BFC4;
+  --input-filled-LabelColor: #79777E;
+  --input-PlaceholderColor: #79777E;
   --input-hover-PlaceholderColor: #F2F2F6;
   --input-focus-PlaceholderColor: #5E5C63;
   --input-HelperColor: #979AA1;
   --input-error-BorderColor: #fb6863;
-  --input-search-IconColor: #F2F2F6;
+  --input-search-IconColor: #C0BFC4;
 
   /** Checkboxes **/
-  --selector-BackgroundColor: #6098F20D;
-  --selector-BorderColor: #C0BFC4;
+  --selector-active-BackgroundColor: #F2F2F6;
+  --selector-IconColor: #0E0F11;
+  --selector-BackgroundColor: #FFFFFF0D;
+  --selector-BorderColor: #979AA1;
   --selector-off-BackgroundColor: #5E5C63;
-  --selector-hover-overlay-BackgroundColor: #6098F21A;
-  --selector-disabled-BackgroundColor: #6098F21A;
-  --selector-disabled-BorderColor: #6098F20D;
+  --selector-hover-overlay-BackgroundColor: #FFFFFF1A;
+  --selector-disabled-BackgroundColor: #FFFFFF1A;
+  --selector-disabled-BorderColor: #FFFFFF0D;
 
   --love-active-call-color-1: #6098F2;
   --love-active-call-color-2: #E27252;
