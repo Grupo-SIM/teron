@@ -257,7 +257,9 @@ jobs:
           context: ${{ matrix.context }}
           dockerfile: ${{ matrix.context }}/Dockerfile
           cache-scope: ${{ matrix.image }}
-          password: ${{ secrets.GITHUB_TOKEN }}
+          registry: docker.io
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
 
   publish-hulypulse:
     name: Build and publish hulypulse image
@@ -276,4 +278,6 @@ jobs:
           context: foundations/hulypulse
           dockerfile: foundations/hulypulse/Dockerfile
           cache-scope: hulypulse
-          password: ${{ secrets.GITHUB_TOKEN }}
+          registry: docker.io
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
