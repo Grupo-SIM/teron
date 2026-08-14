@@ -40,7 +40,7 @@ test.describe('login test', () => {
     await loginPage.checkIfLoginButtonIsDisabled()
     await loginPage.checkIfLoginButtonIsDisabled()
     await loginPage.clickOnRecover()
-    await checkIfUrlContains(page, '/password')
+    await checkIfUrlContains(page, 'mode=recover')
     await loginPage.checkIfPasswordRecoveryIsVisible()
     await loginPage.clickOnRecoveryLogin()
     await checkIfUrlContains(page, '/entrar')

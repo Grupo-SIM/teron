@@ -38,7 +38,7 @@ import {
   type WorkspaceInfoWithStatus,
   type WorkspaceUserOperation
 } from '@hcengineering/core'
-import { loginRoute, signupRoute } from '@hcengineering/login'
+import { getAuthUrl, openAuthRoute } from '@hcengineering/login'
 import platform, {
   OK,
   PlatformError,
@@ -55,7 +55,6 @@ import {
   getCurrentLocation,
   isSameSegments,
   locationStorageKeyId,
-  locationToUrl,
   navigate,
   setMetadataLocalStorage,
   type Location
@@ -425,9 +424,7 @@ export async function selectWorkspace (
     return [OK, loginInfo, true]
   } catch (err: any) {
     if (err instanceof PlatformError && err.status.code === platform.status.Unauthorized) {
-      const loc = getCurrentLocation()
-      loc.path = [loginRoute]
-      navigate(loc)
+      openAuthRoute()
       return [unknownStatus('Please login'), null, true]
     } else if (err instanceof PlatformError) {
       Analytics.handleEvent(LoginEvents.SelectWorkspace, { name: workspaceUrl, ok: false })
@@ -620,21 +617,9 @@ export async function getInviteLink (
   navigateUrl?: string
 ): Promise<string> {
   const inviteId = await getInviteLinkId(expHours, mask, limit ?? -1, role)
-  const loc = getCurrentLocation()
-  loc.path = [loginRoute, 'join']
-  loc.query = {
-    inviteId
-  }
-  if (navigateUrl !== undefined) {
-    loc.query.navigateUrl = navigateUrl
-  }
-  loc.fragment = undefined
-
-  const url = locationToUrl(loc)
-
   const frontUrl = getMetadata(presentation.metadata.FrontUrl)
   const host = frontUrl ?? document.location.origin
-  return concatLink(host, url)
+  return concatLink(host, getAuthUrl('join', { inviteId, navigateUrl }))
 }
 
 export async function getInviteLinkId (
@@ -862,25 +847,15 @@ async function handleStatusError (message: string, err: Status): Promise<void> {
   Analytics.handleError(new Error(`${message}: ${label}`))
 }
 
-export function getLoc (path: Pages): Location {
-  const loc = getCurrentLocation()
-  loc.path = path === 'login' ? [loginRoute] : path === 'signup' ? [signupRoute] : [loginRoute, path]
-  return loc
-}
-
 export function goTo (path: Pages, clearQuery: boolean = false): void {
-  const loc = getLoc(path)
-  if (clearQuery) {
-    loc.query = undefined
-  }
-  navigate(loc, clearQuery)
+  const query = clearQuery ? undefined : getCurrentLocation().query
+  openAuthRoute(path, query)
 }
 
 export function getHref (path: Pages): string {
-  const url = locationToUrl(getLoc(path))
   const frontUrl = getMetadata(presentation.metadata.FrontUrl)
   const host = frontUrl ?? document.location.origin
-  return host + url
+  return concatLink(host, getAuthUrl(path))
 }
 
 export async function afterConfirm (clearQuery = false): Promise<void> {
@@ -1055,20 +1030,7 @@ export async function doLoginNavigate (
 ): Promise<void> {
   if (result != null) {
     if (result.tfaRequired === true) {
-      const currentLoc = getCurrentLocation()
-      const loc = getCurrentLocation()
-      loc.path[1] = 'tfa'
-      loc.path.length = 2
-      if (navigateUrl !== undefined || result.token != null) {
-        loc.query = { ...loc.query, navigateUrl: navigateUrl ?? null, token: result.token ?? null }
-      }
-
-      if (loc.path.length === currentLoc.path.length && isSameSegments(currentLoc, loc, loc.path.length)) {
-        window.location.reload()
-        return
-      }
-
-      navigate(loc)
+      openAuthRoute('tfa', { navigateUrl, token: result.token })
       return
     }
 
@@ -1098,22 +1060,7 @@ export async function doLoginNavigate (
       }
     }
 
-    const currentLoc = getCurrentLocation()
-
-    const loc = getCurrentLocation()
-    loc.path[1] = result.token != null ? 'selectWorkspace' : 'confirmationSend'
-    loc.path.length = 2
-    if (navigateUrl !== undefined) {
-      loc.query = { ...loc.query, navigateUrl }
-    }
-
-    // If we're already on the target page, reload to refresh state
-    if (loc.path.length === currentLoc.path.length && isSameSegments(currentLoc, loc, loc.path.length)) {
-      window.location.reload()
-      return
-    }
-
-    navigate(loc)
+    openAuthRoute(result.token != null ? 'selectWorkspace' : 'confirmationSend', { navigateUrl })
   }
 }
 

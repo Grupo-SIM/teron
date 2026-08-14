@@ -424,7 +424,7 @@ export function start (
 
       const workspaces = await accountClient.getUserWorkspaces()
       const workspace = workspaces.sort((a, b) => (b.lastVisit ?? 0) - (a.lastVisit ?? 0))[0]
-      const workspaceHref = workspace !== undefined ? `/workbench/${encodeURIComponent(workspace.url)}` : '/entrar/selectWorkspace'
+      const workspaceHref = workspace !== undefined ? `/workbench/${encodeURIComponent(workspace.url)}` : '/entrar?mode=workspaces'
 
       res.json({ authenticated: true, workspaceHref })
     } catch {
@@ -446,10 +446,24 @@ export function start (
 
     if (path === '/signup' || path === '/login/signup') {
       target = '/cadastro'
-    } else if (path === '/login') {
+    } else if (path === '/login' || path === '/login/login') {
       target = '/entrar'
-    } else if (path.startsWith('/login/')) {
-      target = `/entrar/${path.slice('/login/'.length)}`
+    } else if (path === '/login/admin') {
+      target = '/entrar/admin'
+    } else if ((path.startsWith('/login/') || path.startsWith('/entrar/')) && path !== '/entrar/admin') {
+      const page = path.slice(path.indexOf('/', 1) + 1)
+      const modes: Record<string, string> = {
+        password: 'recover',
+        recovery: 'restore',
+        confirm: 'confirm',
+        auth: 'auth',
+        selectWorkspace: 'workspaces',
+        createWorkspace: 'create-workspace',
+        confirmationSend: 'confirmation-sent',
+        join: 'join',
+        tfa: 'tfa'
+      }
+      target = `/entrar?mode=${modes[page] ?? page}`
     }
 
     if (target === undefined) {
@@ -457,8 +471,8 @@ export function start (
       return
     }
 
-    const query = request.originalUrl.slice(request.path.length)
-    response.redirect(308, `${target}${query}`)
+    const query = request.originalUrl.slice(request.path.length).replace(/^\?/, '')
+    response.redirect(308, `${target}${query === '' ? '' : `${target.includes('?') ? '&' : '?'}${query}`}`)
   })
 
   let brandingUrl: URL | undefined
@@ -496,11 +510,6 @@ export function start (
       }
       const route = request.path.replace(/\/+$/, '')
       if (route === '') {
-        next()
-        return
-      }
-      const startsAuthFlow = request.query.email !== undefined || request.query.provider !== undefined
-      if ((route === '/entrar' || route === '/cadastro') && startsAuthFlow) {
         next()
         return
       }

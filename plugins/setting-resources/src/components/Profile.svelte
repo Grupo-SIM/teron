@@ -16,7 +16,7 @@
   import contact, { combineName, getFirstName, getLastName } from '@hcengineering/contact'
   import { ChannelsEditor, EditableAvatar, myEmployeeStore } from '@hcengineering/contact-resources'
   import { AccountRole, getCurrentAccount, SocialIdType } from '@hcengineering/core'
-  import login, { loginRoute } from '@hcengineering/login'
+  import login, { openAuthRoute } from '@hcengineering/login'
   import platform, { getResource, PlatformError } from '@hcengineering/platform'
   import { AttributeEditor, createQuery, getClient, hasResource, MessageBox } from '@hcengineering/presentation'
   import {
@@ -27,7 +27,6 @@
     EditBox,
     FocusHandler,
     Header,
-    navigate,
     Scroller,
     showPopup
   } from '@hcengineering/ui'
@@ -87,10 +86,10 @@
 
           if (loginInfo?.token != null) {
             await logIn(loginInfo)
-            navigate({ path: [loginRoute, 'selectWorkspace'] })
+            openAuthRoute('selectWorkspace')
           } else {
             await logOut()
-            navigate({ path: [loginRoute] })
+            openAuthRoute()
           }
         } catch (err: any) {
           if (

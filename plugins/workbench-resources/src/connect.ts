@@ -20,7 +20,7 @@ import core, {
   SocialIdType,
   type WorkspaceInfoWithStatus
 } from '@hcengineering/core'
-import login, { loginRoute, type Pages } from '@hcengineering/login'
+import login, { openAuthRoute, type Pages } from '@hcengineering/login'
 import platform, {
   broadcastEvent,
   getMetadata,
@@ -95,9 +95,7 @@ export async function connect (title: string): Promise<Client | undefined> {
         return
       }
     } else {
-      navigate({
-        path: [loginRoute]
-      })
+      openAuthRoute()
       return
     }
   }
@@ -121,7 +119,7 @@ export async function connect (title: string): Promise<Client | undefined> {
       )
       // something went wrong with selecting workspace with the selected token
       await logOut()
-      navigate({ path: [loginRoute] })
+      openAuthRoute()
       return
     }
     break
@@ -153,9 +151,7 @@ export async function connect (title: string): Promise<Client | undefined> {
       console.error(
         `Error fetching workspace ${wsUrl}. It might no longer exist or be inaccessible. Please try to log in again.`
       )
-      navigate({
-        path: [loginRoute]
-      })
+      openAuthRoute()
       return
     }
     break
@@ -178,9 +174,7 @@ export async function connect (title: string): Promise<Client | undefined> {
 
       if (workspace == null) {
         // something went wrong, workspace not exist, redirect to login
-        navigate({
-          path: [loginRoute]
-        })
+        openAuthRoute()
         return
       }
 
@@ -203,10 +197,7 @@ export async function connect (title: string): Promise<Client | undefined> {
   if (token == null || endpoint == null || account == null) {
     console.error('Something of the vital auth info is missing. Please try to log in again.')
     const navigateUrl = encodeURIComponent(JSON.stringify(loc))
-    navigate({
-      path: [loginRoute],
-      query: { navigateUrl }
-    })
+    openAuthRoute('login', { navigateUrl })
     return
   }
 
@@ -286,10 +277,7 @@ export async function connect (title: string): Promise<Client | undefined> {
           switch (status) {
             case platform.status.WorkspaceArchived: {
               const selectWorkspace: Pages = 'selectWorkspace'
-              navigate({
-                path: [loginRoute, selectWorkspace],
-                query: {}
-              })
+              openAuthRoute(selectWorkspace)
               break
             }
             case platform.status.PasswordExpired: {
@@ -300,20 +288,14 @@ export async function connect (title: string): Promise<Client | undefined> {
                     label: login.string.SelectWorkspace,
                     action: () => {
                       const selectWorkspace: Pages = 'selectWorkspace'
-                      navigate({
-                        path: [loginRoute, selectWorkspace],
-                        query: {}
-                      })
+                      openAuthRoute(selectWorkspace)
                     }
                   },
                   {
                     label: login.string.ChangePassword,
                     action: () => {
                       const changePassword: Pages = 'changePassword'
-                      navigate({
-                        path: [loginRoute, changePassword],
-                        query: {}
-                      })
+                      openAuthRoute(changePassword)
                     }
                   }
                 ])
@@ -333,10 +315,7 @@ export async function connect (title: string): Promise<Client | undefined> {
             }
             case platform.status.Unauthorized: {
               void logOut().then(() => {
-                navigate({
-                  path: [loginRoute],
-                  query: {}
-                })
+                openAuthRoute()
               })
             }
           }
@@ -473,10 +452,7 @@ export async function connect (title: string): Promise<Client | undefined> {
 
     if (employee == null) {
       console.log('Failed to ensure employee')
-      navigate({
-        path: [loginRoute],
-        query: {}
-      })
+      openAuthRoute()
       return
     }
 

@@ -26,7 +26,7 @@
     SortingOrder,
     Space
   } from '@hcengineering/core'
-  import login, { loginRoute } from '@hcengineering/login'
+  import login, { openAuthRoute } from '@hcengineering/login'
   import notification, { DocNotifyContext, InboxNotification, notificationId } from '@hcengineering/notification'
   import { BrowserNotificatator, InboxNotificationsClientImpl } from '@hcengineering/notification-resources'
   import inbox, { inboxId } from '@hcengineering/inbox'
@@ -802,7 +802,7 @@
       size={'small'}
       on:click={() => {
         void logOut().then(() => {
-          navigate({ path: [loginRoute] })
+          openAuthRoute()
         })
       }}
     />

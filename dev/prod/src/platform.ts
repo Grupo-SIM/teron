@@ -39,7 +39,7 @@ import { hrId } from '@hcengineering/hr'
 import { imageCropperId } from '@hcengineering/image-cropper'
 import { inventoryId } from '@hcengineering/inventory'
 import { leadId } from '@hcengineering/lead'
-import login, { loginId, loginRoute, signupRoute } from '@hcengineering/login'
+import login, { loginId, loginRoute } from '@hcengineering/login'
 import love, { loveId } from '@hcengineering/love'
 import notification, { notificationId } from '@hcengineering/notification'
 import onboard, { onboardId } from '@hcengineering/onboard'
@@ -554,8 +554,8 @@ export async function configurePlatform() {
     new Map([
       [workbenchId, workbench.component.WorkbenchApp],
       [loginId, login.component.LoginApp],
+      // Public authentication is served by the new site; this registration remains for /entrar/admin only.
       [loginRoute, login.component.LoginApp],
-      [signupRoute, login.component.LoginApp],
       [onboardId, onboard.component.OnboardApp],
       [githubId, github.component.ConnectApp],
       [calendarId, calendar.component.ConnectApp],

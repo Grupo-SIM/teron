@@ -1005,7 +1005,7 @@ describe('account utils', () => {
                 'Content-Type': 'application/json',
                 Authorization: 'Bearer test-auth-token'
               },
-              body: expect.stringContaining('https://app.example.com/entrar/confirm')
+              body: expect.stringContaining('https://app.example.com/entrar?mode=confirm')
             })
           )
         })
@@ -1031,7 +1031,7 @@ describe('account utils', () => {
           expect(mockFetch).toHaveBeenCalledWith(
             expect.any(String),
             expect.objectContaining({
-              body: expect.stringContaining('https://custom.example.com/entrar/confirm')
+              body: expect.stringContaining('https://custom.example.com/entrar?mode=confirm')
             })
           )
         })

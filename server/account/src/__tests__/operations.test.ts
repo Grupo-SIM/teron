@@ -213,7 +213,7 @@ describe('account operations', () => {
         role: AccountRole.User
       })
 
-      expect(result).toBe(`${frontUrl}/entrar/join?inviteId=${inviteId}`)
+      expect(result).toBe(`${frontUrl}/entrar?mode=join&inviteId=${inviteId}`)
     })
 
     test('should create link with auto-join parameters', async () => {
@@ -236,7 +236,7 @@ describe('account operations', () => {
         lastName: 'Doe'
       })
 
-      expect(result).toBe(`${frontUrl}/entrar/join?inviteId=${inviteId}&autoJoin&firstName=John&lastName=Doe`)
+      expect(result).toBe(`${frontUrl}/entrar?mode=join&inviteId=${inviteId}&autoJoin&firstName=John&lastName=Doe`)
     })
 
     test('should create link with redirect parameter', async () => {
@@ -253,7 +253,7 @@ describe('account operations', () => {
         navigateUrl
       })
 
-      expect(result).toBe(`${frontUrl}/entrar/join?inviteId=${inviteId}&navigateUrl=${encodeURIComponent(navigateUrl)}`)
+      expect(result).toBe(`${frontUrl}/entrar?mode=join&inviteId=${inviteId}&navigateUrl=${encodeURIComponent(navigateUrl)}`)
     })
 
     test('should create link with all parameters', async () => {
@@ -279,7 +279,7 @@ describe('account operations', () => {
       })
 
       expect(result).toBe(
-        `${frontUrl}/entrar/join?inviteId=${inviteId}&autoJoin&firstName=John&lastName=Doe&navigateUrl=${encodeURIComponent(navigateUrl)}`
+        `${frontUrl}/entrar?mode=join&inviteId=${inviteId}&autoJoin&firstName=John&lastName=Doe&navigateUrl=${encodeURIComponent(navigateUrl)}`
       )
     })
 
@@ -1143,7 +1143,7 @@ describe('account operations', () => {
 
       expect(mockDb.generatePersonUuid).toHaveBeenCalled()
       expect(result).toBe(
-        `${frontUrl}/entrar/auth?token=mocked-token-b6996120-416f-49cd-841e-e4a5d2e49c9b-${JSON.stringify({
+        `${frontUrl}/entrar?mode=auth&token=mocked-token-b6996120-416f-49cd-841e-e4a5d2e49c9b-${JSON.stringify({
           grant: {
             workspace: 'workspace-uuid',
             role: 'USER',
@@ -1167,7 +1167,7 @@ describe('account operations', () => {
 
       expect(mockDb.generatePersonUuid).toHaveBeenCalled()
       expect(result).toBe(
-        `${frontUrl}/entrar/auth?token=mocked-token-b6996120-416f-49cd-841e-e4a5d2e49c9b-${JSON.stringify({
+        `${frontUrl}/entrar?mode=auth&token=mocked-token-b6996120-416f-49cd-841e-e4a5d2e49c9b-${JSON.stringify({
           grant: {
             workspace: mockWorkspace.uuid,
             role: AccountRole.User,
@@ -1193,7 +1193,7 @@ describe('account operations', () => {
 
       expect(mockDb.generatePersonUuid).toHaveBeenCalled()
       expect(result).toBe(
-        `${frontUrl}/entrar/auth?token=mocked-token-b6996120-416f-49cd-841e-e4a5d2e49c9b-${JSON.stringify({
+        `${frontUrl}/entrar?mode=auth&token=mocked-token-b6996120-416f-49cd-841e-e4a5d2e49c9b-${JSON.stringify({
           grant: {
             workspace: mockWorkspace.uuid,
             role: AccountRole.User,
@@ -1218,7 +1218,7 @@ describe('account operations', () => {
 
       expect(mockDb.generatePersonUuid).toHaveBeenCalled()
       expect(result).toBe(
-        `${frontUrl}/entrar/auth?token=mocked-token-b6996120-416f-49cd-841e-e4a5d2e49c9b-${JSON.stringify({
+        `${frontUrl}/entrar?mode=auth&token=mocked-token-b6996120-416f-49cd-841e-e4a5d2e49c9b-${JSON.stringify({
           grant: {
             workspace: 'workspace-uuid',
             role: 'USER',
@@ -1273,7 +1273,7 @@ describe('account operations', () => {
       })
 
       expect(result).toBe(
-        `${frontUrl}/entrar/auth?token=mocked-token-b6996120-416f-49cd-841e-e4a5d2e49c9b-${JSON.stringify({
+        `${frontUrl}/entrar?mode=auth&token=mocked-token-b6996120-416f-49cd-841e-e4a5d2e49c9b-${JSON.stringify({
           grant: {
             workspace: mockWorkspace.uuid,
             role: AccountRole.User,

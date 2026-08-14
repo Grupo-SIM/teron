@@ -4,8 +4,7 @@ import { Asset } from "@/components/site/asset";
 import { Localized, defaultLocale, type Locale } from "@/i18n/site";
 
 import { AuthDecor } from "./auth-decor";
-import { AuthForm } from "./auth-form";
-import { AuthProviders } from "./auth-providers";
+import { AuthFlow } from "./auth-flow";
 import "./auth.css";
 
 /*
@@ -22,22 +21,14 @@ export type AuthVariant = "login" | "signup";
 
 const COPY = {
   login: {
-    title: "Entrar na Teron",
-    submitLabel: "Entrar",
-    providerAction: "Entrar",
     switchText: "Não tem uma conta?",
     switchLabel: "Cadastre-se",
     switchHref: "/cadastro",
-    flowHref: "/entrar",
   },
   signup: {
-    title: "Criar nova conta",
-    submitLabel: "Criar conta",
-    providerAction: "Cadastrar",
     switchText: "Já tem uma conta?",
     switchLabel: "Entrar",
     switchHref: "/entrar",
-    flowHref: "/cadastro",
   },
 } as const satisfies Record<AuthVariant, unknown>;
 
@@ -54,7 +45,7 @@ export function AuthPage({ variant, locale = defaultLocale }: { variant: AuthVar
       </header>
 
       <section className="auth-stage">
-        <div className="auth-card">
+        <div className="auth-card auth-card--flow">
           <main className="auth-card-body">
             <Asset
               src="/assets/teronwhite.svg"
@@ -62,10 +53,7 @@ export function AuthPage({ variant, locale = defaultLocale }: { variant: AuthVar
               ratio="595 / 550"
               className="auth-logo"
             />
-            <h1 className="auth-title">{copy.title}</h1>
-
-            <AuthForm submitLabel={copy.submitLabel} flowHref={copy.flowHref} />
-            <AuthProviders action={copy.providerAction} flowHref={copy.flowHref} />
+            <AuthFlow variant={variant} locale={locale} />
           </main>
 
           <AuthDecor />

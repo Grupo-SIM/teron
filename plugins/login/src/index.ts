@@ -47,6 +47,37 @@ export const pages = [
 ] as const
 
 export type Pages = (typeof pages)[number]
+
+const authModes: Partial<Record<Pages, string>> = {
+  password: 'recover',
+  recovery: 'restore',
+  selectWorkspace: 'workspaces',
+  createWorkspace: 'create-workspace',
+  confirmationSend: 'confirmation-sent',
+  confirm: 'confirm',
+  auth: 'auth',
+  join: 'join',
+  autoJoin: 'join',
+  tfa: 'tfa',
+  changePassword: 'change-password'
+}
+
+export function getAuthUrl (page: Pages = 'login', query?: Record<string, string | null | undefined>): string {
+  const params = new URLSearchParams()
+  const mode = authModes[page]
+  if (mode !== undefined) params.set('mode', mode)
+  for (const [key, value] of Object.entries(query ?? {})) {
+    if (value != null) params.set(key, value)
+  }
+  const path = page === 'signup' ? '/cadastro' : page === 'admin' ? '/entrar/admin' : '/entrar'
+  const search = params.toString()
+  return search === '' ? path : `${path}?${search}`
+}
+
+export function openAuthRoute (page: Pages = 'login', query?: Record<string, string | null | undefined>): void {
+  window.location.assign(getAuthUrl(page, query))
+}
+
 export default plugin(loginId, {
   metadata: {
     AccountsUrl: '' as Asset,

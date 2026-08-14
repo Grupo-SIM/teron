@@ -10,25 +10,24 @@ export class LoginPage {
 
   inputEmail = (): Locator => this.page.locator('input[name=email]')
   inputPassword = (): Locator => this.page.locator('input[name=current-password]')
-  buttonLogin = (): Locator => this.page.locator('button', { hasText: 'Log In' })
-  loginWithPassword = (): Locator => this.page.locator('a', { hasText: 'Login with password' })
-  linkSignUp = (): Locator => this.page.locator('a.title', { hasText: 'Sign Up' })
-  invalidCredentialsMessage = (): Locator =>
-    this.page.getByText('Account not found or the provided credentials are incorrect')
+  buttonLogin = (): Locator => this.page.getByTestId('auth-submit')
+  loginWithPassword = (): Locator => this.page.getByTestId('auth-method-toggle')
+  linkSignUp = (): Locator => this.page.locator('a[href="/cadastro"]')
+  invalidCredentialsMessage = (): Locator => this.page.locator('.auth-error')
 
-  recoverLink = (): Locator => this.page.getByRole('link', { name: 'Recover' })
-  passwordRecovery = (): Locator => this.page.getByText('Password recovery')
-  recoveryLoginText = (): Locator => this.page.getByText('Know your password? Log In')
-  recoverySignUpText = (): Locator => this.page.getByText('Do not have an account? Sign Up')
-  recoveryLogin = (): Locator => this.page.getByRole('link', { name: 'Log In' })
-  recoverySignUp = (): Locator => this.page.getByRole('link', { name: 'Sign Up' })
+  recoverLink = (): Locator => this.page.getByTestId('auth-recover')
+  passwordRecovery = (): Locator => this.page.locator('h1.auth-title')
+  recoveryLoginText = (): Locator => this.page.locator('.auth-back-action')
+  recoverySignUpText = (): Locator => this.linkSignUp()
+  recoveryLogin = (): Locator => this.page.locator('.auth-back-action')
+  recoverySignUp = (): Locator => this.linkSignUp()
 
   profileButton = (): Locator => this.page.locator('#profile-button')
   popupItemButton = (hasText: string): Locator => this.page.locator('div.popup button[class*="menu"]', { hasText })
 
   // ACTIONS
   async goto (): Promise<void> {
-    await (await this.page.goto(`${PlatformURI}/entrar/login`))?.finished()
+    await (await this.page.goto(`${PlatformURI}/entrar`))?.finished()
   }
 
   // ACTIONS
@@ -54,6 +53,7 @@ export class LoginPage {
 
   async login (email: string, password: string): Promise<void> {
     await this.inputEmail().fill(email)
+    if (!(await this.inputPassword().isVisible())) await this.loginWithPassword().click()
     await this.inputPassword().fill(password)
     expect(await this.buttonLogin().isEnabled()).toBe(true)
     await this.buttonLogin().click()

@@ -16,7 +16,7 @@
   import { AvatarType } from '@hcengineering/contact'
   import { EditableAvatar, getAccountClient } from '@hcengineering/contact-resources'
   import core, { Configuration, WorkspaceAccountPermission } from '@hcengineering/core'
-  import { loginRoute } from '@hcengineering/login'
+  import { openAuthRoute } from '@hcengineering/login'
   import { translateCB } from '@hcengineering/platform'
   import { createQuery, getClient, MessageBox } from '@hcengineering/presentation'
   import { WorkspaceSetting } from '@hcengineering/setting'
@@ -36,7 +36,6 @@
     IconEdit,
     Label,
     Loading,
-    navigate,
     Scroller,
     showPopup,
     themeStore,
@@ -99,7 +98,7 @@
       dangerous: true,
       action: async () => {
         await accountClient.deleteWorkspace()
-        navigate({ path: [loginRoute] })
+        openAuthRoute()
       }
     })
   }

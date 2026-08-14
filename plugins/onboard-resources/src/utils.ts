@@ -13,7 +13,7 @@
 // limitations under the License.
 //
 
-import { loginRoute, signupRoute, type LoginInfo } from '@hcengineering/login'
+import { openAuthRoute, type LoginInfo } from '@hcengineering/login'
 import {
   getWorkspaces,
   navigateToWorkspace,
@@ -42,12 +42,8 @@ export function goTo (path: Pages, clearQuery: boolean = false): void {
 }
 
 export function goToLogin (page: LoginPages, clearQuery: boolean = false): void {
-  const loc = getCurrentLocation()
-  loc.path = page === 'signup' ? [signupRoute] : page === 'login' ? [loginRoute] : [loginRoute, page]
-  if (clearQuery) {
-    loc.query = undefined
-  }
-  navigate(loc, clearQuery)
+  const query = clearQuery ? undefined : getCurrentLocation().query
+  openAuthRoute(page, query)
 }
 
 export function getHref (path: Pages): string {
@@ -59,9 +55,7 @@ export function getHref (path: Pages): string {
 
 export async function ensureConfirmed (account: LoginInfo): Promise<void> {
   if (account.token === undefined) {
-    const loc = getCurrentLocation()
-    loc.path = [loginRoute, 'confirmationSend']
-    navigate(loc)
+    openAuthRoute('confirmationSend')
   }
 }
 

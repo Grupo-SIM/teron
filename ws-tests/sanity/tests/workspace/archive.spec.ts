@@ -66,11 +66,11 @@ test.describe('Workspace Archive tests', () => {
       await loginPage2.goto()
       await loginPage2.login('admin', '1234')
       await loginPage2.page.waitForURL((url) => {
-        return url.pathname.startsWith('/entrar/selectWorkspace') || url.pathname.startsWith('/workbench/')
+        return (url.pathname === '/entrar' && url.searchParams.get('mode') === 'workspaces') || url.pathname.startsWith('/workbench/')
       })
 
       await loginPage2.page.waitForURL((url) => {
-        return url.pathname.startsWith('/entrar/selectWorkspace') || url.pathname.startsWith('/workbench/')
+        return (url.pathname === '/entrar' && url.searchParams.get('mode') === 'workspaces') || url.pathname.startsWith('/workbench/')
       })
 
       const adminPage = new AdminPage(page2)

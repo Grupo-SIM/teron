@@ -13,9 +13,9 @@ export class SignUpPage extends CommonPage {
   inputFirstName = (): Locator => this.page.locator('input[name="given-name"]')
   inputLastName = (): Locator => this.page.locator('input[name="family-name"]')
   inputEmail = (): Locator => this.page.locator('input[name="email"]')
-  inputNewPassword = (): Locator => this.page.locator('//div[text()="Password"]/../input')
-  inputRepeatPassword = (): Locator => this.page.locator('//div[text()="Repeat password"]/../input')
-  buttonSignUp = (): Locator => this.page.locator('button', { hasText: 'Sign Up' })
+  inputNewPassword = (): Locator => this.page.getByTestId('auth-password')
+  inputRepeatPassword = (): Locator => this.page.getByTestId('auth-password-repeat')
+  buttonSignUp = (): Locator => this.page.getByTestId('auth-submit')
 
   async enterFirstName (firstName: string): Promise<void> {
     await this.inputFirstName().fill(firstName)
@@ -30,6 +30,7 @@ export class SignUpPage extends CommonPage {
   }
 
   async enterPassword (password: string): Promise<void> {
+    if (!(await this.inputNewPassword().isVisible())) await this.page.getByTestId('auth-method-toggle').click()
     await this.inputNewPassword().fill(password)
   }
 

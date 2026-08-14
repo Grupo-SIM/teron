@@ -11,11 +11,10 @@ export class SignInJoinPage extends CommonPage {
   }
 
   inputEmail = (): Locator => this.page.locator('input[name="email"]')
-  inputPassword = (): Locator => this.page.locator('//div[text()="Password"]/../input')
-  buttonSubmit = (): Locator => this.page.locator('button[data-id="join-form-submit"]')
-  buttonToggle = (): Locator => this.page.locator('button[data-id="join-form-toggle"]')
-  buttonJoinWithThisAccount = (): Locator => this.page.locator('button[data-id="join-with-this-account"]')
-  buttonUseDifferentAccount = (): Locator => this.page.locator('button[data-id="join-use-different-account"]')
+  inputPassword = (): Locator => this.page.getByTestId('auth-password')
+  buttonSubmit = (): Locator => this.page.getByTestId('join-form-submit')
+  buttonToggle = (): Locator => this.page.getByTestId('join-form-toggle')
+  buttonJoinWithThisAccount = (): Locator => this.page.getByTestId('join-with-this-account')
 
   async join (data: Pick<SignUpData, 'email' | 'password'>): Promise<void> {
     await Promise.race([
@@ -25,12 +24,6 @@ export class SignInJoinPage extends CommonPage {
 
     const submitBtn = this.buttonSubmit()
     const toggleBtn = this.buttonToggle()
-    const joinWithAccountBtn = this.buttonJoinWithThisAccount()
-
-    if (await joinWithAccountBtn.isVisible({ timeout: 2000 }).catch(() => false)) {
-      await this.buttonUseDifferentAccount().click()
-      await this.inputEmail().waitFor({ state: 'visible', timeout: 5000 })
-    }
 
     const submitText = await submitBtn.textContent().catch(() => '')
     if (submitText != null && submitText.toLowerCase().includes('sign up')) {

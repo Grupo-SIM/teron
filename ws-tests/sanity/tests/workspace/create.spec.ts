@@ -188,15 +188,15 @@ test.describe('Workspace tests', () => {
       const signUpPage2 = new SignUpPage(page2)
       await signUpPage2.signUp(newUser2)
       await page2.waitForURL((url) => {
-        return url.pathname.startsWith('/entrar/createWorkspace')
+        return url.pathname === '/entrar' && url.searchParams.get('mode') === 'create-workspace'
       })
 
       await page2.waitForURL((url) => {
-        return url.pathname.startsWith('/entrar/createWorkspace')
+        return url.pathname === '/entrar' && url.searchParams.get('mode') === 'create-workspace'
       })
 
       await page2.waitForURL((url) => {
-        return url.pathname.startsWith('/entrar/createWorkspace')
+        return url.pathname === '/entrar' && url.searchParams.get('mode') === 'create-workspace'
       })
 
       // Ok we signed in, and no workspace present.

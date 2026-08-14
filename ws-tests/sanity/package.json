@@ -24,7 +24,7 @@
     "dev-uitest": "cross-env PLATFORM_URI=http://teron.local:8080 PLATFORM_TRANSACTOR=ws://teron.local:3333 DEV_URL=http://teron.local:8080/account playwright test -c ./tests/playwright.config.ts",
     "debug": "cross-env LOCAL_URL=http://teron.local:3003/ DEV_URL= playwright test -c ./tests/playwright.config.ts --debug --headed",
     "dev-debug": "cross-env PLATFORM_URI=http://teron.local:8080 PLATFORM_TRANSACTOR=ws://teron.local:3333 playwright test -c ./tests/playwright.config.ts --debug --headed",
-    "codegen": "playwright codegen --load-storage .auth/storage.json http://teron.local:8083/entrar/selectWorkspace",
+    "codegen": "playwright codegen --load-storage .auth/storage.json 'http://teron.local:8083/entrar?mode=workspaces'",
     "codegen-admin": "playwright codegen --load-storage .auth/adminStorage.json http://teron.local:8083/entrar/admin",
     "dev-codegen": "cross-env playwright codegen --load-storage storage-dev.json http://teron.local:8080/workbench/sanity-ws/",
     "allure:generate": "allure generate allure-results -o allure-report --clean"

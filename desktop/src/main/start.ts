@@ -213,7 +213,7 @@ function runTheApp (): void {
 
   function handleAuthRedirects (window: BrowserWindow): void {
     window.webContents.on('will-redirect', (event) => {
-      if (event?.url.startsWith(`${FRONT_URL}/entrar/auth`)) {
+      if (event?.url.startsWith(`${FRONT_URL}/entrar?mode=auth`)) {
         console.log('Auth happened, redirecting to local index')
         const urlObj = new URL(decodeURIComponent(event.url))
         event.preventDefault()

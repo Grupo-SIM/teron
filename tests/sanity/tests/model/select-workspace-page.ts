@@ -9,13 +9,13 @@ export class SelectWorkspacePage extends CommonPage {
     this.page = page
   }
 
-  title = (): Locator => this.page.locator('div.title', { hasText: 'Select workspace' })
-  buttonWorkspace = (): Locator => this.page.locator('div[class*="workspace"]')
-  buttonCreateWorkspace = (): Locator => this.page.locator('button > span', { hasText: 'Create workspace' })
-  buttonWorkspaceName = (): Locator => this.page.locator('input[type="text"]').first()
-  buttonCreateNewWorkspace = (): Locator => this.page.locator('div.form-row.send button')
+  title = (): Locator => this.page.locator('h1.auth-title')
+  buttonWorkspace = (): Locator => this.page.getByTestId('auth-workspace')
+  buttonCreateWorkspace = (): Locator => this.page.getByTestId('auth-create-workspace')
+  buttonWorkspaceName = (): Locator => this.page.getByTestId('auth-workspace-name')
+  buttonCreateNewWorkspace = (): Locator => this.page.getByTestId('auth-submit')
   workspaceButtonByName = (workspace: string): Locator => this.buttonWorkspace().filter({ hasText: workspace }).first()
-  createAnotherWorkspace = (): Locator => this.page.getByRole('link', { name: 'Create workspace' })
+  createAnotherWorkspace = (): Locator => this.page.getByTestId('auth-create-workspace')
   workspaceLogo = (): Locator => this.page.getByText('N', { exact: true })
   workspaceList = (workspaceName: string): Locator => this.page.getByRole('button', { name: workspaceName })
   createSampleProjectsToggle = (): Locator =>

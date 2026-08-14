@@ -13,18 +13,19 @@ export class LoginPage {
     this.page = page
     this.inputEmail = page.locator('input[name=email]')
     this.inputPassword = page.locator('input[name=current-password]')
-    this.buttonLogin = page.locator('button', { hasText: 'Log In' })
-    this.buttonSignUp = page.locator('a.title', { hasText: 'Sign Up' })
-    this.loginWithPassword = page.locator('a', { hasText: 'Login with password' })
-    this.accountNotFoundMessage = page.getByText('Account not found or the provided credentials are incorrect')
+    this.buttonLogin = page.getByTestId('auth-submit')
+    this.buttonSignUp = page.locator('a[href="/cadastro"]')
+    this.loginWithPassword = page.getByTestId('auth-method-toggle')
+    this.accountNotFoundMessage = page.locator('.auth-error')
   }
 
   async goto (): Promise<void> {
-    await (await this.page.goto(`${PlatformURI}/entrar/login`))?.finished()
+    await (await this.page.goto(`${PlatformURI}/entrar`))?.finished()
   }
 
   async login (email: string, password: string): Promise<void> {
     await this.inputEmail.fill(email)
+    if (!(await this.inputPassword.isVisible())) await this.loginWithPassword.click()
     await this.inputPassword.fill(password)
 
     // Wait for form validation to complete
@@ -43,7 +44,7 @@ export class LoginPage {
   async checkIfUserIsLoggedIn (credentials: string): Promise<void> {
     if (credentials === 'wrong-email' || credentials === 'wrong-password') {
       await expect(this.buttonLogin).toBeVisible()
-      await expect(this.page.getByText('Account not found or the provided credentials are incorrect')).toBeVisible()
+      await expect(this.accountNotFoundMessage).toBeVisible()
     }
     if (credentials === 'correct-credentials') {
       await expect(this.page.getByText('sanity-ws')).toBeVisible()

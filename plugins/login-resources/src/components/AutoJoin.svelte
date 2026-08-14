@@ -19,7 +19,7 @@
   import { setMetadata, translate } from '@hcengineering/platform'
   import { Loading, Label, getCurrentLocation, navigate } from '@hcengineering/ui'
   import { type LoginInfo } from '@hcengineering/account-client'
-  import { loginRoute } from '@hcengineering/login'
+  import { openAuthRoute } from '@hcengineering/login'
   import { themeStore } from '@hcengineering/theme'
   import presentation from '@hcengineering/presentation'
 
@@ -73,7 +73,7 @@
           if (result.email == null) {
             console.error('No email in auto join info')
             Analytics.handleError(new Error('No email in auto join info'))
-            navigate({ path: [loginRoute] })
+            openAuthRoute()
             return
           }
 
@@ -86,7 +86,7 @@
       Analytics.handleError(
         new Error('Failed to check auto join: ' + (err instanceof Error ? err.message : String(err)))
       )
-      navigate({ path: [loginRoute] })
+      openAuthRoute()
       return
     }
 

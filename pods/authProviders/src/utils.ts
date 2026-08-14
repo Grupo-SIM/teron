@@ -112,15 +112,15 @@ export async function handleProviderAuth (
       })
       return concatLink(branding?.front ?? frontUrl, '/entrar')
     } else {
-      const origin = concatLink(branding?.front ?? frontUrl, '/entrar/auth')
-      const queryObj: any = { token: loginInfo.token }
+      const origin = concatLink(branding?.front ?? frontUrl, '/entrar')
+      const queryObj: any = { mode: 'auth', token: loginInfo.token }
       if (state.autoJoin === true) {
         queryObj.autoJoin = state.autoJoin
         queryObj.inviteId = state.inviteId
         queryObj.navigateUrl = state.navigateUrl
       }
 
-      const query = encodeURIComponent(qs.stringify(queryObj))
+      const query = qs.stringify(queryObj)
 
       // Successful authentication, redirect to your application
       measureCtx.info('Success auth, redirect', { email, type: providerType, target: origin })

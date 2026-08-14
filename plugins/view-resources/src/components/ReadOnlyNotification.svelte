@@ -1,7 +1,7 @@
 <script lang="ts">
-  import { loginRoute } from '@hcengineering/login'
+  import { openAuthRoute } from '@hcengineering/login'
   import { getMetadata } from '@hcengineering/platform'
-  import { Button, navigate, Notification, NotificationToast } from '@hcengineering/ui'
+  import { Button, Notification, NotificationToast } from '@hcengineering/ui'
   import view from '@hcengineering/view'
   import presentation, { getCurrentWorkspaceUrl } from '@hcengineering/presentation'
   import { allowGuestSignUpStore } from '../utils'
@@ -10,7 +10,7 @@
   export let notification: Notification
 
   function joinWorkspace (e: MouseEvent): void {
-    navigate({ path: [loginRoute, 'join'], query: { workspace: getCurrentWorkspaceUrl() } })
+    openAuthRoute('join', { workspace: getCurrentWorkspaceUrl() })
   }
 </script>
 
