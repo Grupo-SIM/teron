@@ -83,7 +83,8 @@ export function getMigrations (ns: string, flavor: DBFlavor): [string, string][]
     getV23Migration(ns, flavor),
     getV24Migration(ns, flavor),
     getV25Migration(ns, flavor),
-    getV26Migration(ns, flavor)
+    getV26Migration(ns, flavor),
+    getV27Migration(ns, flavor)
   ]
 }
 
@@ -806,6 +807,121 @@ function getV26Migration (ns: string, flavor: DBFlavor): [string, string] {
     -- after model init, then cleared back to NULL.
     ALTER TABLE ${ns}.workspace
     ADD COLUMN IF NOT EXISTS pending_configuration JSONB;
+    `
+  ]
+}
+
+function getV27Migration (ns: string, flavor: DBFlavor): [string, string] {
+  const types = dbTypes[flavor]
+  return [
+    'account_db_v27_workspace_subscriptions',
+    `
+    ALTER TABLE ${ns}.account
+      ADD COLUMN IF NOT EXISTS free_trial_used_on ${types.int8};
+    ALTER TABLE ${ns}.account
+      ADD COLUMN IF NOT EXISTS free_trial_workspace_uuid UUID;
+
+    ALTER TABLE ${ns}.subscription
+      ADD COLUMN IF NOT EXISTS seat_limit ${types.int4};
+    ALTER TABLE ${ns}.subscription
+      ADD COLUMN IF NOT EXISTS next_seat_limit ${types.int4};
+
+    CREATE TABLE IF NOT EXISTS ${ns}.subscription_event (
+      id ${types.string} NOT NULL,
+      subscription_id ${types.string} NOT NULL,
+      workspace_uuid UUID NOT NULL,
+      event_type ${types.string} NOT NULL,
+      period_start ${types.int8},
+      period_end ${types.int8},
+      seat_limit ${types.int4},
+      previous_seat_limit ${types.int4},
+      next_seat_limit ${types.int4},
+      previous_next_seat_limit ${types.int4},
+      created_on ${types.int8} NOT NULL DEFAULT current_epoch_ms(),
+      CONSTRAINT subscription_event_pk PRIMARY KEY (id),
+      CONSTRAINT subscription_event_subscription_fk FOREIGN KEY (subscription_id) REFERENCES ${ns}.subscription(id),
+      CONSTRAINT subscription_event_workspace_fk FOREIGN KEY (workspace_uuid) REFERENCES ${ns}.workspace(uuid)
+    );
+    CREATE INDEX IF NOT EXISTS subscription_event_subscription_created_idx
+      ON ${ns}.subscription_event (subscription_id, created_on);
+
+    -- Normalize active legacy paid tiers. The current occupied capacity becomes
+    -- the first Business seat limit while provider-specific billing is migrated.
+    UPDATE ${ns}.subscription s
+    SET plan = 'business',
+        seat_limit = GREATEST(
+          1,
+          (SELECT COUNT(*) FROM ${ns}.workspace_members m
+            WHERE m.workspace_uuid = s.workspace_uuid
+              AND m.role IN ('OWNER', 'MAINTAINER', 'USER', 'GUEST')) +
+          (SELECT COUNT(*) FROM ${ns}.invite i
+            WHERE i.workspace_uuid = s.workspace_uuid
+              AND i.email IS NOT NULL AND i.email <> ''
+              AND (i.expires_on = -1 OR i.expires_on > current_epoch_ms())
+              AND i.remaining_uses > 0)
+        )
+    WHERE s.type = 'tier'
+      AND s.plan IN ('rare', 'epic', 'legendary')
+      AND s.status IN ('active', 'trialing', 'past_due');
+
+    -- Every existing non-paying workspace receives a fresh 30-day migration trial.
+    UPDATE ${ns}.subscription s
+    SET plan = 'free',
+        status = 'trialing',
+        period_start = current_epoch_ms(),
+        period_end = current_epoch_ms() + 2592000000,
+        trial_end = current_epoch_ms() + 2592000000,
+        seat_limit = NULL,
+        next_seat_limit = NULL
+    WHERE s.type = 'tier'
+      AND s.plan = 'common'
+      AND NOT EXISTS (
+        SELECT 1 FROM ${ns}.subscription paid
+        WHERE paid.workspace_uuid = s.workspace_uuid
+          AND paid.type = 'tier'
+          AND paid.plan = 'business'
+          AND paid.status IN ('active', 'trialing', 'past_due')
+      );
+
+    INSERT INTO ${ns}.subscription (
+      id, workspace_uuid, account_uuid, provider, provider_subscription_id,
+      type, status, plan, period_start, period_end, trial_end, created_on, updated_on
+    )
+    SELECT
+      CONCAT('free:', w.uuid::TEXT), w.uuid, COALESCE(w.billing_account, w.created_by),
+      'internal', CONCAT('free:', w.uuid::TEXT), 'tier', 'trialing', 'free',
+      current_epoch_ms(), current_epoch_ms() + 2592000000, current_epoch_ms() + 2592000000,
+      current_epoch_ms(), current_epoch_ms()
+    FROM ${ns}.workspace w
+    WHERE COALESCE(w.billing_account, w.created_by) IS NOT NULL
+      AND NOT EXISTS (
+        SELECT 1 FROM ${ns}.subscription s
+        WHERE s.workspace_uuid = w.uuid
+          AND s.type = 'tier'
+          AND s.status IN ('active', 'trialing', 'past_due')
+      );
+
+    UPDATE ${ns}.account a
+    SET free_trial_used_on = current_epoch_ms(),
+        free_trial_workspace_uuid = (
+          SELECT w.uuid FROM ${ns}.workspace w
+          WHERE w.created_by = a.uuid
+          ORDER BY w.created_on ASC LIMIT 1
+        )
+    WHERE EXISTS (SELECT 1 FROM ${ns}.workspace w WHERE w.created_by = a.uuid)
+      AND a.free_trial_used_on IS NULL;
+
+    INSERT INTO ${ns}.subscription_event (
+      id, subscription_id, workspace_uuid, event_type, period_start, period_end,
+      seat_limit, next_seat_limit, created_on
+    )
+    SELECT CONCAT('migration:', s.id), s.id, s.workspace_uuid, 'created',
+      s.period_start, s.period_end, s.seat_limit, s.next_seat_limit, current_epoch_ms()
+    FROM ${ns}.subscription s
+    WHERE s.type = 'tier'
+      AND NOT EXISTS (
+        SELECT 1 FROM ${ns}.subscription_event e WHERE e.subscription_id = s.id
+      );
     `
   ]
 }

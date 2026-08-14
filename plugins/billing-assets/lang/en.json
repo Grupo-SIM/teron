@@ -24,6 +24,10 @@
     "EpicDescription": "For professional creative companies and small businesses.",
     "Legendary": "Legendary",
     "LegendaryDescription": "Best for large multiple teams that need maximum capabilities.",
+    "Free": "Free",
+    "FreeDescription": "Unlimited people for 30 days, then read-only access.",
+    "Business": "Business",
+    "BusinessDescription": "Paid workspace with a contracted number of seats per billing period.",
     "UnlimitedUsers": "Unlimited users",
     "UnlimitedObjects": "Unlimited Teron objects",
     "ChangePlan": "Change plan",
@@ -35,6 +39,7 @@
     "SubscriptionEnds": "Until {date}",
     "SubscriptionRenews": "Next renewal: {date}",
     "SubscriptionValidUntil": "Valid until {date}",
+    "TrialEnds": "Free access ends on {date}",
     "ProcessingPayment": "Processing payment...",
     "Downgrade": "Downgrade",
     "CancelSubscription": "Cancel Subscription",
@@ -91,6 +96,10 @@
     "NoFilesYet": "No files in this workspace yet.",
     "UnknownLocation": "Standalone file",
     "StorageAccessDenied": "Only workspace owners and maintainers can manage storage.",
-    "Refresh": "Refresh"
+    "Refresh": "Refresh",
+    "SeatsUsage": "{used} of {limit} seats in use",
+    "ScheduledSeatLimit": "{limit} seats scheduled for the next billing period",
+    "ReadOnlyWorkspace": "Workspace is read-only",
+    "PaymentIntegrationPending": "Payment integration coming next"
   }
 }

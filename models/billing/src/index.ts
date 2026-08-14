@@ -56,59 +56,29 @@ export function createModel (builder: Builder): void {
     billing.class.Tier,
     core.space.Model,
     {
-      label: billing.string.Common,
-      description: billing.string.CommonDescription,
+      label: billing.string.Free,
+      description: billing.string.FreeDescription,
       storageLimitGB: TIER_LIMITS_GB.common.storageGB,
       trafficLimitGB: TIER_LIMITS_GB.common.trafficGB,
       priceMonthly: 0,
       index: 0
     },
-    billing.tier.Common
+    billing.tier.Free
   )
 
   builder.createDoc(
     billing.class.Tier,
     core.space.Model,
     {
-      label: billing.string.Rare,
-      description: billing.string.RareDescription,
-      storageLimitGB: TIER_LIMITS_GB.rare.storageGB,
-      trafficLimitGB: TIER_LIMITS_GB.rare.trafficGB,
-      priceMonthly: 19.99,
+      label: billing.string.Business,
+      description: billing.string.BusinessDescription,
+      storageLimitGB: TIER_LIMITS_GB.legendary.storageGB,
+      trafficLimitGB: TIER_LIMITS_GB.legendary.trafficGB,
+      priceMonthly: 0,
       index: 1,
       color: 'Sky'
     },
-    billing.tier.Rare
-  )
-
-  builder.createDoc(
-    billing.class.Tier,
-    core.space.Model,
-    {
-      label: billing.string.Epic,
-      description: billing.string.EpicDescription,
-      storageLimitGB: TIER_LIMITS_GB.epic.storageGB,
-      trafficLimitGB: TIER_LIMITS_GB.epic.trafficGB,
-      priceMonthly: 99.99,
-      index: 2,
-      color: 'Orchid'
-    },
-    billing.tier.Epic
-  )
-
-  builder.createDoc(
-    billing.class.Tier,
-    core.space.Model,
-    {
-      label: billing.string.Legendary,
-      description: billing.string.LegendaryDescription,
-      storageLimitGB: TIER_LIMITS_GB.legendary.storageGB,
-      trafficLimitGB: TIER_LIMITS_GB.legendary.trafficGB,
-      priceMonthly: 399.99,
-      index: 3,
-      color: 'Orange'
-    },
-    billing.tier.Legendary
+    billing.tier.Business
   )
 
   builder.createDoc(presentation.class.ComponentPointExtension, core.space.Model, {

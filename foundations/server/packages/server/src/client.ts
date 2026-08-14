@@ -16,6 +16,7 @@
 import type { LoginInfoWithWorkspaces } from '@hcengineering/account-client'
 import {
   generateId,
+  systemAccountUuid,
   TxProcessor,
   type Account,
   type AccountUuid,
@@ -46,7 +47,7 @@ import {
   type WorkspaceDataId,
   type WorkspaceIds
 } from '@hcengineering/core'
-import { PlatformError, unknownError } from '@hcengineering/platform'
+import platform, { PlatformError, Severity, Status, unknownError } from '@hcengineering/platform'
 import {
   BackupClientOps,
   createBroadcastEvent,
@@ -119,6 +120,13 @@ export class ClientSession implements Session {
 
   getMode (): string {
     return this.token.extra?.mode ?? 'normal'
+  }
+
+  private isReadOnly (): boolean {
+    if (this.token.account === systemAccountUuid || this.token.extra?.service !== undefined) return false
+    if (this.token.extra?.readonly === 'true') return true
+    const readOnlyAfter = Number(this.token.extra?.readonlyAfter)
+    return Number.isFinite(readOnlyAfter) && Date.now() >= readOnlyAfter
   }
 
   updateLast (): void {
@@ -262,6 +270,9 @@ export class ClientSession implements Session {
       broadcastPromise: Promise<void>
       asyncsPromise: Promise<void> | undefined
     }> {
+    if (this.isReadOnly()) {
+      throw new PlatformError(new Status(Severity.ERROR, platform.status.ReadOnlyAccount, {}))
+    }
     this.lastRequest = Date.now()
     this.total.tx++
     this.current.tx++
@@ -405,8 +416,9 @@ export class ClientSession implements Session {
   }
 
   async upload (ctx: ClientSessionCtx, domain: Domain, docs: Doc[]): Promise<void> {
-    if (!this.allowUpload) {
+    if (!this.allowUpload || this.isReadOnly()) {
       await ctx.sendResponse(ctx.requestId, { error: 'Upload not allowed' })
+      return
     }
     this.lastRequest = Date.now()
     try {
@@ -420,8 +432,9 @@ export class ClientSession implements Session {
   }
 
   async clean (ctx: ClientSessionCtx, domain: Domain, docs: Ref<Doc>[]): Promise<void> {
-    if (!this.allowUpload) {
+    if (!this.allowUpload || this.isReadOnly()) {
       await ctx.sendResponse(ctx.requestId, { error: 'Clean not allowed' })
+      return
     }
     this.lastRequest = Date.now()
     try {

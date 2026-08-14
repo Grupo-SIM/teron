@@ -62,13 +62,16 @@ import {
   type OtpInfo,
   type RegionInfo,
   type SocialId,
+  type Subscription,
   type Workspace,
   type WorkspaceInfoWithStatus,
   type WorkspaceInvite,
   type WorkspaceJoinInfo,
   type WorkspaceLoginInfo,
   type WorkspaceStatus,
-  type DBFlavor
+  type DBFlavor,
+  SubscriptionStatus,
+  SubscriptionType
 } from './types'
 import { isAdminEmail } from './admin'
 import { type Sql } from 'postgres'
@@ -166,11 +169,47 @@ export function getRolePower (role: AccountRole): number {
 }
 
 export function isReadOnlyOrGuest (account: AccountUuid, extra: Record<string, any> | undefined): boolean {
-  return isGuest(account, extra) || extra?.readonly === 'true'
+  if (account === systemAccountUuid || extra?.service !== undefined) return false
+  const readOnlyAfter = Number(extra?.readonlyAfter)
+  return (
+    isGuest(account, extra) ||
+    extra?.readonly === 'true' ||
+    (Number.isFinite(readOnlyAfter) && Date.now() >= readOnlyAfter)
+  )
 }
 
 export function isGuest (account: AccountUuid, extra: Record<string, any> | undefined): boolean {
   return account === GUEST_ACCOUNT && extra?.guest === 'true'
+}
+
+async function findTierSubscriptions (db: AccountDB, workspaceUuid: WorkspaceUuid): Promise<Subscription[]> {
+  return db.subscription?.find != null
+    ? await db.subscription.find({ workspaceUuid, type: SubscriptionType.Tier })
+    : []
+}
+
+function selectTierSubscription (tiers: Subscription[]): Subscription | undefined {
+  const sorted = tiers.sort((a, b) => b.updatedOn - a.updatedOn)
+  return (
+    sorted.find((it) =>
+      [SubscriptionStatus.Active, SubscriptionStatus.Trialing, SubscriptionStatus.PastDue].includes(it.status)
+    ) ?? sorted[0]
+  )
+}
+
+async function verifySubscriptionWritable (db: AccountDB, workspaceUuid: WorkspaceUuid): Promise<void> {
+  const tier = selectTierSubscription(await findTierSubscriptions(db, workspaceUuid))
+  if (db.subscription?.find != null && tier == null) {
+    throw new PlatformError(new Status(Severity.ERROR, platform.status.ReadOnlyAccount, {}))
+  }
+  const readOnlyAfter = tier?.trialEnd ?? tier?.periodEnd
+  if (
+    tier != null &&
+    (![SubscriptionStatus.Active, SubscriptionStatus.Trialing, SubscriptionStatus.PastDue].includes(tier.status) ||
+      (readOnlyAfter != null && Date.now() >= readOnlyAfter))
+  ) {
+    throw new PlatformError(new Status(Severity.ERROR, platform.status.ReadOnlyAccount, {}))
+  }
 }
 
 export function wrap (
@@ -861,6 +900,25 @@ export async function selectWorkspace (
     extra.readonly = 'true'
   }
 
+  const tier = selectTierSubscription(await findTierSubscriptions(db, workspace.uuid))
+  const subscriptionReadOnlyAfter = tier?.trialEnd ?? tier?.periodEnd
+  if (db.subscription?.find != null && tier == null) {
+    extra ??= {}
+    extra.readonly = 'true'
+  }
+  if (tier != null) {
+    extra ??= {}
+    if (subscriptionReadOnlyAfter != null) {
+      extra.readonlyAfter = String(subscriptionReadOnlyAfter)
+    }
+    if (
+      [SubscriptionStatus.Expired, SubscriptionStatus.Canceled].includes(tier.status) ||
+      (subscriptionReadOnlyAfter != null && Date.now() >= subscriptionReadOnlyAfter)
+    ) {
+      extra.readonly = 'true'
+    }
+  }
+
   const wsStatus = await db.workspaceStatus.findOne({ workspaceUuid: workspace.uuid })
 
   if (wsStatus != null) {
@@ -888,7 +946,9 @@ export async function selectWorkspace (
     workspace: workspace.uuid,
     workspaceUrl: workspace.url,
     workspaceDataId: workspace.dataId,
-    allowGuestSignUp: workspace.allowReadOnlyGuest && workspace.allowGuestSignUp,
+    ...(workspace.allowReadOnlyGuest && workspace.allowGuestSignUp ? { allowGuestSignUp: true } : {}),
+    ...(extra?.readonly === 'true' ? { readOnly: true } : {}),
+    ...(subscriptionReadOnlyAfter != null ? { readOnlyAfter: subscriptionReadOnlyAfter } : {}),
     role
   }
 }
@@ -913,6 +973,8 @@ export async function updateAllowReadOnlyGuests (
   if (accRole == null || getRolePower(accRole) < getRolePower(AccountRole.Owner)) {
     throw new PlatformError(new Status(Severity.ERROR, platform.status.Forbidden, {}))
   }
+
+  if (account !== systemAccountUuid) await verifySubscriptionWritable(db, workspace)
 
   await db.updateAllowReadOnlyGuests(workspace, readOnlyGuestsAllowed)
   if (!readOnlyGuestsAllowed) {
@@ -1017,6 +1079,7 @@ export async function updateAllowGuestSignUp (
   if (accRole == null || getRolePower(accRole) < getRolePower(AccountRole.Owner)) {
     throw new PlatformError(new Status(Severity.ERROR, platform.status.Forbidden, {}))
   }
+  if (account !== systemAccountUuid) await verifySubscriptionWritable(db, workspace)
 
   await db.updateAllowGuestSignUp(workspace, guestSignUpAllowed)
 }
@@ -1042,6 +1105,8 @@ export async function updateWorkspaceRole (
   if (workspace === null) {
     throw new PlatformError(new Status(Severity.ERROR, platform.status.WorkspaceNotFound, { workspaceUuid: workspace }))
   }
+
+  if (account !== systemAccountUuid) await verifySubscriptionWritable(db, workspace)
 
   const accRole = account === systemAccountUuid ? AccountRole.Owner : await db.getWorkspaceRole(account, workspace)
 
@@ -1496,14 +1561,57 @@ export async function doJoinByInvite (
 ): Promise<WorkspaceLoginInfo> {
   const role = await db.getWorkspaceRole(account, workspace.uuid)
 
+  const tierSubscriptions = await findTierSubscriptions(db, workspace.uuid)
+  const tier = selectTierSubscription(tierSubscriptions)
+  if (db.subscription?.find != null && tier == null) {
+    throw new PlatformError(new Status(Severity.ERROR, platform.status.ReadOnlyAccount, {}))
+  }
+  const isBusiness = tier?.plan === 'business' || ['rare', 'epic', 'legendary'].includes(tier?.plan ?? '')
+  const readOnlyAfter = tier?.trialEnd ?? tier?.periodEnd
+  if (
+    tier != null &&
+    (![SubscriptionStatus.Active, SubscriptionStatus.Trialing, SubscriptionStatus.PastDue].includes(tier.status) ||
+      (readOnlyAfter != null && Date.now() >= readOnlyAfter))
+  ) {
+    throw new PlatformError(new Status(Severity.ERROR, platform.status.ReadOnlyAccount, {}))
+  }
+  if (isBusiness && invite != null && (invite.email == null || invite.email === '' || invite.remainingUses !== 1)) {
+    throw new PlatformError(new Status(Severity.ERROR, platform.status.Forbidden, {}))
+  }
+  if (isBusiness && role == null && invite == null) {
+    const members = await db.getWorkspaceMembers(workspace.uuid)
+    const pending = await db.invite.find({
+      workspaceUuid: workspace.uuid,
+      remainingUses: { $gt: 0 }
+    })
+    const now = Date.now()
+    const memberSeats = members.filter((it) =>
+      [AccountRole.Owner, AccountRole.Maintainer, AccountRole.User, AccountRole.Guest].includes(it.role)
+    ).length
+    const used =
+      memberSeats +
+      pending.filter((it) => (it.expiresOn === -1 || it.expiresOn > now) && it.email != null && it.email !== '').length
+    const limit = Math.min(tier.seatLimit ?? 0, tier.nextSeatLimit ?? tier.seatLimit ?? 0)
+    if (used >= limit) {
+      throw new PlatformError(new Status(Severity.ERROR, platform.status.WorkspaceLimitReached, {}))
+    }
+  }
+
   if (invite !== undefined && invite != null) {
     // TODO: should we re-join kicked users? How are they marked as inactive?
     if (role == null) {
-      await db.assignWorkspace(account, workspace.uuid, invite.role)
+      if (isBusiness) {
+        const accepted = await db.consumeInviteAndAssignWorkspace(invite.id, account, workspace.uuid, invite.role)
+        if (!accepted) {
+          throw new PlatformError(new Status(Severity.ERROR, platform.status.Forbidden, {}))
+        }
+      } else {
+        await db.assignWorkspace(account, workspace.uuid, invite.role)
+      }
     } else if (getRolePower(role) < getRolePower(invite.role)) {
       await db.updateWorkspaceRole(account, workspace.uuid, invite.role)
     }
-    await useInvite(db, invite.id)
+    if (!isBusiness || role != null) await useInvite(db, invite.id)
   } else if (workspace.allowReadOnlyGuest && workspace.allowGuestSignUp) {
     if (role == null) {
       await db.assignWorkspace(account, workspace.uuid, AccountRole.Guest)

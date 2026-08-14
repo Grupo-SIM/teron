@@ -46,6 +46,8 @@ export interface LoginInfoWorkspace {
   progress?: number
   branding?: string
   passwordAgingRule?: number | null // in days
+  readOnly?: boolean
+  readOnlyAfter?: Timestamp
 }
 
 export interface LoginInfoWithWorkspaces extends LoginInfo {
@@ -67,6 +69,8 @@ export interface WorkspaceLoginInfo extends LoginInfo {
   token: string
   role: AccountRole
   allowGuestSignUp?: boolean
+  readOnly?: boolean
+  readOnlyAfter?: Timestamp
 }
 
 export interface LoginInfoRequestData {
@@ -216,6 +220,11 @@ export interface Subscription {
   status: SubscriptionStatus // Current status
   plan: string // Plan/product identifier (e.g. 'free', 'pro', 'storage-100gb', 'supporter')
 
+  // Undefined means unlimited seats (the Free trial).
+  seatLimit?: number
+  // A decrease scheduled for the next billing period.
+  nextSeatLimit?: number
+
   // Amount paid (in cents, e.g. 9999 = $99.99)
   // Used primarily for pay-what-you-want/donation subscriptions to track actual payment
   amount?: number
@@ -243,3 +252,21 @@ export interface Subscription {
  * Used by billing service to upsert subscription data
  */
 export type SubscriptionData = Omit<Subscription, 'createdOn' | 'updatedOn'>
+
+export type WorkspaceSubscriptionPlan = 'free' | 'business'
+export type WorkspaceAccessMode = 'full' | 'read-only'
+
+/** Effective subscription state used by access control and billing UI. */
+export interface WorkspaceEntitlement {
+  plan: WorkspaceSubscriptionPlan
+  status: SubscriptionStatus
+  accessMode: WorkspaceAccessMode
+  periodStart?: Timestamp
+  periodEnd?: Timestamp
+  readOnlyAfter?: Timestamp
+  seatLimit?: number
+  nextSeatLimit?: number
+  memberSeats: number
+  pendingInviteSeats: number
+  availableSeats?: number
+}

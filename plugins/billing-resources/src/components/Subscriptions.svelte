@@ -13,11 +13,15 @@
 // limitations under the License.
 -->
 <script lang="ts">
-  import { type SubscriptionData, SubscriptionType } from '@hcengineering/account-client'
-  import { type SubscribeRequest, type CheckoutStatus } from '@hcengineering/payment-client'
+  import {
+    type SubscriptionData,
+    SubscriptionType,
+    type WorkspaceEntitlement
+  } from '@hcengineering/account-client'
+  import { type CheckoutStatus } from '@hcengineering/payment-client'
   import { Tier } from '@hcengineering/billing'
-  import { getMetadata, translate } from '@hcengineering/platform'
-  import presentation, { getClient, MessageBox } from '@hcengineering/presentation'
+  import { translate } from '@hcengineering/platform'
+  import { getClient, MessageBox } from '@hcengineering/presentation'
   import { type Ref, SortingOrder, UsageStatus } from '@hcengineering/core'
   import {
     IconCheckmark,
@@ -54,13 +58,13 @@
   export let isReadOnly: boolean = false
 
   let currentSubscription: SubscriptionData | undefined = undefined
+  let entitlement: WorkspaceEntitlement | undefined
   $: currentTier = currentSubscription != null ? tierByPlan[currentSubscription.plan] : undefined
   let loading = true
   let pollingCheckoutId: string | null = null
   let isPolling = false
   let pollAttempts = 0
   let pollTimer: number | undefined
-  let isUpdating = false
   let isCanceling = false
   let isUncanceling = false
   const MAX_POLL_ATTEMPTS = 120
@@ -69,27 +73,7 @@
   let usageInfo: UsageStatus | null = null
 
   $: isCurrentCanceled = currentSubscription?.canceledAt !== undefined && currentSubscription.canceledAt > 0
-
-  async function subscribe (tierId: Ref<Tier>): Promise<void> {
-    if (paymentClient == null) {
-      return
-    }
-
-    const workspace = getMetadata(presentation.metadata.WorkspaceUuid)
-    if (workspace === undefined) {
-      console.warn('Workspace metadata not available')
-      return
-    }
-
-    try {
-      const request: SubscribeRequest = getTypeAndPlan(tierId)
-      const { checkoutUrl } = await paymentClient.createSubscription(workspace, request)
-      window.location.href = checkoutUrl
-    } catch (error) {
-      console.error('Error while upgrading plan:', error)
-      await showErrorNotification()
-    }
-  }
+  $: canManageProviderSubscription = currentSubscription?.provider !== 'internal'
 
   async function showErrorNotification (): Promise<void> {
     addNotification(
@@ -99,93 +83,6 @@
       undefined,
       NotificationSeverity.Error
     )
-  }
-
-  async function showPlanChangeConfirmation (newPlan: string, newTier: Tier): Promise<void> {
-    if (currentTier === undefined) {
-      return
-    }
-
-    const isDowngrade = newTier.priceMonthly < currentTier.priceMonthly
-    const priceDifference = Math.abs(newTier.priceMonthly - currentTier.priceMonthly)
-
-    const title = isDowngrade ? plugin.string.ConfirmDowngrade : plugin.string.ConfirmUpgrade
-    const descriptionKey = isDowngrade ? plugin.string.DowngradeDescription : plugin.string.UpgradeDescription
-
-    showPopup(MessageBox, {
-      label: title,
-      message: descriptionKey,
-      params: { amount: priceDifference.toFixed(2) },
-      action: async () => {
-        await executeUpdate(newPlan)
-      }
-    })
-  }
-
-  async function handlePlanChange (newTierId: Ref<Tier>): Promise<void> {
-    const { plan: newPlan } = getTypeAndPlan(newTierId)
-    const newTier = tierByPlan[newPlan]
-
-    if (currentSubscription?.id === undefined) {
-      // No active subscription, create new one
-      await subscribe(newTierId)
-      return
-    }
-
-    if (currentTier === undefined) {
-      // No current tier selected, should not happen but guard against it
-      return
-    }
-
-    // If subscription is canceled, show uncancel confirmation first
-    if (isCurrentCanceled) {
-      showPopup(MessageBox, {
-        label: plugin.string.ConfirmUncancel,
-        message: plugin.string.UncancelDescription,
-        action: async () => {
-          // After uncanceling, show the plan change confirmation
-          await showPlanChangeConfirmation(newPlan, newTier)
-        }
-      })
-    } else {
-      await showPlanChangeConfirmation(newPlan, newTier)
-    }
-  }
-
-  async function executeUpdate (newPlan: string): Promise<void> {
-    if (paymentClient == null) {
-      return
-    }
-    if (currentSubscription?.id === undefined) {
-      return
-    }
-
-    try {
-      isUpdating = true
-
-      // If subscription is canceled, uncancel it first
-      if (isCurrentCanceled) {
-        currentSubscription = await paymentClient.uncancelSubscription(currentSubscription.id)
-      }
-
-      // Now update the plan
-      const updateResult = await paymentClient.updateSubscriptionPlan(currentSubscription.id, newPlan)
-
-      // Check if it's a CheckoutResponse (free-to-paid upgrade requires checkout)
-      if ('checkoutUrl' in updateResult) {
-        // Redirect to checkout URL for free-to-paid upgrade
-        window.location.href = (updateResult as any).checkoutUrl
-        return
-      }
-
-      // It's a SubscriptionData - direct update successful
-      currentSubscription = updateResult
-    } catch (error) {
-      console.error('Error updating subscription:', error)
-      await showErrorNotification()
-    } finally {
-      isUpdating = false
-    }
   }
 
   async function handleCancel (): Promise<void> {
@@ -273,8 +170,14 @@
       const accountClient = getAccountClient()
       if (accountClient == null) return
 
-      const subscriptions = await accountClient.getSubscriptions()
-      currentSubscription = subscriptions.find((p) => p.type === 'tier')
+      const [subscriptions, currentEntitlement] = await Promise.all([
+        accountClient.getSubscriptions(undefined, false),
+        accountClient.getWorkspaceEntitlement()
+      ])
+      entitlement = currentEntitlement
+      currentSubscription = subscriptions
+        .filter((p) => p.type === 'tier')
+        .sort((a, b) => b.updatedOn - a.updatedOn)[0]
       const plan = currentSubscription?.plan
       currentTier = plan !== undefined ? tierByPlan[plan] : undefined
     } catch (err) {
@@ -455,6 +358,26 @@
               {/if}
             </div>
 
+            {#if entitlement?.accessMode === 'read-only'}
+              <div class="status-badge"><Label label={plugin.string.ReadOnlyWorkspace} /></div>
+            {/if}
+            {#if entitlement?.seatLimit !== undefined}
+              <div>
+                <Label
+                  label={plugin.string.SeatsUsage}
+                  params={{
+                    used: entitlement.memberSeats + entitlement.pendingInviteSeats,
+                    limit: entitlement.seatLimit
+                  }}
+                />
+              </div>
+            {/if}
+            {#if entitlement?.nextSeatLimit !== undefined}
+              <div>
+                <Label label={plugin.string.ScheduledSeatLimit} params={{ limit: entitlement.nextSeatLimit }} />
+              </div>
+            {/if}
+
             {#if usageInfo !== null}
               <div class="usage-section">
                 <UsageSection usage={usageInfo} tier={currentTier} />
@@ -464,14 +387,16 @@
             <div class="curr-tier-footer">
               {#if currentSubscription?.periodEnd}
                 {@const date = formatEndDate(currentSubscription.periodEnd)}
-                {#if isCurrentCanceled}
+                {#if entitlement?.plan === 'free'}
+                  <div><Label label={plugin.string.TrialEnds} params={{ date }} /></div>
+                {:else if isCurrentCanceled}
                   <div><Label label={plugin.string.SubscriptionValidUntil} params={{ date }} /></div>
                 {:else}
                   <div><Label label={plugin.string.SubscriptionRenews} params={{ date }} /></div>
                 {/if}
               {/if}
 
-              {#if !isCurrentCanceled}
+              {#if canManageProviderSubscription && !isCurrentCanceled}
                 <Button
                   label={plugin.string.CancelSubscription}
                   kind="ghost"
@@ -480,7 +405,7 @@
                     void handleCancel()
                   }}
                 />
-              {:else}
+              {:else if canManageProviderSubscription}
                 <Button
                   label={plugin.string.UncancelSubscription}
                   kind="primary"
@@ -547,19 +472,7 @@
                   </div>
                 </div>
                 <div class="tier-card-footer">
-                  {#if !isReadOnly && (currentTier === undefined || currentTier._id !== tier._id)}
-                    <Button
-                      label={currentTier === undefined ? plugin.string.Subscribe : plugin.string.ChangePlan}
-                      size={'large'}
-                      kind={currentTier === undefined || tier.priceMonthly > currentTier.priceMonthly
-                        ? 'primary'
-                        : 'regular'}
-                      disabled={loading || isCheckoutPolling || isUpdating}
-                      on:click={() => {
-                        void handlePlanChange(tier._id)
-                      }}
-                    />
-                  {/if}
+                  <Label label={plugin.string.PaymentIntegrationPending} />
                 </div>
               </div>
             {/each}

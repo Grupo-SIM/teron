@@ -504,7 +504,7 @@ export async function connect (title: string): Promise<Client | undefined> {
 
   allowGuestSignUpStore.set(workspaceLoginInfo.allowGuestSignUp ?? false)
 
-  if (me.role === AccountRole.ReadOnlyGuest) {
+  if (me.role === AccountRole.ReadOnlyGuest || workspaceLoginInfo.readOnly === true) {
     await broadcastEvent(PlatformEvent, new Status(Severity.INFO, platform.status.ReadOnlyAccount, {}))
   } else {
     await broadcastEvent(PlatformEvent, new Status(Severity.INFO, platform.status.RegularAccount, {}))

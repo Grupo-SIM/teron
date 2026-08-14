@@ -338,6 +338,8 @@ describe('AccountPostgresDbCollection', () => {
         a.max_workspaces,
         a.failed_login_attempts,
         a.tfa_secret,
+        a.free_trial_used_on,
+        a.free_trial_workspace_uuid,
         p.hash,
         p.salt
       FROM global_account.account as a

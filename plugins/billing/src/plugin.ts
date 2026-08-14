@@ -54,6 +54,10 @@ export const billingPlugin = plugin(billingId, {
     EpicDescription: '' as IntlString,
     Legendary: '' as IntlString,
     LegendaryDescription: '' as IntlString,
+    Free: '' as IntlString,
+    FreeDescription: '' as IntlString,
+    Business: '' as IntlString,
+    BusinessDescription: '' as IntlString,
     UpgradePlan: '' as IntlString,
     LimitReached: '' as IntlString,
     LimitsExceededShort: '' as IntlString,
@@ -69,6 +73,8 @@ export const billingPlugin = plugin(billingId, {
     Subscriptions: '' as Asset
   },
   tier: {
+    Free: '' as Ref<Tier>,
+    Business: '' as Ref<Tier>,
     Common: '' as Ref<Tier>,
     Rare: '' as Ref<Tier>,
     Epic: '' as Ref<Tier>,

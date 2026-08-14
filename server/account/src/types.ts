@@ -67,6 +67,8 @@ export interface Account {
   maxWorkspaces?: number
   failedLoginAttempts?: number // Number of consecutive failed login attempts
   tfaSecret?: string
+  freeTrialUsedOn?: Timestamp
+  freeTrialWorkspaceUuid?: WorkspaceUuid
 }
 
 // TODO: type data with generic type
@@ -264,7 +266,9 @@ export interface Subscription {
   // Subscription classification
   type: SubscriptionType // What this subscription is for (tier, addon, support)
   status: SubscriptionStatus // Current status
-  plan: string // Plan/product identifier (e.g. 'free', 'pro', 'storage-100gb', 'supporter')
+  plan: string // Plan/product identifier (e.g. 'free', 'business', 'supporter')
+  seatLimit?: number
+  nextSeatLimit?: number
 
   // Amount paid (in cents, e.g. 9999 = $99.99)
   // Used primarily for pay-what-you-want/donation subscriptions to track actual payment
@@ -292,6 +296,37 @@ export interface Subscription {
 }
 
 export type SubscriptionData = Omit<Subscription, 'createdOn' | 'updatedOn'>
+
+export interface SubscriptionEvent {
+  id: string
+  subscriptionId: string
+  workspaceUuid: WorkspaceUuid
+  eventType: 'created' | 'period_started' | 'seats_changed' | 'plan_changed' | 'status_changed'
+  periodStart?: Timestamp
+  periodEnd?: Timestamp
+  seatLimit?: number
+  previousSeatLimit?: number
+  nextSeatLimit?: number
+  previousNextSeatLimit?: number
+  createdOn: Timestamp
+}
+
+export type WorkspaceSubscriptionPlan = 'free' | 'business'
+export type WorkspaceAccessMode = 'full' | 'read-only'
+
+export interface WorkspaceEntitlement {
+  plan: WorkspaceSubscriptionPlan
+  status: SubscriptionStatus
+  accessMode: WorkspaceAccessMode
+  periodStart?: Timestamp
+  periodEnd?: Timestamp
+  readOnlyAfter?: Timestamp
+  seatLimit?: number
+  nextSeatLimit?: number
+  memberSeats: number
+  pendingInviteSeats: number
+  availableSeats?: number
+}
 
 /* ========= S U P P L E M E N T A R Y ========= */
 
@@ -326,6 +361,7 @@ export interface AccountDB {
   integrationSecret: DbCollection<IntegrationSecret>
   userProfile: DbCollection<UserProfile>
   subscription: DbCollection<Subscription>
+  subscriptionEvent: DbCollection<SubscriptionEvent>
   workspacePermission: DbCollection<WorkspacePermission>
 
   init: () => Promise<void>
@@ -341,6 +377,16 @@ export interface AccountDB {
   getWorkspaceRoles: (accountId: AccountUuid) => Promise<Map<WorkspaceUuid, AccountRole>>
   getWorkspaceMembers: (workspaceId: WorkspaceUuid) => Promise<WorkspaceMemberInfo[]>
   getAccountWorkspaces: (accountId: AccountUuid) => Promise<WorkspaceInfoWithStatus[]>
+  claimFreeTrial: (accountId: AccountUuid, claimedOn: Timestamp) => Promise<boolean>
+  setFreeTrialWorkspace: (accountId: AccountUuid, workspaceId: WorkspaceUuid) => Promise<void>
+  releaseFreeTrial: (accountId: AccountUuid, claimedOn: Timestamp) => Promise<void>
+  reserveSeatAndCreateInvite: (data: WorkspaceInviteData, capacity: number) => Promise<string | null>
+  consumeInviteAndAssignWorkspace: (
+    inviteId: string,
+    accountId: AccountUuid,
+    workspaceId: WorkspaceUuid,
+    role: AccountRole
+  ) => Promise<boolean>
   batchAssignWorkspacePermission: (
     workspaceId: WorkspaceUuid,
     accountIds: AccountUuid[],

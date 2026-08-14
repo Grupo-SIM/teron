@@ -33,6 +33,7 @@ export default mergeIds(billingId, billing, {
     SubscriptionEnds: '' as IntlString,
     SubscriptionRenews: '' as IntlString,
     SubscriptionValidUntil: '' as IntlString,
+    TrialEnds: '' as IntlString,
     ProcessingPayment: '' as IntlString,
     Downgrade: '' as IntlString,
     CancelSubscription: '' as IntlString,
@@ -80,6 +81,10 @@ export default mergeIds(billingId, billing, {
     NoFilesYet: '' as IntlString,
     UnknownLocation: '' as IntlString,
     StorageAccessDenied: '' as IntlString,
-    Refresh: '' as IntlString
+    Refresh: '' as IntlString,
+    SeatsUsage: '' as IntlString,
+    ScheduledSeatLimit: '' as IntlString,
+    ReadOnlyWorkspace: '' as IntlString,
+    PaymentIntegrationPending: '' as IntlString
   }
 })

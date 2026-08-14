@@ -13,7 +13,7 @@
 // limitations under the License.
 //
 import {
-  type AccountRole,
+  AccountRole,
   type Data,
   isActiveMode,
   type MeasureContext,
@@ -28,7 +28,8 @@ import {
   type WorkspaceUuid,
   type AccountUuid,
   type UsageStatus,
-  readOnlyGuestAccountUuid
+  readOnlyGuestAccountUuid,
+  generateId
 } from '@hcengineering/core'
 import platform, { getMetadata, PlatformError, Severity, Status, unknownError } from '@hcengineering/platform'
 import { decodeTokenVerbose } from '@hcengineering/server-token'
@@ -46,6 +47,7 @@ import type {
   SocialId,
   Subscription,
   SubscriptionData,
+  SubscriptionEvent,
   Workspace,
   WorkspaceEvent,
   WorkspaceInfoWithStatus,
@@ -1046,6 +1048,45 @@ export async function upsertSubscription (
 
   // Check if subscription exists by provider + providerSubscriptionId (unique external ID)
   const existing = await db.subscription.findOne({ provider, providerSubscriptionId })
+  const normalizedPlan =
+    params.plan === 'common' ? 'free' : ['rare', 'epic', 'legendary'].includes(params.plan) ? 'business' : params.plan
+  let seatLimit = params.seatLimit
+  let nextSeatLimit = params.nextSeatLimit
+
+  if (normalizedPlan === 'business') {
+    const members = await db.getWorkspaceMembers(workspaceUuid)
+    const pendingInvites = await db.invite.find({
+      workspaceUuid,
+      remainingUses: { $gt: 0 }
+    })
+    const now = Date.now()
+    const memberSeats = members.filter((it) =>
+      [AccountRole.Owner, AccountRole.Maintainer, AccountRole.User, AccountRole.Guest].includes(it.role)
+    ).length
+    const occupied =
+      memberSeats +
+      pendingInvites.filter(
+        (it) => (it.expiresOn === -1 || it.expiresOn > now) && it.email != null && it.email !== ''
+      ).length
+    seatLimit ??= existing?.seatLimit ?? Math.max(1, occupied)
+
+    const periodRolled =
+      existing?.periodStart != null && params.periodStart != null && params.periodStart > existing.periodStart
+    if (periodRolled && existing?.nextSeatLimit != null) {
+      seatLimit = existing.nextSeatLimit
+      nextSeatLimit = undefined
+    } else if (existing?.seatLimit != null && seatLimit < existing.seatLimit) {
+      nextSeatLimit = seatLimit
+      seatLimit = existing.seatLimit
+    }
+
+    if ((nextSeatLimit ?? seatLimit) < occupied) {
+      throw new PlatformError(new Status(Severity.ERROR, platform.status.WorkspaceLimitReached, {}))
+    }
+  } else {
+    seatLimit = undefined
+    nextSeatLimit = undefined
+  }
   const updateData = {
     workspaceUuid: params.workspaceUuid,
     accountUuid: params.accountUuid,
@@ -1055,7 +1096,9 @@ export async function upsertSubscription (
     amount: params.amount,
     type: params.type,
     status: params.status,
-    plan: params.plan,
+    plan: normalizedPlan,
+    seatLimit,
+    nextSeatLimit,
     periodStart: params.periodStart,
     periodEnd: params.periodEnd,
     trialEnd: params.trialEnd,
@@ -1067,6 +1110,31 @@ export async function upsertSubscription (
   if (existing !== null) {
     // Update existing subscription
     await db.subscription.update({ id: existing.id }, updateData)
+    const eventType: SubscriptionEvent['eventType'] | undefined =
+      existing.periodStart !== params.periodStart
+        ? 'period_started'
+        : existing.seatLimit !== seatLimit || existing.nextSeatLimit !== nextSeatLimit
+          ? 'seats_changed'
+          : existing.plan !== normalizedPlan
+            ? 'plan_changed'
+            : existing.status !== params.status
+              ? 'status_changed'
+              : undefined
+    if (eventType !== undefined) {
+      await db.subscriptionEvent.insertOne({
+        id: generateId(),
+        subscriptionId: existing.id,
+        workspaceUuid,
+        eventType,
+        periodStart: params.periodStart,
+        periodEnd: params.periodEnd,
+        seatLimit,
+        previousSeatLimit: existing.seatLimit,
+        nextSeatLimit,
+        previousNextSeatLimit: existing.nextSeatLimit,
+        createdOn: Date.now()
+      })
+    }
     ctx.info('Subscription updated', {
       id: existing.id,
       workspaceUuid,
@@ -1079,6 +1147,17 @@ export async function upsertSubscription (
     await db.subscription.insertOne({
       ...updateData,
       id: params.id,
+      createdOn: Date.now()
+    })
+    await db.subscriptionEvent.insertOne({
+      id: generateId(),
+      subscriptionId: params.id,
+      workspaceUuid,
+      eventType: 'created',
+      periodStart: params.periodStart,
+      periodEnd: params.periodEnd,
+      seatLimit,
+      nextSeatLimit,
       createdOn: Date.now()
     })
     ctx.info('Subscription created', {

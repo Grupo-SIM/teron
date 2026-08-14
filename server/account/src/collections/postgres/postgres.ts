@@ -35,6 +35,7 @@ import type {
   Account,
   OTP,
   WorkspaceInvite,
+  WorkspaceInviteData,
   AccountEvent,
   SocialId,
   WorkspaceData,
@@ -49,6 +50,7 @@ import type {
   AccountAggregatedInfo,
   UserProfile,
   Subscription,
+  SubscriptionEvent,
   WorkspacePermission,
   DBFlavor
 } from '../../types'
@@ -454,6 +456,8 @@ export class AccountPostgresDbCollection
         a.max_workspaces,
         a.failed_login_attempts,
         a.tfa_secret,
+        a.free_trial_used_on,
+        a.free_trial_workspace_uuid,
         p.hash,
         p.salt
       FROM ${this.getTableName()} as a
@@ -539,6 +543,7 @@ export class PostgresAccountDB implements AccountDB {
   integrationSecret: PostgresDbCollection<IntegrationSecret>
   userProfile: PostgresDbCollection<UserProfile, 'personUuid'>
   subscription: PostgresDbCollection<Subscription, 'id'>
+  subscriptionEvent: PostgresDbCollection<SubscriptionEvent, 'id'>
   workspacePermission: PostgresDbCollection<WorkspacePermission>
 
   constructor (
@@ -602,6 +607,12 @@ export class PostgresAccountDB implements AccountDB {
       ns,
       idKey: 'id',
       timestampFields: ['periodStart', 'periodEnd', 'trialEnd', 'canceledAt', 'willCancelAt', 'createdOn', 'updatedOn'],
+      withRetryClient
+    })
+    this.subscriptionEvent = new PostgresDbCollection<SubscriptionEvent, 'id'>('subscription_event', client, {
+      ns,
+      idKey: 'id',
+      timestampFields: ['periodStart', 'periodEnd', 'createdOn'],
       withRetryClient
     })
     this.workspacePermission = new PostgresDbCollection<WorkspacePermission>('workspace_permissions', client, {
@@ -852,6 +863,84 @@ export class PostgresAccountDB implements AccountDB {
       async (rTx) =>
         await rTx`DELETE FROM ${this.client(this.getWsMembersTableName())} WHERE workspace_uuid = ${workspaceUuid} AND account_uuid = ${accountUuid}`
     )
+  }
+
+  async claimFreeTrial (accountUuid: AccountUuid, claimedOn: number): Promise<boolean> {
+    return await this.withRetry(async (rTx) => {
+      const result = await rTx`
+        UPDATE ${this.client(this.account.getTableName())}
+        SET free_trial_used_on = ${claimedOn}
+        WHERE uuid = ${accountUuid} AND free_trial_used_on IS NULL
+        RETURNING uuid
+      `
+      return result.length === 1
+    })
+  }
+
+  async setFreeTrialWorkspace (accountUuid: AccountUuid, workspaceUuid: WorkspaceUuid): Promise<void> {
+    await this.withRetry(async (rTx) => {
+      await rTx`
+        UPDATE ${this.client(this.account.getTableName())}
+        SET free_trial_workspace_uuid = ${workspaceUuid}
+        WHERE uuid = ${accountUuid}
+      `
+    })
+  }
+
+  async reserveSeatAndCreateInvite (data: WorkspaceInviteData, capacity: number): Promise<string | null> {
+    return await this.client.begin(async (tx) => {
+      await tx`SELECT uuid FROM ${this.client(this.workspace.getTableName())} WHERE uuid = ${data.workspaceUuid} FOR UPDATE`
+      const [row] = await tx`
+        SELECT
+          (SELECT COUNT(*) FROM ${this.client(this.getWsMembersTableName())}
+            WHERE workspace_uuid = ${data.workspaceUuid}
+              AND role IN ('OWNER', 'MAINTAINER', 'USER', 'GUEST')) +
+          (SELECT COUNT(*) FROM ${this.client(this.invite.getTableName())}
+            WHERE workspace_uuid = ${data.workspaceUuid}
+              AND email IS NOT NULL AND email <> ''
+              AND (expires_on = -1 OR expires_on > ${Date.now()})
+              AND remaining_uses > 0) AS used
+      `
+      if (Number(row?.used ?? 0) >= capacity) return null
+      return await this.invite.insertOne(data, tx as TransactionSql)
+    })
+  }
+
+  async consumeInviteAndAssignWorkspace (
+    inviteId: string,
+    accountUuid: AccountUuid,
+    workspaceUuid: WorkspaceUuid,
+    role: AccountRole
+  ): Promise<boolean> {
+    return await this.client.begin(async (tx) => {
+      await tx`SELECT uuid FROM ${this.client(this.workspace.getTableName())} WHERE uuid = ${workspaceUuid} FOR UPDATE`
+      const claimed = await tx`
+        UPDATE ${this.client(this.invite.getTableName())}
+        SET remaining_uses = remaining_uses - 1
+        WHERE id = ${inviteId}
+          AND workspace_uuid = ${workspaceUuid}
+          AND remaining_uses > 0
+          AND (expires_on = -1 OR expires_on > ${Date.now()})
+        RETURNING id
+      `
+      if (claimed.length === 0) return false
+      await tx`
+        INSERT INTO ${this.client(this.getWsMembersTableName())} (account_uuid, workspace_uuid, role)
+        VALUES (${accountUuid}, ${workspaceUuid}, ${role})
+        ON CONFLICT (account_uuid, workspace_uuid) DO NOTHING
+      `
+      return true
+    })
+  }
+
+  async releaseFreeTrial (accountUuid: AccountUuid, claimedOn: number): Promise<void> {
+    await this.withRetry(async (rTx) => {
+      await rTx`
+        UPDATE ${this.client(this.account.getTableName())}
+        SET free_trial_used_on = NULL, free_trial_workspace_uuid = NULL
+        WHERE uuid = ${accountUuid} AND free_trial_used_on = ${claimedOn}
+      `
+    })
   }
 
   async updateWorkspaceRole (accountUuid: AccountUuid, workspaceUuid: WorkspaceUuid, role: AccountRole): Promise<void> {

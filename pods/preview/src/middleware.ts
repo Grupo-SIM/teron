@@ -55,7 +55,15 @@ export const withAdminAuthorization = (req: RequestWithAuth, res: Response, next
 export const withAuthorization = (req: RequestWithAuth, res: Response, next: NextFunction): void => {
   try {
     const token = extractToken(req.headers)
-    if (token == null || token.extra?.guest === 'true' || token.extra?.readonly === 'true') {
+    const readOnlyAfter = Number(token?.extra?.readonlyAfter)
+    const isSystemService = token?.account === systemAccountUuid || token?.extra?.service !== undefined
+    if (
+      token == null ||
+      (!isSystemService &&
+        (token.extra?.guest === 'true' ||
+          token.extra?.readonly === 'true' ||
+          (Number.isFinite(readOnlyAfter) && Date.now() >= readOnlyAfter)))
+    ) {
       throw new HttpError(401, 'Unauthorized')
     }
     req.token = token

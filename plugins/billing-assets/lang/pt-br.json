@@ -23,7 +23,11 @@
     "Epic": "Épico",
     "EpicDescription": "Para empresas criativas grandes ou pequenas empresas.",
     "Legendary": "Legendário",
-    "LegendaryDescription": "Melhor para grandes equipes que precisam de capacidades máximas.",
+        "LegendaryDescription": "Melhor para grandes equipes que precisam de capacidades máximas.",
+        "Free": "Free",
+        "FreeDescription": "Pessoas ilimitadas por 30 dias e acesso somente leitura depois.",
+        "Business": "Empresas",
+        "BusinessDescription": "Workspace pago com vagas contratadas por período de cobrança.",
     "UnlimitedUsers": "Usuários ilimitados",
     "UnlimitedObjects": "Objetos Teron ilimitados",
     "ChangePlan": "Alterar plano",
@@ -35,6 +39,7 @@
     "SubscriptionEnds": "Até {date}",
     "SubscriptionRenews": "Próxima renovação: {date}",
     "SubscriptionValidUntil": "Válido até {date}",
+    "TrialEnds": "O acesso gratuito termina em {date}",
     "ProcessingPayment": "Processando pagamento...",
     "Downgrade": "Fazer downgrade",
     "CancelSubscription": "Cancelar assinatura",
@@ -91,6 +96,10 @@
     "StorageAccessDenied": "Apenas proprietários e mantenedores do espaço de trabalho podem gerenciar o armazenamento.",
     "Refresh": "Atualizar",
     "SubscriptionOperationFailed": "Falha na operação da assinatura",
-    "SubscriptionErrorMessage": "Algo deu errado. Tente novamente ou entre em contato com o suporte."
+    "SubscriptionErrorMessage": "Algo deu errado. Tente novamente ou entre em contato com o suporte.",
+    "SeatsUsage": "{used} de {limit} vagas em uso",
+    "ScheduledSeatLimit": "{limit} vagas agendadas para o próximo período",
+    "ReadOnlyWorkspace": "Workspace em modo somente leitura",
+    "PaymentIntegrationPending": "Integração de pagamento será disponibilizada em seguida"
   }
 }

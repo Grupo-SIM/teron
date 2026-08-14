@@ -52,9 +52,11 @@ import type {
   Sort,
   UserProfile,
   Subscription,
+  SubscriptionEvent,
   WorkspaceData,
   WorkspaceInfoWithStatus,
   WorkspaceInvite,
+  WorkspaceInviteData,
   WorkspaceOperation,
   WorkspaceStatus,
   WorkspaceStatusData,
@@ -408,6 +410,7 @@ export class MongoAccountDB implements AccountDB {
   integrationSecret: MongoDbCollection<IntegrationSecret>
   userProfile: MongoDbCollection<UserProfile, 'personUuid'>
   subscription: MongoDbCollection<Subscription, 'id'>
+  subscriptionEvent: MongoDbCollection<SubscriptionEvent, 'id'>
 
   workspaceMembers: MongoDbCollection<WorkspaceMember>
   workspacePermission: MongoDbCollection<WorkspacePermission>
@@ -428,6 +431,7 @@ export class MongoAccountDB implements AccountDB {
     this.integrationSecret = new MongoDbCollection<IntegrationSecret>('integrationSecret', db)
     this.userProfile = new MongoDbCollection<UserProfile, 'personUuid'>('user_profile', db, 'personUuid')
     this.subscription = new MongoDbCollection<Subscription, 'id'>('subscription', db, 'id')
+    this.subscriptionEvent = new MongoDbCollection<SubscriptionEvent, 'id'>('subscriptionEvent', db, 'id')
 
     this.workspaceMembers = new MongoDbCollection<WorkspaceMember>('workspaceMembers', db)
     this.workspacePermission = new MongoDbCollection<WorkspacePermission>('workspacePermissions', db)
@@ -529,7 +533,7 @@ export class MongoAccountDB implements AccountDB {
   }
 
   protected getMigrations (): Migration[] {
-    return [this.getV1Migration(), this.getV2Migration()]
+    return [this.getV1Migration(), this.getV2Migration(), this.getV3Migration()]
   }
 
   // NOTE: NEVER MODIFY EXISTING MIGRATIONS. IF YOU NEED TO DO SOMETHING, ADD A NEW MIGRATION.
@@ -594,12 +598,235 @@ export class MongoAccountDB implements AccountDB {
     }
   }
 
+  private getV3Migration (): Migration {
+    return {
+      key: 'account_db_v3_workspace_subscriptions',
+      op: async () => {
+        const now = Date.now()
+        const trialEnd = now + 30 * 24 * 60 * 60 * 1000
+        const workspaces = (await this.workspace.find({})) ?? []
+        for (const workspace of workspaces) {
+          const tiers = await this.subscription.find({ workspaceUuid: workspace.uuid, type: 'tier' as any })
+          const sortedTiers = tiers.sort((a, b) => b.updatedOn - a.updatedOn)
+          const effectiveStatuses = ['active', 'trialing', 'past_due']
+          const paidLegacyTier = sortedTiers.find(
+            (it) => ['rare', 'epic', 'legendary'].includes(it.plan) && effectiveStatuses.includes(it.status)
+          )
+          const commonTier = sortedTiers.find((it) => it.plan === 'common')
+          const currentBusinessTier = sortedTiers.find(
+            (it) => it.plan === 'business' && effectiveStatuses.includes(it.status)
+          )
+          const currentFreeTier = sortedTiers.find(
+            (it) => it.plan === 'free' && effectiveStatuses.includes(it.status)
+          )
+          let tier = paidLegacyTier ?? currentBusinessTier ?? commonTier ?? currentFreeTier
+          if (tier == null) {
+            const accountUuid = workspace.billingAccount ?? workspace.createdBy
+            if (accountUuid == null) continue
+            const id = `free:${workspace.uuid}`
+            await this.subscription.insertOne({
+              id,
+              workspaceUuid: workspace.uuid,
+              accountUuid: accountUuid as AccountUuid,
+              provider: 'internal',
+              providerSubscriptionId: id,
+              type: 'tier' as any,
+              status: 'trialing' as any,
+              plan: 'free',
+              periodStart: now,
+              periodEnd: trialEnd,
+              trialEnd,
+              createdOn: now,
+              updatedOn: now
+            })
+            tier = await this.subscription.findOne({ id })
+          } else if (tier === paidLegacyTier) {
+            const members = await this.getWorkspaceMembers(workspace.uuid)
+            const invites = await this.invite.find({
+              workspaceUuid: workspace.uuid,
+              remainingUses: { $gt: 0 }
+            })
+            const memberSeats = members.filter((it) =>
+              [AccountRole.Owner, AccountRole.Maintainer, AccountRole.User, AccountRole.Guest].includes(it.role)
+            ).length
+            const occupied =
+              memberSeats +
+              invites.filter(
+                (it) => (it.expiresOn === -1 || it.expiresOn > now) && it.email != null && it.email !== ''
+              ).length
+            await this.subscription.update({ id: tier.id }, { plan: 'business', seatLimit: Math.max(1, occupied) })
+            tier = { ...tier, plan: 'business', seatLimit: Math.max(1, occupied) }
+          } else if (tier === commonTier) {
+            await this.subscription.update(
+              { id: tier.id },
+              {
+                plan: 'free',
+                status: 'trialing' as any,
+                periodStart: now,
+                periodEnd: trialEnd,
+                trialEnd
+              }
+            )
+            await this.subscription.collection.updateOne(
+              { id: tier.id },
+              { $unset: { seatLimit: '', nextSeatLimit: '' } }
+            )
+            tier = { ...tier, plan: 'free', periodStart: now, periodEnd: trialEnd, trialEnd }
+          }
+
+          if (tier != null && !(await this.subscriptionEvent.exists({ subscriptionId: tier.id }))) {
+            await this.subscriptionEvent.insertOne({
+              id: `migration:${tier.id}`,
+              subscriptionId: tier.id,
+              workspaceUuid: workspace.uuid,
+              eventType: 'created',
+              periodStart: tier.periodStart,
+              periodEnd: tier.periodEnd,
+              seatLimit: tier.seatLimit,
+              nextSeatLimit: tier.nextSeatLimit,
+              createdOn: now
+            })
+          }
+
+          if (workspace.createdBy != null) {
+            await this.account.collection.updateOne(
+              {
+                uuid: workspace.createdBy as AccountUuid,
+                $or: [{ freeTrialUsedOn: { $exists: false } }, { freeTrialUsedOn: null }]
+              },
+              { $set: { freeTrialUsedOn: now, freeTrialWorkspaceUuid: workspace.uuid } }
+            )
+          }
+        }
+      }
+    }
+  }
+
   async assignWorkspace (accountId: AccountUuid, workspaceId: WorkspaceUuid, role: AccountRole): Promise<void> {
     await this.workspaceMembers.insertOne({
       workspaceUuid: workspaceId,
       accountUuid: accountId,
       role
     })
+  }
+
+  async claimFreeTrial (accountId: AccountUuid, claimedOn: number): Promise<boolean> {
+    const result = await this.account.collection.findOneAndUpdate(
+      { uuid: accountId, $or: [{ freeTrialUsedOn: { $exists: false } }, { freeTrialUsedOn: null }] },
+      { $set: { freeTrialUsedOn: claimedOn } },
+      { returnDocument: 'after' }
+    )
+    return result != null
+  }
+
+  async setFreeTrialWorkspace (accountId: AccountUuid, workspaceId: WorkspaceUuid): Promise<void> {
+    await this.account.collection.updateOne({ uuid: accountId }, { $set: { freeTrialWorkspaceUuid: workspaceId } })
+  }
+
+  async reserveSeatAndCreateInvite (data: WorkspaceInviteData, capacity: number): Promise<string | null> {
+    const lockToken = new UUID().toJSON()
+    const expiresAt = Date.now() + 10000
+    for (let attempt = 0; attempt < 20; attempt++) {
+      const locked = await this.workspace.collection.findOneAndUpdate(
+        {
+          uuid: data.workspaceUuid,
+          $or: [
+            { seatReservationLock: { $exists: false } },
+            { 'seatReservationLock.expiresAt': { $lt: Date.now() } }
+          ]
+        } as any,
+        { $set: { seatReservationLock: { token: lockToken, expiresAt } } } as any,
+        { returnDocument: 'after' }
+      )
+      if (locked == null) {
+        await new Promise((resolve) => setTimeout(resolve, 10))
+        continue
+      }
+      try {
+        const members = await this.getWorkspaceMembers(data.workspaceUuid)
+        const invites = await this.invite.find({
+          workspaceUuid: data.workspaceUuid,
+          remainingUses: { $gt: 0 }
+        })
+        const now = Date.now()
+        const memberSeats = members.filter((it) =>
+          [AccountRole.Owner, AccountRole.Maintainer, AccountRole.User, AccountRole.Guest].includes(it.role)
+        ).length
+        const used =
+          memberSeats +
+          invites.filter(
+            (it) => (it.expiresOn === -1 || it.expiresOn > now) && it.email != null && it.email !== ''
+          ).length
+        return used >= capacity ? null : await this.invite.insertOne(data)
+      } finally {
+        await this.workspace.collection.updateOne(
+          { uuid: data.workspaceUuid, 'seatReservationLock.token': lockToken } as any,
+          { $unset: { seatReservationLock: '' } } as any
+        )
+      }
+    }
+    return null
+  }
+
+  async consumeInviteAndAssignWorkspace (
+    inviteId: string,
+    accountId: AccountUuid,
+    workspaceId: WorkspaceUuid,
+    role: AccountRole
+  ): Promise<boolean> {
+    const lockToken = new UUID().toJSON()
+    const expiresAt = Date.now() + 10000
+    for (let attempt = 0; attempt < 20; attempt++) {
+      const locked = await this.workspace.collection.findOneAndUpdate(
+        {
+          uuid: workspaceId,
+          $or: [
+            { seatReservationLock: { $exists: false } },
+            { 'seatReservationLock.expiresAt': { $lt: Date.now() } }
+          ]
+        } as any,
+        { $set: { seatReservationLock: { token: lockToken, expiresAt } } } as any,
+        { returnDocument: 'after' }
+      )
+      if (locked == null) {
+        await new Promise((resolve) => setTimeout(resolve, 10))
+        continue
+      }
+      try {
+        const now = Date.now()
+        const claimed = await this.invite.collection.findOneAndUpdate(
+          {
+            id: inviteId,
+            workspaceUuid: workspaceId,
+            remainingUses: { $gt: 0 },
+            $or: [{ expiresOn: -1 }, { expiresOn: { $gt: now } }]
+          } as any,
+          { $inc: { remainingUses: -1 } } as any,
+          { returnDocument: 'after' }
+        )
+        if (claimed == null) return false
+        try {
+          await this.assignWorkspace(accountId, workspaceId, role)
+        } catch (err) {
+          await this.invite.collection.updateOne({ id: inviteId }, { $inc: { remainingUses: 1 } })
+          throw err
+        }
+        return true
+      } finally {
+        await this.workspace.collection.updateOne(
+          { uuid: workspaceId, 'seatReservationLock.token': lockToken } as any,
+          { $unset: { seatReservationLock: '' } } as any
+        )
+      }
+    }
+    return false
+  }
+
+  async releaseFreeTrial (accountId: AccountUuid, claimedOn: number): Promise<void> {
+    await this.account.collection.updateOne(
+      { uuid: accountId, freeTrialUsedOn: claimedOn },
+      { $unset: { freeTrialUsedOn: '', freeTrialWorkspaceUuid: '' } }
+    )
   }
 
   async batchAssignWorkspace (data: [AccountUuid, WorkspaceUuid, AccountRole][]): Promise<void> {

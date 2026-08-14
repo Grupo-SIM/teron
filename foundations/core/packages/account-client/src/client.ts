@@ -56,6 +56,7 @@ import type {
   SubscriptionData,
   UserProfile,
   WorkspaceConfiguration,
+  WorkspaceEntitlement,
   WorkspaceLoginInfo,
   WorkspaceOperation
 } from './types'
@@ -106,6 +107,7 @@ export interface AccountClient {
   ) => Promise<WorkspaceLoginInfo>
   join: (email: string, password: string, inviteId: string, workspaceUrl: string) => Promise<WorkspaceLoginInfo>
   createInvite: (exp: number, emailMask: string, limit: number, role: AccountRole) => Promise<string>
+  cancelInvite: (inviteId: string) => Promise<void>
   /**
    * @param options.personalized
    * If true, will generate a link with a personalized token for one person access
@@ -249,6 +251,7 @@ export interface AccountClient {
   getUserProfile: (personUuid?: PersonUuid) => Promise<PersonWithProfile | null>
 
   getSubscriptions: (workspaceUuid?: WorkspaceUuid | undefined, activeOnly?: boolean) => Promise<Subscription[]>
+  getWorkspaceEntitlement: (workspaceUuid?: WorkspaceUuid) => Promise<WorkspaceEntitlement>
   getSubscriptionByProviderId: (provider: string, providerSubscriptionId: string) => Promise<Subscription | null>
   getSubscriptionById: (subscriptionId: string) => Promise<Subscription | null>
   upsertSubscription: (subscription: SubscriptionData) => Promise<void>
@@ -600,6 +603,10 @@ class AccountClientImpl implements AccountClient {
     }
 
     return await this.rpc(request)
+  }
+
+  async cancelInvite (inviteId: string): Promise<void> {
+    await this.rpc({ method: 'cancelInvite', params: { inviteId } })
   }
 
   async checkJoin (inviteId: string): Promise<WorkspaceLoginInfo> {
@@ -1287,6 +1294,13 @@ class AccountClientImpl implements AccountClient {
         workspaceUuid,
         activeOnly
       }
+    })
+  }
+
+  async getWorkspaceEntitlement (workspaceUuid?: WorkspaceUuid): Promise<WorkspaceEntitlement> {
+    return await this._rpc({
+      method: 'getWorkspaceEntitlement',
+      params: { workspaceUuid }
     })
   }
 

@@ -32,6 +32,7 @@ import { type AccountDB, type SocialId } from '../types'
 import {
   createInvite,
   createInviteLink,
+  createWorkspace,
   sendInvite,
   resendInvite,
   getLoginInfoByToken,
@@ -52,6 +53,7 @@ import {
   getAccountInfo,
   createAccessLink,
   getSubscriptions,
+  getWorkspaceEntitlement,
   leaveWorkspace,
   checkJoin
 } from '../operations'
@@ -101,22 +103,39 @@ describe('account operations', () => {
       findOne: jest.fn()
     },
     workspace: {
-      findOne: jest.fn()
+      findOne: jest.fn(),
+      find: jest.fn()
     },
     invite: {
       insertOne: jest.fn(),
       findOne: jest.fn(),
+      find: jest.fn().mockResolvedValue([]),
       update: jest.fn()
     },
+    subscription: {
+      find: jest.fn().mockResolvedValue([]),
+      insertOne: jest.fn()
+    },
+    subscriptionEvent: {
+      insertOne: jest.fn()
+    },
+    claimFreeTrial: jest.fn().mockResolvedValue(true),
+    setFreeTrialWorkspace: jest.fn(),
+    releaseFreeTrial: jest.fn(),
+    reserveSeatAndCreateInvite: jest.fn(),
+    consumeInviteAndAssignWorkspace: jest.fn(),
     getWorkspaceRole: jest.fn(),
     getWorkspaceMembers: jest.fn(),
+    createWorkspace: jest.fn(),
+    assignWorkspace: jest.fn(),
     unassignWorkspace: jest.fn(),
     updateWorkspaceRole: jest.fn(),
     person: {
       findOne: jest.fn()
     },
     socialId: {
-      findOne: jest.fn()
+      findOne: jest.fn(),
+      find: jest.fn()
     },
     generatePersonUuid: jest.fn().mockResolvedValue('generated-person-uuid' as PersonUuid)
   } as unknown as AccountDB
@@ -132,6 +151,19 @@ describe('account operations', () => {
 
   beforeEach(() => {
     jest.clearAllMocks()
+    ;(mockDb.subscription.find as jest.Mock).mockResolvedValue([
+      {
+        id: 'default-free-subscription',
+        workspaceUuid: mockWorkspace.uuid,
+        type: 'tier',
+        status: 'trialing',
+        plan: 'free',
+        updatedOn: Date.now()
+      }
+    ])
+    ;(mockDb.invite.find as jest.Mock).mockResolvedValue([])
+    ;(mockDb.getWorkspaceMembers as jest.Mock).mockResolvedValue([])
+    ;(mockDb.claimFreeTrial as jest.Mock).mockResolvedValue(true)
     ;(decodeTokenVerbose as jest.Mock).mockReturnValue({
       account: mockAccount.uuid,
       workspace: mockWorkspace.uuid,
@@ -188,6 +220,199 @@ describe('account operations', () => {
           role: AccountRole.Owner
         })
       ).rejects.toThrow(new PlatformError(new Status(Severity.ERROR, platform.status.Forbidden, {})))
+    })
+
+    test('should atomically reserve a business seat for a personalized invite', async () => {
+      ;(mockDb.account.findOne as jest.Mock).mockResolvedValue(mockAccount)
+      ;(mockDb.workspace.findOne as jest.Mock).mockResolvedValue(mockWorkspace)
+      ;(mockDb.getWorkspaceRole as jest.Mock).mockResolvedValue(AccountRole.Maintainer)
+      ;(mockDb.subscription.find as jest.Mock).mockResolvedValue([
+        {
+          id: 'business-subscription',
+          workspaceUuid: mockWorkspace.uuid,
+          type: 'tier',
+          status: 'active',
+          plan: 'business',
+          seatLimit: 4,
+          nextSeatLimit: 3,
+          updatedOn: Date.now()
+        }
+      ])
+      ;(mockDb.reserveSeatAndCreateInvite as jest.Mock).mockResolvedValue('business-invite')
+
+      const result = await createInvite(mockCtx, mockDb, mockBranding, mockToken, {
+        exp: 60000,
+        email: 'person@example.com',
+        limit: 1,
+        role: AccountRole.User
+      })
+
+      expect(result).toBe('business-invite')
+      expect(mockDb.reserveSeatAndCreateInvite).toHaveBeenCalledWith(
+        expect.objectContaining({ email: 'person@example.com', remainingUses: 1 }),
+        3
+      )
+      expect(mockDb.invite.insertOne).not.toHaveBeenCalled()
+    })
+
+    test('should reject generic business invite links', async () => {
+      ;(mockDb.account.findOne as jest.Mock).mockResolvedValue(mockAccount)
+      ;(mockDb.workspace.findOne as jest.Mock).mockResolvedValue(mockWorkspace)
+      ;(mockDb.getWorkspaceRole as jest.Mock).mockResolvedValue(AccountRole.Maintainer)
+      ;(mockDb.subscription.find as jest.Mock).mockResolvedValue([
+        {
+          id: 'business-subscription',
+          workspaceUuid: mockWorkspace.uuid,
+          type: 'tier',
+          status: 'active',
+          plan: 'business',
+          seatLimit: 4,
+          updatedOn: Date.now()
+        }
+      ])
+
+      await expect(
+        createInvite(mockCtx, mockDb, mockBranding, mockToken, {
+          exp: 60000,
+          emailMask: '.*',
+          limit: 10,
+          role: AccountRole.User
+        })
+      ).rejects.toThrow(new PlatformError(new Status(Severity.ERROR, platform.status.BadRequest, {})))
+    })
+  })
+
+  describe('createWorkspace free trial', () => {
+    beforeEach(() => {
+      ;(mockDb.socialId.find as jest.Mock).mockResolvedValue([
+        { _id: 'email:test@example.com', personUuid: mockAccount.uuid, verifiedOn: Date.now(), key: 'test@example.com' }
+      ])
+      ;(mockDb.person.findOne as jest.Mock).mockResolvedValue({
+        uuid: mockAccount.uuid,
+        firstName: 'Test',
+        lastName: 'User'
+      })
+      ;(mockDb.account.findOne as jest.Mock).mockResolvedValue(mockAccount)
+      ;(mockDb.workspace.find as jest.Mock).mockResolvedValue([])
+    })
+
+    test('should reject a second lifetime free trial', async () => {
+      ;(mockDb.account.findOne as jest.Mock).mockResolvedValue({ ...mockAccount, freeTrialUsedOn: 1 })
+
+      await expect(
+        createWorkspace(mockCtx, mockDb, mockBranding, mockToken, { workspaceName: 'Second workspace' })
+      ).rejects.toThrow(PlatformError)
+
+      expect(mockDb.claimFreeTrial).not.toHaveBeenCalled()
+    })
+
+    test('should reject creation when another request atomically claimed the trial', async () => {
+      ;(mockDb.claimFreeTrial as jest.Mock).mockResolvedValue(false)
+
+      await expect(
+        createWorkspace(mockCtx, mockDb, mockBranding, mockToken, { workspaceName: 'Concurrent workspace' })
+      ).rejects.toThrow(PlatformError)
+
+      expect(mockDb.createWorkspace).not.toHaveBeenCalled()
+    })
+
+    test('should create Free with an exact 30-day server-side trial', async () => {
+      const startedOn = 10_000_000
+      const nowSpy = jest.spyOn(Date, 'now').mockReturnValue(startedOn)
+      ;(getMetadata as jest.Mock).mockImplementation((key) => {
+        if (key === accountPlugin.metadata.Transactors) return 'http://internal;http://external;'
+        return undefined
+      })
+      ;(mockDb.createWorkspace as jest.Mock).mockResolvedValue(mockWorkspace.uuid)
+
+      await createWorkspace(mockCtx, mockDb, mockBranding, mockToken, { workspaceName: 'First workspace' })
+
+      const trialEnd = startedOn + 30 * 24 * 60 * 60 * 1000
+      expect(mockDb.subscription.insertOne).toHaveBeenCalledWith(
+        expect.objectContaining({
+          workspaceUuid: mockWorkspace.uuid,
+          plan: 'free',
+          status: 'trialing',
+          periodStart: startedOn,
+          periodEnd: trialEnd,
+          trialEnd
+        })
+      )
+      expect(mockDb.assignWorkspace).toHaveBeenCalledWith(mockAccount.uuid, mockWorkspace.uuid, AccountRole.Owner)
+      expect(mockDb.setFreeTrialWorkspace).toHaveBeenCalledWith(mockAccount.uuid, mockWorkspace.uuid)
+      nowSpy.mockRestore()
+    })
+  })
+
+  describe('getWorkspaceEntitlement', () => {
+    test('should become read-only exactly at the free trial boundary', async () => {
+      const boundary = 2_000_000
+      const nowSpy = jest.spyOn(Date, 'now').mockReturnValue(boundary)
+      ;(mockDb.getWorkspaceRole as jest.Mock).mockResolvedValue(AccountRole.Owner)
+      ;(mockDb.subscription.find as jest.Mock).mockResolvedValue([
+        {
+          id: 'free-subscription',
+          workspaceUuid: mockWorkspace.uuid,
+          type: 'tier',
+          status: 'trialing',
+          plan: 'free',
+          periodStart: boundary - 30 * 24 * 60 * 60 * 1000,
+          periodEnd: boundary,
+          trialEnd: boundary,
+          updatedOn: boundary - 1
+        }
+      ])
+
+      const result = await getWorkspaceEntitlement(mockCtx, mockDb, mockBranding, mockToken, {})
+
+      expect(result).toEqual(
+        expect.objectContaining({ plan: 'free', accessMode: 'read-only', readOnlyAfter: boundary })
+      )
+      nowSpy.mockRestore()
+    })
+
+    test('should count members and only valid personalized pending invites', async () => {
+      const now = 3_000_000
+      const nowSpy = jest.spyOn(Date, 'now').mockReturnValue(now)
+      ;(mockDb.getWorkspaceRole as jest.Mock).mockResolvedValue(AccountRole.Owner)
+      ;(mockDb.getWorkspaceMembers as jest.Mock).mockResolvedValue([
+        { role: AccountRole.Owner },
+        { role: AccountRole.Guest },
+        { role: AccountRole.ReadOnlyGuest }
+      ])
+      ;(mockDb.invite.find as jest.Mock).mockResolvedValue([
+        { email: 'pending@example.com', expiresOn: -1, remainingUses: 1 },
+        { email: 'expired@example.com', expiresOn: now - 1, remainingUses: 1 },
+        { expiresOn: now + 1000, remainingUses: 10 }
+      ])
+      ;(mockDb.subscription.find as jest.Mock).mockResolvedValue([
+        {
+          id: 'business-subscription',
+          workspaceUuid: mockWorkspace.uuid,
+          type: 'tier',
+          status: 'active',
+          plan: 'business',
+          seatLimit: 5,
+          nextSeatLimit: 4,
+          periodEnd: now + 10000,
+          updatedOn: now - 1
+        }
+      ])
+
+      const result = await getWorkspaceEntitlement(mockCtx, mockDb, mockBranding, mockToken, {})
+
+      expect(result).toEqual(
+        expect.objectContaining({
+          plan: 'business',
+          accessMode: 'full',
+          seatLimit: 5,
+          nextSeatLimit: 4,
+          memberSeats: 2,
+          pendingInviteSeats: 1,
+          availableSeats: 1
+        })
+      )
+      nowSpy.mockRestore()
     })
   })
 

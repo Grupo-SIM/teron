@@ -20,6 +20,7 @@ import {
   type Branding,
   buildSocialIdString,
   concatLink,
+  generateId,
   isActiveMode,
   isDeletingMode,
   isWorkspaceCreating,
@@ -66,6 +67,8 @@ import {
   type PersonWithProfile,
   type Subscription,
   SubscriptionStatus,
+  SubscriptionType,
+  type WorkspaceEntitlement,
   type Query,
   type InviteInfo
 } from './types'
@@ -139,6 +142,75 @@ const NIL_UUID = '00000000-0000-0000-0000-000000000000' as AccountUuid
 
 const workspaceLimitPerUser =
   process.env.WORKSPACE_LIMIT_PER_USER != null ? parseInt(process.env.WORKSPACE_LIMIT_PER_USER) : 10
+
+const FREE_TRIAL_MS = 30 * 24 * 60 * 60 * 1000
+const LEGACY_BUSINESS_PLANS = new Set(['rare', 'epic', 'legendary'])
+const BILLABLE_ROLES = new Set([AccountRole.Owner, AccountRole.Maintainer, AccountRole.User, AccountRole.Guest])
+
+function effectivePlan (plan: string): 'free' | 'business' {
+  return plan === 'business' || LEGACY_BUSINESS_PLANS.has(plan) ? 'business' : 'free'
+}
+
+async function getEntitlement (
+  db: AccountDB,
+  workspaceUuid: WorkspaceUuid,
+  now: number = Date.now()
+): Promise<WorkspaceEntitlement> {
+  const hasSubscriptionStore = db.subscription?.find != null
+  const subscriptions =
+    hasSubscriptionStore
+      ? await db.subscription.find({ workspaceUuid, type: SubscriptionType.Tier })
+      : []
+  const subscription = subscriptions
+    .filter((it) =>
+      [SubscriptionStatus.Active, SubscriptionStatus.Trialing, SubscriptionStatus.PastDue].includes(it.status)
+    )
+    .sort((a, b) => b.updatedOn - a.updatedOn)[0]
+
+  const members = db.getWorkspaceMembers != null ? await db.getWorkspaceMembers(workspaceUuid) : []
+  const memberSeats = members.filter((it) => BILLABLE_ROLES.has(it.role)).length
+  const pendingInvites =
+    db.invite?.find != null
+      ? await db.invite.find({
+        workspaceUuid,
+        remainingUses: { $gt: 0 }
+      })
+      : []
+  const pendingInviteSeats = pendingInvites.filter(
+    (it) => (it.expiresOn === -1 || it.expiresOn > now) && it.email != null && it.email !== ''
+  ).length
+  const plan = effectivePlan(subscription?.plan ?? 'free')
+  const readOnlyAfter = subscription?.trialEnd ?? subscription?.periodEnd
+  const expired =
+    (hasSubscriptionStore && subscription == null) ||
+    subscription?.status === SubscriptionStatus.Expired ||
+    subscription?.status === SubscriptionStatus.Canceled ||
+    (readOnlyAfter != null && now >= readOnlyAfter)
+  const seatLimit = plan === 'business' ? subscription?.seatLimit : undefined
+  const capacity = seatLimit == null ? undefined : Math.min(seatLimit, subscription?.nextSeatLimit ?? seatLimit)
+  const usedSeats = memberSeats + pendingInviteSeats
+
+  return {
+    plan,
+    status: expired ? SubscriptionStatus.Expired : (subscription?.status ?? SubscriptionStatus.Trialing),
+    accessMode: expired ? 'read-only' : 'full',
+    periodStart: subscription?.periodStart,
+    periodEnd: subscription?.periodEnd,
+    readOnlyAfter,
+    seatLimit,
+    nextSeatLimit: subscription?.nextSeatLimit,
+    memberSeats,
+    pendingInviteSeats,
+    availableSeats: capacity == null ? undefined : Math.max(0, capacity - usedSeats)
+  }
+}
+
+async function verifyWorkspaceWritable (db: AccountDB, workspaceUuid: WorkspaceUuid): Promise<void> {
+  const entitlement = await getEntitlement(db, workspaceUuid)
+  if (entitlement.accessMode === 'read-only') {
+    throw new PlatformError(new Status(Severity.ERROR, platform.status.ReadOnlyAccount, {}))
+  }
+}
 
 /* =================================== */
 /* ============OPERATIONS============= */
@@ -589,6 +661,13 @@ export async function createWorkspace (
     throw new PlatformError(new Status(Severity.ERROR, platform.status.InternalServerError, {}))
   }
 
+  if (accountObj.freeTrialUsedOn != null) {
+    ctx.warn('free-trial-already-used', { account, workspace: workspaceName })
+    throw new PlatformError(
+      new Status(Severity.ERROR, platform.status.WorkspaceLimitReached, { workspace: workspaceName })
+    )
+  }
+
   // Get a list of created workspaces
   const created = (await db.workspace.find({ createdBy: socialId.personUuid })).length
 
@@ -605,19 +684,61 @@ export async function createWorkspace (
   const pendingConfiguration =
     configuration?.withDemoContent !== undefined ? { withDemoContent: configuration.withDemoContent } : undefined
 
-  const { workspaceUuid, workspaceUrl } = await createWorkspaceRecord(
-    ctx,
-    db,
-    branding,
-    workspaceName,
-    account,
-    region,
-    'pending-creation',
-    undefined,
-    pendingConfiguration
-  )
+  const trialStartedOn = Date.now()
+  if (!(await db.claimFreeTrial(account, trialStartedOn))) {
+    throw new PlatformError(
+      new Status(Severity.ERROR, platform.status.WorkspaceLimitReached, { workspace: workspaceName })
+    )
+  }
+
+  let workspaceUuid: WorkspaceUuid
+  let workspaceUrl: string
+  try {
+    ;({ workspaceUuid, workspaceUrl } = await createWorkspaceRecord(
+      ctx,
+      db,
+      branding,
+      workspaceName,
+      account,
+      region,
+      'pending-creation',
+      undefined,
+      pendingConfiguration
+    ))
+  } catch (err) {
+    await db.releaseFreeTrial(account, trialStartedOn)
+    throw err
+  }
 
   await db.assignWorkspace(account, workspaceUuid, AccountRole.Owner)
+
+  const trialEndsOn = trialStartedOn + FREE_TRIAL_MS
+  const subscriptionId = `free:${workspaceUuid}`
+  await db.subscription.insertOne({
+    id: subscriptionId,
+    workspaceUuid,
+    accountUuid: account,
+    provider: 'internal',
+    providerSubscriptionId: subscriptionId,
+    type: SubscriptionType.Tier,
+    status: SubscriptionStatus.Trialing,
+    plan: 'free',
+    periodStart: trialStartedOn,
+    periodEnd: trialEndsOn,
+    trialEnd: trialEndsOn,
+    createdOn: trialStartedOn,
+    updatedOn: trialStartedOn
+  })
+  await db.subscriptionEvent.insertOne({
+    id: generateId(),
+    subscriptionId,
+    workspaceUuid,
+    eventType: 'created',
+    periodStart: trialStartedOn,
+    periodEnd: trialEndsOn,
+    createdOn: trialStartedOn
+  })
+  await db.setFreeTrialWorkspace(account, workspaceUuid)
 
   ctx.info('Creating workspace record done', { workspaceName, region, account: socialId.personUuid })
 
@@ -668,13 +789,38 @@ export async function createInvite (
   const callerRole = await db.getWorkspaceRole(account, workspace.uuid)
   verifyAllowedRole(callerRole, role, extra)
 
+  const entitlement = await getEntitlement(db, workspaceUuid)
+  let businessCapacity: number | undefined
+  if (entitlement.accessMode === 'read-only') {
+    throw new PlatformError(new Status(Severity.ERROR, platform.status.ReadOnlyAccount, {}))
+  }
+  if (entitlement.plan === 'business') {
+    if (email == null || email === '' || limit !== 1 || emailMask != null) {
+      throw new PlatformError(new Status(Severity.ERROR, platform.status.BadRequest, {}))
+    }
+    const existing = await db.invite.findOne({
+      workspaceUuid,
+      email,
+      expiresOn: { $gt: Date.now() },
+      remainingUses: { $gt: 0 }
+    })
+    if (existing != null) {
+      await db.invite.update({ id: existing.id }, { expiresOn: exp < 0 ? -1 : Date.now() + exp, role })
+      return existing.id
+    }
+    businessCapacity = Math.min(
+      entitlement.seatLimit ?? 0,
+      entitlement.nextSeatLimit ?? entitlement.seatLimit ?? 0
+    )
+  }
+
   if (autoJoin === true) {
     verifyAllowedServices(['schedule'], extra)
   }
 
   ctx.info('Creating invite', { workspace, workspaceName: workspace.name, email, emailMask, limit, autoJoin })
 
-  return await db.invite.insertOne({
+  const inviteData = {
     workspaceUuid,
     expiresOn: exp < 0 ? -1 : Date.now() + exp,
     email,
@@ -682,7 +828,35 @@ export async function createInvite (
     remainingUses: limit,
     role,
     autoJoin
-  })
+  }
+  if (businessCapacity !== undefined) {
+    const inviteId = await db.reserveSeatAndCreateInvite(inviteData, businessCapacity)
+    if (inviteId == null) {
+      throw new PlatformError(new Status(Severity.ERROR, platform.status.WorkspaceLimitReached, {}))
+    }
+    return inviteId
+  }
+  return await db.invite.insertOne(inviteData)
+}
+
+export async function cancelInvite (
+  ctx: MeasureContext,
+  db: AccountDB,
+  branding: Branding | null,
+  token: string,
+  params: { inviteId: string }
+): Promise<void> {
+  const { account, workspace } = decodeTokenVerbose(ctx, token)
+  const invite = await db.invite.findOne({ id: params.inviteId })
+  if (workspace == null || invite == null || invite.workspaceUuid !== workspace) {
+    throw new PlatformError(new Status(Severity.ERROR, platform.status.Forbidden, {}))
+  }
+  const role = await db.getWorkspaceRole(account, workspace)
+  if (role == null || getRolePower(role) < getRolePower(AccountRole.Maintainer)) {
+    throw new PlatformError(new Status(Severity.ERROR, platform.status.Forbidden, {}))
+  }
+  await verifyWorkspaceWritable(db, workspace)
+  await db.invite.deleteMany({ id: invite.id })
 }
 
 // TODO: Temporary solution to prevent spam using sendInvite
@@ -969,6 +1143,7 @@ export async function resendInvite (
 
   const callerRole = await db.getWorkspaceRole(account, workspace.uuid)
   verifyAllowedRole(callerRole, role, extra)
+  await verifyWorkspaceWritable(db, workspaceUuid)
 
   const expHours = 48
   const newExp = Date.now() + expHours * 60 * 60 * 1000
@@ -1780,6 +1955,8 @@ export async function updateWorkspaceName (
     throw new PlatformError(new Status(Severity.ERROR, platform.status.Forbidden, {}))
   }
 
+  await verifyWorkspaceWritable(db, workspace)
+
   await db.workspace.update(
     { uuid: workspace },
     {
@@ -2230,12 +2407,20 @@ export async function getLoginInfoByToken (
       throw new PlatformError(new Status(Severity.ERROR, platform.status.Forbidden, {}))
     }
 
+    const entitlement = await getEntitlement(db, workspace.uuid)
+    const workspaceExtra = { ...extra }
+    if (entitlement.readOnlyAfter != null) workspaceExtra.readonlyAfter = String(entitlement.readOnlyAfter)
+    if (entitlement.accessMode === 'read-only') workspaceExtra.readonly = 'true'
+
     return {
       ...loginInfo,
+      token: generateToken(accountUuid, workspaceUuid, workspaceExtra, undefined, { grant, nbf, exp, sub }),
       workspace: workspace.uuid,
-      workspaceDataId: workspace.dataId,
+      ...(workspace.dataId != null ? { workspaceDataId: workspace.dataId } : {}),
       workspaceUrl: workspace.url,
       endpoint,
+      ...(entitlement.accessMode === 'read-only' ? { readOnly: true } : {}),
+      ...(entitlement.readOnlyAfter != null ? { readOnlyAfter: entitlement.readOnlyAfter } : {}),
       role
     } satisfies WorkspaceLoginInfo
   } else {
@@ -2306,6 +2491,14 @@ export async function getLoginWithWorkspaceInfo (
 
   const userWorkspaces = (await db.getAccountWorkspaces(accountUuid)).filter((it) => isActiveMode(it.status.mode))
   const roles: Map<WorkspaceUuid, AccountRole | null> = await getWorkspaceRoles(db, accountUuid)
+  const hasSubscriptionStore = db.subscription?.find != null
+  const tierSubscriptions =
+    hasSubscriptionStore && userWorkspaces.length > 0
+      ? await db.subscription.find({
+        type: SubscriptionType.Tier,
+        workspaceUuid: { $in: userWorkspaces.map((it) => it.uuid) }
+      })
+      : []
 
   const info = getEndpointInfo()
   const loginInfo: LoginInfoWithWorkspaces = {
@@ -2316,24 +2509,45 @@ export async function getLoginWithWorkspaceInfo (
     workspaces: Object.fromEntries(
       isSystem || isDocGuest
         ? []
-        : userWorkspaces.map((it, idx) => [
-          it.uuid,
-          {
-            url: it.url,
-            dataId: it.dataId,
-            mode: it.status.mode,
-            endpoint: getWorkspaceEndpoint(info, it.uuid, it.region),
-            role: roles.get(it.uuid) ?? null,
-            version: {
-              versionMajor: it.status.versionMajor,
-              versionMinor: it.status.versionMinor,
-              versionPatch: it.status.versionPatch
-            },
-            progress: it.status.processingProgress,
-            branding: it.branding,
-            passwordAgingRule: it.passwordAgingRule
-          }
-        ])
+        : userWorkspaces.map((it, idx) => {
+          const workspaceTiers = tierSubscriptions
+            .filter((subscription) => subscription.workspaceUuid === it.uuid)
+            .sort((a, b) => b.updatedOn - a.updatedOn)
+          const tier =
+            workspaceTiers.find((subscription) =>
+              [SubscriptionStatus.Active, SubscriptionStatus.Trialing, SubscriptionStatus.PastDue].includes(
+                subscription.status
+              )
+            ) ?? workspaceTiers[0]
+          const readOnlyAfter = tier?.trialEnd ?? tier?.periodEnd
+          const readOnly =
+            (hasSubscriptionStore && tier == null) ||
+            (tier != null &&
+              (![SubscriptionStatus.Active, SubscriptionStatus.Trialing, SubscriptionStatus.PastDue].includes(
+                tier.status
+              ) ||
+                (readOnlyAfter != null && Date.now() >= readOnlyAfter)))
+          return [
+            it.uuid,
+            {
+              url: it.url,
+              dataId: it.dataId,
+              mode: it.status.mode,
+              endpoint: getWorkspaceEndpoint(info, it.uuid, it.region),
+              role: roles.get(it.uuid) ?? null,
+              version: {
+                versionMajor: it.status.versionMajor,
+                versionMinor: it.status.versionMinor,
+                versionPatch: it.status.versionPatch
+              },
+              progress: it.status.processingProgress,
+              branding: it.branding,
+              passwordAgingRule: it.passwordAgingRule,
+              readOnly,
+              readOnlyAfter
+            }
+          ]
+        })
     ),
     socialIds
   }
@@ -3109,6 +3323,25 @@ export async function getSubscriptions (
   return subscriptions
 }
 
+export async function getWorkspaceEntitlement (
+  ctx: MeasureContext,
+  db: AccountDB,
+  branding: Branding | null,
+  token: string,
+  params: { workspaceUuid?: WorkspaceUuid }
+): Promise<WorkspaceEntitlement> {
+  const { account, extra, workspace: tokenWorkspace } = decodeTokenVerbose(ctx, token)
+  const isService = extra?.service !== undefined
+  const workspaceUuid = isService ? params.workspaceUuid : tokenWorkspace
+  if (workspaceUuid == null) {
+    throw new PlatformError(new Status(Severity.ERROR, platform.status.BadRequest, {}))
+  }
+  if (!isService && (await db.getWorkspaceRole(account, workspaceUuid)) == null) {
+    throw new PlatformError(new Status(Severity.ERROR, platform.status.Forbidden, {}))
+  }
+  return await getEntitlement(db, workspaceUuid)
+}
+
 /**
  * Get a subscription by its internal ID
  * - Services: Can query any subscription
@@ -3301,6 +3534,7 @@ export type AccountMethods =
   | 'validateOtp'
   | 'createWorkspace'
   | 'createInvite'
+  | 'cancelInvite'
   | 'createInviteLink'
   | 'createAccessLink'
   | 'sendInvite'
@@ -3360,6 +3594,7 @@ export type AccountMethods =
   | 'setMyProfile'
   | 'getUserProfile'
   | 'getSubscriptions'
+  | 'getWorkspaceEntitlement'
   | 'getSubscriptionById'
   | 'updatePasswordAgingRule'
   | 'checkPasswordAging'
@@ -3383,6 +3618,7 @@ export function getMethods (hasSignUp: boolean = true): Partial<Record<AccountMe
     validateOtp: wrap(validateOtp),
     createWorkspace: wrap(createWorkspace),
     createInvite: wrap(createInvite),
+    cancelInvite: wrap(cancelInvite),
     createInviteLink: wrap(createInviteLink),
     createAccessLink: wrap(createAccessLink),
     sendInvite: wrap(sendInvite),
@@ -3428,6 +3664,7 @@ export function getMethods (hasSignUp: boolean = true): Partial<Record<AccountMe
     setMyProfile: wrap(setMyProfile),
     getUserProfile: wrap(getUserProfile),
     getSubscriptions: wrap(getSubscriptions),
+    getWorkspaceEntitlement: wrap(getWorkspaceEntitlement),
     getSubscriptionById: wrap(getSubscriptionById),
     batchAssignWorkspacePermission: wrap(batchAssignWorkspacePermission),
     batchRevokeWorkspacePermission: wrap(batchRevokeWorkspacePermission),

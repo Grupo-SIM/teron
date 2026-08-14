@@ -14,6 +14,7 @@
 //
 
 import {
+  AccountRole,
   type AccountUuid,
   type IntegrationKind,
   type MeasureContext,
@@ -1428,6 +1429,13 @@ describe('upsertSubscription', () => {
         findOne: jest.fn(),
         insertOne: jest.fn(),
         update: jest.fn()
+      },
+      subscriptionEvent: {
+        insertOne: jest.fn()
+      },
+      getWorkspaceMembers: jest.fn().mockResolvedValue([]),
+      invite: {
+        find: jest.fn().mockResolvedValue([])
       }
     }
 
@@ -1522,6 +1530,133 @@ describe('upsertSubscription', () => {
       })
     )
     expect(mockDb.subscription.insertOne).not.toHaveBeenCalled()
+  })
+
+  test('should apply seat increases immediately and schedule decreases', async () => {
+    const workspaceUuid = 'test-workspace' as WorkspaceUuid
+    ;(decodeTokenVerbose as jest.Mock).mockReturnValue({ extra: { service: 'payment' } })
+    getWorkspaceByIdSpy.mockResolvedValue({ uuid: workspaceUuid })
+    mockDb.subscription.findOne.mockResolvedValue({
+      id: 'business-subscription',
+      workspaceUuid,
+      provider: 'polar',
+      providerSubscriptionId: 'polar-sub-123',
+      plan: 'business',
+      status: SubscriptionStatus.Active,
+      seatLimit: 10,
+      periodStart: 1000
+    })
+    mockDb.getWorkspaceMembers.mockResolvedValue(new Array(4).fill({ role: AccountRole.User }))
+
+    await upsertSubscription(mockCtx, mockDb, mockBranding, mockToken, {
+      id: 'business-subscription',
+      workspaceUuid,
+      provider: 'polar',
+      providerSubscriptionId: 'polar-sub-123',
+      type: SubscriptionType.Tier,
+      status: SubscriptionStatus.Active,
+      plan: 'business',
+      seatLimit: 7,
+      periodStart: 1000
+    })
+
+    expect(mockDb.subscription.update).toHaveBeenCalledWith(
+      { id: 'business-subscription' },
+      expect.objectContaining({ seatLimit: 10, nextSeatLimit: 7 })
+    )
+    expect(mockDb.subscriptionEvent.insertOne).toHaveBeenCalledWith(
+      expect.objectContaining({
+        eventType: 'seats_changed',
+        seatLimit: 10,
+        previousSeatLimit: 10,
+        nextSeatLimit: 7
+      })
+    )
+
+    mockDb.subscription.update.mockClear()
+    await upsertSubscription(mockCtx, mockDb, mockBranding, mockToken, {
+      id: 'business-subscription',
+      workspaceUuid,
+      provider: 'polar',
+      providerSubscriptionId: 'polar-sub-123',
+      type: SubscriptionType.Tier,
+      status: SubscriptionStatus.Active,
+      plan: 'business',
+      seatLimit: 12,
+      periodStart: 1000
+    })
+
+    expect(mockDb.subscription.update).toHaveBeenCalledWith(
+      { id: 'business-subscription' },
+      expect.objectContaining({ seatLimit: 12, nextSeatLimit: undefined })
+    )
+  })
+
+  test('should reject a scheduled seat reduction below current occupancy', async () => {
+    const workspaceUuid = 'test-workspace' as WorkspaceUuid
+    ;(decodeTokenVerbose as jest.Mock).mockReturnValue({ extra: { service: 'payment' } })
+    getWorkspaceByIdSpy.mockResolvedValue({ uuid: workspaceUuid })
+    mockDb.subscription.findOne.mockResolvedValue({
+      id: 'business-subscription',
+      workspaceUuid,
+      provider: 'polar',
+      providerSubscriptionId: 'polar-sub-123',
+      plan: 'business',
+      status: SubscriptionStatus.Active,
+      seatLimit: 10,
+      periodStart: 1000
+    })
+    mockDb.getWorkspaceMembers.mockResolvedValue(new Array(5).fill({ role: AccountRole.User }))
+    mockDb.invite.find.mockResolvedValue([{ email: 'pending@example.com', expiresOn: -1, remainingUses: 1 }])
+
+    await expect(
+      upsertSubscription(mockCtx, mockDb, mockBranding, mockToken, {
+        id: 'business-subscription',
+        workspaceUuid,
+        provider: 'polar',
+        providerSubscriptionId: 'polar-sub-123',
+        type: SubscriptionType.Tier,
+        status: SubscriptionStatus.Active,
+        plan: 'business',
+        seatLimit: 5,
+        periodStart: 1000
+      })
+    ).rejects.toThrow(new PlatformError(new Status(Severity.ERROR, platform.status.WorkspaceLimitReached, {})))
+  })
+
+  test('should activate the scheduled seat limit when a new billing period starts', async () => {
+    const workspaceUuid = 'test-workspace' as WorkspaceUuid
+    ;(decodeTokenVerbose as jest.Mock).mockReturnValue({ extra: { service: 'payment' } })
+    getWorkspaceByIdSpy.mockResolvedValue({ uuid: workspaceUuid })
+    mockDb.subscription.findOne.mockResolvedValue({
+      id: 'business-subscription',
+      workspaceUuid,
+      provider: 'polar',
+      providerSubscriptionId: 'polar-sub-123',
+      plan: 'business',
+      status: SubscriptionStatus.Active,
+      seatLimit: 10,
+      nextSeatLimit: 7,
+      periodStart: 1000
+    })
+    mockDb.getWorkspaceMembers.mockResolvedValue(new Array(5).fill({ role: AccountRole.User }))
+
+    await upsertSubscription(mockCtx, mockDb, mockBranding, mockToken, {
+      id: 'business-subscription',
+      workspaceUuid,
+      provider: 'polar',
+      providerSubscriptionId: 'polar-sub-123',
+      type: SubscriptionType.Tier,
+      status: SubscriptionStatus.Active,
+      plan: 'business',
+      seatLimit: 10,
+      periodStart: 2000
+    })
+
+    expect(mockDb.subscription.update).toHaveBeenCalledWith(
+      { id: 'business-subscription' },
+      expect.objectContaining({ seatLimit: 7, nextSeatLimit: undefined, periodStart: 2000 })
+    )
   })
 
   test('should reject non-billing service', async () => {
