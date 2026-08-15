@@ -134,6 +134,7 @@ import {
   verifyTotpCode,
   getTotpUrl
 } from './utils'
+import { createPaidWorkspaceSubscription, type WorkspacePaymentDetails } from './simintpay'
 
 const NIL_UUID = '00000000-0000-0000-0000-000000000000' as AccountUuid
 
@@ -633,9 +634,10 @@ export async function createWorkspace (
     workspaceName: string
     region?: string
     configuration?: WorkspaceConfiguration
+    payment?: WorkspacePaymentDetails
   }
 ): Promise<WorkspaceLoginInfo> {
-  const { workspaceName, region, configuration } = params
+  const { workspaceName, region, configuration, payment } = params
 
   if (workspaceName == null || workspaceName.length === 0) {
     throw new PlatformError(new Status(Severity.ERROR, platform.status.BadRequest, {}))
@@ -663,16 +665,9 @@ export async function createWorkspace (
     throw new PlatformError(new Status(Severity.ERROR, platform.status.InternalServerError, {}))
   }
 
-  // Existing workspace owners are grandfathered into Unlimited by the
-  // release migration, so they cannot start a separate Free trial.
+  // Only the very first workspace can use the 30-day Free trial. Subsequent
+  // workspaces go through the paid subscription path below.
   const created = (await db.workspace.find({ createdBy: socialId.personUuid })).length
-  if (accountObj.freeTrialUsedOn != null || created > 0) {
-    ctx.warn('free-trial-already-used', { account, workspace: workspaceName })
-    throw new PlatformError(
-      new Status(Severity.ERROR, platform.status.WorkspaceLimitReached, { workspace: workspaceName })
-    )
-  }
-
   if (created >= (accountObj.maxWorkspaces ?? workspaceLimitPerUser)) {
     ctx.warn('created-by-limit', { person: socialId.key, workspace: workspaceName })
     throw new PlatformError(
@@ -687,16 +682,32 @@ export async function createWorkspace (
     configuration?.withDemoContent !== undefined ? { withDemoContent: configuration.withDemoContent } : undefined
 
   const trialStartedOn = Date.now()
-  if (!(await db.claimFreeTrial(account, trialStartedOn))) {
-    throw new PlatformError(
-      new Status(Severity.ERROR, platform.status.WorkspaceLimitReached, { workspace: workspaceName })
+  const canClaimFreeTrial = accountObj.freeTrialUsedOn == null && created === 0
+  const isFreeTrial = canClaimFreeTrial ? await db.claimFreeTrial(account, trialStartedOn) : false
+  // A concurrent first-workspace request may have claimed the trial between
+  // the account read above and the atomic claim. Do not turn that race into a
+  // second paid workspace creation.
+  if (canClaimFreeTrial && !isFreeTrial) {
+    throw new PlatformError(new Status(Severity.ERROR, 'WorkspaceLimitReached', {}))
+  }
+  if (!isFreeTrial && payment == null) {
+    throw new PlatformError(new Status(Severity.ERROR, 'WorkspacePaymentRequired', {}))
+  }
+
+  const workspaceUuid = generateId() as WorkspaceUuid
+  let paidSubscription: Awaited<ReturnType<typeof createPaidWorkspaceSubscription>> | undefined
+  if (!isFreeTrial) {
+    paidSubscription = await createPaidWorkspaceSubscription(
+      account,
+      workspaceUuid,
+      { name: getPersonName(person), email: socialId.value },
+      payment
     )
   }
 
-  let workspaceUuid: WorkspaceUuid
   let workspaceUrl: string
   try {
-    ;({ workspaceUuid, workspaceUrl } = await createWorkspaceRecord(
+    ;({ workspaceUrl } = await createWorkspaceRecord(
       ctx,
       db,
       branding,
@@ -705,29 +716,33 @@ export async function createWorkspace (
       region,
       'pending-creation',
       undefined,
-      pendingConfiguration
+      pendingConfiguration,
+      workspaceUuid
     ))
   } catch (err) {
-    await db.releaseFreeTrial(account, trialStartedOn)
+    if (isFreeTrial) await db.releaseFreeTrial(account, trialStartedOn)
     throw err
   }
 
   await db.assignWorkspace(account, workspaceUuid, AccountRole.Owner)
 
   const trialEndsOn = trialStartedOn + FREE_TRIAL_MS
-  const subscriptionId = `free:${workspaceUuid}`
+  const subscriptionPeriodStart = isFreeTrial ? trialStartedOn : Date.parse(paidSubscription!.currentPeriodStart)
+  const subscriptionPeriodEnd = isFreeTrial ? trialEndsOn : Date.parse(paidSubscription!.currentPeriodEnd)
+  const subscriptionId = isFreeTrial ? `free:${workspaceUuid}` : paidSubscription!.contractId
   await db.subscription.insertOne({
     id: subscriptionId,
     workspaceUuid,
     accountUuid: account,
-    provider: 'internal',
-    providerSubscriptionId: subscriptionId,
+    provider: isFreeTrial ? 'internal' : 'simintpay',
+    providerSubscriptionId: isFreeTrial ? subscriptionId : paidSubscription!.externalSubscriptionId,
     type: SubscriptionType.Tier,
-    status: SubscriptionStatus.Trialing,
-    plan: 'free',
-    periodStart: trialStartedOn,
-    periodEnd: trialEndsOn,
-    trialEnd: trialEndsOn,
+    status: isFreeTrial ? SubscriptionStatus.Trialing : SubscriptionStatus.Active,
+    plan: isFreeTrial ? 'free' : 'business',
+    seatLimit: isFreeTrial ? undefined : payment!.seats,
+    periodStart: subscriptionPeriodStart,
+    periodEnd: subscriptionPeriodEnd,
+    trialEnd: isFreeTrial ? trialEndsOn : undefined,
     createdOn: trialStartedOn,
     updatedOn: trialStartedOn
   })
@@ -736,11 +751,12 @@ export async function createWorkspace (
     subscriptionId,
     workspaceUuid,
     eventType: 'created',
-    periodStart: trialStartedOn,
-    periodEnd: trialEndsOn,
+    periodStart: subscriptionPeriodStart,
+    periodEnd: subscriptionPeriodEnd,
+    seatLimit: isFreeTrial ? undefined : payment!.seats,
     createdOn: trialStartedOn
   })
-  await db.setFreeTrialWorkspace(account, workspaceUuid)
+  if (isFreeTrial) await db.setFreeTrialWorkspace(account, workspaceUuid)
 
   ctx.info('Creating workspace record done', { workspaceName, region, account: socialId.personUuid })
 
@@ -2120,6 +2136,18 @@ export async function getUserWorkspaces (
   return (await db.getAccountWorkspaces(account)).filter(
     (ws) => isWorkspaceCreating(ws.status.mode) || !(isDeletingMode(ws.status.mode) || ws.status.isDisabled)
   )
+}
+
+export async function getWorkspaceCreationInfo (
+  ctx: MeasureContext,
+  db: AccountDB,
+  branding: Branding | null,
+  token: string
+): Promise<{ freeTrialAvailable: boolean }> {
+  const { account } = decodeTokenVerbose(ctx, token)
+  const accountInfo = await db.account.findOne({ uuid: account })
+  const owned = await db.workspace.find({ createdBy: account })
+  return { freeTrialAvailable: accountInfo?.freeTrialUsedOn == null && owned.length === 0 }
 }
 
 /**
@@ -3567,6 +3595,7 @@ export type AccountMethods =
   | 'verify2fa'
   | 'getRegionInfo'
   | 'getUserWorkspaces'
+  | 'getWorkspaceCreationInfo'
   | 'getWorkspaceInfo'
   | 'getWorkspacesInfo'
   | 'updateLastVisit'
@@ -3622,6 +3651,7 @@ export function getMethods (hasSignUp: boolean = true): Partial<Record<AccountMe
     ...(hasSignUp ? { signUpOtp: wrap(signUpOtp) } : {}),
     validateOtp: wrap(validateOtp),
     createWorkspace: wrap(createWorkspace),
+    getWorkspaceCreationInfo: wrap(getWorkspaceCreationInfo),
     createInvite: wrap(createInvite),
     cancelInvite: wrap(cancelInvite),
     createInviteLink: wrap(createInviteLink),

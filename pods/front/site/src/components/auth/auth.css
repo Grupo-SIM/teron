@@ -67,8 +67,8 @@
   align-items: center;
   justify-content: center;
   overflow: hidden;
-  min-height: 770px;
-  padding: 64px 0;
+  min-height: 100dvh;
+  padding: 96px 20px 72px;
 }
 
 /* O `z-index` positivo faz do card um contexto de empilhamento: é o que
@@ -78,8 +78,8 @@
   position: relative;
   z-index: 10;
   width: 480px;
-  height: 479px;
-  padding: 56px 48px 0;
+  height: auto;
+  padding: 44px 48px 0;
   background: #000;
   /* O preto do card é o que sobra por baixo da trama, que só chega até o raio
      da moldura. Sem arredondar aqui também, os quatro cantos aparecem
@@ -88,9 +88,8 @@
 }
 
 .auth-card--flow {
-  height: auto;
-  min-height: 479px;
-  padding-bottom: 48px;
+  min-height: 0;
+  padding-bottom: 44px;
 }
 
 .auth-decor {
@@ -143,7 +142,7 @@
    fixo do original (`bottom: -111px`) desalinha assim que o espaçamento muda.
    Moram aqui, no ancestral comum dos dois. */
 .auth-card-body {
-  --auth-or-mt: 16px;
+  --auth-or-mt: 20px;
   --auth-or-h: 18px;
   --auth-providers-mt: 25px;
   --auth-provider-h: 40px;
@@ -156,7 +155,7 @@
 }
 
 .auth-title {
-  margin: 17px 0 0;
+  margin: 20px 0 0;
   font-size: 36px;
   font-weight: 600;
   line-height: 1;
@@ -167,7 +166,7 @@
 .auth-form {
   display: flex;
   flex-direction: column;
-  margin-top: 28px;
+  margin-top: 24px;
 }
 
 .auth-form .auth-label + .auth-label,
@@ -211,7 +210,7 @@
   display: flex;
   justify-content: space-between;
   gap: 12px;
-  margin-top: 12px;
+  margin-top: 14px;
 }
 
 .auth-inline-actions button,
@@ -242,7 +241,7 @@
 .auth-back-action,
 .auth-guest {
   align-self: center;
-  margin-top: 16px;
+  margin-top: 18px;
 }
 
 .auth-guest {
@@ -308,11 +307,34 @@
   color-scheme: dark;
 }
 
+.auth-billing {
+  display: grid;
+  gap: 12px;
+  margin: 20px 0 0;
+  padding: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  border-radius: 8px;
+}
+
+.auth-billing legend {
+  padding: 0 6px;
+  color: rgb(229, 229, 231);
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.auth-billing p {
+  margin: 0;
+  color: rgb(149, 151, 158);
+  font-size: 13px;
+  line-height: 1.4;
+}
+
 .auth-check {
   display: flex;
   align-items: flex-start;
   gap: 9px;
-  margin-top: 14px;
+  margin-top: 16px;
   color: rgb(149, 151, 158);
   font-size: 12px;
   line-height: 1.4;
@@ -371,7 +393,7 @@
 
 .auth-submit-row {
   height: 44px;
-  margin-top: 27px;
+  margin-top: 24px;
 }
 
 .auth-submit-wrap {
@@ -585,10 +607,7 @@
 }
 
 .auth-btn-lights {
-  position: absolute;
-  inset: 0;
-  z-index: 50;
-  pointer-events: none;
+  display: none;
 }
 
 .auth-btn-light {
@@ -769,12 +788,12 @@
 }
 
 .auth-legal {
-  position: absolute;
-  bottom: 32px;
+  position: static;
   z-index: 10;
   display: flex;
   align-items: center;
   gap: 12px;
+  margin-top: 24px;
   font-size: 13px;
   line-height: 1.375;
   letter-spacing: -0.02em;
@@ -799,7 +818,7 @@
 @media (max-width: 1279px) {
   .auth-card {
     width: 464px;
-    padding: 64px 40px 0;
+    padding: 44px 40px 0;
   }
 
   .auth-title {
@@ -850,16 +869,16 @@
    provedores empilham, e a altura fixa cortaria o segundo botão. */
 @media (max-width: 639px) {
   .auth-stage {
-    min-height: 440px;
-    padding: 72px 20px 32px;
+    min-height: 100dvh;
+    padding: 76px 16px 32px;
   }
 
   .auth-card {
     width: 100%;
     max-width: 384px;
     height: auto;
-    min-height: 384px;
-    padding: 20px 20px 24px;
+    min-height: 0;
+    padding: 28px 20px 24px;
     border-radius: 18px;
   }
 
@@ -874,7 +893,7 @@
 
   .auth-card-pattern {
     left: 50%;
-    height: 384px;
+    height: 100%;
     width: auto;
     border-radius: 18px;
     transform: translateX(-50%);

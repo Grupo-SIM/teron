@@ -198,6 +198,14 @@ services:
       - OTEL_EXPORTER_OTLP_ENDPOINT=http://jaeger:4318/v1/traces
       - MAILBOX_DOMAINS=teron.dev.local
       - MAILBOX_MAX_COUNT_PER_ACCOUNT=2
+      # Simintpay: subsequent workspaces are created only after their first
+      # monthly subscription is approved. Keep the shared token out of this
+      # compose file and provide it through the host environment/.env.
+      - SIMINTPAY_API_URL=${SIMINTPAY_API_URL:-}
+      - SIMINTPAY_INTERNAL_TOKEN=${SIMINTPAY_INTERNAL_TOKEN:-}
+      - SIMINTPAY_BILLING_OWNER_ID=${SIMINTPAY_BILLING_OWNER_ID:-}
+      - SIMINTPAY_WORKSPACE_BASE_AMOUNT=${SIMINTPAY_WORKSPACE_BASE_AMOUNT:-0.00}
+      - SIMINTPAY_WORKSPACE_SEAT_AMOUNT=${SIMINTPAY_WORKSPACE_SEAT_AMOUNT:-}
     restart: unless-stopped
   stats:
     image: hardcoreeng/stats

@@ -6,7 +6,6 @@ import Image from "next/image";
 import { usePillGlow } from "@/components/site/use-pill-glow";
 import type { Locale } from "@/i18n/site";
 
-import { AuthButtonLights } from "./auth-decor";
 import {
   AuthApi,
   authErrorMessage,
@@ -86,6 +85,17 @@ const text = {
     restoreWorkspace: "Restaurar workspace",
     createWorkspace: "Criar workspace",
     workspaceName: "Nome do workspace",
+    seats: "Quantidade de integrantes",
+    billingTitle: "Pagamento mensal",
+    billingDescription: "Informe os dados para pagar o primeiro mês de acesso.",
+    document: "CPF ou CNPJ",
+    phone: "Telefone",
+    cardNumber: "Número do cartão",
+    cardExpiry: "Validade (MM/AA)",
+    cardCvv: "CVV",
+    cardHolder: "Nome impresso no cartão",
+    paidCreate: "Pagar e criar workspace",
+    freeTrialDescription: "Seu primeiro workspace inclui 30 dias gratuitos.",
     region: "Região",
     create: "Criar e continuar",
     demoContent: "Criar projetos de exemplo e conteúdo demonstrativo",
@@ -150,6 +160,17 @@ const text = {
     restoreWorkspace: "Restore workspace",
     createWorkspace: "Create workspace",
     workspaceName: "Workspace name",
+    seats: "Number of members",
+    billingTitle: "Monthly payment",
+    billingDescription: "Enter your details to pay for the first month of access.",
+    document: "Tax ID",
+    phone: "Phone",
+    cardNumber: "Card number",
+    cardExpiry: "Expiry (MM/YY)",
+    cardCvv: "CVV",
+    cardHolder: "Name on card",
+    paidCreate: "Pay and create workspace",
+    freeTrialDescription: "Your first workspace includes a 30-day free trial.",
     region: "Region",
     create: "Create and continue",
     demoContent: "Create sample projects and demo content",
@@ -191,6 +212,14 @@ export function AuthFlow({ variant, locale }: { variant: Variant; locale: Locale
   const [archivedWorkspace, setArchivedWorkspace] = useState<{ workspace: WorkspaceInfo; login: WorkspaceLoginInfo }>();
   const [regions, setRegions] = useState<RegionInfo[]>([]);
   const [workspaceName, setWorkspaceName] = useState("");
+  const [freeTrialAvailable, setFreeTrialAvailable] = useState<boolean>();
+  const [seats, setSeats] = useState("1");
+  const [customerDocument, setCustomerDocument] = useState("");
+  const [customerPhone, setCustomerPhone] = useState("");
+  const [cardNumber, setCardNumber] = useState("");
+  const [cardExpiry, setCardExpiry] = useState("");
+  const [cardCvv, setCardCvv] = useState("");
+  const [cardHolder, setCardHolder] = useState("");
   const [withDemoContent, setWithDemoContent] = useState(true);
   const [region, setRegion] = useState("");
   const [inviteId, setInviteId] = useState("");
@@ -261,6 +290,7 @@ export function AuthFlow({ variant, locale }: { variant: Variant; locale: Locale
           const info = await api!.getLoginInfo();
           const authToken = info && "token" in info ? info.token : undefined;
           if (authToken) setToken(authToken);
+          setFreeTrialAvailable((await api!.getWorkspaceCreationInfo(authToken)).freeTrialAvailable);
           const availableRegions = await api!.getRegions(authToken);
           setRegions(availableRegions.filter((item) => item.name));
           setRegion(availableRegions.find((item) => item.name)?.region ?? "");
@@ -367,6 +397,7 @@ export function AuthFlow({ variant, locale }: { variant: Variant; locale: Locale
     const result = await api.getWorkspaces(authToken);
     setWorkspaces(result.toSorted((a, b) => (b.lastVisit ?? 0) - (a.lastVisit ?? 0)));
     if (result.length === 0) {
+      setFreeTrialAvailable((await api.getWorkspaceCreationInfo(authToken)).freeTrialAvailable);
       const availableRegions = await api.getRegions(authToken);
       setRegions(availableRegions.filter((item) => item.name));
       setRegion(availableRegions.find((item) => item.name)?.region ?? "");
@@ -514,7 +545,14 @@ export function AuthFlow({ variant, locale }: { variant: Variant; locale: Locale
   async function submitWorkspace(event: FormEvent<HTMLFormElement>) {
     event.preventDefault();
     if (!api || !workspaceName) return;
-    await run(async () => finishWorkspace(await api.createWorkspace(workspaceName, region, withDemoContent, token)));
+    await run(async () => {
+      const [expMonth, expYear] = cardExpiry.split("/").map((value) => value.trim());
+      const payment = freeTrialAvailable ? undefined : {
+        seats: Number(seats), customerDocument, customerPhone,
+        card: { number: cardNumber.replace(/\s/g, ""), expMonth, expYear, cvv: cardCvv, holderName: cardHolder, holderDocument: customerDocument },
+      };
+      await finishWorkspace(await api.createWorkspace(workspaceName, region, withDemoContent, payment, token));
+    });
   }
 
   async function submitJoin(event: FormEvent<HTMLFormElement>) {
@@ -667,8 +705,9 @@ export function AuthFlow({ variant, locale }: { variant: Variant; locale: Locale
         <form className="auth-form" onSubmit={submitWorkspace}>
           <AuthInput testId="auth-workspace-name" label={copy.workspaceName} value={workspaceName} onChange={setWorkspaceName} autoComplete="organization" />
           {regions.length > 1 ? <label className="auth-label">{copy.region}<select className="auth-input auth-select" value={region} onChange={(event) => setRegion(event.target.value)}>{regions.map((item) => <option key={item.region} value={item.region}>{item.name}</option>)}</select></label> : null}
+          {freeTrialAvailable ? <p className="auth-description">{copy.freeTrialDescription}</p> : <fieldset className="auth-billing"><legend>{copy.billingTitle}</legend><p>{copy.billingDescription}</p><AuthInput label={copy.seats} value={seats} onChange={(value) => setSeats(value.replace(/\D/g, ""))} inputMode="numeric" /><AuthInput label={copy.document} value={customerDocument} onChange={setCustomerDocument} inputMode="numeric" /><AuthInput label={copy.phone} value={customerPhone} onChange={setCustomerPhone} inputMode="numeric" /><AuthInput label={copy.cardNumber} value={cardNumber} onChange={setCardNumber} inputMode="numeric" autoComplete="cc-number" /><div className="auth-fields-row"><AuthInput label={copy.cardExpiry} value={cardExpiry} onChange={setCardExpiry} placeholder="MM/AA" autoComplete="cc-exp" /><AuthInput label={copy.cardCvv} value={cardCvv} onChange={setCardCvv} inputMode="numeric" autoComplete="cc-csc" /></div><AuthInput label={copy.cardHolder} value={cardHolder} onChange={setCardHolder} autoComplete="cc-name" /></fieldset>}
           <label className="auth-check"><input type="checkbox" checked={withDemoContent} onChange={(event) => setWithDemoContent(event.target.checked)} /><span>{copy.demoContent}</span></label>
-          <AuthSubmit disabled={!workspaceName} loading={loading} label={copy.create} />
+          <AuthSubmit disabled={!workspaceName || freeTrialAvailable === undefined || (!freeTrialAvailable && (!Number.isInteger(Number(seats)) || Number(seats) < 1 || !customerDocument || !customerPhone || !cardNumber || !/^\d{2}\s*\/\s*\d{2,4}$/.test(cardExpiry) || !cardCvv || !cardHolder))} loading={loading} label={freeTrialAvailable ? copy.create : copy.paidCreate} />
           {workspaces.length ? <BackButton label={copy.back} onClick={() => setStep("workspaces")} /> : null}
         </form>
       ) : null}
@@ -696,7 +735,7 @@ function AuthInput({ label, value, onChange, type = "text", required = true, tes
 
 function AuthSubmit({ label, loading, disabled = false, testId = "auth-submit" }: { label: string; loading: boolean; disabled?: boolean; testId?: string }) {
   const wrapRef = usePillGlow<HTMLDivElement>();
-  return <div className="auth-submit-row"><div ref={wrapRef} className="auth-submit-wrap"><div className="auth-ring auth-ring--r"><div className="auth-ring-inner" /></div><div className="auth-ring auth-ring--l"><div className="auth-ring-inner" /></div><button type="submit" data-testid={testId} className="auth-submit" disabled={loading || disabled}><span aria-hidden className="auth-btn-glow"><span className="auth-btn-glow-core" /><span className="auth-btn-glow-wide" /></span><span className="auth-submit-label">{loading ? "…" : label}</span></button><AuthButtonLights /></div></div>;
+  return <div className="auth-submit-row"><div ref={wrapRef} className="auth-submit-wrap"><div className="auth-ring auth-ring--r"><div className="auth-ring-inner" /></div><div className="auth-ring auth-ring--l"><div className="auth-ring-inner" /></div><button type="submit" data-testid={testId} className="auth-submit" disabled={loading || disabled}><span aria-hidden className="auth-btn-glow"><span className="auth-btn-glow-core" /><span className="auth-btn-glow-wide" /></span><span className="auth-submit-label">{loading ? "…" : label}</span></button></div></div>;
 }
 
 function Providers({ api, providers, variant, copy, query }: { api?: AuthApi; providers: ProviderInfo[]; variant: Variant; copy: Copy; query?: { inviteId?: string; autoJoin?: boolean; navigateUrl?: string } }) {

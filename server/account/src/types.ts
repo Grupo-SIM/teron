@@ -333,7 +333,7 @@ export interface WorkspaceEntitlement {
 export interface WorkspaceInfoWithStatus extends Workspace {
   status: WorkspaceStatus
 }
-export type WorkspaceData = Omit<Workspace, 'uuid' | 'status' | 'members'>
+export type WorkspaceData = Omit<Workspace, 'uuid' | 'status' | 'members'> & { uuid?: WorkspaceUuid }
 
 export interface WorkspaceWithEndpoint extends Workspace {
   endpoint?: string

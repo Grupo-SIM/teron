@@ -328,9 +328,10 @@ describe('account operations', () => {
       await createWorkspace(mockCtx, mockDb, mockBranding, mockToken, { workspaceName: 'First workspace' })
 
       const trialEnd = startedOn + 30 * 24 * 60 * 60 * 1000
-      expect(mockDb.subscription.insertOne).toHaveBeenCalledWith(
+      const [subscription] = (mockDb.subscription.insertOne as jest.Mock).mock.calls[0]
+      expect(subscription).toEqual(
         expect.objectContaining({
-          workspaceUuid: mockWorkspace.uuid,
+          workspaceUuid: expect.any(String),
           plan: 'free',
           status: 'trialing',
           periodStart: startedOn,
@@ -338,8 +339,9 @@ describe('account operations', () => {
           trialEnd
         })
       )
-      expect(mockDb.assignWorkspace).toHaveBeenCalledWith(mockAccount.uuid, mockWorkspace.uuid, AccountRole.Owner)
-      expect(mockDb.setFreeTrialWorkspace).toHaveBeenCalledWith(mockAccount.uuid, mockWorkspace.uuid)
+      expect(mockDb.createWorkspace).toHaveBeenCalledWith(expect.objectContaining({ uuid: subscription.workspaceUuid }), expect.anything())
+      expect(mockDb.assignWorkspace).toHaveBeenCalledWith(mockAccount.uuid, subscription.workspaceUuid, AccountRole.Owner)
+      expect(mockDb.setFreeTrialWorkspace).toHaveBeenCalledWith(mockAccount.uuid, subscription.workspaceUuid)
       nowSpy.mockRestore()
     })
   })

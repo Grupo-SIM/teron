@@ -1190,7 +1190,8 @@ export async function createWorkspaceRecord (
   region: string = '',
   initMode: WorkspaceMode = 'pending-creation',
   dataId?: WorkspaceDataId,
-  pendingConfiguration?: WorkspaceConfiguration
+  pendingConfiguration?: WorkspaceConfiguration,
+  workspaceId?: WorkspaceUuid
 ): Promise<CreateWorkspaceRecordResult> {
   const brandingKey = branding?.key ?? 'teron'
   const regionInfo = getRegions().find((it) => it.region === region)
@@ -1224,6 +1225,7 @@ export async function createWorkspaceRecord (
     try {
       const workspaceUuid = await db.createWorkspace(
         {
+          ...(workspaceId !== undefined ? { uuid: workspaceId } : {}),
           name: workspaceName,
           url: workspaceUrl,
           dataId,

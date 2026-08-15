@@ -154,10 +154,23 @@ export class AuthApi {
     return this.rpc<RegionInfo[]>("getRegionInfo", {}, token);
   }
 
-  createWorkspace(workspaceName: string, region: string, withDemoContent: boolean, token?: string) {
+  getWorkspaceCreationInfo(token?: string) {
+    return this.rpc<{ freeTrialAvailable: boolean }>("getWorkspaceCreationInfo", {}, token);
+  }
+
+  createWorkspace(
+    workspaceName: string,
+    region: string,
+    withDemoContent: boolean,
+    payment: {
+      seats: number; customerDocument: string; customerPhone: string;
+      card: { number: string; expMonth: string; expYear: string; cvv: string; holderName: string; holderDocument: string };
+    } | undefined,
+    token?: string,
+  ) {
     return this.rpc<WorkspaceLoginInfo>(
       "createWorkspace",
-      { workspaceName, region, configuration: { withDemoContent } },
+      { workspaceName, region, configuration: { withDemoContent }, payment },
       token,
     );
   }
@@ -242,6 +255,10 @@ export function authErrorMessage(error: unknown, locale: "pt-BR" | "en-US"): str
     AccountAlreadyExists: ["Já existe uma conta com este e-mail.", "An account with this email already exists."],
     Unauthorized: ["Sua sessão expirou. Entre novamente.", "Your session has expired. Sign in again."],
     WorkspaceNotFound: ["Workspace não encontrado.", "Workspace not found."],
+    WorkspacePaymentRequired: ["Conclua o pagamento para criar outro workspace.", "Complete payment to create another workspace."],
+    WorkspacePaymentFailed: ["Não foi possível aprovar o pagamento. Revise os dados do cartão.", "We could not approve the payment. Check your card details."],
+    SimintpayNotConfigured: ["O pagamento ainda não está configurado.", "Payment is not configured yet."],
+    InvalidWorkspaceSeats: ["Informe uma quantidade válida de integrantes.", "Enter a valid number of members."],
   };
   const match = messages[code];
   if (match) return match[english ? 1 : 0];

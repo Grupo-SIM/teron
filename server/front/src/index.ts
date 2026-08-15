@@ -422,11 +422,10 @@ export function start (
         return
       }
 
-      const workspaces = await accountClient.getUserWorkspaces()
-      const workspace = workspaces.sort((a, b) => (b.lastVisit ?? 0) - (a.lastVisit ?? 0))[0]
-      const workspaceHref = workspace !== undefined ? `/workbench/${encodeURIComponent(workspace.url)}` : '/entrar?mode=workspaces'
-
-      res.json({ authenticated: true, workspaceHref })
+      // The site header always opens the workspace picker. Besides avoiding a
+      // stale “last workspace” redirect, this also lets people deliberately
+      // choose a different organization before entering the product.
+      res.json({ authenticated: true })
     } catch {
       // An expired or otherwise invalid cookie is equivalent to a signed-out
       // visitor here. The account service remains responsible for validation.

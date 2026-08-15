@@ -1,15 +1,14 @@
 "use client";
 
 import Link from "next/link";
-import { usePathname } from "next/navigation";
-import { useEffect, useState, type MouseEvent } from "react";
+import { useEffect, useState } from "react";
 import { DocumentLocale } from "@/i18n/document-locale";
 import { Localized, defaultLocale, type Locale } from "@/i18n/site";
 import { Asset } from "./asset";
 
 type SiteSession =
   | { authenticated: false }
-  | { authenticated: true; workspaceHref: string };
+  | { authenticated: true };
 
 /*
  * Uma entrada por seção da página, na ordem em que elas aparecem — o topo serve
@@ -33,19 +32,6 @@ const LINKS = [
 export function SiteHeader({ locale = defaultLocale }: { locale?: Locale }) {
   const [menuOpen, setMenuOpen] = useState(false);
   const [session, setSession] = useState<SiteSession | null>(null);
-  const pathname = usePathname();
-  const nextLocale: Locale = locale === "pt-BR" ? "en-US" : "pt-BR";
-  const languageHref =
-    nextLocale === "en-US"
-      ? `/en-US${pathname === "/" ? "" : pathname}`
-      : pathname.replace(/^\/en-US(?=\/|$)/, "") || "/";
-
-  const switchLanguage = (event: MouseEvent<HTMLAnchorElement>) => {
-    event.preventDefault();
-    const url = new URL(window.location.href);
-    url.pathname = languageHref;
-    window.location.assign(url.toString());
-  };
 
   useEffect(() => {
     const controller = new AbortController();
@@ -129,11 +115,8 @@ export function SiteHeader({ locale = defaultLocale }: { locale?: Locale }) {
           className="lp-desktop-only"
           style={{ alignItems: "center", gap: 18 }}
         >
-          <a href={languageHref} onClick={switchLanguage} className="lp-link-plain" style={{ fontSize: 13 }}>
-            {nextLocale}
-          </a>
           {session?.authenticated ? (
-            <WorkspaceLink href={session.workspaceHref} />
+            <WorkspaceLink href="/entrar?mode=workspaces" />
           ) : session === null ? null : (
             <>
               <a
@@ -219,12 +202,9 @@ export function SiteHeader({ locale = defaultLocale }: { locale?: Locale }) {
           </nav>
 
           <div className="lp-menu-actions">
-            <a href={languageHref} onClick={switchLanguage} className="lp-menu-btn">
-              {nextLocale}
-            </a>
             {session?.authenticated ? (
               <a
-                href={session.workspaceHref}
+                href="/entrar?mode=workspaces"
                 onClick={() => setMenuOpen(false)}
                 className="lp-menu-btn"
               >
