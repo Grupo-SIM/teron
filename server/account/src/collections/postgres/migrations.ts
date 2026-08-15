@@ -84,7 +84,13 @@ export function getMigrations (ns: string, flavor: DBFlavor): [string, string][]
     getV24Migration(ns, flavor),
     getV25Migration(ns, flavor),
     getV26Migration(ns, flavor),
-    getV27Migration(ns, flavor)
+    getV27Migration(ns, flavor),
+    getV28Migration(ns, flavor),
+    getV29Migration(ns, flavor),
+    getV30Migration(ns, flavor),
+    getV31Migration(ns, flavor),
+    getV32Migration(ns, flavor),
+    getV33Migration(ns, flavor)
   ]
 }
 
@@ -816,16 +822,6 @@ function getV27Migration (ns: string, flavor: DBFlavor): [string, string] {
   return [
     'account_db_v27_workspace_subscriptions',
     `
-    ALTER TABLE ${ns}.account
-      ADD COLUMN IF NOT EXISTS free_trial_used_on ${types.int8};
-    ALTER TABLE ${ns}.account
-      ADD COLUMN IF NOT EXISTS free_trial_workspace_uuid UUID;
-
-    ALTER TABLE ${ns}.subscription
-      ADD COLUMN IF NOT EXISTS seat_limit ${types.int4};
-    ALTER TABLE ${ns}.subscription
-      ADD COLUMN IF NOT EXISTS next_seat_limit ${types.int4};
-
     CREATE TABLE IF NOT EXISTS ${ns}.subscription_event (
       id ${types.string} NOT NULL,
       subscription_id ${types.string} NOT NULL,
@@ -842,9 +838,72 @@ function getV27Migration (ns: string, flavor: DBFlavor): [string, string] {
       CONSTRAINT subscription_event_subscription_fk FOREIGN KEY (subscription_id) REFERENCES ${ns}.subscription(id),
       CONSTRAINT subscription_event_workspace_fk FOREIGN KEY (workspace_uuid) REFERENCES ${ns}.workspace(uuid)
     );
+    `
+  ]
+}
+
+function getV28Migration (ns: string, flavor: DBFlavor): [string, string] {
+  return [
+    'account_db_v28_subscription_event_index',
+    `
     CREATE INDEX IF NOT EXISTS subscription_event_subscription_created_idx
       ON ${ns}.subscription_event (subscription_id, created_on);
+    `
+  ]
+}
 
+function getV29Migration (ns: string, flavor: DBFlavor): [string, string] {
+  const types = dbTypes[flavor]
+  return [
+    'account_db_v29_add_free_trial_used_on',
+    `
+    ALTER TABLE ${ns}.account
+      ADD COLUMN IF NOT EXISTS free_trial_used_on ${types.int8};
+    `
+  ]
+}
+
+function getV30Migration (ns: string, flavor: DBFlavor): [string, string] {
+  return [
+    'account_db_v30_add_free_trial_workspace_uuid',
+    `
+    ALTER TABLE ${ns}.account
+      ADD COLUMN IF NOT EXISTS free_trial_workspace_uuid UUID;
+    `
+  ]
+}
+
+function getV31Migration (ns: string, flavor: DBFlavor): [string, string] {
+  const types = dbTypes[flavor]
+  return [
+    'account_db_v31_add_subscription_seat_limit',
+    `
+    ALTER TABLE ${ns}.subscription
+      ADD COLUMN IF NOT EXISTS seat_limit ${types.int4};
+    `
+  ]
+}
+
+function getV32Migration (ns: string, flavor: DBFlavor): [string, string] {
+  const types = dbTypes[flavor]
+  return [
+    'account_db_v32_add_subscription_next_seat_limit',
+    `
+    ALTER TABLE ${ns}.subscription
+      ADD COLUMN IF NOT EXISTS next_seat_limit ${types.int4};
+    `
+  ]
+}
+
+function getV33Migration (ns: string, flavor: DBFlavor): [string, string] {
+  return [
+    'account_db_v33_workspace_subscriptions_backfill',
+    `
+    -- This is deliberately separate from the v27-v32 schema migrations.
+    -- CockroachDB keeps a newly created table in the ADDING state until its
+    -- creating transaction commits, and does not support multi-statement DDL
+    -- transactions that reference a newly created table with foreign keys.
+    --
     -- This release grandfathers every workspace that already exists into an
     -- internal Unlimited tier. Workspaces created after this migration still
     -- receive the regular 30-day Free trial.
