@@ -29749,6 +29749,9 @@ importers:
       '@hcengineering/hls':
         specifier: workspace:^0.7.426
         version: link:../../packages/hls
+      '@hcengineering/login':
+        specifier: workspace:^0.7.426
+        version: link:../login
       '@hcengineering/model':
         specifier: workspace:^0.7.426
         version: link:../../foundations/core/packages/model
