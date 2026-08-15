@@ -223,7 +223,6 @@
 
 .auth-inline-actions button,
 .auth-back-action,
-.auth-guest,
 .auth-workspaces > a {
   padding: 0;
   border: 0;
@@ -236,7 +235,6 @@
 
 .auth-inline-actions button:hover,
 .auth-back-action:hover,
-.auth-guest:hover,
 .auth-workspaces > a:hover {
   color: #fff;
 }
@@ -246,16 +244,9 @@
   opacity: 0.45;
 }
 
-.auth-back-action,
-.auth-guest {
+.auth-back-action {
   align-self: center;
   margin-top: 18px;
-}
-
-.auth-guest {
-  display: block;
-  width: 100%;
-  text-align: center;
 }
 
 .auth-message {

@@ -51,7 +51,6 @@ const text = {
     setPassword: "Definir senha agora",
     useCodeSignup: "Definir senha depois",
     forgotPassword: "Esqueci minha senha",
-    guest: "Entrar como visitante",
     or: "ou",
     googleLogin: "Entrar com Google",
     githubLogin: "Entrar com GitHub",
@@ -126,7 +125,6 @@ const text = {
     setPassword: "Set password now",
     useCodeSignup: "Set password later",
     forgotPassword: "Forgot password",
-    guest: "Continue as guest",
     or: "or",
     googleLogin: "Sign in with Google",
     githubLogin: "Sign in with GitHub",
@@ -632,7 +630,6 @@ export function AuthFlow({ variant, locale }: { variant: Variant; locale: Locale
             copy={copy}
             query={autoJoin.current ? { inviteId: autoJoin.current.inviteId, autoJoin: true, navigateUrl: navigateUrl.current } : undefined}
           />
-          {variant === "login" && !api?.config.hideLocalLogin ? <button className="auth-guest" type="button" disabled={loading || !api} onClick={() => void run(async () => completeAuthentication(await api!.loginAsGuest()))}>{copy.guest}</button> : null}
         </>
       ) : null}
 

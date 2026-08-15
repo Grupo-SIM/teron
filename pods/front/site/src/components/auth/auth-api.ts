@@ -92,10 +92,6 @@ export class AuthApi {
     return this.rpc<LoginInfo>("login", { email, password });
   }
 
-  loginAsGuest() {
-    return this.rpc<LoginInfo>("loginAsGuest", {});
-  }
-
   loginOtp(email: string) {
     return this.rpc<OtpInfo>("loginOtp", { email });
   }
