@@ -192,8 +192,10 @@ export function AuthFlow({ variant, locale }: { variant: Variant; locale: Locale
   const navigateUrl = useRef<string | undefined>(undefined);
   const [api, setApi] = useState<AuthApi>();
   const [step, setStep] = useState<Step>("credentials");
-  const [passwordMode, setPasswordMode] = useState(false);
-  const [loading, setLoading] = useState(true);
+  // A configuração chega depois da primeira pintura. Senha é o modo padrão;
+  // assim o formulário não aparece incompleto enquanto `/config.json` carrega.
+  const [passwordMode, setPasswordMode] = useState(true);
+  const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -599,8 +601,6 @@ export function AuthFlow({ variant, locale }: { variant: Variant; locale: Locale
     <>
       <h1 className="auth-title">{title}</h1>
       {error ? <p className="auth-error" role="alert">{error}</p> : null}
-      {loading && !api ? <p className="auth-status">{copy.loading}</p> : null}
-
       {step === "credentials" ? (
         <>
           {!api?.config.hideLocalLogin ? <form className="auth-form" onSubmit={submitCredentials}>
