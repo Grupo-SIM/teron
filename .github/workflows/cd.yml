@@ -224,6 +224,7 @@ jobs:
             context: pods/collaborator
           - image: front
             context: pods/front
+            build-args: TERON_WORKSPACE_SEAT_AMOUNT=${{ vars.TERON_WORKSPACE_SEAT_AMOUNT || '9.99' }}
           - image: fulltext
             context: pods/fulltext
           - image: github
@@ -268,6 +269,7 @@ jobs:
           image: ${{ github.repository }}_${{ matrix.image }}
           context: ${{ matrix.context }}
           dockerfile: ${{ matrix.context }}/Dockerfile
+          build-args: ${{ matrix.build-args }}
           cache-scope: ${{ matrix.image }}
           registry: docker.io
           password: ${{ secrets.DOCKERHUB_TOKEN }}
