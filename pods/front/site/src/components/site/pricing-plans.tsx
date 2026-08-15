@@ -35,6 +35,16 @@ type Plan = {
   items: { label: string; tip?: string }[];
 };
 
+function workspaceSeatPrice(value: string): { int: string; cents: string } {
+  const match = /^(\d+)(?:\.(\d{1,2}))?$/.exec(value.trim());
+  if (!match) return { int: "9", cents: "99" };
+  return { int: match[1], cents: (match[2] ?? "00").padEnd(2, "0") };
+}
+
+// Next.js replaces this direct NEXT_PUBLIC_ reference during `next build`.
+// The Dockerfile receives the value from TERON_WORKSPACE_SEAT_AMOUNT.
+const WORKSPACE_SEAT_PRICE = workspaceSeatPrice(process.env.NEXT_PUBLIC_WORKSPACE_SEAT_AMOUNT ?? "9.99");
+
 const PLANS: Plan[] = [
   {
     name: "Free",
@@ -52,7 +62,7 @@ const PLANS: Plan[] = [
   {
     name: "Empresas",
     slug: "empresa",
-    price: { int: "9", cents: "99", per: "por usuário" },
+    price: { ...WORKSPACE_SEAT_PRICE, per: "por usuário" },
     text: "Para o time que fica, sem teto de armazenamento.",
     cta: "Começar agora",
     items: [
