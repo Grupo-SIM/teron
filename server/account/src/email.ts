@@ -80,7 +80,7 @@ function extractContent (html: string): string {
 }
 
 function normalizeContent (content: string): string {
-  return content
+  const normalized = content
     .replaceAll(legacyFont, brandFont)
     .replaceAll('background-color:#18181B', 'background-color:#2F6BFF')
     .replaceAll('background-color:#F9FAFB', 'background-color:#17171B')
@@ -90,4 +90,26 @@ function normalizeContent (content: string): string {
     .replaceAll('color:#52525B', 'color:#B6B6BB')
     .replaceAll('color:#71717A', 'color:#7AA7FF')
     .replaceAll('color:#A1A1AA', 'color:#8A8A93')
+
+  return promoteLegacyAction(normalized)
+}
+
+/** Turns the first action link in legacy localized fragments into a CTA. */
+function promoteLegacyAction (content: string): string {
+  // Modern templates already contain a styled button table. Only transform
+  // the old paragraph-only templates, which otherwise render as a text link.
+  if (content.includes('<table')) return content
+
+  const action = /<p>([\s\S]*?)<a\s+href=(?:"([^"]+)"|'([^']+)'|([^\s>]+))[^>]*>([\s\S]*?)<\/a>([\s\S]*?)<\/p>/i
+  const match = action.exec(content)
+  if (match == null) return content
+
+  const [, before, doubleQuotedHref, singleQuotedHref, unquotedHref, label, after] = match
+  const href = doubleQuotedHref ?? singleQuotedHref ?? unquotedHref
+  const prefix = before.trim()
+  const suffix = after.trim()
+  const button = `<table role="presentation" cellpadding="0" cellspacing="0" border="0" style="margin:4px 0 28px"><tr><td style="background-color:#2F6BFF;border-radius:8px"><a href="${href}" target="_blank" style="display:inline-block;padding:14px 24px;color:#FFFFFF;text-decoration:none;font-size:14px;font-weight:700;line-height:1.2;font-family:${brandFont}">${label.trim()} &rarr;</a></td></tr></table>`
+  const replacement = `${prefix.length > 0 ? `<p>${prefix}</p>` : ''}${button}${suffix.length > 0 ? `<p>${suffix}</p>` : ''}`
+
+  return content.replace(match[0], replacement)
 }

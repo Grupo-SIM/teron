@@ -43,4 +43,15 @@ describe('renderBrandedEmail', () => {
     expect(result).toContain('color:#B6B6BB')
     expect(result).toContain('background-color:#2F6BFF')
   })
+
+  it('promotes the primary link in legacy fragments to a button', () => {
+    const result = renderBrandedEmail(
+      '<p>Para redefinir sua senha, clique no link abaixo: <a href="https://teron.app/reset">Redefinir senha</a></p><p>Fallback</p>',
+      'pt-br'
+    )
+
+    expect(result).toContain('background-color:#2F6BFF;border-radius:8px')
+    expect(result).toContain('Redefinir senha &rarr;')
+    expect(result).not.toContain('clique no link abaixo: <a')
+  })
 })
