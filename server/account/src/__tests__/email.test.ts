@@ -12,10 +12,17 @@ describe('renderBrandedEmail', () => {
   it('wraps legacy translated fragments in the Teron email shell', () => {
     const result = renderBrandedEmail('<h3>Confirm your email</h3><p>Message</p>')
 
-    expect(result).toContain('https://teron.app/assets/logo-nav.png')
+    expect(result).toContain('<span style="display:block;color:#ffffff;font-size:24px;font-weight:700;line-height:1;letter-spacing:-0.6px">Teron</span>')
     expect(result).toContain("'Manrope','Segoe UI',Arial,sans-serif")
     expect(result).toContain('background-color:#090a0f')
     expect(result).toContain('<h3>Confirm your email</h3><p>Message</p>')
+  })
+
+  it('uses the requested locale in the document and avoids external logo images', () => {
+    const result = renderBrandedEmail('<h3>Recupere sua senha</h3>', 'pt-br')
+
+    expect(result).toContain('<html lang="pt-BR">')
+    expect(result).not.toContain('<img')
   })
 
   it('replaces the previous shell without nesting complete documents', () => {

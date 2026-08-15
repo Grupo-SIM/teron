@@ -1718,7 +1718,7 @@ export async function requestPasswordReset (
   const link = concatLink(front, `/entrar?mode=restore&id=${token}`)
   const lang = branding?.language
   const text = await translate(accountPlugin.string.RecoveryText, { link }, lang)
-  const html = renderBrandedEmail(await translate(accountPlugin.string.RecoveryHTML, { link }, lang))
+  const html = renderBrandedEmail(await translate(accountPlugin.string.RecoveryHTML, { link }, lang), lang)
   const subject = await translate(accountPlugin.string.RecoverySubject, {}, lang)
 
   const response = await fetch(concatLink(mailURL, '/send'), {
@@ -1788,7 +1788,7 @@ export async function requestPasswordSetup (
   const link = concatLink(front, `/entrar?mode=restore&id=${resetToken}`)
   const lang = branding?.language
   const text = await translate(accountPlugin.string.PasswordSetupText, { link }, lang)
-  const html = renderBrandedEmail(await translate(accountPlugin.string.PasswordSetupHTML, { link }, lang))
+  const html = renderBrandedEmail(await translate(accountPlugin.string.PasswordSetupHTML, { link }, lang), lang)
   const subject = await translate(accountPlugin.string.PasswordSetupSubject, {}, lang)
 
   const response = await fetch(concatLink(mailURL, '/send'), {

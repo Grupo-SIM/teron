@@ -625,7 +625,7 @@ export async function sendOtpEmail (
   const app = branding?.title ?? getMetadata(accountPlugin.metadata.ProductName)
 
   const text = await translate(accountPlugin.string.OtpText, { code: otp, app }, lang)
-  const html = renderBrandedEmail(await translate(accountPlugin.string.OtpHTML, { code: otp, app }, lang))
+  const html = renderBrandedEmail(await translate(accountPlugin.string.OtpHTML, { code: otp, app }, lang), lang)
   const subject = await translate(accountPlugin.string.OtpSubject, { code: otp, app }, lang)
 
   const to = email
@@ -1332,7 +1332,7 @@ export async function sendEmailConfirmation (
   const name = branding?.title ?? getMetadata(accountPlugin.metadata.ProductName)
   const lang = branding?.language
   const text = await translate(accountPlugin.string.ConfirmationText, { name, link }, lang)
-  const html = renderBrandedEmail(await translate(accountPlugin.string.ConfirmationHTML, { name, link }, lang))
+  const html = renderBrandedEmail(await translate(accountPlugin.string.ConfirmationHTML, { name, link }, lang), lang)
   const subject = await translate(accountPlugin.string.ConfirmationSubject, { name }, lang)
 
   const response = await fetch(concatLink(mailURL, '/send'), {

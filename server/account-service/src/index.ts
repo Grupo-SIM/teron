@@ -14,6 +14,7 @@ import account, {
   cleanExpiredOtp
 } from '@hcengineering/account'
 import accountEn from '@hcengineering/account/lang/en.json'
+import accountPtBr from '@hcengineering/account/lang/pt-br.json'
 import accountRu from '@hcengineering/account/lang/ru.json'
 import { Analytics } from '@hcengineering/analytics'
 import { registerProviders } from '@hcengineering/auth-providers'
@@ -96,6 +97,9 @@ export function serveAccount (measureCtx: MeasureContext, brandings: BrandingMap
         return accountEn
       case 'ru':
         return accountRu
+      case 'pt-br':
+      case 'pt-BR':
+        return accountPtBr
       default:
         return accountEn
     }
@@ -106,7 +110,7 @@ export function serveAccount (measureCtx: MeasureContext, brandings: BrandingMap
 
   const frontURL = process.env.FRONT_URL
   const productName = process.env.PRODUCT_NAME
-  const lang = process.env.LANGUAGE ?? 'en'
+  const lang = process.env.LANGUAGE ?? 'pt-br'
 
   const wsLivenessDaysRaw = process.env.WS_LIVENESS_DAYS
   let wsLivenessDays: number | undefined
