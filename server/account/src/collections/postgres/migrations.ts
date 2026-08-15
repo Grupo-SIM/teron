@@ -845,72 +845,6 @@ function getV27Migration (ns: string, flavor: DBFlavor): [string, string] {
     CREATE INDEX IF NOT EXISTS subscription_event_subscription_created_idx
       ON ${ns}.subscription_event (subscription_id, created_on);
 
-    -- Normalize active legacy paid tiers. The current occupied capacity becomes
-    -- the first Business seat limit while provider-specific billing is migrated.
-    UPDATE ${ns}.subscription s
-    SET plan = 'business',
-        seat_limit = GREATEST(
-          1,
-          (SELECT COUNT(*) FROM ${ns}.workspace_members m
-            WHERE m.workspace_uuid = s.workspace_uuid
-              AND m.role IN ('OWNER', 'MAINTAINER', 'USER', 'GUEST')) +
-          (SELECT COUNT(*) FROM ${ns}.invite i
-            WHERE i.workspace_uuid = s.workspace_uuid
-              AND i.email IS NOT NULL AND i.email <> ''
-              AND (i.expires_on = -1 OR i.expires_on > current_epoch_ms())
-              AND i.remaining_uses > 0)
-        )
-    WHERE s.type = 'tier'
-      AND s.plan IN ('rare', 'epic', 'legendary')
-      AND s.status IN ('active', 'trialing', 'past_due');
-
-    -- Every existing non-paying workspace receives a fresh 30-day migration trial.
-    UPDATE ${ns}.subscription s
-    SET plan = 'free',
-        status = 'trialing',
-        period_start = current_epoch_ms(),
-        period_end = current_epoch_ms() + 2592000000,
-        trial_end = current_epoch_ms() + 2592000000,
-        seat_limit = NULL,
-        next_seat_limit = NULL
-    WHERE s.type = 'tier'
-      AND s.plan = 'common'
-      AND NOT EXISTS (
-        SELECT 1 FROM ${ns}.subscription paid
-        WHERE paid.workspace_uuid = s.workspace_uuid
-          AND paid.type = 'tier'
-          AND paid.plan = 'business'
-          AND paid.status IN ('active', 'trialing', 'past_due')
-      );
-
-    INSERT INTO ${ns}.subscription (
-      id, workspace_uuid, account_uuid, provider, provider_subscription_id,
-      type, status, plan, period_start, period_end, trial_end, created_on, updated_on
-    )
-    SELECT
-      CONCAT('free:', w.uuid::TEXT), w.uuid, COALESCE(w.billing_account, w.created_by),
-      'internal', CONCAT('free:', w.uuid::TEXT), 'tier', 'trialing', 'free',
-      current_epoch_ms(), current_epoch_ms() + 2592000000, current_epoch_ms() + 2592000000,
-      current_epoch_ms(), current_epoch_ms()
-    FROM ${ns}.workspace w
-    WHERE COALESCE(w.billing_account, w.created_by) IS NOT NULL
-      AND NOT EXISTS (
-        SELECT 1 FROM ${ns}.subscription s
-        WHERE s.workspace_uuid = w.uuid
-          AND s.type = 'tier'
-          AND s.status IN ('active', 'trialing', 'past_due')
-      );
-
-    UPDATE ${ns}.account a
-    SET free_trial_used_on = current_epoch_ms(),
-        free_trial_workspace_uuid = (
-          SELECT w.uuid FROM ${ns}.workspace w
-          WHERE w.created_by = a.uuid
-          ORDER BY w.created_on ASC LIMIT 1
-        )
-    WHERE EXISTS (SELECT 1 FROM ${ns}.workspace w WHERE w.created_by = a.uuid)
-      AND a.free_trial_used_on IS NULL;
-
     -- This release grandfathers every workspace that already exists into an
     -- internal Unlimited tier. Workspaces created after this migration still
     -- receive the regular 30-day Free trial.
@@ -959,16 +893,12 @@ function getV27Migration (ns: string, flavor: DBFlavor): [string, string] {
       period_start = NULL,
       period_end = NULL,
       trial_end = NULL,
-      seat_limit = NULL,
-      next_seat_limit = NULL,
       updated_on = current_epoch_ms();
 
     INSERT INTO ${ns}.subscription_event (
-      id, subscription_id, workspace_uuid, event_type, period_start, period_end,
-      seat_limit, next_seat_limit, created_on
+      id, subscription_id, workspace_uuid, event_type, created_on
     )
-    SELECT CONCAT('migration:', s.id), s.id, s.workspace_uuid, 'created',
-      s.period_start, s.period_end, s.seat_limit, s.next_seat_limit, current_epoch_ms()
+    SELECT CONCAT('migration:', s.id), s.id, s.workspace_uuid, 'created', current_epoch_ms()
     FROM ${ns}.subscription s
     WHERE s.type = 'tier'
       AND NOT EXISTS (

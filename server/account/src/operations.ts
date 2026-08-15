@@ -663,15 +663,15 @@ export async function createWorkspace (
     throw new PlatformError(new Status(Severity.ERROR, platform.status.InternalServerError, {}))
   }
 
-  if (accountObj.freeTrialUsedOn != null) {
+  // Existing workspace owners are grandfathered into Unlimited by the
+  // release migration, so they cannot start a separate Free trial.
+  const created = (await db.workspace.find({ createdBy: socialId.personUuid })).length
+  if (accountObj.freeTrialUsedOn != null || created > 0) {
     ctx.warn('free-trial-already-used', { account, workspace: workspaceName })
     throw new PlatformError(
       new Status(Severity.ERROR, platform.status.WorkspaceLimitReached, { workspace: workspaceName })
     )
   }
-
-  // Get a list of created workspaces
-  const created = (await db.workspace.find({ createdBy: socialId.personUuid })).length
 
   if (created >= (accountObj.maxWorkspaces ?? workspaceLimitPerUser)) {
     ctx.warn('created-by-limit', { person: socialId.key, workspace: workspaceName })
