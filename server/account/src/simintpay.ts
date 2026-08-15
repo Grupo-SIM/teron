@@ -32,8 +32,8 @@ function configuration (): {
   const url = process.env.SIMINTPAY_API_URL
   const token = process.env.SIMINTPAY_INTERNAL_TOKEN
   const ownerId = process.env.SIMINTPAY_BILLING_OWNER_ID
-  const unitAmount = process.env.SIMINTPAY_WORKSPACE_SEAT_AMOUNT
-  if (url == null || token == null || ownerId == null || unitAmount == null) {
+  const unitAmount = process.env.SIMINTPAY_WORKSPACE_SEAT_AMOUNT ?? '9.99'
+  if (url == null || token == null || ownerId == null) {
     throw new PlatformError(new Status(Severity.ERROR, 'SimintpayNotConfigured', {}))
   }
   return { url, token, ownerId, baseAmount: process.env.SIMINTPAY_WORKSPACE_BASE_AMOUNT ?? '0.00', unitAmount }

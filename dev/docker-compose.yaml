@@ -204,9 +204,6 @@ services:
       - SIMINTPAY_API_URL=${SIMINTPAY_API_URL:-}
       - SIMINTPAY_INTERNAL_TOKEN=${SIMINTPAY_INTERNAL_TOKEN:-}
       - SIMINTPAY_BILLING_OWNER_ID=${SIMINTPAY_BILLING_OWNER_ID:-}
-      # Use this same source value as the TERON_WORKSPACE_SEAT_AMOUNT build
-      # argument when rebuilding teron_front; NEXT_PUBLIC_* is baked into it.
-      - SIMINTPAY_WORKSPACE_SEAT_AMOUNT=${TERON_WORKSPACE_SEAT_AMOUNT:-9.99}
     restart: unless-stopped
   stats:
     image: hardcoreeng/stats

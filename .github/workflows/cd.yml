@@ -220,6 +220,7 @@ jobs:
         include:
           - image: account
             context: pods/account
+            build-args: TERON_WORKSPACE_SEAT_AMOUNT=${{ vars.TERON_WORKSPACE_SEAT_AMOUNT || '9.99' }}
           - image: collaborator
             context: pods/collaborator
           - image: front
