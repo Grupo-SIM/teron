@@ -47,7 +47,7 @@ export function renderBrandedEmail (html: string, language?: string): string {
         <table role="presentation" width="560" cellpadding="0" cellspacing="0" border="0" style="width:100%;max-width:560px">
           <tr>
             <td class="email-header" style="padding:28px 40px;background-color:#000000;background-image:linear-gradient(120deg,#000000 55%,#111a2d 100%);border:1px solid #26262c;border-bottom:0;border-radius:16px 16px 0 0">
-              <span style="display:block;color:#ffffff;font-size:24px;font-weight:700;line-height:1;letter-spacing:-0.6px">Teron</span>
+              <img src="https://teron.app/assets/teron-email-logo.png" width="145" alt="Teron" style="display:block;width:145px;max-width:100%;height:auto;border:0">
               <div style="width:36px;height:3px;margin-top:20px;background-color:#2f6bff;border-radius:999px;font-size:0;line-height:0">&nbsp;</div>
             </td>
           </tr>

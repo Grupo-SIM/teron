@@ -12,17 +12,17 @@ describe('renderBrandedEmail', () => {
   it('wraps legacy translated fragments in the Teron email shell', () => {
     const result = renderBrandedEmail('<h3>Confirm your email</h3><p>Message</p>')
 
-    expect(result).toContain('<span style="display:block;color:#ffffff;font-size:24px;font-weight:700;line-height:1;letter-spacing:-0.6px">Teron</span>')
+    expect(result).toContain('https://teron.app/assets/teron-email-logo.png')
     expect(result).toContain("'Manrope','Segoe UI',Arial,sans-serif")
     expect(result).toContain('background-color:#090a0f')
     expect(result).toContain('<h3>Confirm your email</h3><p>Message</p>')
   })
 
-  it('uses the requested locale in the document and avoids external logo images', () => {
+  it('uses the requested locale and the light-mode logo in the document', () => {
     const result = renderBrandedEmail('<h3>Recupere sua senha</h3>', 'pt-br')
 
     expect(result).toContain('<html lang="pt-BR">')
-    expect(result).not.toContain('<img')
+    expect(result).toContain('<img src="https://teron.app/assets/teron-email-logo.png"')
   })
 
   it('replaces the previous shell without nesting complete documents', () => {
@@ -46,12 +46,13 @@ describe('renderBrandedEmail', () => {
 
   it('promotes the primary link in legacy fragments to a button', () => {
     const result = renderBrandedEmail(
-      '<p>Para redefinir sua senha, clique no link abaixo: <a href="https://teron.app/reset">Redefinir senha</a></p><p>Fallback</p>',
+      '<p>Para redefinir sua senha, clique no botão abaixo: <a href="https://teron.app/reset">Redefinir senha</a></p><p>Se o botão acima não funcionar, use o fallback.</p>',
       'pt-br'
     )
 
     expect(result).toContain('background-color:#2F6BFF;border-radius:8px')
     expect(result).toContain('Redefinir senha &rarr;')
-    expect(result).not.toContain('clique no link abaixo: <a')
+    expect(result).toContain('clique no botão abaixo:')
+    expect(result).toContain('Se o botão acima não funcionar')
   })
 })

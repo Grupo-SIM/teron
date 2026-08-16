@@ -4,6 +4,7 @@ Coloque aqui os PNGs referenciados pela página (`src/app/page.tsx`). Enquanto o
 arquivo não existir, o componente `Asset` mostra um placeholder no lugar.
 
 - `logo-nav.png` — logo do header
+- `teron-email-logo.png` — wordmark claro usado nos e-mails transacionais
 - `hero-shot.png` — screenshot do hero
 - `icon-mail.png`, `icon-chat.png`, `icon-person.png` — ícones da seção "O problema"
 - `bento.png` — grade de recursos da seção "Plataforma"
