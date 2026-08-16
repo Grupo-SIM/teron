@@ -19,9 +19,10 @@ import { type Server } from 'http'
 import { MeasureContext, systemAccountUuid } from '@hcengineering/core'
 import morgan from 'morgan'
 import onHeaders from 'on-headers'
+import { createHmac, timingSafeEqual } from 'crypto'
 import rateLimit from 'express-rate-limit'
 import { generateToken } from '@hcengineering/server-token'
-import { SubscriptionData, type WorkspaceLoginInfo } from '@hcengineering/account-client'
+import { SubscriptionType, type SubscriptionData, type WorkspaceLoginInfo } from '@hcengineering/account-client'
 
 import { Config } from './config'
 import { withAdmin, withLoginInfo, withOwner, withToken, type RequestWithAuth } from './middleware'
@@ -102,6 +103,31 @@ export async function createServer (ctx: MeasureContext, config: Config): Promis
 
   const serviceToken = generateToken(systemAccountUuid, undefined, { service: 'payment' })
   const accountClient = getAccountClient(config.AccountsUrl, serviceToken)
+
+  app.post('/api/v1/webhooks/simintpay', async (req: Request, res: Response) => {
+    const secret = config.SimintpayWebhookSecret
+    const raw = JSON.stringify(req.body ?? {})
+    const received = String(req.header('x-simintpay-signature') ?? '')
+    const expected = secret ? createHmac('sha256', secret).update(raw).digest('hex') : ''
+    if (!secret || received.length !== expected.length || !timingSafeEqual(Buffer.from(received), Buffer.from(expected))) {
+      res.status(401).json({ error: 'Invalid Simintpay signature' })
+      return
+    }
+    try {
+      const body = req.body as { contractId: string, workspaceId: string, accountId: string, providerSubscriptionId: string, status: any, periodStart: string, periodEnd: string, willCancelAt?: string | null, quantity: number }
+      await accountClient.upsertSubscription({
+        id: body.contractId, workspaceUuid: body.workspaceId as any, accountUuid: body.accountId as any,
+        provider: 'simintpay', providerSubscriptionId: body.providerSubscriptionId,
+        type: SubscriptionType.Tier, status: body.status, plan: 'business',
+        periodStart: Date.parse(body.periodStart), periodEnd: Date.parse(body.periodEnd),
+        providerData: { contractId: body.contractId, quantity: body.quantity, willCancelAt: body.willCancelAt ?? null }
+      })
+      res.status(204).end()
+    } catch (err) {
+      ctx.error('Failed to apply Simintpay billing event', { err })
+      res.status(500).end()
+    }
+  })
 
   // Initialize payment provider if configured
   let provider: PaymentProvider | undefined

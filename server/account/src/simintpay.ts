@@ -51,7 +51,12 @@ export async function createPaidWorkspaceSubscription (
   const config = configuration()
   const response = await fetch(`${config.url.replace(/\/$/, '')}/internal/billing/workspace-subscriptions`, {
     method: 'POST',
-    headers: { 'content-type': 'application/json', 'x-internal-token': config.token },
+    headers: {
+      'content-type': 'application/json',
+      'x-internal-token': config.token,
+      // Stable for the workspace creation attempt. Never derived from card data.
+      'idempotency-key': `workspace:${workspace}`
+    },
     body: JSON.stringify({
       billingOwnerId: config.ownerId,
       accountId: account,

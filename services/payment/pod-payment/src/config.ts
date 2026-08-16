@@ -35,6 +35,7 @@ export interface Config {
   StripeSubscriptionPlans?: string
 
   ReconciliationIntervalMinutes?: number
+  SimintpayWebhookSecret?: string
 }
 
 const parseNumber = (str: string | undefined): number | undefined => (str !== undefined ? Number(str) : undefined)
@@ -53,7 +54,8 @@ const config: Config = (() => {
     StripeApiKey: process.env.STRIPE_API_KEY,
     StripeWebhookSecret: process.env.STRIPE_WEBHOOK_SECRET,
     StripeSubscriptionPlans: process.env.STRIPE_SUBSCRIPTION_PLANS,
-    ReconciliationIntervalMinutes: parseNumber(process.env.RECONCILIATION_INTERVAL_MINUTES)
+    ReconciliationIntervalMinutes: parseNumber(process.env.RECONCILIATION_INTERVAL_MINUTES),
+    SimintpayWebhookSecret: process.env.SIMINTPAY_WEBHOOK_SECRET
   }
 
   const requiredKeys: Array<keyof Config> = ['Port', 'Secret', 'AccountsUrl', 'FrontUrl']

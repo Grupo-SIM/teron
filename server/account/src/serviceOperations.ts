@@ -54,6 +54,7 @@ import type {
   WorkspaceOperation,
   WorkspaceStatus
 } from './types'
+import { SubscriptionStatus } from './types'
 import {
   integrationServices,
   findExistingIntegration,
@@ -1168,6 +1169,13 @@ export async function upsertSubscription (
       plan: params.plan
     })
   }
+
+  // Payment provider is authoritative for paid workspace availability.
+  // Past due retains access during its grace period; paused/expired blocks it.
+  await db.workspaceStatus.update(
+    { workspaceUuid },
+    { isDisabled: [SubscriptionStatus.Paused, SubscriptionStatus.Expired].includes(params.status) }
+  )
 }
 
 export async function getSubscriptionByProviderId (
