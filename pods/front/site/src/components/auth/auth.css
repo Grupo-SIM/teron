@@ -322,6 +322,7 @@
 }
 
 .auth-check {
+  position: relative;
   display: flex;
   align-items: flex-start;
   gap: 9px;
@@ -332,8 +333,65 @@
   cursor: pointer;
 }
 
-.auth-check input {
-  accent-color: #d1d1d1;
+.auth-check-input {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  white-space: nowrap;
+  clip-path: inset(50%);
+}
+
+.auth-check-control {
+  display: grid;
+  flex: 0 0 auto;
+  place-items: center;
+  width: 18px;
+  height: 18px;
+  margin-top: -1px;
+  border: 1px solid rgb(97, 101, 107);
+  border-radius: 5px;
+  background: rgb(11, 12, 14);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.08);
+  transition: background 0.16s ease, border-color 0.16s ease, box-shadow 0.16s ease;
+}
+
+.auth-check-control svg {
+  width: 12px;
+  height: 12px;
+  opacity: 0;
+  transform: scale(0.72);
+  transition: opacity 0.16s ease, transform 0.16s ease;
+}
+
+.auth-check-control path {
+  fill: none;
+  stroke: #000;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 1.8;
+}
+
+.auth-check:hover .auth-check-control {
+  border-color: rgb(149, 151, 158);
+}
+
+.auth-check-input:checked + .auth-check-control {
+  border-color: rgba(255, 255, 255, 0.72);
+  background: #d1d1d1;
+  box-shadow: 0 0 12px rgba(255, 218, 159, 0.2), inset 0 1px 0 rgba(255, 255, 255, 0.7);
+}
+
+.auth-check-input:checked + .auth-check-control svg {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.auth-check-input:focus-visible + .auth-check-control {
+  outline: 2px solid #ffda9f;
+  outline-offset: 3px;
 }
 
 .auth-label {
