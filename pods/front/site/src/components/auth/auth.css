@@ -215,7 +215,8 @@
 
 .auth-inline-actions button,
 .auth-back-action,
-.auth-workspaces > a {
+.auth-workspaces > a,
+.auth-workspaces > .auth-back-action {
   padding: 0;
   border: 0;
   background: transparent;
@@ -227,12 +228,18 @@
 
 .auth-inline-actions button:hover,
 .auth-back-action:hover,
-.auth-workspaces > a:hover {
+.auth-workspaces > a:hover,
+.auth-workspaces > .auth-back-action:hover {
   color: #fff;
 }
 
 .auth-inline-actions button:disabled {
   cursor: default;
+  opacity: 0.45;
+}
+
+.auth-workspaces > .auth-back-action:disabled {
+  cursor: wait;
   opacity: 0.45;
 }
 
@@ -272,7 +279,7 @@
   margin-top: 24px;
 }
 
-.auth-workspaces > button:not(.auth-secondary) {
+.auth-workspaces > button:not(.auth-secondary):not(.auth-back-action) {
   display: flex;
   flex-direction: column;
   gap: 3px;

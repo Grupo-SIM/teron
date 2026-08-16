@@ -325,6 +325,13 @@ export function AuthFlow({ variant, locale }: { variant: Variant; locale: Locale
           const authToken = info && "token" in info ? info.token : undefined;
           if (authToken) setToken(authToken);
           await loadWorkspaces(authToken);
+        } else if (!mode) {
+          const info = await api!.getLoginInfo();
+          if (info && !("request" in info)) {
+            const query = new URLSearchParams(params);
+            query.set("mode", "workspaces");
+            window.location.replace(`${locale === "en-US" ? "/en-US" : ""}/entrar?${query.toString()}`);
+          }
         }
       } catch (cause) {
         setError(authErrorMessage(cause, locale));
@@ -435,6 +442,19 @@ export function AuthFlow({ variant, locale }: { variant: Variant; locale: Locale
       return;
     }
     await finishWorkspace(result);
+  }
+
+  async function changeAccount() {
+    if (!api) return;
+    setLoading(true);
+    setError("");
+    try {
+      await api.deleteCookie();
+      window.location.replace(locale === "en-US" ? "/en-US/entrar" : "/entrar");
+    } catch (cause) {
+      setError(authErrorMessage(cause, locale));
+      setLoading(false);
+    }
   }
 
   async function restoreWorkspace() {
@@ -688,7 +708,7 @@ export function AuthFlow({ variant, locale }: { variant: Variant; locale: Locale
         <div className="auth-workspaces">
           {workspaces.map((workspace) => <button data-testid="auth-workspace" key={workspace.uuid} type="button" disabled={loading} onClick={() => void run(async () => selectWorkspace(workspace))}><span>{workspace.name ?? workspace.url}</span><small>{workspace.url}{workspace.mode === "archived" || workspace.mode?.startsWith("archiving-") ? " · arquivado" : ""}</small></button>)}
           <button data-testid="auth-create-workspace" className="auth-secondary" type="button" onClick={() => setStep("create-workspace")}>{copy.createWorkspace}</button>
-          <a href="/entrar">{copy.changeAccount}</a>
+          <button className="auth-back-action" type="button" disabled={loading} onClick={() => void changeAccount()}>{copy.changeAccount}</button>
         </div>
       ) : null}
       {step === "restore-workspace" ? (

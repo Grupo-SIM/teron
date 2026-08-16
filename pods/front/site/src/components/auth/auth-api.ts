@@ -232,6 +232,14 @@ export class AuthApi {
     if (!response.ok) throw new Error("Não foi possível concluir a sessão.");
   }
 
+  async deleteCookie(): Promise<void> {
+    const response = await fetch(joinUrl(this.config.accountsUrl, "/cookie"), {
+      method: "DELETE",
+      credentials: "include",
+    });
+    if (!response.ok) throw new Error("Não foi possível encerrar a sessão.");
+  }
+
   providerUrl(provider: string, query?: { inviteId?: string; autoJoin?: boolean; navigateUrl?: string }): string {
     const url = new URL(joinUrl(this.config.accountsUrl, `/auth/${provider}`), window.location.origin);
     if (query?.inviteId) url.searchParams.set("inviteId", query.inviteId);
