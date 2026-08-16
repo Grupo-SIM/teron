@@ -728,7 +728,7 @@ export function AuthFlow({ variant, locale }: { variant: Variant; locale: Locale
             <span className="auth-check-control" aria-hidden="true"><svg viewBox="0 0 12 12"><path d="m2.25 6.25 2.3 2.3 5.2-5.2" /></svg></span>
             <span>{copy.demoContent}</span>
           </label>
-          <AuthSubmit disabled={!workspaceName || freeTrialAvailable === undefined || (!freeTrialAvailable && (!Number.isInteger(Number(seats)) || Number(seats) < 1 || !isValidDocument(customerDocument) || !isValidPhone(customerPhone) || !isValidCardNumber(cardNumber) || !isValidCardExpiry(cardExpiry) || !/^\d{3,4}$/.test(cardCvv) || !cardHolder))} loading={loading} label={freeTrialAvailable ? copy.create : copy.paidCreate} />
+          <AuthSubmit disabled={!workspaceName || (!freeTrialAvailable && (!Number.isInteger(Number(seats)) || Number(seats) < 1 || !isValidDocument(customerDocument) || !isValidPhone(customerPhone) || !isValidCardNumber(cardNumber) || !isValidCardExpiry(cardExpiry) || !/^\d{3,4}$/.test(cardCvv) || !cardHolder))} loading={loading} label={freeTrialAvailable ? copy.create : copy.paidCreate} />
           {workspaces.length ? <BackButton label={copy.back} onClick={() => setStep("workspaces")} /> : null}
         </form>
       ) : null}
