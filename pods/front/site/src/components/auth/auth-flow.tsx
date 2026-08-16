@@ -568,8 +568,8 @@ export function AuthFlow({ variant, locale }: { variant: Variant; locale: Locale
     await run(async () => {
       const [expMonth, expYear] = cardExpiry.split("/").map((value) => value.trim());
       const payment = freeTrialAvailable ? undefined : {
-        seats: Number(seats), customerDocument, customerPhone,
-        card: { number: cardNumber.replace(/\s/g, ""), expMonth, expYear, cvv: cardCvv, holderName: cardHolder, holderDocument: customerDocument },
+        seats: Number(seats), customerDocument: digitsOnly(customerDocument), customerPhone: digitsOnly(customerPhone),
+        card: { number: digitsOnly(cardNumber), expMonth, expYear, cvv: cardCvv, holderName: cardHolder, holderDocument: digitsOnly(customerDocument) },
       };
       await finishWorkspace(await api.createWorkspace(workspaceName, region, withDemoContent, payment, token));
     });
@@ -722,13 +722,13 @@ export function AuthFlow({ variant, locale }: { variant: Variant; locale: Locale
         <form className="auth-form" onSubmit={submitWorkspace}>
           <AuthInput testId="auth-workspace-name" label={copy.workspaceName} value={workspaceName} onChange={setWorkspaceName} autoComplete="organization" />
           {regions.length > 1 ? <label className="auth-label">{copy.region}<select className="auth-input auth-select" value={region} onChange={(event) => setRegion(event.target.value)}>{regions.map((item) => <option key={item.region} value={item.region}>{item.name}</option>)}</select></label> : null}
-          {freeTrialAvailable ? <p className="auth-description">{copy.freeTrialDescription}</p> : <fieldset className="auth-billing"><legend>{copy.billingTitle}</legend><p>{copy.billingDescription}</p><AuthInput label={copy.seats} value={seats} onChange={(value) => setSeats(value.replace(/\D/g, ""))} inputMode="numeric" /><AuthInput label={copy.document} value={customerDocument} onChange={setCustomerDocument} inputMode="numeric" /><AuthInput label={copy.phone} value={customerPhone} onChange={setCustomerPhone} inputMode="numeric" /><AuthInput label={copy.cardNumber} value={cardNumber} onChange={setCardNumber} inputMode="numeric" autoComplete="cc-number" /><div className="auth-fields-row"><AuthInput label={copy.cardExpiry} value={cardExpiry} onChange={setCardExpiry} placeholder="MM/AA" autoComplete="cc-exp" /><AuthInput label={copy.cardCvv} value={cardCvv} onChange={setCardCvv} inputMode="numeric" autoComplete="cc-csc" /></div><AuthInput label={copy.cardHolder} value={cardHolder} onChange={setCardHolder} autoComplete="cc-name" /></fieldset>}
+          {freeTrialAvailable ? <p className="auth-description">{copy.freeTrialDescription}</p> : <fieldset className="auth-billing"><legend>{copy.billingTitle}</legend><p>{copy.billingDescription}</p><AuthInput label={copy.seats} value={seats} onChange={(value) => setSeats(value.replace(/\D/g, ""))} inputMode="numeric" /><AuthInput name="document" label={copy.document} value={customerDocument} onChange={(value) => setCustomerDocument(formatDocument(value))} placeholder="000.000.000-00" inputMode="numeric" /><AuthInput name="tel" label={copy.phone} value={customerPhone} onChange={(value) => setCustomerPhone(formatPhone(value))} placeholder="(00) 00000-0000" inputMode="numeric" autoComplete="tel" /><AuthInput name="cc-number" label={copy.cardNumber} value={cardNumber} onChange={(value) => setCardNumber(formatCardNumber(value))} placeholder="0000 0000 0000 0000" inputMode="numeric" autoComplete="cc-number" /><div className="auth-fields-row"><AuthInput name="cc-exp" label={copy.cardExpiry} value={cardExpiry} onChange={(value) => setCardExpiry(formatCardExpiry(value))} placeholder="MM/AA" inputMode="numeric" autoComplete="cc-exp" /><AuthInput name="cc-csc" label={copy.cardCvv} value={cardCvv} onChange={(value) => setCardCvv(digitsOnly(value).slice(0, 4))} placeholder="123" inputMode="numeric" autoComplete="cc-csc" /></div><AuthInput name="cc-name" label={copy.cardHolder} value={cardHolder} onChange={setCardHolder} autoComplete="cc-name" /></fieldset>}
           <label className="auth-check">
             <input className="auth-check-input" type="checkbox" checked={withDemoContent} onChange={(event) => setWithDemoContent(event.target.checked)} />
             <span className="auth-check-control" aria-hidden="true"><svg viewBox="0 0 12 12"><path d="m2.25 6.25 2.3 2.3 5.2-5.2" /></svg></span>
             <span>{copy.demoContent}</span>
           </label>
-          <AuthSubmit disabled={!workspaceName || freeTrialAvailable === undefined || (!freeTrialAvailable && (!Number.isInteger(Number(seats)) || Number(seats) < 1 || !customerDocument || !customerPhone || !cardNumber || !/^\d{2}\s*\/\s*\d{2,4}$/.test(cardExpiry) || !cardCvv || !cardHolder))} loading={loading} label={freeTrialAvailable ? copy.create : copy.paidCreate} />
+          <AuthSubmit disabled={!workspaceName || freeTrialAvailable === undefined || (!freeTrialAvailable && (!Number.isInteger(Number(seats)) || Number(seats) < 1 || !isValidDocument(customerDocument) || !isValidPhone(customerPhone) || !isValidCardNumber(cardNumber) || !isValidCardExpiry(cardExpiry) || !/^\d{3,4}$/.test(cardCvv) || !cardHolder))} loading={loading} label={freeTrialAvailable ? copy.create : copy.paidCreate} />
           {workspaces.length ? <BackButton label={copy.back} onClick={() => setStep("workspaces")} /> : null}
         </form>
       ) : null}
@@ -749,6 +749,51 @@ export function AuthFlow({ variant, locale }: { variant: Variant; locale: Locale
 }
 
 type Copy = (typeof text)[Locale];
+
+function digitsOnly(value: string) {
+  return value.replace(/\D/g, "");
+}
+
+function formatDocument(value: string) {
+  const digits = digitsOnly(value).slice(0, 14);
+  if (digits.length <= 11) return digits.replace(/^(\d{3})(\d)/, "$1.$2").replace(/^(\d{3}\.\d{3})(\d)/, "$1.$2").replace(/(\d{3}\.\d{3}\.\d{3})(\d)/, "$1-$2");
+  return digits.replace(/^(\d{2})(\d)/, "$1.$2").replace(/^(\d{2}\.\d{3})(\d)/, "$1.$2").replace(/(\d{2}\.\d{3}\.\d{3})(\d)/, "$1/$2").replace(/(\d{2}\.\d{3}\.\d{3}\/\d{4})(\d)/, "$1-$2");
+}
+
+function formatPhone(value: string) {
+  const digits = digitsOnly(value).slice(0, 11);
+  if (digits.length <= 2) return digits ? `(${digits}` : "";
+  if (digits.length <= 6) return `(${digits.slice(0, 2)}) ${digits.slice(2)}`;
+  const prefixLength = digits.length === 11 ? 7 : 6;
+  return `(${digits.slice(0, 2)}) ${digits.slice(2, prefixLength)}-${digits.slice(prefixLength)}`;
+}
+
+function formatCardNumber(value: string) {
+  return (digitsOnly(value).slice(0, 19).match(/.{1,4}/g) ?? []).join(" ");
+}
+
+function formatCardExpiry(value: string) {
+  const digits = digitsOnly(value).slice(0, 4);
+  return digits.length > 2 ? `${digits.slice(0, 2)}/${digits.slice(2)}` : digits;
+}
+
+function isValidDocument(value: string) {
+  return [11, 14].includes(digitsOnly(value).length);
+}
+
+function isValidPhone(value: string) {
+  return [10, 11].includes(digitsOnly(value).length);
+}
+
+function isValidCardNumber(value: string) {
+  const length = digitsOnly(value).length;
+  return length >= 13 && length <= 19;
+}
+
+function isValidCardExpiry(value: string) {
+  const match = /^(\d{2})\/(\d{2})$/.exec(value);
+  return match !== null && Number(match[1]) >= 1 && Number(match[1]) <= 12;
+}
 
 function AuthInput({ label, value, onChange, type = "text", required = true, testId, ...props }: { label: string; value: string; onChange: (value: string) => void; type?: string; required?: boolean; testId?: string; name?: string; placeholder?: string; autoComplete?: string; inputMode?: "numeric" }) {
   return <label className="auth-label">{label}<span className="auth-input-row"><input data-testid={testId} className="auth-input" required={required} value={value} onChange={(event) => onChange(event.target.value)} type={type} {...props} /></span></label>;
