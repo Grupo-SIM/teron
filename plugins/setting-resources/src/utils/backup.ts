@@ -16,16 +16,6 @@
 import { type BackupInfo } from '../types'
 
 /**
- * Link to the full backup & restore guide (download + restore into another
- * Teron instance). Shown on the Backup settings page and embedded in the
- * generated RESTORE.md so it travels with the backup.
- *
- * @public
- */
-export const backupRestoreGuideLink =
-  'https://github.com/hcengineering/platform/blob/develop/docs/guides/backup-restore.en.md'
-
-/**
  * Shape of the data returned from `<backupUrl>/<workspace>/index.json`.
  * Mirrors the inline type used by the backup settings page.
  */
@@ -190,8 +180,6 @@ admin tool.
   than the server's blob limit — are listed in \`blob-info.json.gz\` but their
   contents are NOT included here; they remain in the source workspace's live
   storage.
-
-Full guide, including troubleshooting: ${backupRestoreGuideLink}
 `
 }
 

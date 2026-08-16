@@ -22,7 +22,6 @@
   import setting from '../plugin'
   import { BackupInfo, BackupSnapshot } from '../types'
   import {
-    backupRestoreGuideLink,
     buildStoreZip,
     collectBackupFileNames,
     generateBackupScript,
@@ -321,22 +320,6 @@
             />
             <Button label={tokenCopied ? view.string.Copied : setting.string.BackupCopyToken} on:click={copyToken} />
           </div>
-        </div>
-        <div class="backup-action">
-          <div class="backup-action__text">
-            <div class="backup-action__title">
-              <Label label={setting.string.BackupRestoreGuide} />
-            </div>
-            <div class="backup-action__info">
-              <Label label={setting.string.BackupRestoreGuideInfo} />
-            </div>
-          </div>
-          <Button
-            label={setting.string.BackupRestoreGuide}
-            on:click={() => {
-              window.open(backupRestoreGuideLink, '_blank', 'noopener,noreferrer')
-            }}
-          />
         </div>
       </div>
 

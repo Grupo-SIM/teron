@@ -14,7 +14,6 @@
 //
 
 import {
-  backupRestoreGuideLink,
   buildStoreZip,
   collectBackupFileNames,
   crc32,
@@ -122,15 +121,6 @@ describe('generateRestoreReadme', () => {
     expect(readme).toContain('--accounts')
   })
 
-  it('links to the full backup & restore guide', () => {
-    expect(readme).toContain(backupRestoreGuideLink)
-  })
-})
-
-describe('backupRestoreGuideLink', () => {
-  it('is an https link', () => {
-    expect(backupRestoreGuideLink.startsWith('https://')).toBe(true)
-  })
 })
 
 describe('crc32', () => {
