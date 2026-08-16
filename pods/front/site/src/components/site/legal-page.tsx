@@ -3,6 +3,7 @@ import { Localized, defaultLocale, type Locale } from "@/i18n/site";
 
 import { SiteFooter } from "./site-footer";
 import { SiteHeader } from "./site-header";
+import { LegalPageScrollReset } from "./LegalPageScrollReset";
 
 /**
  * Moldura das páginas de texto legal (termos, privacidade). São páginas de
@@ -27,6 +28,7 @@ export function LegalPage({
 }: LegalPageProps) {
   return (
     <Localized locale={locale}><div className="lp-legal-page">
+      <LegalPageScrollReset />
       <SiteHeader />
 
       <main className="lp-legal">
