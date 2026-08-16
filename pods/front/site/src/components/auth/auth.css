@@ -134,21 +134,6 @@
   object-fit: fill;
 }
 
-.auth-card-border {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  display: block;
-  /* O SVG traz traços verticais no limite exato do viewBox. Ao redimensionar
-     com a altura variável do card, o antialias do navegador deixa um fio
-     claro dentro da moldura. Recorta só esses limites e preserva o brilho do
-     topo. */
-  clip-path: inset(0 2px);
-  object-fit: fill;
-  object-position: top left;
-}
-
 /* As quatro medidas abaixo desenham a régua "OU" e a fileira de provedores, e
    são as mesmas que posicionam as luzes de baixo do botão — que precisam cair
    em cima dessa fileira. Ficam como variáveis porque quem as usa está em dois
@@ -906,12 +891,6 @@
     width: calc(100% - 2px);
     border-radius: 18px;
     transform: none;
-  }
-
-  .auth-card-border {
-    inset: 0;
-    height: 100%;
-    width: 100%;
   }
 
   .auth-aurora {

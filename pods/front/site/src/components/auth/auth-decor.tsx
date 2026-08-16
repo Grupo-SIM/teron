@@ -11,7 +11,8 @@
  * - `aurora`: a mancha azul/violeta que passa por trás do card;
  * - `form-pattern`: o fundo do card, com o brilho no canto superior direito e
  *   a trama de pontos;
- * - `form-border`: o aro do card, aceso no topo e à esquerda.
+ * O fundo e a aurora ficam contidos pela moldura; não há aro SVG, pois ele
+ * escala junto com a altura variável dos formulários e cria linhas claras.
  */
 export function AuthDecor() {
   return (
@@ -27,13 +28,6 @@ export function AuthDecor() {
         <img
           className="auth-card-pattern"
           src="/assets/auth/form-pattern.jpg"
-          width={480}
-          height={479}
-          alt=""
-        />
-        <img
-          className="auth-card-border"
-          src="/assets/auth/form-border.svg"
           width={480}
           height={479}
           alt=""
