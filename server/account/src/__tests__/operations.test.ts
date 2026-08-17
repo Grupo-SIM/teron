@@ -339,6 +339,9 @@ describe('account operations', () => {
           trialEnd
         })
       )
+      expect(subscription.workspaceUuid).toMatch(
+        /^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/i
+      )
       expect(mockDb.createWorkspace).toHaveBeenCalledWith(expect.objectContaining({ uuid: subscription.workspaceUuid }), expect.anything())
       expect(mockDb.assignWorkspace).toHaveBeenCalledWith(mockAccount.uuid, subscription.workspaceUuid, AccountRole.Owner)
       expect(mockDb.setFreeTrialWorkspace).toHaveBeenCalledWith(mockAccount.uuid, subscription.workspaceUuid)

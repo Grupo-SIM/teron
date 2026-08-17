@@ -261,6 +261,9 @@ export function authErrorMessage(error: unknown, locale: "pt-BR" | "en-US"): str
     WorkspaceNotFound: ["Workspace não encontrado.", "Workspace not found."],
     WorkspacePaymentRequired: ["Conclua o pagamento para criar outro workspace.", "Complete payment to create another workspace."],
     WorkspacePaymentFailed: ["Não foi possível aprovar o pagamento. Revise os dados do cartão.", "We could not approve the payment. Check your card details."],
+    WorkspacePaymentDeclined: ["Pagamento recusado pelo gateway. Verifique o cartão ou tente outro.", "Payment was declined by the gateway. Check the card or try another one."],
+    WorkspacePaymentInvalidDetails: ["Revise os dados de cobrança e tente novamente.", "Review your billing details and try again."],
+    WorkspacePaymentUnavailable: ["Serviço de pagamento indisponível. Tente novamente em instantes.", "Payment service is unavailable. Try again shortly."],
     SimintpayNotConfigured: ["O pagamento ainda não está configurado.", "Payment is not configured yet."],
     InvalidWorkspaceSeats: ["Informe uma quantidade válida de integrantes.", "Enter a valid number of members."],
   };

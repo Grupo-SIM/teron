@@ -21,6 +21,7 @@ import {
   buildSocialIdString,
   concatLink,
   generateId,
+  generateUuid,
   isActiveMode,
   isDeletingMode,
   isWorkspaceCreating,
@@ -694,7 +695,9 @@ export async function createWorkspace (
     throw new PlatformError(new Status(Severity.ERROR, 'WorkspacePaymentRequired', {}))
   }
 
-  const workspaceUuid = generateId() as WorkspaceUuid
+  // PostgreSQL stores workspace UUIDs in a native UUID column. `generateId`
+  // produces a Mongo-style 24-character identifier and is not valid there.
+  const workspaceUuid = generateUuid() as WorkspaceUuid
   let paidSubscription: Awaited<ReturnType<typeof createPaidWorkspaceSubscription>> | undefined
   if (!isFreeTrial) {
     paidSubscription = await createPaidWorkspaceSubscription(
