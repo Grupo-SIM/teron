@@ -58,6 +58,7 @@ import {
   getWorkspacePendingInvites,
   getWorkspaceSeatQuote,
   changeWorkspaceSeatLimit,
+  reconcileWorkspaceSeatChanges,
   leaveWorkspace,
   checkJoin
 } from '../operations'
@@ -126,6 +127,7 @@ describe('account operations', () => {
       insertOne: jest.fn()
     },
     workspaceSeatChange: {
+      find: jest.fn().mockResolvedValue([]),
       findOne: jest.fn(),
       insertOne: jest.fn(),
       update: jest.fn()
@@ -549,6 +551,30 @@ describe('account operations', () => {
       await expect(changeWorkspaceSeatLimit(mockCtx, mockDb, mockBranding, mockToken, {
         targetSeatLimit: 1, operationId: 'operation-2'
       })).rejects.toThrow(PlatformError)
+    })
+
+    test('reconciles pending provider operations and applies capacity', async () => {
+      ;(mockDb.workspaceSeatChange.find as jest.Mock).mockResolvedValue([
+        {
+          id: 'operation-3', workspaceUuid: mockWorkspace.uuid, accountUuid: mockAccount.uuid,
+          contractId: 'contract', providerChangeId: 'provider-change', status: 'PENDING_PAYMENT',
+          previousSeatLimit: 1, targetSeatLimit: 2, createdOn: 1, updatedOn: 1
+        }
+      ])
+      jest.spyOn(simintpay, 'getWorkspaceQuantityChange').mockResolvedValue({
+        id: 'provider-change', contractId: 'contract', status: 'APPLIED', previousQuantity: 1,
+        targetQuantity: 2, effectiveQuantity: 2, scheduledFor: null, prorationAmount: '5.00',
+        nextRecurringAmount: '20.00', failureCode: null, failureMessage: null
+      })
+
+      await reconcileWorkspaceSeatChanges(mockCtx, mockDb)
+
+      expect(mockDb.subscription.update).toHaveBeenCalledWith(
+        { id: 'business-subscription' }, expect.objectContaining({ seatLimit: 2 })
+      )
+      expect(mockDb.workspaceSeatChange.update).toHaveBeenCalledWith(
+        { id: 'operation-3' }, expect.objectContaining({ status: 'APPLIED' })
+      )
     })
   })
 

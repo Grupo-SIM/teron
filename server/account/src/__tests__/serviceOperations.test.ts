@@ -1433,6 +1433,9 @@ describe('upsertSubscription', () => {
       subscriptionEvent: {
         insertOne: jest.fn()
       },
+      workspaceStatus: {
+        update: jest.fn()
+      },
       getWorkspaceMembers: jest.fn().mockResolvedValue([]),
       invite: {
         find: jest.fn().mockResolvedValue([])
@@ -1539,6 +1542,7 @@ describe('upsertSubscription', () => {
     mockDb.subscription.findOne.mockResolvedValue({
       id: 'business-subscription',
       workspaceUuid,
+      accountUuid: 'test-account' as AccountUuid,
       provider: 'polar',
       providerSubscriptionId: 'polar-sub-123',
       plan: 'business',
@@ -1551,6 +1555,7 @@ describe('upsertSubscription', () => {
     await upsertSubscription(mockCtx, mockDb, mockBranding, mockToken, {
       id: 'business-subscription',
       workspaceUuid,
+      accountUuid: 'test-account' as AccountUuid,
       provider: 'polar',
       providerSubscriptionId: 'polar-sub-123',
       type: SubscriptionType.Tier,
@@ -1577,6 +1582,7 @@ describe('upsertSubscription', () => {
     await upsertSubscription(mockCtx, mockDb, mockBranding, mockToken, {
       id: 'business-subscription',
       workspaceUuid,
+      accountUuid: 'test-account' as AccountUuid,
       provider: 'polar',
       providerSubscriptionId: 'polar-sub-123',
       type: SubscriptionType.Tier,
@@ -1599,6 +1605,7 @@ describe('upsertSubscription', () => {
     mockDb.subscription.findOne.mockResolvedValue({
       id: 'business-subscription',
       workspaceUuid,
+      accountUuid: 'test-account' as AccountUuid,
       provider: 'polar',
       providerSubscriptionId: 'polar-sub-123',
       plan: 'business',
@@ -1613,6 +1620,7 @@ describe('upsertSubscription', () => {
       upsertSubscription(mockCtx, mockDb, mockBranding, mockToken, {
         id: 'business-subscription',
         workspaceUuid,
+        accountUuid: 'test-account' as AccountUuid,
         provider: 'polar',
         providerSubscriptionId: 'polar-sub-123',
         type: SubscriptionType.Tier,
@@ -1621,7 +1629,9 @@ describe('upsertSubscription', () => {
         seatLimit: 5,
         periodStart: 1000
       })
-    ).rejects.toThrow(new PlatformError(new Status(Severity.ERROR, platform.status.WorkspaceLimitReached, {})))
+    ).rejects.toThrow(
+      new PlatformError(new Status(Severity.ERROR, platform.status.WorkspaceLimitReached, { workspace: workspaceUuid }))
+    )
   })
 
   test('should activate the scheduled seat limit when a new billing period starts', async () => {
@@ -1631,6 +1641,7 @@ describe('upsertSubscription', () => {
     mockDb.subscription.findOne.mockResolvedValue({
       id: 'business-subscription',
       workspaceUuid,
+      accountUuid: 'test-account' as AccountUuid,
       provider: 'polar',
       providerSubscriptionId: 'polar-sub-123',
       plan: 'business',
@@ -1644,6 +1655,7 @@ describe('upsertSubscription', () => {
     await upsertSubscription(mockCtx, mockDb, mockBranding, mockToken, {
       id: 'business-subscription',
       workspaceUuid,
+      accountUuid: 'test-account' as AccountUuid,
       provider: 'polar',
       providerSubscriptionId: 'polar-sub-123',
       type: SubscriptionType.Tier,

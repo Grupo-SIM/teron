@@ -1143,7 +1143,7 @@ export async function updateWorkspaceRole (
     if (business) {
       const capacity = Math.min(tier?.seatLimit ?? 0, tier?.nextSeatLimit ?? tier?.seatLimit ?? 0)
       if (!(await db.updateWorkspaceRoleWithinCapacity(targetAccount, workspace, targetRole, capacity))) {
-        throw new PlatformError(new Status(Severity.ERROR, platform.status.WorkspaceLimitReached, {}))
+        throw new PlatformError(new Status(Severity.ERROR, platform.status.WorkspaceLimitReached, { workspace }))
       }
       return
     }
@@ -1608,9 +1608,9 @@ export async function doJoinByInvite (
     const used =
       memberSeats +
       pending.filter((it) => (it.expiresOn === -1 || it.expiresOn > now) && it.email != null && it.email !== '').length
-    const limit = Math.min(tier.seatLimit ?? 0, tier.nextSeatLimit ?? tier.seatLimit ?? 0)
+    const limit = Math.min(tier!.seatLimit ?? 0, tier!.nextSeatLimit ?? tier!.seatLimit ?? 0)
     if (used >= limit) {
-      throw new PlatformError(new Status(Severity.ERROR, platform.status.WorkspaceLimitReached, {}))
+      throw new PlatformError(new Status(Severity.ERROR, platform.status.WorkspaceLimitReached, { workspace: workspace.uuid }))
     }
   }
 
@@ -1634,7 +1634,7 @@ export async function doJoinByInvite (
       if (isBusiness) {
         const capacity = Math.min(tier?.seatLimit ?? 0, tier?.nextSeatLimit ?? tier?.seatLimit ?? 0)
         if (!(await db.assignWorkspaceWithinCapacity(account, workspace.uuid, AccountRole.Guest, capacity))) {
-          throw new PlatformError(new Status(Severity.ERROR, platform.status.WorkspaceLimitReached, {}))
+          throw new PlatformError(new Status(Severity.ERROR, platform.status.WorkspaceLimitReached, { workspace: workspace.uuid }))
         }
       } else {
         await db.assignWorkspace(account, workspace.uuid, AccountRole.Guest)

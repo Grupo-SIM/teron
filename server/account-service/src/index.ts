@@ -11,7 +11,8 @@ import account, {
   getAccountDB,
   getAllTransactors,
   getMethods,
-  cleanExpiredOtp
+  cleanExpiredOtp,
+  reconcileWorkspaceSeatChanges
 } from '@hcengineering/account'
 import accountEn from '@hcengineering/account/lang/en.json'
 import accountPtBr from '@hcengineering/account/lang/pt-br.json'
@@ -183,6 +184,12 @@ export function serveAccount (measureCtx: MeasureContext, brandings: BrandingMap
         void cleanExpiredOtp(db)
       },
       3 * 60 * 1000
+    )
+    setInterval(
+      () => {
+        void reconcileWorkspaceSeatChanges(measureCtx, db)
+      },
+      60 * 1000
     )
   })
 

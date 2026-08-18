@@ -13,7 +13,7 @@
 // limitations under the License.
 //
 import {
-  type AccountRole,
+  AccountRole,
   type Data,
   type Person,
   type Version,
@@ -642,7 +642,7 @@ export class MongoAccountDB implements AccountDB {
               createdOn: now,
               updatedOn: now
             })
-            tier = await this.subscription.findOne({ id })
+            tier = (await this.subscription.findOne({ id })) ?? undefined
           } else if (tier === paidLegacyTier) {
             const members = await this.getWorkspaceMembers(workspace.uuid)
             const invites = await this.invite.find({
@@ -693,10 +693,10 @@ export class MongoAccountDB implements AccountDB {
 
           if (workspace.createdBy != null) {
             await this.account.collection.updateOne(
-              {
+              ({
                 uuid: workspace.createdBy as AccountUuid,
                 $or: [{ freeTrialUsedOn: { $exists: false } }, { freeTrialUsedOn: null }]
-              },
+              } as any),
               { $set: { freeTrialUsedOn: now, freeTrialWorkspaceUuid: workspace.uuid } }
             )
           }
@@ -776,7 +776,7 @@ export class MongoAccountDB implements AccountDB {
 
   async claimFreeTrial (accountId: AccountUuid, claimedOn: number): Promise<boolean> {
     const result = await this.account.collection.findOneAndUpdate(
-      { uuid: accountId, $or: [{ freeTrialUsedOn: { $exists: false } }, { freeTrialUsedOn: null }] },
+      { uuid: accountId, $or: [{ freeTrialUsedOn: { $exists: false } }, { freeTrialUsedOn: null }] } as any,
       { $set: { freeTrialUsedOn: claimedOn } },
       { returnDocument: 'after' }
     )

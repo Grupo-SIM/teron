@@ -1082,7 +1082,7 @@ export async function upsertSubscription (
     }
 
     if ((nextSeatLimit ?? seatLimit) < occupied) {
-      throw new PlatformError(new Status(Severity.ERROR, platform.status.WorkspaceLimitReached, {}))
+      throw new PlatformError(new Status(Severity.ERROR, platform.status.WorkspaceLimitReached, { workspace: workspaceUuid }))
     }
   } else {
     seatLimit = undefined

@@ -82,7 +82,7 @@ function configuration (): {
   const ownerId = process.env.SIMINTPAY_BILLING_OWNER_ID
   const unitAmount = process.env.SIMINTPAY_WORKSPACE_SEAT_AMOUNT ?? '9.99'
   if (url == null || token == null || ownerId == null) {
-    throw new PlatformError(new Status(Severity.ERROR, 'SimintpayNotConfigured', {}))
+    throw new PlatformError(new Status(Severity.ERROR, 'SimintpayNotConfigured' as any, {}))
   }
   return { url, token, ownerId, baseAmount: process.env.SIMINTPAY_WORKSPACE_BASE_AMOUNT ?? '0.00', unitAmount }
 }
@@ -94,7 +94,7 @@ export async function createPaidWorkspaceSubscription (
   payment: WorkspacePaymentDetails
 ): Promise<SimintpayWorkspaceSubscription> {
   if (!Number.isInteger(payment.seats) || payment.seats < 1) {
-    throw new PlatformError(new Status(Severity.ERROR, 'InvalidWorkspaceSeats', {}))
+    throw new PlatformError(new Status(Severity.ERROR, 'InvalidWorkspaceSeats' as any, {}))
   }
   const config = configuration()
   let response: Response
@@ -132,11 +132,11 @@ export async function createPaidWorkspaceSubscription (
       })
     })
   } catch {
-    throw new PlatformError(new Status(Severity.ERROR, 'WorkspacePaymentUnavailable', {}))
+    throw new PlatformError(new Status(Severity.ERROR, 'WorkspacePaymentUnavailable' as any, {}))
   }
   if (!response.ok) {
     const body = await response.text()
-    throw new PlatformError(new Status(Severity.ERROR, workspacePaymentErrorCode(response.status, body), {}))
+    throw new PlatformError(new Status(Severity.ERROR, workspacePaymentErrorCode(response.status, body) as any, {}))
   }
   return (await response.json()) as SimintpayWorkspaceSubscription
 }
@@ -153,11 +153,11 @@ async function internalRequest<T> (path: string, init?: RequestInit): Promise<T>
       headers
     })
   } catch {
-    throw new PlatformError(new Status(Severity.ERROR, 'WorkspacePaymentUnavailable', {}))
+    throw new PlatformError(new Status(Severity.ERROR, 'WorkspacePaymentUnavailable' as any, {}))
   }
   if (!response.ok) {
     const body = await response.text()
-    throw new PlatformError(new Status(Severity.ERROR, workspacePaymentErrorCode(response.status, body), {}))
+    throw new PlatformError(new Status(Severity.ERROR, workspacePaymentErrorCode(response.status, body) as any, {}))
   }
   return (await response.json()) as T
 }

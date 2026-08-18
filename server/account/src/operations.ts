@@ -291,7 +291,7 @@ async function assignWorkspaceRespectingEntitlement (
   }
   const capacity = Math.min(entitlement.seatLimit ?? 0, entitlement.nextSeatLimit ?? entitlement.seatLimit ?? 0)
   if (!(await db.assignWorkspaceWithinCapacity(account, workspace, role, capacity))) {
-    throw new PlatformError(new Status(Severity.ERROR, platform.status.WorkspaceLimitReached, {}))
+    throw new PlatformError(new Status(Severity.ERROR, platform.status.WorkspaceLimitReached, { workspace }))
   }
 }
 
@@ -306,7 +306,7 @@ async function updateWorkspaceRoleRespectingEntitlement (
   if (entitlement.plan === 'business' && !BILLABLE_ROLES.has(currentRole) && BILLABLE_ROLES.has(targetRole)) {
     const capacity = Math.min(entitlement.seatLimit ?? 0, entitlement.nextSeatLimit ?? entitlement.seatLimit ?? 0)
     if (!(await db.updateWorkspaceRoleWithinCapacity(account, workspace, targetRole, capacity))) {
-      throw new PlatformError(new Status(Severity.ERROR, platform.status.WorkspaceLimitReached, {}))
+      throw new PlatformError(new Status(Severity.ERROR, platform.status.WorkspaceLimitReached, { workspace }))
     }
     return
   }
@@ -786,10 +786,10 @@ export async function createWorkspace (
   // the account read above and the atomic claim. Do not turn that race into a
   // second paid workspace creation.
   if (canClaimFreeTrial && !isFreeTrial) {
-    throw new PlatformError(new Status(Severity.ERROR, 'WorkspaceLimitReached', {}))
+    throw new PlatformError(new Status(Severity.ERROR, 'WorkspaceLimitReached' as any, {}))
   }
   if (!isFreeTrial && payment == null) {
-    throw new PlatformError(new Status(Severity.ERROR, 'WorkspacePaymentRequired', {}))
+    throw new PlatformError(new Status(Severity.ERROR, 'WorkspacePaymentRequired' as any, {}))
   }
 
   // PostgreSQL stores workspace UUIDs in a native UUID column. `generateId`
@@ -801,7 +801,7 @@ export async function createWorkspace (
       account,
       workspaceUuid,
       { name: getPersonName(person), email: socialId.value },
-      payment
+      payment!
     )
   }
 
@@ -950,7 +950,7 @@ export async function createInvite (
   if (businessCapacity !== undefined) {
     const inviteId = await db.reserveSeatAndCreateInvite(inviteData, businessCapacity)
     if (inviteId == null) {
-      throw new PlatformError(new Status(Severity.ERROR, platform.status.WorkspaceLimitReached, {}))
+      throw new PlatformError(new Status(Severity.ERROR, platform.status.WorkspaceLimitReached, { workspace: workspaceUuid }))
     }
     return inviteId
   }
@@ -3626,6 +3626,24 @@ export async function getWorkspaceSeatChange (
     return seatChangeData(await applyWorkspaceSeatChange(ctx, db, branding, token, stored, provider))
   }
   return seatChangeData(stored)
+}
+
+export async function reconcileWorkspaceSeatChanges (ctx: MeasureContext, db: AccountDB): Promise<void> {
+  const now = Date.now()
+  const changes = await db.workspaceSeatChange.find({
+    status: { $in: ['PENDING_PAYMENT', 'PENDING_RECURRENCE_UPDATE', 'SCHEDULED'] }
+  })
+  for (const stored of changes) {
+    if (stored.status === 'SCHEDULED' && (stored.scheduledFor == null || stored.scheduledFor > now)) continue
+    if (stored.providerChangeId == null) continue
+    try {
+      const provider = await getWorkspaceQuantityChange(stored.contractId, stored.providerChangeId)
+      const token = generateToken(stored.accountUuid, stored.workspaceUuid)
+      await applyWorkspaceSeatChange(ctx, db, null, token, stored, provider)
+    } catch (err) {
+      ctx.error('Failed to reconcile workspace seat change', { operationId: stored.id, err })
+    }
+  }
 }
 
 /**

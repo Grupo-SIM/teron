@@ -106,7 +106,7 @@ export async function createServer (ctx: MeasureContext, config: Config): Promis
 
   app.post('/api/v1/webhooks/simintpay', async (req: Request, res: Response) => {
     const secret = config.SimintpayWebhookSecret
-    const raw = JSON.stringify(req.body ?? {})
+    const raw = Buffer.isBuffer(req.body) ? req.body.toString('utf8') : JSON.stringify(req.body ?? {})
     const received = String(req.header('x-simintpay-signature') ?? '')
     const expected = secret ? createHmac('sha256', secret).update(raw).digest('hex') : ''
     if (!secret || received.length !== expected.length || !timingSafeEqual(Buffer.from(received), Buffer.from(expected))) {
@@ -114,7 +114,7 @@ export async function createServer (ctx: MeasureContext, config: Config): Promis
       return
     }
     try {
-      const body = req.body as { contractId: string, workspaceId: string, accountId: string, providerSubscriptionId: string, status: any, periodStart: string, periodEnd: string, willCancelAt?: string | null, quantity: number }
+      const body = JSON.parse(raw) as { contractId: string, workspaceId: string, accountId: string, providerSubscriptionId: string, status: any, periodStart: string, periodEnd: string, willCancelAt?: string | null, quantity: number }
       await accountClient.upsertSubscription({
         id: body.contractId, workspaceUuid: body.workspaceId as any, accountUuid: body.accountId as any,
         provider: 'simintpay', providerSubscriptionId: body.providerSubscriptionId,
