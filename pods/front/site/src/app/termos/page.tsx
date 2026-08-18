@@ -72,8 +72,9 @@ export function TermosContent({ locale = defaultLocale }: { locale?: Locale }) {
         </ul>
         <p>
           A cobrança é mensal e recorrente, feita no início de cada ciclo, com
-          base no número de usuários ativos no workspace. Usuários adicionados ao
-          longo do ciclo são cobrados proporcionalmente no ciclo seguinte.
+          base nas vagas contratadas do workspace. Vagas adicionadas durante o
+          ciclo são cobradas imediatamente pelo valor proporcional ao tempo
+          restante; reduções valem na renovação seguinte.
         </p>
         <p>
           Você pode cancelar a qualquer momento: o acesso ao plano pago continua

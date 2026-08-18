@@ -247,6 +247,24 @@
     "CountSpaces": "{count, plural, =0 {Nenhum espaço} =1 {# espaço} other {# espaços}}",
     "Roles": "Funções",
     "RoleName": "Nome da função",
-    "Permissions": "Permissões"
+    "Permissions": "Permissões",
+    "InviteMember": "Convidar integrante",
+    "InviteEmailPlaceholder": "nome@empresa.com.br",
+    "BuySeatAndInvite": "Comprar vaga e convidar",
+    "SeatLimitOwnerOnly": "Não há vagas disponíveis. Um owner do workspace precisa comprar outra vaga.",
+    "SeatPurchaseSummary": "Cobrança estimada agora: {proration}. Novo valor mensal: {recurring}.",
+    "ContractedSeats": "Vagas contratadas",
+    "OccupiedSeats": "Vagas ocupadas",
+    "AvailableSeats": "Vagas livres",
+    "AvailableSeatsHint": "Há {count} vaga(s) paga(s) livre(s). Convide alguém ou reduza a capacidade em Billing.",
+    "ManageBilling": "Gerenciar cobrança",
+    "ActiveMembers": "Membros ativos",
+    "RemoveMember": "Remover",
+    "RemoveMemberDescription": "Remover este membro do workspace? A vaga paga ficará disponível.",
+    "PendingInvites": "Convites pendentes",
+    "NoPendingInvites": "Nenhum convite pendente",
+    "InviteExpires": "Expira em {date}",
+    "ResendInvite": "Reenviar",
+    "CancelInvite": "Cancelar convite"
   }
 }

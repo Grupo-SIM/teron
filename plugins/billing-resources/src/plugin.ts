@@ -85,6 +85,23 @@ export default mergeIds(billingId, billing, {
     SeatsUsage: '' as IntlString,
     ScheduledSeatLimit: '' as IntlString,
     ReadOnlyWorkspace: '' as IntlString,
-    PaymentIntegrationPending: '' as IntlString
+    PaymentIntegrationPending: '' as IntlString,
+    SeatManagement: '' as IntlString,
+    SeatManagementDescription: '' as IntlString,
+    ContractedSeats: '' as IntlString,
+    OccupiedSeats: '' as IntlString,
+    AvailableSeats: '' as IntlString,
+    PendingInviteSeats: '' as IntlString,
+    TargetSeatCount: '' as IntlString,
+    PreviewSeatChange: '' as IntlString,
+    ApplySeatChange: '' as IntlString,
+    ProrationDueNow: '' as IntlString,
+    NextRecurringAmount: '' as IntlString,
+    SeatReductionScheduled: '' as IntlString,
+    SeatReductionBlocked: '' as IntlString,
+    SeatChangePending: '' as IntlString,
+    SeatChangeFailed: '' as IntlString,
+    ConfirmSeatChange: '' as IntlString,
+    ConfirmSeatChangeDescription: '' as IntlString
   }
 })

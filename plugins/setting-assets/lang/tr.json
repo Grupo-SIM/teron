@@ -247,6 +247,24 @@
     "ShowQRCode": "QR kodu göster",
     "EnterVerificationCode": "Doğrulama kodunu gir",
     "OverrideAttribute": "Özniteliği geçersiz kıl",
-    "Required": "Zorunlu"
+    "Required": "Zorunlu",
+    "InviteMember": "Invite member",
+    "InviteEmailPlaceholder": "name@example.com",
+    "BuySeatAndInvite": "Buy seat and invite",
+    "SeatLimitOwnerOnly": "No seats available. A workspace owner must purchase another seat.",
+    "SeatPurchaseSummary": "Estimated charge now: {proration}. New monthly amount: {recurring}.",
+    "ContractedSeats": "Contracted seats",
+    "OccupiedSeats": "Occupied seats",
+    "AvailableSeats": "Available seats",
+    "AvailableSeatsHint": "{count} paid seat(s) available. Invite someone or reduce capacity in Billing.",
+    "ManageBilling": "Manage billing",
+    "ActiveMembers": "Active members",
+    "RemoveMember": "Remove",
+    "RemoveMemberDescription": "Remove this member from the workspace? Their paid seat will become available.",
+    "PendingInvites": "Pending invites",
+    "NoPendingInvites": "No pending invites",
+    "InviteExpires": "Expires {date}",
+    "ResendInvite": "Resend",
+    "CancelInvite": "Cancel invite"
   }
 }

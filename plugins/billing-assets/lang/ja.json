@@ -91,6 +91,23 @@
     "NoFilesYet": "このワークスペースにはまだファイルがありません。",
     "UnknownLocation": "単独のファイル",
     "StorageAccessDenied": "ストレージを管理できるのはワークスペースのオーナーとメンテナーのみです。",
-    "Refresh": "更新"
+    "Refresh": "更新",
+    "SeatManagement": "Member seats",
+    "SeatManagementDescription": "Increase seats immediately with a prorated charge, or schedule a reduction for renewal.",
+    "ContractedSeats": "Contracted",
+    "OccupiedSeats": "Occupied",
+    "AvailableSeats": "Available",
+    "PendingInviteSeats": "Pending invites",
+    "TargetSeatCount": "Desired seats",
+    "PreviewSeatChange": "Preview",
+    "ApplySeatChange": "Apply change",
+    "ProrationDueNow": "Estimated charge now:",
+    "NextRecurringAmount": "Next monthly amount:",
+    "SeatReductionScheduled": "{limit} seats scheduled for the next renewal",
+    "SeatReductionBlocked": "Cancel invites or remove members before reducing below current occupancy.",
+    "SeatChangePending": "Payment processing. Capacity will only change after approval.",
+    "SeatChangeFailed": "Seat change failed. No additional capacity was released.",
+    "ConfirmSeatChange": "Confirm seat change",
+    "ConfirmSeatChangeDescription": "Apply this seat change to workspace billing?"
   }
 }

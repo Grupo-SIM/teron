@@ -22,20 +22,19 @@
   import { Tier } from '@hcengineering/billing'
   import { translate } from '@hcengineering/platform'
   import { getClient, MessageBox } from '@hcengineering/presentation'
-  import { type Ref, SortingOrder, UsageStatus } from '@hcengineering/core'
+  import { generateId, type Ref, SortingOrder, UsageStatus } from '@hcengineering/core'
   import {
-    IconCheckmark,
     Label,
     Loading,
     Scroller,
     Button,
-    getPlatformColorByName,
     themeStore,
     getLocation,
     navigate,
     showPopup,
     addNotification,
-    NotificationSeverity
+    NotificationSeverity,
+    EditBox
   } from '@hcengineering/ui'
   import { onMount, onDestroy } from 'svelte'
 
@@ -54,7 +53,6 @@
     acc[plan] = tier
     return acc
   }, {})
-  const selectableTiers = tiers.filter((tier) => getTypeAndPlan(tier._id).plan !== 'unlimited')
 
   export let isReadOnly: boolean = false
 
@@ -72,6 +70,10 @@
   const POLL_INTERVAL = 2000
 
   let usageInfo: UsageStatus | null = null
+  let seatQuote: Awaited<ReturnType<NonNullable<ReturnType<typeof getAccountClient>>['getWorkspaceSeatQuote']>> | undefined
+  let targetSeatLimit: number | undefined
+  let seatChangeStatus: string | undefined
+  let changingSeats = false
 
   $: isCurrentCanceled = currentSubscription?.canceledAt !== undefined && currentSubscription.canceledAt > 0
   $: canManageProviderSubscription = currentSubscription?.provider !== 'internal'
@@ -183,12 +185,54 @@
         )[0]
       const plan = currentSubscription?.plan
       currentTier = plan !== undefined ? tierByPlan[plan] : undefined
+      if (currentEntitlement.plan === 'business' && currentEntitlement.seatLimit !== undefined) {
+        targetSeatLimit = currentEntitlement.nextSeatLimit ?? currentEntitlement.seatLimit
+        seatQuote = await accountClient.getWorkspaceSeatQuote(currentEntitlement.seatLimit)
+      }
     } catch (err) {
       console.error('Error fetching current plan:', err)
       await showErrorNotification()
     } finally {
       loading = false
     }
+  }
+
+  async function previewSeatChange (): Promise<void> {
+    const accountClient = getAccountClient()
+    if (accountClient == null || targetSeatLimit == null) return
+    seatQuote = await accountClient.getWorkspaceSeatQuote(targetSeatLimit)
+  }
+
+  async function applySeatChange (): Promise<void> {
+    const accountClient = getAccountClient()
+    if (accountClient == null || targetSeatLimit == null) return
+    changingSeats = true
+    try {
+      const operationId = generateId()
+      let result = await accountClient.changeWorkspaceSeatLimit(targetSeatLimit, operationId)
+      seatChangeStatus = result.status
+      while (['PENDING_PAYMENT', 'PENDING_RECURRENCE_UPDATE'].includes(result.status)) {
+        await new Promise((resolve) => setTimeout(resolve, 2000))
+        const refreshed = await accountClient.getWorkspaceSeatChange(operationId)
+        if (refreshed == null) break
+        result = refreshed
+        seatChangeStatus = result.status
+      }
+      await fetchSubscriptions()
+    } catch (err) {
+      seatChangeStatus = 'FAILED'
+      await showErrorNotification()
+    } finally {
+      changingSeats = false
+    }
+  }
+
+  function confirmSeatChange (): void {
+    showPopup(MessageBox, {
+      label: plugin.string.ConfirmSeatChange,
+      message: plugin.string.ConfirmSeatChangeDescription,
+      action: async () => await applySeatChange()
+    })
   }
 
   async function fetchUsageStats (): Promise<void> {
@@ -203,10 +247,6 @@
       await showErrorNotification()
       usageInfo = null
     }
-  }
-
-  function formatSize (gb: number): { limit: number, unit: string } {
-    return gb < 1000 ? { limit: gb, unit: 'GB' } : { limit: Math.floor(gb / 1000), unit: 'TB' }
   }
 
   async function pollCheckoutStatus (checkoutId: string): Promise<void> {
@@ -423,65 +463,57 @@
         </div>
       </div>
 
-      <div class="flex-col flex-gap-4">
-        <div class="section-title">
-          <Label label={isReadOnly ? plugin.string.RestrictedPlans : plugin.string.AllPlans} />
-        </div>
-        <Scroller contentDirection="horizontal" buttons={false} showOverflowArrows shrink={false} noFade={false}>
-          <div class="flex-row-top flex-gap-4 flex-no-shrink mb-3">
-            {#each selectableTiers as tier}
-              {@const color =
-                tier.color !== null && tier.color !== undefined && tier.color.length > 0
-                  ? getPlatformColorByName(tier.color, $themeStore.dark)
-                  : null}
-              {@const bgAttr = $themeStore.dark ? 'background' : 'background-color'}
-              <div
-                class="tier-card"
-                style={color !== null && color !== undefined ? `${bgAttr}: ${color.background};` : ''}
-              >
-                <div class="tier-card-content">
-                  <div class="fs-title text-lg">
-                    <Label label={tier.label} />
-                  </div>
-                  <div class="flex-row-center items-end">
-                    <span class="fs-title text-xl">
-                      ${tier.priceMonthly}
-                    </span>
-                    <span class="ml-1 lower">
-                      <Label label={plugin.string.Monthly} />
-                    </span>
-                  </div>
-                  <div class="mb-2 h-16">
-                    <Label label={tier.description} />
-                  </div>
+      {#if entitlement?.plan === 'business' && entitlement.seatLimit !== undefined}
+        <div class="flex-col flex-gap-4">
+          <div class="section-title"><Label label={plugin.string.SeatManagement} /></div>
+          <div class="current-tier-card w-full flex-gap-4">
+            <Label label={plugin.string.SeatManagementDescription} />
+            <div class="seat-grid">
+              <div><strong>{entitlement.seatLimit}</strong><Label label={plugin.string.ContractedSeats} /></div>
+              <div><strong>{entitlement.memberSeats + entitlement.pendingInviteSeats}</strong><Label label={plugin.string.OccupiedSeats} /></div>
+              <div><strong>{entitlement.availableSeats ?? 0}</strong><Label label={plugin.string.AvailableSeats} /></div>
+              <div><strong>{entitlement.pendingInviteSeats}</strong><Label label={plugin.string.PendingInviteSeats} /></div>
+            </div>
 
-                  <div class="tier-features">
-                    <div class="feature-item">
-                      <span class="feature-bullet"><IconCheckmark size="small" /></span>
-                      <Label label={plugin.string.UnlimitedUsers} />
-                    </div>
-                    <div class="feature-item">
-                      <span class="feature-bullet"><IconCheckmark size="small" /></span>
-                      <Label label={plugin.string.UnlimitedObjects} />
-                    </div>
-                    <div class="feature-item">
-                      <span class="feature-bullet"><IconCheckmark size="small" /></span>
-                      <Label label={plugin.string.StorageLimit} params={{ ...formatSize(tier.storageLimitGB) }} />
-                    </div>
-                    <div class="feature-item">
-                      <span class="feature-bullet"><IconCheckmark size="small" /></span>
-                      <Label label={plugin.string.TrafficLimit} params={{ ...formatSize(tier.trafficLimitGB) }} />
-                    </div>
-                  </div>
-                </div>
-                <div class="tier-card-footer">
-                  <Label label={plugin.string.PaymentIntegrationPending} />
-                </div>
+            {#if seatQuote != null}
+              <div class="billing-values">
+                <div><Label label={plugin.string.ProrationDueNow} /> <strong>{Number(seatQuote.estimatedProrationAmount).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</strong></div>
+                <div><Label label={plugin.string.NextRecurringAmount} /> <strong>{Number(seatQuote.nextRecurringAmount).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</strong></div>
               </div>
-            {/each}
+            {/if}
+
+            {#if entitlement.nextSeatLimit !== undefined}
+              <div class="status-badge"><Label label={plugin.string.SeatReductionScheduled} params={{ limit: entitlement.nextSeatLimit }} /></div>
+            {/if}
+            {#if seatChangeStatus === 'PENDING_PAYMENT' || seatChangeStatus === 'PENDING_RECURRENCE_UPDATE'}
+              <div><Label label={plugin.string.SeatChangePending} /></div>
+            {:else if seatChangeStatus === 'FAILED' || seatChangeStatus === 'COMPENSATION_REQUIRED'}
+              <div class="error-color"><Label label={plugin.string.SeatChangeFailed} /></div>
+            {/if}
+
+            <div class="flex-row-center flex-gap-2">
+              <div class="max-w-40 flex-grow">
+                <EditBox
+                  format="number"
+                  minValue={entitlement.memberSeats + entitlement.pendingInviteSeats}
+                  maxDigitsAfterPoint={0}
+                  bind:value={targetSeatLimit}
+                />
+              </div>
+              <Button label={plugin.string.PreviewSeatChange} kind="secondary" disabled={changingSeats} on:click={() => void previewSeatChange()} />
+              <Button
+                label={plugin.string.ApplySeatChange}
+                kind="primary"
+                disabled={changingSeats || targetSeatLimit == null || targetSeatLimit === entitlement.seatLimit}
+                on:click={confirmSeatChange}
+              />
+            </div>
+            {#if targetSeatLimit != null && targetSeatLimit < entitlement.memberSeats + entitlement.pendingInviteSeats}
+              <div class="error-color"><Label label={plugin.string.SeatReductionBlocked} /></div>
+            {/if}
           </div>
-        </Scroller>
-      </div>
+        </div>
+      {/if}
     </div>
   </Scroller>
 {/if}
@@ -572,6 +604,31 @@
 
   .processing {
     text-align: center;
+  }
+
+  .seat-grid {
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: var(--spacing-2);
+  }
+
+  .seat-grid > div {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-1);
+    padding: var(--spacing-2);
+    border: 1px solid var(--theme-divider-color);
+    border-radius: var(--small-BorderRadius);
+  }
+
+  .seat-grid strong {
+    font-size: 1.25rem;
+  }
+
+  .billing-values {
+    display: flex;
+    justify-content: space-between;
+    gap: var(--spacing-2);
   }
 
   .usage-section {
