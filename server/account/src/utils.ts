@@ -1136,6 +1136,19 @@ export async function updateWorkspaceRole (
     }
   }
 
+  const billableRoles = [AccountRole.Owner, AccountRole.Maintainer, AccountRole.User, AccountRole.Guest]
+  if (!billableRoles.includes(currentRole) && billableRoles.includes(targetRole)) {
+    const tier = selectTierSubscription(await findTierSubscriptions(db, workspace))
+    const business = tier?.plan === 'business' || ['rare', 'epic', 'legendary'].includes(tier?.plan ?? '')
+    if (business) {
+      const capacity = Math.min(tier?.seatLimit ?? 0, tier?.nextSeatLimit ?? tier?.seatLimit ?? 0)
+      if (!(await db.updateWorkspaceRoleWithinCapacity(targetAccount, workspace, targetRole, capacity))) {
+        throw new PlatformError(new Status(Severity.ERROR, platform.status.WorkspaceLimitReached, {}))
+      }
+      return
+    }
+  }
+
   await db.updateWorkspaceRole(targetAccount, workspace, targetRole)
 }
 
@@ -1618,7 +1631,14 @@ export async function doJoinByInvite (
     if (!isBusiness || role != null) await useInvite(db, invite.id)
   } else if (workspace.allowReadOnlyGuest && workspace.allowGuestSignUp) {
     if (role == null) {
-      await db.assignWorkspace(account, workspace.uuid, AccountRole.Guest)
+      if (isBusiness) {
+        const capacity = Math.min(tier?.seatLimit ?? 0, tier?.nextSeatLimit ?? tier?.seatLimit ?? 0)
+        if (!(await db.assignWorkspaceWithinCapacity(account, workspace.uuid, AccountRole.Guest, capacity))) {
+          throw new PlatformError(new Status(Severity.ERROR, platform.status.WorkspaceLimitReached, {}))
+        }
+      } else {
+        await db.assignWorkspace(account, workspace.uuid, AccountRole.Guest)
+      }
     }
   } else {
     throw new PlatformError(new Status(Severity.ERROR, platform.status.Forbidden, {}))

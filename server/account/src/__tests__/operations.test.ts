@@ -28,6 +28,7 @@ import platform, { PlatformError, Status, Severity, getMetadata } from '@hcengin
 import { decodeToken, decodeTokenVerbose } from '@hcengineering/server-token'
 
 import * as utils from '../utils'
+import * as simintpay from '../simintpay'
 import { type AccountDB, type SocialId } from '../types'
 import {
   createInvite,
@@ -54,6 +55,9 @@ import {
   createAccessLink,
   getSubscriptions,
   getWorkspaceEntitlement,
+  getWorkspacePendingInvites,
+  getWorkspaceSeatQuote,
+  changeWorkspaceSeatLimit,
   leaveWorkspace,
   checkJoin
 } from '../operations'
@@ -114,16 +118,25 @@ describe('account operations', () => {
     },
     subscription: {
       find: jest.fn().mockResolvedValue([]),
-      insertOne: jest.fn()
+      findOne: jest.fn(),
+      insertOne: jest.fn(),
+      update: jest.fn()
     },
     subscriptionEvent: {
       insertOne: jest.fn()
+    },
+    workspaceSeatChange: {
+      findOne: jest.fn(),
+      insertOne: jest.fn(),
+      update: jest.fn()
     },
     claimFreeTrial: jest.fn().mockResolvedValue(true),
     setFreeTrialWorkspace: jest.fn(),
     releaseFreeTrial: jest.fn(),
     reserveSeatAndCreateInvite: jest.fn(),
     consumeInviteAndAssignWorkspace: jest.fn(),
+    assignWorkspaceWithinCapacity: jest.fn(),
+    updateWorkspaceRoleWithinCapacity: jest.fn(),
     getWorkspaceRole: jest.fn(),
     getWorkspaceMembers: jest.fn(),
     createWorkspace: jest.fn(),
@@ -455,6 +468,87 @@ describe('account operations', () => {
           readOnlyAfter: undefined
         })
       )
+    })
+  })
+
+  describe('workspace seat billing', () => {
+    beforeEach(() => {
+      ;(mockDb.getWorkspaceRole as jest.Mock).mockResolvedValue(AccountRole.Owner)
+      ;(mockDb.getWorkspaceMembers as jest.Mock).mockResolvedValue([
+        { person: mockAccount.uuid, role: AccountRole.Owner }
+      ])
+      ;(mockDb.subscription.find as jest.Mock).mockResolvedValue([
+        {
+          id: 'business-subscription', workspaceUuid: mockWorkspace.uuid, type: 'tier', status: 'active',
+          plan: 'business', provider: 'simintpay', seatLimit: 1, updatedOn: 1
+        }
+      ])
+      ;(mockDb.subscription.findOne as jest.Mock).mockResolvedValue({
+        id: 'business-subscription', workspaceUuid: mockWorkspace.uuid, type: 'tier', provider: 'simintpay'
+      })
+      ;(mockDb.workspaceSeatChange.findOne as jest.Mock).mockResolvedValue(null)
+    })
+
+    test('lists only valid personalized pending invites', async () => {
+      const now = Date.now()
+      ;(mockDb.invite.find as jest.Mock).mockResolvedValue([
+        { id: 'a', email: 'a@example.com', role: AccountRole.User, expiresOn: now + 1000, remainingUses: 1 },
+        { id: 'b', email: 'b@example.com', role: AccountRole.User, expiresOn: now - 1, remainingUses: 1 },
+        { id: 'c', role: AccountRole.User, expiresOn: -1, remainingUses: 5 }
+      ])
+
+      await expect(getWorkspacePendingInvites(mockCtx, mockDb, mockBranding, mockToken)).resolves.toEqual([
+        expect.objectContaining({ id: 'a', email: 'a@example.com' })
+      ])
+    })
+
+    test('quotes an immediate prorated increase from authoritative contract data', async () => {
+      const now = Date.now()
+      jest.spyOn(simintpay, 'getWorkspaceBillingContract').mockResolvedValue({
+        id: 'contract', quantity: 1, pendingQuantity: null, version: 2, unitAmount: '10.00',
+        recurringAmount: '10.00', currentPeriodStart: new Date(now - 5000).toISOString(),
+        currentPeriodEnd: new Date(now + 5000).toISOString()
+      })
+
+      const quote = await getWorkspaceSeatQuote(mockCtx, mockDb, mockBranding, mockToken, { targetSeatLimit: 2 })
+
+      expect(quote.nextRecurringAmount).toBe('20.00')
+      expect(Number(quote.estimatedProrationAmount)).toBeGreaterThan(4)
+      expect(Number(quote.estimatedProrationAmount)).toBeLessThanOrEqual(5)
+    })
+
+    test('applies paid capacity and stores the idempotent operation', async () => {
+      const now = Date.now()
+      jest.spyOn(simintpay, 'getWorkspaceBillingContract').mockResolvedValue({
+        id: 'contract', quantity: 1, pendingQuantity: null, version: 2, unitAmount: '10.00',
+        recurringAmount: '10.00', currentPeriodStart: new Date(now - 5000).toISOString(),
+        currentPeriodEnd: new Date(now + 5000).toISOString()
+      })
+      jest.spyOn(simintpay, 'requestWorkspaceQuantityChange').mockResolvedValue({
+        id: 'provider-change', contractId: 'contract', status: 'APPLIED', previousQuantity: 1,
+        targetQuantity: 2, effectiveQuantity: 2, scheduledFor: null, prorationAmount: '5.00',
+        nextRecurringAmount: '20.00', failureCode: null, failureMessage: null
+      })
+
+      const result = await changeWorkspaceSeatLimit(mockCtx, mockDb, mockBranding, mockToken, {
+        targetSeatLimit: 2, operationId: 'operation-1'
+      })
+
+      expect(result.status).toBe('APPLIED')
+      expect(mockDb.workspaceSeatChange.insertOne).toHaveBeenCalledWith(expect.objectContaining({ id: 'operation-1' }))
+      expect(mockDb.subscription.update).toHaveBeenCalledWith(
+        { id: 'business-subscription' }, expect.objectContaining({ seatLimit: 2 })
+      )
+    })
+
+    test('rejects a reduction below members and pending invitations', async () => {
+      ;(mockDb.invite.find as jest.Mock).mockResolvedValue([
+        { id: 'a', email: 'a@example.com', role: AccountRole.User, expiresOn: -1, remainingUses: 1 }
+      ])
+
+      await expect(changeWorkspaceSeatLimit(mockCtx, mockDb, mockBranding, mockToken, {
+        targetSeatLimit: 1, operationId: 'operation-2'
+      })).rejects.toThrow(PlatformError)
     })
   })
 

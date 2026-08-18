@@ -22,6 +22,31 @@ interface SimintpayWorkspaceSubscription {
   currentPeriodEnd: string
 }
 
+export interface SimintpayBillingContract {
+  id: string
+  quantity: number
+  pendingQuantity: number | null
+  version: number
+  unitAmount: string
+  recurringAmount: string
+  currentPeriodStart: string
+  currentPeriodEnd: string
+}
+
+export interface SimintpayQuantityChange {
+  id: string
+  contractId: string
+  status: 'APPLIED' | 'SCHEDULED' | 'PENDING_PAYMENT' | 'PENDING_RECURRENCE_UPDATE' | 'FAILED' | 'COMPENSATION_REQUIRED'
+  previousQuantity: number
+  targetQuantity: number
+  effectiveQuantity: number
+  scheduledFor: string | null
+  prorationAmount: string
+  nextRecurringAmount: string
+  failureCode: string | null
+  failureMessage: string | null
+}
+
 function responseMessage (body: string): string {
   try {
     const parsed = JSON.parse(body) as { message?: unknown, error?: unknown }
@@ -114,4 +139,51 @@ export async function createPaidWorkspaceSubscription (
     throw new PlatformError(new Status(Severity.ERROR, workspacePaymentErrorCode(response.status, body), {}))
   }
   return (await response.json()) as SimintpayWorkspaceSubscription
+}
+
+async function internalRequest<T> (path: string, init?: RequestInit): Promise<T> {
+  const config = configuration()
+  const headers = new Headers(init?.headers)
+  headers.set('content-type', 'application/json')
+  headers.set('x-internal-token', config.token)
+  let response: Response
+  try {
+    response = await fetch(`${config.url.replace(/\/$/, '')}/internal/billing${path}`, {
+      ...init,
+      headers
+    })
+  } catch {
+    throw new PlatformError(new Status(Severity.ERROR, 'WorkspacePaymentUnavailable', {}))
+  }
+  if (!response.ok) {
+    const body = await response.text()
+    throw new PlatformError(new Status(Severity.ERROR, workspacePaymentErrorCode(response.status, body), {}))
+  }
+  return (await response.json()) as T
+}
+
+export async function getWorkspaceBillingContract (workspace: WorkspaceUuid): Promise<SimintpayBillingContract> {
+  return await internalRequest(`/contracts/by-resource/WORKSPACE/${encodeURIComponent(workspace)}`)
+}
+
+export async function requestWorkspaceQuantityChange (
+  contract: SimintpayBillingContract,
+  workspace: WorkspaceUuid,
+  targetQuantity: number,
+  operationId: string
+): Promise<SimintpayQuantityChange> {
+  return await internalRequest(`/contracts/${encodeURIComponent(contract.id)}/quantity-changes`, {
+    method: 'POST',
+    headers: { 'idempotency-key': `workspace:${workspace}:quantity:${operationId}` },
+    body: JSON.stringify({ targetQuantity, expectedVersion: contract.version })
+  })
+}
+
+export async function getWorkspaceQuantityChange (
+  contractId: string,
+  changeId: string
+): Promise<SimintpayQuantityChange> {
+  return await internalRequest(
+    `/contracts/${encodeURIComponent(contractId)}/quantity-changes/${encodeURIComponent(changeId)}`
+  )
 }

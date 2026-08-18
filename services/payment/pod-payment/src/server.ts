@@ -119,6 +119,7 @@ export async function createServer (ctx: MeasureContext, config: Config): Promis
         id: body.contractId, workspaceUuid: body.workspaceId as any, accountUuid: body.accountId as any,
         provider: 'simintpay', providerSubscriptionId: body.providerSubscriptionId,
         type: SubscriptionType.Tier, status: body.status, plan: 'business',
+        seatLimit: body.quantity,
         periodStart: Date.parse(body.periodStart), periodEnd: Date.parse(body.periodEnd),
         providerData: { contractId: body.contractId, quantity: body.quantity, willCancelAt: body.willCancelAt ?? null }
       })

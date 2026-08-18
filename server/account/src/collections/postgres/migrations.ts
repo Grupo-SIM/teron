@@ -90,7 +90,8 @@ export function getMigrations (ns: string, flavor: DBFlavor): [string, string][]
     getV30Migration(ns, flavor),
     getV31Migration(ns, flavor),
     getV32Migration(ns, flavor),
-    getV33Migration(ns, flavor)
+    getV33Migration(ns, flavor),
+    getV34Migration(ns, flavor)
   ]
 }
 
@@ -963,6 +964,42 @@ function getV33Migration (ns: string, flavor: DBFlavor): [string, string] {
       AND NOT EXISTS (
         SELECT 1 FROM ${ns}.subscription_event e WHERE e.subscription_id = s.id
       );
+    `
+  ]
+}
+
+function getV34Migration (ns: string, flavor: DBFlavor): [string, string] {
+  const types = dbTypes[flavor]
+  return [
+    'account_db_v34_workspace_seat_changes',
+    `
+    CREATE TABLE IF NOT EXISTS ${ns}.workspace_seat_change (
+      id ${types.string} NOT NULL,
+      workspace_uuid UUID NOT NULL,
+      account_uuid UUID NOT NULL,
+      contract_id ${types.string} NOT NULL,
+      provider_change_id ${types.string},
+      status ${types.string} NOT NULL,
+      previous_quantity ${types.int4} NOT NULL,
+      target_quantity ${types.int4} NOT NULL,
+      effective_quantity ${types.int4} NOT NULL,
+      proration_amount ${types.string} NOT NULL,
+      next_recurring_amount ${types.string} NOT NULL,
+      currency ${types.string} NOT NULL,
+      scheduled_for ${types.int8},
+      invite_email ${types.string},
+      invite_role ${types.string},
+      invite_sent_on ${types.int8},
+      failure_code ${types.string},
+      failure_message ${types.string},
+      created_on ${types.int8} NOT NULL,
+      updated_on ${types.int8} NOT NULL,
+      CONSTRAINT workspace_seat_change_pk PRIMARY KEY (id),
+      CONSTRAINT workspace_seat_change_workspace_fk FOREIGN KEY (workspace_uuid) REFERENCES ${ns}.workspace(uuid),
+      CONSTRAINT workspace_seat_change_account_fk FOREIGN KEY (account_uuid) REFERENCES ${ns}.account(uuid)
+    );
+    CREATE INDEX IF NOT EXISTS workspace_seat_change_workspace_created_idx
+      ON ${ns}.workspace_seat_change (workspace_uuid, created_on);
     `
   ]
 }

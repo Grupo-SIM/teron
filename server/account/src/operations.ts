@@ -70,10 +70,20 @@ import {
   SubscriptionStatus,
   SubscriptionType,
   type WorkspaceEntitlement,
+  type WorkspacePendingInvite,
+  type WorkspaceSeatChange,
+  type WorkspaceSeatChangeData,
+  type WorkspaceSeatQuote,
   type WorkspaceSubscriptionPlan,
   type Query,
   type InviteInfo
 } from './types'
+import {
+  getWorkspaceBillingContract,
+  getWorkspaceQuantityChange,
+  requestWorkspaceQuantityChange,
+  type SimintpayQuantityChange
+} from './simintpay'
 import {
   addSocialIdBase,
   checkInvite,
@@ -209,11 +219,98 @@ async function getEntitlement (
   }
 }
 
+function seatChangeData (change: WorkspaceSeatChange): WorkspaceSeatChangeData {
+  const { workspaceUuid: _workspaceUuid, accountUuid: _accountUuid, createdOn: _createdOn, updatedOn: _updatedOn, ...data } = change
+  return data
+}
+
+async function applyWorkspaceSeatChange (
+  ctx: MeasureContext,
+  db: AccountDB,
+  branding: Branding | null,
+  token: string,
+  stored: WorkspaceSeatChange,
+  provider: SimintpayQuantityChange
+): Promise<WorkspaceSeatChange> {
+  const now = Date.now()
+  const update = {
+    providerChangeId: provider.id,
+    status: provider.status,
+    previousQuantity: provider.previousQuantity,
+    targetQuantity: provider.targetQuantity,
+    effectiveQuantity: provider.effectiveQuantity,
+    prorationAmount: provider.prorationAmount,
+    nextRecurringAmount: provider.nextRecurringAmount,
+    scheduledFor: provider.scheduledFor != null ? Date.parse(provider.scheduledFor) : undefined,
+    failureCode: provider.failureCode ?? undefined,
+    failureMessage: provider.failureMessage ?? undefined,
+    updatedOn: now
+  }
+  await db.workspaceSeatChange.update({ id: stored.id }, update)
+
+  const subscription = await db.subscription.findOne({
+    workspaceUuid: stored.workspaceUuid,
+    type: SubscriptionType.Tier,
+    provider: 'simintpay'
+  })
+  if (subscription != null && provider.status === 'APPLIED') {
+    await db.subscription.update(
+      { id: subscription.id },
+      { seatLimit: provider.effectiveQuantity, nextSeatLimit: undefined, updatedOn: now }
+    )
+  } else if (subscription != null && provider.status === 'SCHEDULED') {
+    await db.subscription.update({ id: subscription.id }, { nextSeatLimit: provider.targetQuantity, updatedOn: now })
+  }
+
+  let result = { ...stored, ...update }
+  if (provider.status === 'APPLIED' && stored.inviteEmail != null && stored.inviteRole != null && stored.inviteSentOn == null) {
+    await sendInvite(ctx, db, branding, token, { email: stored.inviteEmail, role: stored.inviteRole })
+    await db.workspaceSeatChange.update({ id: stored.id }, { inviteSentOn: now, updatedOn: now })
+    result = { ...result, inviteSentOn: now }
+  }
+  return result
+}
+
 async function verifyWorkspaceWritable (db: AccountDB, workspaceUuid: WorkspaceUuid): Promise<void> {
   const entitlement = await getEntitlement(db, workspaceUuid)
   if (entitlement.accessMode === 'read-only') {
     throw new PlatformError(new Status(Severity.ERROR, platform.status.ReadOnlyAccount, {}))
   }
+}
+
+async function assignWorkspaceRespectingEntitlement (
+  db: AccountDB,
+  account: AccountUuid,
+  workspace: WorkspaceUuid,
+  role: AccountRole
+): Promise<void> {
+  const entitlement = await getEntitlement(db, workspace)
+  if (entitlement.plan !== 'business' || !BILLABLE_ROLES.has(role)) {
+    await db.assignWorkspace(account, workspace, role)
+    return
+  }
+  const capacity = Math.min(entitlement.seatLimit ?? 0, entitlement.nextSeatLimit ?? entitlement.seatLimit ?? 0)
+  if (!(await db.assignWorkspaceWithinCapacity(account, workspace, role, capacity))) {
+    throw new PlatformError(new Status(Severity.ERROR, platform.status.WorkspaceLimitReached, {}))
+  }
+}
+
+async function updateWorkspaceRoleRespectingEntitlement (
+  db: AccountDB,
+  account: AccountUuid,
+  workspace: WorkspaceUuid,
+  currentRole: AccountRole,
+  targetRole: AccountRole
+): Promise<void> {
+  const entitlement = await getEntitlement(db, workspace)
+  if (entitlement.plan === 'business' && !BILLABLE_ROLES.has(currentRole) && BILLABLE_ROLES.has(targetRole)) {
+    const capacity = Math.min(entitlement.seatLimit ?? 0, entitlement.nextSeatLimit ?? entitlement.seatLimit ?? 0)
+    if (!(await db.updateWorkspaceRoleWithinCapacity(account, workspace, targetRole, capacity))) {
+      throw new PlatformError(new Status(Severity.ERROR, platform.status.WorkspaceLimitReached, {}))
+    }
+    return
+  }
+  await db.updateWorkspaceRole(account, workspace, targetRole)
 }
 
 /* =================================== */
@@ -1175,7 +1272,7 @@ export async function resendInvite (
     inviteId = invite.id
     await db.invite.update({ id: invite.id }, { expiresOn: newExp, remainingUses: 1, role })
   } else {
-    inviteId = await createInvite(ctx, db, branding, token, { exp: newExp, email, limit: 1, role })
+    inviteId = await createInvite(ctx, db, branding, token, { exp: expHours * 60 * 60 * 1000, email, limit: 1, role })
   }
   const front = getFrontUrl(branding)
   const link = concatLink(front, `/entrar?mode=join&inviteId=${inviteId}`)
@@ -1438,8 +1535,21 @@ export async function checkAutoJoin (
       const targetRole = await getWorkspaceRole(db, targetAccount.uuid, workspace.uuid)
 
       if (targetRole == null) {
-        await db.assignWorkspace(targetAccount.uuid, workspace.uuid, invite.role)
+        const accepted = await db.consumeInviteAndAssignWorkspace(
+          invite.id,
+          targetAccount.uuid,
+          workspace.uuid,
+          invite.role
+        )
+        if (!accepted) throw new PlatformError(new Status(Severity.ERROR, platform.status.Forbidden, {}))
       } else if (getRolePower(targetRole) < getRolePower(invite.role)) {
+        const accepted = await db.consumeInviteAndAssignWorkspace(
+          invite.id,
+          targetAccount.uuid,
+          workspace.uuid,
+          invite.role
+        )
+        if (!accepted) throw new PlatformError(new Status(Severity.ERROR, platform.status.Forbidden, {}))
         await db.updateWorkspaceRole(targetAccount.uuid, workspace.uuid, invite.role)
       }
 
@@ -2345,7 +2455,7 @@ export async function getLoginInfoByToken (
 
       // Create an automatic account and assign it to the grant workspace
       await signUpByGrant(ctx, db, branding, accountUuid, grant, params)
-      await db.assignWorkspace(accountUuid, workspaceUuid, grant.role)
+      await assignWorkspaceRespectingEntitlement(db, accountUuid, workspaceUuid, grant.role)
     } else {
       if (grantAccount.automatic == null || !grantAccount.automatic) {
         // If grant is for existing non-automatic account we need it to be signed in using the regular approach
@@ -2355,9 +2465,9 @@ export async function getLoginInfoByToken (
         // Existing automatic account, check workspace assignment and consider it signed in
         const existingRole = await db.getWorkspaceRole(accountUuid, workspaceUuid)
         if (existingRole == null) {
-          await db.assignWorkspace(accountUuid, workspaceUuid, grant.role)
+          await assignWorkspaceRespectingEntitlement(db, accountUuid, workspaceUuid, grant.role)
         } else if (getRolePower(existingRole) < getRolePower(grant.role)) {
-          await db.updateWorkspaceRole(accountUuid, workspaceUuid, grant.role)
+          await updateWorkspaceRoleRespectingEntitlement(db, accountUuid, workspaceUuid, existingRole, grant.role)
         }
       }
     }
@@ -3378,6 +3488,146 @@ export async function getWorkspaceEntitlement (
   return await getEntitlement(db, workspaceUuid)
 }
 
+export async function getWorkspacePendingInvites (
+  ctx: MeasureContext,
+  db: AccountDB,
+  branding: Branding | null,
+  token: string
+): Promise<WorkspacePendingInvite[]> {
+  const { account, workspace } = decodeTokenVerbose(ctx, token)
+  if (workspace == null) throw new PlatformError(new Status(Severity.ERROR, platform.status.BadRequest, {}))
+  const role = await db.getWorkspaceRole(account, workspace)
+  if (role == null || getRolePower(role) < getRolePower(AccountRole.Maintainer)) {
+    throw new PlatformError(new Status(Severity.ERROR, platform.status.Forbidden, {}))
+  }
+  const now = Date.now()
+  return (await db.invite.find({ workspaceUuid: workspace, remainingUses: { $gt: 0 } }))
+    .filter((invite) => invite.email != null && invite.email !== '' && (invite.expiresOn === -1 || invite.expiresOn > now))
+    .map((invite) => ({ id: invite.id, email: invite.email as string, role: invite.role, expiresOn: invite.expiresOn }))
+    .sort((a, b) => a.email.localeCompare(b.email))
+}
+
+async function requireSeatBillingOwner (
+  ctx: MeasureContext,
+  db: AccountDB,
+  token: string
+): Promise<{ account: AccountUuid, workspace: WorkspaceUuid, entitlement: WorkspaceEntitlement }> {
+  const decoded = decodeTokenVerbose(ctx, token)
+  if (decoded.workspace == null) throw new PlatformError(new Status(Severity.ERROR, platform.status.BadRequest, {}))
+  const role = await db.getWorkspaceRole(decoded.account, decoded.workspace)
+  if (role !== AccountRole.Owner) throw new PlatformError(new Status(Severity.ERROR, platform.status.Forbidden, {}))
+  const entitlement = await getEntitlement(db, decoded.workspace)
+  if (entitlement.plan !== 'business' || entitlement.accessMode !== 'full') {
+    throw new PlatformError(new Status(Severity.ERROR, platform.status.BadRequest, {}))
+  }
+  return { account: decoded.account, workspace: decoded.workspace, entitlement }
+}
+
+export async function getWorkspaceSeatQuote (
+  ctx: MeasureContext,
+  db: AccountDB,
+  branding: Branding | null,
+  token: string,
+  params: { targetSeatLimit: number }
+): Promise<WorkspaceSeatQuote> {
+  const { workspace, entitlement } = await requireSeatBillingOwner(ctx, db, token)
+  const target = params.targetSeatLimit
+  const occupied = entitlement.memberSeats + entitlement.pendingInviteSeats
+  if (!Number.isSafeInteger(target) || target < 1 || target < occupied) {
+    throw new PlatformError(new Status(Severity.ERROR, platform.status.BadRequest, {}))
+  }
+  const contract = await getWorkspaceBillingContract(workspace)
+  const periodStart = Date.parse(contract.currentPeriodStart)
+  const periodEnd = Date.parse(contract.currentPeriodEnd)
+  const duration = Math.max(1, periodEnd - periodStart)
+  const remainingRatio = Math.max(0, Math.min(1, (periodEnd - Date.now()) / duration))
+  const unit = Number(contract.unitAmount)
+  const delta = target - contract.quantity
+  return {
+    currentQuantity: contract.quantity,
+    targetQuantity: target,
+    occupiedQuantity: occupied,
+    unitAmount: unit.toFixed(2),
+    currentRecurringAmount: contract.recurringAmount,
+    nextRecurringAmount: (Number(contract.recurringAmount) + unit * delta).toFixed(2),
+    estimatedProrationAmount: (delta > 0 ? unit * delta * remainingRatio : 0).toFixed(2),
+    currency: 'BRL',
+    periodEnd
+  }
+}
+
+export async function changeWorkspaceSeatLimit (
+  ctx: MeasureContext,
+  db: AccountDB,
+  branding: Branding | null,
+  token: string,
+  params: { targetSeatLimit: number, operationId: string, invite?: { email: string, role: AccountRole } }
+): Promise<WorkspaceSeatChangeData> {
+  const { account, workspace, entitlement } = await requireSeatBillingOwner(ctx, db, token)
+  const target = params.targetSeatLimit
+  const occupied = entitlement.memberSeats + entitlement.pendingInviteSeats
+  if (!Number.isSafeInteger(target) || target < 1 || target < occupied || params.operationId.trim() === '') {
+    throw new PlatformError(new Status(Severity.ERROR, platform.status.BadRequest, {}))
+  }
+  if (params.invite != null) {
+    if (target <= (entitlement.seatLimit ?? 0) || !isEmail(params.invite.email) || !assignableRoles.includes(params.invite.role)) {
+      throw new PlatformError(new Status(Severity.ERROR, platform.status.BadRequest, {}))
+    }
+  }
+
+  let stored = await db.workspaceSeatChange.findOne({ id: params.operationId })
+  if (stored != null && (stored.workspaceUuid !== workspace || stored.targetQuantity !== target)) {
+    throw new PlatformError(new Status(Severity.ERROR, platform.status.BadRequest, {}))
+  }
+  const contract = await getWorkspaceBillingContract(workspace)
+  if (stored == null) {
+    const now = Date.now()
+    stored = {
+      id: params.operationId,
+      workspaceUuid: workspace,
+      accountUuid: account,
+      contractId: contract.id,
+      status: 'PENDING_PAYMENT',
+      previousQuantity: contract.quantity,
+      targetQuantity: target,
+      effectiveQuantity: contract.quantity,
+      prorationAmount: '0.00',
+      nextRecurringAmount: contract.recurringAmount,
+      currency: 'BRL',
+      inviteEmail: params.invite?.email.trim().toLowerCase(),
+      inviteRole: params.invite?.role,
+      createdOn: now,
+      updatedOn: now
+    }
+    await db.workspaceSeatChange.insertOne(stored)
+  }
+  const provider = stored.providerChangeId != null
+    ? await getWorkspaceQuantityChange(stored.contractId, stored.providerChangeId)
+    : await requestWorkspaceQuantityChange(contract, workspace, target, stored.id)
+  return seatChangeData(await applyWorkspaceSeatChange(ctx, db, branding, token, stored, provider))
+}
+
+export async function getWorkspaceSeatChange (
+  ctx: MeasureContext,
+  db: AccountDB,
+  branding: Branding | null,
+  token: string,
+  params: { operationId: string }
+): Promise<WorkspaceSeatChangeData | null> {
+  const { workspace } = await requireSeatBillingOwner(ctx, db, token)
+  const stored = await db.workspaceSeatChange.findOne({ id: params.operationId, workspaceUuid: workspace })
+  if (stored == null) return null
+  if (stored.providerChangeId == null || ['PENDING_PAYMENT', 'PENDING_RECURRENCE_UPDATE'].includes(stored.status)) {
+    const provider = stored.providerChangeId != null
+      ? await getWorkspaceQuantityChange(stored.contractId, stored.providerChangeId)
+      : await requestWorkspaceQuantityChange(
+        await getWorkspaceBillingContract(workspace), workspace, stored.targetQuantity, stored.id
+      )
+    return seatChangeData(await applyWorkspaceSeatChange(ctx, db, branding, token, stored, provider))
+  }
+  return seatChangeData(stored)
+}
+
 /**
  * Get a subscription by its internal ID
  * - Services: Can query any subscription
@@ -3632,6 +3882,10 @@ export type AccountMethods =
   | 'getUserProfile'
   | 'getSubscriptions'
   | 'getWorkspaceEntitlement'
+  | 'getWorkspacePendingInvites'
+  | 'getWorkspaceSeatQuote'
+  | 'changeWorkspaceSeatLimit'
+  | 'getWorkspaceSeatChange'
   | 'getSubscriptionById'
   | 'updatePasswordAgingRule'
   | 'checkPasswordAging'
@@ -3703,6 +3957,10 @@ export function getMethods (hasSignUp: boolean = true): Partial<Record<AccountMe
     getUserProfile: wrap(getUserProfile),
     getSubscriptions: wrap(getSubscriptions),
     getWorkspaceEntitlement: wrap(getWorkspaceEntitlement),
+    getWorkspacePendingInvites: wrap(getWorkspacePendingInvites),
+    getWorkspaceSeatQuote: wrap(getWorkspaceSeatQuote),
+    changeWorkspaceSeatLimit: wrap(changeWorkspaceSeatLimit),
+    getWorkspaceSeatChange: wrap(getWorkspaceSeatChange),
     getSubscriptionById: wrap(getSubscriptionById),
     batchAssignWorkspacePermission: wrap(batchAssignWorkspacePermission),
     batchRevokeWorkspacePermission: wrap(batchRevokeWorkspacePermission),

@@ -759,21 +759,11 @@ export async function leaveWorkspace (account: AccountUuid): Promise<LoginInfo |
 }
 
 export async function sendInvite (email: string, role: AccountRole): Promise<void> {
-  try {
-    await getAccountClient().sendInvite(email, role)
-  } catch (e) {
-    console.log('Failed to send invite', email, role)
-    console.error(e)
-  }
+  await getAccountClient().sendInvite(email, role)
 }
 
 export async function resendInvite (email: string, role: AccountRole): Promise<void> {
-  try {
-    await getAccountClient().resendInvite(email, role)
-  } catch (e) {
-    console.log('Failed to resend invite', email, role)
-    console.error(e)
-  }
+  await getAccountClient().resendInvite(email, role)
 }
 
 export async function requestPassword (email: string): Promise<Status> {

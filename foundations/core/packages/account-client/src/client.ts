@@ -57,6 +57,9 @@ import type {
   UserProfile,
   WorkspaceConfiguration,
   WorkspaceEntitlement,
+  WorkspacePendingInvite,
+  WorkspaceSeatChange,
+  WorkspaceSeatQuote,
   WorkspaceLoginInfo,
   WorkspaceOperation
 } from './types'
@@ -252,6 +255,14 @@ export interface AccountClient {
 
   getSubscriptions: (workspaceUuid?: WorkspaceUuid | undefined, activeOnly?: boolean) => Promise<Subscription[]>
   getWorkspaceEntitlement: (workspaceUuid?: WorkspaceUuid) => Promise<WorkspaceEntitlement>
+  getWorkspacePendingInvites: () => Promise<WorkspacePendingInvite[]>
+  getWorkspaceSeatQuote: (targetSeatLimit: number) => Promise<WorkspaceSeatQuote>
+  changeWorkspaceSeatLimit: (
+    targetSeatLimit: number,
+    operationId: string,
+    invite?: { email: string, role: AccountRole }
+  ) => Promise<WorkspaceSeatChange>
+  getWorkspaceSeatChange: (operationId: string) => Promise<WorkspaceSeatChange | null>
   getSubscriptionByProviderId: (provider: string, providerSubscriptionId: string) => Promise<Subscription | null>
   getSubscriptionById: (subscriptionId: string) => Promise<Subscription | null>
   upsertSubscription: (subscription: SubscriptionData) => Promise<void>
@@ -1302,6 +1313,26 @@ class AccountClientImpl implements AccountClient {
       method: 'getWorkspaceEntitlement',
       params: { workspaceUuid }
     })
+  }
+
+  async getWorkspacePendingInvites (): Promise<WorkspacePendingInvite[]> {
+    return await this._rpc({ method: 'getWorkspacePendingInvites', params: {} })
+  }
+
+  async getWorkspaceSeatQuote (targetSeatLimit: number): Promise<WorkspaceSeatQuote> {
+    return await this._rpc({ method: 'getWorkspaceSeatQuote', params: { targetSeatLimit } })
+  }
+
+  async changeWorkspaceSeatLimit (
+    targetSeatLimit: number,
+    operationId: string,
+    invite?: { email: string, role: AccountRole }
+  ): Promise<WorkspaceSeatChange> {
+    return await this._rpc({ method: 'changeWorkspaceSeatLimit', params: { targetSeatLimit, operationId, invite } })
+  }
+
+  async getWorkspaceSeatChange (operationId: string): Promise<WorkspaceSeatChange | null> {
+    return await this._rpc({ method: 'getWorkspaceSeatChange', params: { operationId } })
   }
 
   async getSubscriptionByProviderId (provider: string, providerSubscriptionId: string): Promise<Subscription | null> {

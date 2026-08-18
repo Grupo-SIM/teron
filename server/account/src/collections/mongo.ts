@@ -53,6 +53,7 @@ import type {
   UserProfile,
   Subscription,
   SubscriptionEvent,
+  WorkspaceSeatChange,
   WorkspaceData,
   WorkspaceInfoWithStatus,
   WorkspaceInvite,
@@ -411,6 +412,7 @@ export class MongoAccountDB implements AccountDB {
   userProfile: MongoDbCollection<UserProfile, 'personUuid'>
   subscription: MongoDbCollection<Subscription, 'id'>
   subscriptionEvent: MongoDbCollection<SubscriptionEvent, 'id'>
+  workspaceSeatChange: MongoDbCollection<WorkspaceSeatChange, 'id'>
 
   workspaceMembers: MongoDbCollection<WorkspaceMember>
   workspacePermission: MongoDbCollection<WorkspacePermission>
@@ -432,6 +434,7 @@ export class MongoAccountDB implements AccountDB {
     this.userProfile = new MongoDbCollection<UserProfile, 'personUuid'>('user_profile', db, 'personUuid')
     this.subscription = new MongoDbCollection<Subscription, 'id'>('subscription', db, 'id')
     this.subscriptionEvent = new MongoDbCollection<SubscriptionEvent, 'id'>('subscriptionEvent', db, 'id')
+    this.workspaceSeatChange = new MongoDbCollection<WorkspaceSeatChange, 'id'>('workspaceSeatChange', db, 'id')
 
     this.workspaceMembers = new MongoDbCollection<WorkspaceMember>('workspaceMembers', db)
     this.workspacePermission = new MongoDbCollection<WorkspacePermission>('workspacePermissions', db)
@@ -881,6 +884,72 @@ export class MongoAccountDB implements AccountDB {
       }
     }
     return false
+  }
+
+  private async withSeatReservation<T> (workspaceId: WorkspaceUuid, operation: () => Promise<T>): Promise<T | null> {
+    const lockToken = new UUID().toJSON()
+    const expiresAt = Date.now() + 10000
+    for (let attempt = 0; attempt < 20; attempt++) {
+      const locked = await this.workspace.collection.findOneAndUpdate(
+        {
+          uuid: workspaceId,
+          $or: [{ seatReservationLock: { $exists: false } }, { 'seatReservationLock.expiresAt': { $lt: Date.now() } }]
+        } as any,
+        { $set: { seatReservationLock: { token: lockToken, expiresAt } } } as any,
+        { returnDocument: 'after' }
+      )
+      if (locked == null) {
+        await new Promise((resolve) => setTimeout(resolve, 10))
+        continue
+      }
+      try {
+        return await operation()
+      } finally {
+        await this.workspace.collection.updateOne(
+          { uuid: workspaceId, 'seatReservationLock.token': lockToken } as any,
+          { $unset: { seatReservationLock: '' } } as any
+        )
+      }
+    }
+    return null
+  }
+
+  private async hasSeatCapacity (workspaceId: WorkspaceUuid, capacity: number): Promise<boolean> {
+    const members = await this.getWorkspaceMembers(workspaceId)
+    const invites = await this.invite.find({ workspaceUuid: workspaceId, remainingUses: { $gt: 0 } })
+    const now = Date.now()
+    const used = members.filter((it) =>
+      [AccountRole.Owner, AccountRole.Maintainer, AccountRole.User, AccountRole.Guest].includes(it.role)
+    ).length + invites.filter((it) =>
+      (it.expiresOn === -1 || it.expiresOn > now) && it.email != null && it.email !== ''
+    ).length
+    return used < capacity
+  }
+
+  async assignWorkspaceWithinCapacity (
+    accountId: AccountUuid,
+    workspaceId: WorkspaceUuid,
+    role: AccountRole,
+    capacity: number
+  ): Promise<boolean> {
+    return (await this.withSeatReservation(workspaceId, async () => {
+      if (!(await this.hasSeatCapacity(workspaceId, capacity))) return false
+      await this.assignWorkspace(accountId, workspaceId, role)
+      return true
+    })) ?? false
+  }
+
+  async updateWorkspaceRoleWithinCapacity (
+    accountId: AccountUuid,
+    workspaceId: WorkspaceUuid,
+    role: AccountRole,
+    capacity: number
+  ): Promise<boolean> {
+    return (await this.withSeatReservation(workspaceId, async () => {
+      if (!(await this.hasSeatCapacity(workspaceId, capacity))) return false
+      await this.updateWorkspaceRole(accountId, workspaceId, role)
+      return true
+    })) ?? false
   }
 
   async releaseFreeTrial (accountId: AccountUuid, claimedOn: number): Promise<void> {

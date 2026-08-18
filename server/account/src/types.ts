@@ -311,6 +311,58 @@ export interface SubscriptionEvent {
   createdOn: Timestamp
 }
 
+export type WorkspaceSeatChangeStatus =
+  | 'APPLIED'
+  | 'SCHEDULED'
+  | 'PENDING_PAYMENT'
+  | 'PENDING_RECURRENCE_UPDATE'
+  | 'FAILED'
+  | 'COMPENSATION_REQUIRED'
+
+export interface WorkspaceSeatChange {
+  id: string
+  workspaceUuid: WorkspaceUuid
+  accountUuid: AccountUuid
+  contractId: string
+  providerChangeId?: string
+  status: WorkspaceSeatChangeStatus
+  previousQuantity: number
+  targetQuantity: number
+  effectiveQuantity: number
+  prorationAmount: string
+  nextRecurringAmount: string
+  currency: 'BRL'
+  scheduledFor?: Timestamp
+  inviteEmail?: string
+  inviteRole?: AccountRole
+  inviteSentOn?: Timestamp
+  failureCode?: string
+  failureMessage?: string
+  createdOn: Timestamp
+  updatedOn: Timestamp
+}
+
+export type WorkspaceSeatChangeData = Omit<WorkspaceSeatChange, 'workspaceUuid' | 'accountUuid' | 'createdOn' | 'updatedOn'>
+
+export interface WorkspacePendingInvite {
+  id: string
+  email: string
+  role: AccountRole
+  expiresOn: Timestamp
+}
+
+export interface WorkspaceSeatQuote {
+  currentQuantity: number
+  targetQuantity: number
+  occupiedQuantity: number
+  unitAmount: string
+  currentRecurringAmount: string
+  nextRecurringAmount: string
+  estimatedProrationAmount: string
+  currency: 'BRL'
+  periodEnd: Timestamp
+}
+
 export type WorkspaceSubscriptionPlan = 'free' | 'business' | 'unlimited'
 export type WorkspaceAccessMode = 'full' | 'read-only'
 
@@ -362,6 +414,7 @@ export interface AccountDB {
   userProfile: DbCollection<UserProfile>
   subscription: DbCollection<Subscription>
   subscriptionEvent: DbCollection<SubscriptionEvent>
+  workspaceSeatChange: DbCollection<WorkspaceSeatChange>
   workspacePermission: DbCollection<WorkspacePermission>
 
   init: () => Promise<void>
@@ -386,6 +439,18 @@ export interface AccountDB {
     accountId: AccountUuid,
     workspaceId: WorkspaceUuid,
     role: AccountRole
+  ) => Promise<boolean>
+  assignWorkspaceWithinCapacity: (
+    accountId: AccountUuid,
+    workspaceId: WorkspaceUuid,
+    role: AccountRole,
+    capacity: number
+  ) => Promise<boolean>
+  updateWorkspaceRoleWithinCapacity: (
+    accountId: AccountUuid,
+    workspaceId: WorkspaceUuid,
+    role: AccountRole,
+    capacity: number
   ) => Promise<boolean>
   batchAssignWorkspacePermission: (
     workspaceId: WorkspaceUuid,

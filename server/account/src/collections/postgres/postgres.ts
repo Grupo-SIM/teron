@@ -51,6 +51,7 @@ import type {
   UserProfile,
   Subscription,
   SubscriptionEvent,
+  WorkspaceSeatChange,
   WorkspacePermission,
   DBFlavor
 } from '../../types'
@@ -544,6 +545,7 @@ export class PostgresAccountDB implements AccountDB {
   userProfile: PostgresDbCollection<UserProfile, 'personUuid'>
   subscription: PostgresDbCollection<Subscription, 'id'>
   subscriptionEvent: PostgresDbCollection<SubscriptionEvent, 'id'>
+  workspaceSeatChange: PostgresDbCollection<WorkspaceSeatChange, 'id'>
   workspacePermission: PostgresDbCollection<WorkspacePermission>
 
   constructor (
@@ -613,6 +615,12 @@ export class PostgresAccountDB implements AccountDB {
       ns,
       idKey: 'id',
       timestampFields: ['periodStart', 'periodEnd', 'createdOn'],
+      withRetryClient
+    })
+    this.workspaceSeatChange = new PostgresDbCollection<WorkspaceSeatChange, 'id'>('workspace_seat_change', client, {
+      ns,
+      idKey: 'id',
+      timestampFields: ['scheduledFor', 'inviteSentOn', 'createdOn', 'updatedOn'],
       withRetryClient
     })
     this.workspacePermission = new PostgresDbCollection<WorkspacePermission>('workspace_permissions', client, {
@@ -929,6 +937,54 @@ export class PostgresAccountDB implements AccountDB {
         VALUES (${accountUuid}, ${workspaceUuid}, ${role})
         ON CONFLICT (account_uuid, workspace_uuid) DO NOTHING
       `
+      return true
+    })
+  }
+
+  async assignWorkspaceWithinCapacity (
+    accountUuid: AccountUuid,
+    workspaceUuid: WorkspaceUuid,
+    role: AccountRole,
+    capacity: number
+  ): Promise<boolean> {
+    return await this.client.begin(async (tx) => {
+      await tx`SELECT uuid FROM ${this.client(this.workspace.getTableName())} WHERE uuid = ${workspaceUuid} FOR UPDATE`
+      const [row] = await tx`
+        SELECT
+          (SELECT COUNT(*) FROM ${this.client(this.getWsMembersTableName())}
+            WHERE workspace_uuid = ${workspaceUuid} AND role IN ('OWNER', 'MAINTAINER', 'USER', 'GUEST')) +
+          (SELECT COUNT(*) FROM ${this.client(this.invite.getTableName())}
+            WHERE workspace_uuid = ${workspaceUuid} AND email IS NOT NULL AND email <> ''
+              AND (expires_on = -1 OR expires_on > ${Date.now()}) AND remaining_uses > 0) AS used
+      `
+      if (Number(row?.used ?? 0) >= capacity) return false
+      await tx`
+        INSERT INTO ${this.client(this.getWsMembersTableName())} (account_uuid, workspace_uuid, role)
+        VALUES (${accountUuid}, ${workspaceUuid}, ${role}) ON CONFLICT (account_uuid, workspace_uuid) DO NOTHING
+      `
+      return true
+    })
+  }
+
+  async updateWorkspaceRoleWithinCapacity (
+    accountUuid: AccountUuid,
+    workspaceUuid: WorkspaceUuid,
+    role: AccountRole,
+    capacity: number
+  ): Promise<boolean> {
+    return await this.client.begin(async (tx) => {
+      await tx`SELECT uuid FROM ${this.client(this.workspace.getTableName())} WHERE uuid = ${workspaceUuid} FOR UPDATE`
+      const [row] = await tx`
+        SELECT
+          (SELECT COUNT(*) FROM ${this.client(this.getWsMembersTableName())}
+            WHERE workspace_uuid = ${workspaceUuid} AND role IN ('OWNER', 'MAINTAINER', 'USER', 'GUEST')) +
+          (SELECT COUNT(*) FROM ${this.client(this.invite.getTableName())}
+            WHERE workspace_uuid = ${workspaceUuid} AND email IS NOT NULL AND email <> ''
+              AND (expires_on = -1 OR expires_on > ${Date.now()}) AND remaining_uses > 0) AS used
+      `
+      if (Number(row?.used ?? 0) >= capacity) return false
+      await tx`UPDATE ${this.client(this.getWsMembersTableName())} SET role = ${role}
+        WHERE workspace_uuid = ${workspaceUuid} AND account_uuid = ${accountUuid}`
       return true
     })
   }

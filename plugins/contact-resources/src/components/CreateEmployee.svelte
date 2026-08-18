@@ -88,6 +88,10 @@
         return
       }
 
+      // Reserve billing capacity before creating workspace-local employee data.
+      const sendInvite = await getResource(login.function.SendInvite)
+      await sendInvite(mail, AccountRole.User)
+
       const { uuid, socialId } = await accountClient.ensurePerson(SocialIdType.EMAIL, mail, firstName, lastName)
 
       const name = combineName(firstName, lastName)
@@ -123,9 +127,6 @@
         },
         socialId as SocialIdentityRef
       )
-
-      const sendInvite = await getResource(login.function.SendInvite)
-      await sendInvite(mail, AccountRole.User)
 
       for (const channel of channels) {
         await client.addCollection(
