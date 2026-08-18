@@ -5,7 +5,8 @@
 <script lang="ts">
   import { AccountRole, generateId, getCurrentAccount } from '@hcengineering/core'
   import platform, { PlatformError } from '@hcengineering/platform'
-  import { Card, EditBox, DropdownLabelsIntl, Label, type DropdownIntlItem } from '@hcengineering/ui'
+  import { Card } from '@hcengineering/presentation'
+  import { EditBox, DropdownLabelsIntl, Label, type DropdownIntlItem } from '@hcengineering/ui'
   import { createEventDispatcher } from 'svelte'
 
   import setting from '../plugin'
@@ -26,6 +27,7 @@
   let saving = false
   let ownerOnly = false
   let quote: Awaited<ReturnType<typeof accountClient.getWorkspaceSeatQuote>> | undefined
+  let operationId: string | undefined
 
   async function submit (): Promise<void> {
     saving = true
@@ -47,11 +49,15 @@
         }
       }
 
-      const operationId = generateId()
-      const result = await accountClient.changeWorkspaceSeatLimit(quote.targetQuantity, operationId, {
+      operationId ??= generateId()
+      let result = await accountClient.changeWorkspaceSeatLimit(quote.targetQuantity, operationId, {
         email: email.trim(),
         role
       })
+      for (let attempt = 0; attempt < 120 && ['PENDING_PAYMENT', 'PENDING_RECURRENCE_UPDATE'].includes(result.status); attempt++) {
+        await new Promise((resolve) => setTimeout(resolve, 2000))
+        result = await accountClient.getWorkspaceSeatChange(operationId)
+      }
       if (result.status === 'APPLIED') dispatch('close', true)
     } finally {
       saving = false

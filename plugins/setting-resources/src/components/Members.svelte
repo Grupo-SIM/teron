@@ -136,7 +136,7 @@
     <Button
       label={setting.string.InviteMember}
       kind="primary"
-      on:click={() => showPopup(InviteMemberPopup, {}, () => void load())}
+      on:click={() => showPopup(InviteMemberPopup, {}, undefined, () => void load())}
     />
     <svelte:fragment slot="search"><SearchInput bind:value={search} collapsed /></svelte:fragment>
   </Header>
