@@ -15,21 +15,14 @@
 <script lang="ts">
   import { AvatarType } from '@hcengineering/contact'
   import { EditableAvatar, getAccountClient } from '@hcengineering/contact-resources'
-  import core, { Configuration, WorkspaceAccountPermission } from '@hcengineering/core'
+  import core from '@hcengineering/core'
   import { openAuthRoute } from '@hcengineering/login'
-  import { translateCB } from '@hcengineering/platform'
-  import { createQuery, getClient, MessageBox } from '@hcengineering/presentation'
+  import { getClient, MessageBox } from '@hcengineering/presentation'
   import { WorkspaceSetting } from '@hcengineering/setting'
   import {
     Breadcrumb,
     Button,
-    deviceOptionsStore as deviceInfo,
-    DropdownLabels,
-    type DropdownTextItem,
     EditBox,
-    getLocalWeekStart,
-    getWeekDayNames,
-    hasLocalWeekStart,
     Header,
     IconCheckmark,
     IconClose,
@@ -37,20 +30,14 @@
     Label,
     Loading,
     Scroller,
-    showPopup,
-    themeStore,
-    Toggle
+    showPopup
   } from '@hcengineering/ui'
   import settingsRes from '../plugin'
-  import ApiTokenPopup from './ApiTokenPopup.svelte'
-  import WorkspacePermissionEditor from './WorkspacePermissionEditor.svelte'
 
   let loading = true
   let isEditingName = false
   let oldName: string
   let name: string = ''
-  let workspaceUrl = ''
-  let passwordAgingRule: number | undefined = undefined
 
   const accountClient = getAccountClient()
   const disabledSet = ['\n', '<', '>', '/', '\\']
@@ -67,10 +54,8 @@
   async function loadWorkspaceName (): Promise<void> {
     const res = await accountClient.getWorkspaceInfo()
 
-    workspaceUrl = res.url
     oldName = res.name
     name = oldName
-    passwordAgingRule = res.passwordAgingRule ?? undefined
     loading = false
   }
 
@@ -135,76 +120,6 @@
     }
   }
 
-  const permissionConfigurationQuery = createQuery()
-  let disablePermissionsConfiguration: Configuration | undefined = undefined
-  $: arePermissionsDisabled = disablePermissionsConfiguration?.enabled ?? false
-
-  $: permissionConfigurationQuery.query(
-    core.class.Configuration,
-    { _id: settingsRes.ids.DisablePermissionsConfiguration },
-    (result) => {
-      disablePermissionsConfiguration = result[0]
-    }
-  )
-
-  async function changePasswordAgingRules (val: number | undefined): Promise<void> {
-    passwordAgingRule = val !== undefined ? Math.max(val, 1) : undefined
-    await accountClient.updatePasswordAgingRule(passwordAgingRule)
-  }
-
-  async function handleGenerateApiToken (): Promise<void> {
-    const { token } = await accountClient.selectWorkspace(workspaceUrl)
-    showPopup(ApiTokenPopup, { token })
-  }
-
-  function handleTogglePermissions (): void {
-    const newState = !arePermissionsDisabled
-    showPopup(MessageBox, {
-      label: newState ? settingsRes.string.DisablePermissions : settingsRes.string.EnablePermissions,
-      message: newState
-        ? settingsRes.string.DisablePermissionsConfirmation
-        : settingsRes.string.EnablePermissionsConfirmation,
-      dangerous: true,
-      action: async () => {
-        if (disablePermissionsConfiguration === undefined) {
-          await client.createDoc(
-            core.class.Configuration,
-            core.space.Workspace,
-            { enabled: newState },
-            settingsRes.ids.DisablePermissionsConfiguration
-          )
-        } else {
-          await client.update(disablePermissionsConfiguration, { enabled: newState })
-        }
-      }
-    })
-  }
-
-  const weekInfoFirstDay: number = getLocalWeekStart()
-  const hasWeekInfo: boolean = hasLocalWeekStart()
-  const weekNames = getWeekDayNames()
-  let items: DropdownTextItem[] = []
-  let selected: string
-
-  $: translateCB(
-    hasWeekInfo ? settingsRes.string.SystemSetupString : settingsRes.string.DefaultString,
-    { day: weekNames?.get(weekInfoFirstDay)?.toLowerCase() ?? '' },
-    $themeStore.language,
-    (r) => {
-      items = [
-        { id: 'system', label: r },
-        ...Array.from(weekNames.entries()).map((it) => ({ id: it[0].toString(), label: it[1] }))
-      ]
-      const savedFirstDayOfWeek = localStorage.getItem('firstDayOfWeek') ?? 'system'
-      selected = items[savedFirstDayOfWeek === 'system' ? 0 : $deviceInfo.firstDayOfWeek + 1].id
-    }
-  )
-
-  const onSelected = (e: CustomEvent<string>): void => {
-    selected = e.detail
-    localStorage.setItem('firstDayOfWeek', `${e.detail}`)
-    $deviceInfo.firstDayOfWeek = e.detail === 'system' ? weekInfoFirstDay : (parseInt(e.detail, 10) ?? 1)
-  }
 </script>
 
 <div class="teronComponent">
@@ -251,83 +166,6 @@
             {#if isEditingName}
               <Button icon={IconClose} kind="ghost" size="small" on:click={handleCancelEditName} />
             {/if}
-          </div>
-
-          <div class="flex-col flex-gap-4 mt-6">
-            <div class="title"><Label label={settingsRes.string.PasswordAgingRule} /></div>
-            <div class="flex-row-center flex-gap-4">
-              <Label label={settingsRes.string.PasswordAgingRuleDescription} />
-              <Toggle
-                on={!!passwordAgingRule}
-                on:change={(e) => {
-                  if (e.detail === false) {
-                    void changePasswordAgingRules(undefined)
-                  } else {
-                    void changePasswordAgingRules(30)
-                  }
-                }}
-              />
-              {#if passwordAgingRule}
-                <div class="w-32">
-                  <EditBox
-                    format={'number'}
-                    minValue={1}
-                    maxDigitsAfterPoint={0}
-                    bind:value={passwordAgingRule}
-                    disabled={!passwordAgingRule}
-                    on:change={() => changePasswordAgingRules(passwordAgingRule)}
-                  />
-                </div>
-              {/if}
-            </div>
-          </div>
-
-          <div class="flex-col flex-gap-4 mt-6">
-            <div class="title"><Label label={settingsRes.string.Calendar} /></div>
-            <div class="flex-row-center flex-gap-4">
-              <Label label={settingsRes.string.StartOfTheWeek} />
-              <DropdownLabels
-                {items}
-                kind={'regular'}
-                size={'medium'}
-                {selected}
-                enableSearch={false}
-                on:selected={onSelected}
-              />
-            </div>
-          </div>
-
-          <div class="flex-col flex-gap-4 mt-6">
-            <div class="title"><Label label={settingsRes.string.AccessControl} /></div>
-            <div class="w-32">
-              <Button
-                kind="regular"
-                label={arePermissionsDisabled
-                  ? settingsRes.string.EnablePermissions
-                  : settingsRes.string.DisablePermissions}
-                on:click={handleTogglePermissions}
-              />
-            </div>
-          </div>
-
-          <WorkspacePermissionEditor
-            permission={WorkspaceAccountPermission.ImportDocument}
-            label={settingsRes.string.ImportDocumentPermission}
-            description={settingsRes.string.ImportDocumentDescription}
-            allowGuests={true}
-          />
-
-          <div class="flex-col flex-gap-4 mt-6">
-            <div class="title"><Label label={settingsRes.string.ApiAccess} /></div>
-            <div class="w-32">
-              <Button
-                label={settingsRes.string.GenerateApiToken}
-                kind="regular"
-                disabled={workspaceUrl === ''}
-                showTooltip={{ label: settingsRes.string.GenerateApiToken }}
-                on:click={handleGenerateApiToken}
-              />
-            </div>
           </div>
 
           <div class="flex-col flex-gap-4 mt-6">
