@@ -33,7 +33,8 @@ RUN mkdir src \
     fi
 
 COPY src ./src
-RUN if [ "$TARGETPLATFORM" = "linux/amd64" ]; then \
+RUN touch src/main.rs \
+    && if [ "$TARGETPLATFORM" = "linux/amd64" ]; then \
         cargo build --locked --release --target=x86_64-unknown-linux-gnu ; \
     else \
         cargo build --locked --release --target=aarch64-unknown-linux-gnu ; \
