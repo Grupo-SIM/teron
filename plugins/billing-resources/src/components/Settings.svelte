@@ -13,7 +13,7 @@
 // limitations under the License.
 -->
 <script lang="ts">
-  import { type Asset, type IntlString, getMetadata } from '@hcengineering/platform'
+  import { type Asset, type IntlString } from '@hcengineering/platform'
   import {
     AnySvelteComponent,
     Breadcrumb,
@@ -29,7 +29,6 @@
     resolvedLocationStore,
     twoPanelsSeparators
   } from '@hcengineering/ui'
-  import presentation from '@hcengineering/presentation'
   import { getCurrentAccount } from '@hcengineering/core'
   import { onDestroy } from 'svelte'
 
@@ -68,14 +67,10 @@
     // }
   ]
 
-  // Only include subscriptions group if payment URL is configured.
-  // Storage usage is available regardless of payment configuration but
-  // requires Maintainer-or-higher account role.
-  const paymentUrl = getMetadata(presentation.metadata.PaymentUrl)
-  const showSubscriptions = paymentUrl != null && paymentUrl !== ''
+  // Seat billing uses the account service and Simintpay directly. It must stay
+  // visible even when deployments do not configure the legacy checkout URL.
   const showStorage = canManageStorage(getCurrentAccount())
   const groups = baseGroups.filter((g) => {
-    if (g.key === 'subscriptions') return showSubscriptions
     if (g.key === 'storage') return showStorage
     return true
   })

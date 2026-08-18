@@ -389,7 +389,16 @@
                   <div class="status-badge ml-2 text-md"><Label label={plugin.string.Active} /></div>
                 {/if}
               </div>
-              {#if currentSubscription?.amount}
+              {#if entitlement?.plan === 'business' && seatQuote != null}
+                <div class="flex-row-center items-end">
+                  <span class="fs-title text-xl">
+                    {Number(seatQuote.nextRecurringAmount).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
+                  </span>
+                  <span class="ml-1 lower">
+                    <Label label={plugin.string.Monthly} />
+                  </span>
+                </div>
+              {:else if currentSubscription?.amount}
                 <div class="flex-row-center items-end">
                   <span class="fs-title text-xl">
                     ${currentSubscription?.amount / 100}

@@ -30,7 +30,6 @@
     navigate,
     resolvedLocationStore,
     settingsSeparators,
-    showPopup,
     type AnyComponent,
     deviceOptionsStore as deviceInfo,
     deviceWidths
@@ -67,7 +66,12 @@
     {},
     (res) => {
       categories = res.filter(
-        (p) => !hiddenCategories.has(p.name) && hasAccountRole(account, p.role) && !isDisabled(p.feature)
+        // Workspace seat billing is backed by the account service, not by the
+        // optional legacy payment feature. Keep it reachable for every owner.
+        (p) =>
+          !hiddenCategories.has(p.name) &&
+          hasAccountRole(account, p.role) &&
+          (p.name === 'billing' || !isDisabled(p.feature))
       )
       category = findCategory(categoryId)
     },
@@ -115,11 +119,6 @@
     Analytics.handleEvent(SettingsEvents.SelectWorkspace)
     openAuthRoute('selectWorkspace')
   }
-  function inviteWorkspace (): void {
-    Analytics.handleEvent(SettingsEvents.InviteToWorkspace)
-    showPopup(login.component.InviteLink, {})
-  }
-
   const updatedStore = (ss: SettingsStore): ComponentType | AnyComponent | null => {
     asideProps = ss.props ?? null
     return ss.component === undefined ? null : ss.component
@@ -196,13 +195,6 @@
           label={setting.string.SelectWorkspace}
           on:click={selectWorkspace}
         />
-        {#if hasAccountRole(account, AccountRole.User) && !isDisabled('invites')}
-          <NavItem
-            icon={setting.icon.InviteWorkspace}
-            label={setting.string.InviteWorkspace}
-            on:click={inviteWorkspace}
-          />
-        {/if}
         <NavItem icon={setting.icon.Signout} label={setting.string.Signout} on:click={signOut} />
       </NavFooter>
     </div>

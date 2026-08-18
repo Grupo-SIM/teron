@@ -26,10 +26,9 @@
   import presentation, {
     createQuery,
     getCurrentWorkspaceUrl,
-    hasResource,
-    isDisabled
+    hasResource
   } from '@hcengineering/presentation'
-  import setting, { RoleCapability, settingId, SettingsCategory } from '@hcengineering/setting'
+  import setting, { settingId, SettingsCategory } from '@hcengineering/setting'
   import {
     Action,
     closePopup,
@@ -46,12 +45,10 @@
   import { logOut } from '../utils'
   import { Analytics } from '@hcengineering/analytics'
   import { allowGuestSignUpStore } from '@hcengineering/view-resources'
-  import { getMetadata, getResource } from '@hcengineering/platform'
+  import { getMetadata } from '@hcengineering/platform'
   import { onMount } from 'svelte'
 
   let items: SettingsCategory[] = []
-  let canGenerateInviteLink = false
-
   const account = getCurrentAccount()
   const settingsQuery = createQuery()
   settingsQuery.query(
@@ -65,13 +62,6 @@
 
   onMount(() => {
     loadWorkspaceMemberStatuses()
-    void getResource(setting.function.HasRoleCapability).then((checkCapability) => {
-      if (checkCapability != null) {
-        void checkCapability(RoleCapability.GenerateInviteLink).then((v: boolean) => {
-          canGenerateInviteLink = v
-        })
-      }
-    })
   })
 
   $: person = $myEmployeeStore
@@ -93,10 +83,6 @@
       loc.path.length = 3
     }
     navigate(loc)
-  }
-
-  function inviteWorkspace (): void {
-    showPopup(login.component.InviteLink, {})
   }
 
   function filterItems (items: SettingsCategory[], keys: string[]): SettingsCategory[] {
@@ -158,17 +144,6 @@
       })
     }
     actions.push(...getMenu(items, ['main']))
-    if (hasAccountRole(account, AccountRole.User) && !isDisabled('invites') && canGenerateInviteLink) {
-      actions.push({
-        icon: setting.icon.InviteWorkspace,
-        label: setting.string.InviteWorkspace,
-        action: async () => {
-          inviteWorkspace()
-        },
-        group: 'end'
-      })
-    }
-
     if (hasAccountRole(account, AccountRole.User)) {
       actions.push({
         icon: setting.icon.Signout,
