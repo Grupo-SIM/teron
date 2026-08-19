@@ -9,9 +9,9 @@ const manrope = Manrope({
 
 export const metadata: Metadata = {
   applicationName: "Teron",
-  title: "Teron — Tudo o que sua equipe precisa. Em um só lugar.",
+  title: "Teron — Tudo o que sua equipe precisa para trabalhar melhor.",
   description:
-    "Centralize projetos, tarefas, reuniões e comunicação em uma única plataforma para sua equipe produzir mais.",
+    "Sua empresa mais organizada, sua equipe mais produtiva. Organize seu time, centralize o trabalho e simplifique a rotina da sua empresa.",
   manifest: "/teron/site.webmanifest",
   icons: {
     icon: [

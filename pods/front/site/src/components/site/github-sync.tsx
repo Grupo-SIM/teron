@@ -1,6 +1,8 @@
 import type { ReactNode } from "react";
 import { Localized, defaultLocale, type Locale } from "@/i18n/site";
 
+import { HeroCta } from "./hero-cta";
+
 /**
  * Seção de integração com o GitHub, no mesmo arranjo do teron.io: título curto,
  * a janela sob um brilho laranja/azul e a grade de seis recursos embaixo.
@@ -28,92 +30,79 @@ function Icon({ id, children }: { id: string; children: ReactNode }) {
   );
 }
 
+/*
+ * Cada card ilustra um compromisso, e não um recurso, então o desenho segue o
+ * texto: cadeado, marca, escudo, lente, boia e aperto de mão. Os títulos vêm em
+ * duas partes porque a grade escreve a segunda numa linha própria — palavra
+ * única deixa a segunda vazia e a linha continua reservada, mantendo os seis
+ * cards com a mesma altura de texto.
+ */
 const FEATURES = [
   {
-    id: "gh-sync",
+    id: "gh-security",
     icon: (
-      <Icon id="gh-sync">
-        <path d="M16 3a13 13 0 0 0-9.2 22.2l2.8-2.8A9 9 0 0 1 16 7v4l7-5.5L16 0v3Z" />
-        <path
-          d="M16 29a13 13 0 0 0 9.2-22.2l-2.8 2.8A9 9 0 0 1 16 25v-4l-7 5.5L16 32v-3Z"
-          opacity=".65"
-        />
+      <Icon id="gh-security">
+        <path d="M16 2a7 7 0 0 0-7 7v4h3.2V9a3.8 3.8 0 1 1 7.6 0v4H23V9a7 7 0 0 0-7-7Z" />
+        <path d="M7 13h18a2 2 0 0 1 2 2v13a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V15a2 2 0 0 1 2-2Zm9 5.5a2.6 2.6 0 0 0-1.3 4.85V26h2.6v-2.65A2.6 2.6 0 0 0 16 18.5Z" opacity=".7" />
       </Icon>
     ),
-    title: ["Sincronização", "nos dois sentidos"],
-    text: "Ligue o gerenciador de tarefas ao GitHub e veja cada mudança refletida nos dois lados na hora.",
+    title: ["Segurança", "e privacidade"],
+    text: "Suas informações são privadas e acessíveis somente por quem sua empresa autorizar.",
   },
   {
-    id: "gh-private",
+    id: "gh-belonging",
     icon: (
-      <Icon id="gh-private">
-        <circle cx="8" cy="8" r="3.4" />
-        <circle cx="24" cy="8" r="3.4" opacity=".55" />
-        <circle cx="16" cy="16" r="3.4" />
-        <circle cx="8" cy="24" r="3.4" opacity=".55" />
-        <circle cx="24" cy="24" r="3.4" />
-        <path
-          d="M9.6 9.6 14.4 14.4M17.6 17.6 22.4 22.4M22.4 9.6 17.6 14.4M14.4 17.6 9.6 22.4"
-          stroke="url(#gh-private)"
-          strokeWidth="1.6"
-        />
+      <Icon id="gh-belonging">
+        <path d="M16 2.5 27 8v9.5c0 6.4-4.4 10.9-11 12.5-6.6-1.6-11-6.1-11-12.5V8l11-5.5Z" opacity=".45" />
+        <path d="M16 9.5c-2.6-2.6-6.6-.9-6.6 2.4 0 3.2 3.6 5.9 6.6 8.1 3-2.2 6.6-4.9 6.6-8.1 0-3.3-4-5-6.6-2.4Z" />
       </Icon>
     ),
-    title: ["Tarefas", "privadas"],
-    text: "Mantenha no seu espaço as tarefas que não devem sair para o repositório público.",
+    title: ["Pertencimento", ""],
+    text: "Sua empresa tem seu próprio jeito. O Teron acompanha essa identidade.",
   },
   {
-    id: "gh-repos",
+    id: "gh-trust",
     icon: (
-      <Icon id="gh-repos">
-        <path d="M16 2 30 8.5 16 15 2 8.5 16 2Z" />
-        <path d="M16 17.2 4.6 12l-2.6 1.2L16 20l14-6.8-2.6-1.2L16 17.2Z" opacity=".7" />
-        <path d="M16 24.4 4.6 19.2 2 20.4 16 27l14-6.6-2.6-1.2L16 24.4Z" opacity=".45" />
+      <Icon id="gh-trust">
+        <path d="M16 2 5 6.6v8.9c0 6.8 4.5 12.4 11 14.5 6.5-2.1 11-7.7 11-14.5V6.6L16 2Z" opacity=".45" />
+        <path d="m14.5 20.7-4.3-4.3 2.1-2.1 2.2 2.2 6.6-6.6 2.1 2.1-8.7 8.7Z" />
       </Icon>
     ),
-    title: ["Múltiplos", "repositórios"],
-    text: "Conecte quantos repositórios o time precisar e organize todos em um único painel.",
+    title: ["Confiança", ""],
+    text: "Seu trabalho merece uma plataforma na qual você possa confiar.",
   },
   {
-    id: "gh-milestone",
+    id: "gh-transparency",
     icon: (
-      <Icon id="gh-milestone">
-        <path d="M16 2a14 14 0 1 0 0 28 14 14 0 0 0 0-28Zm0 3a11 11 0 1 1 0 22 11 11 0 0 1 0-22Z" />
-        <path d="M21.5 10.5 13 13l-2.5 8.5L19 19l2.5-8.5Z" />
+      <Icon id="gh-transparency">
+        <path d="M16 6C8.8 6 3.4 11.4 1.5 16c1.9 4.6 7.3 10 14.5 10s12.6-5.4 14.5-10C28.6 11.4 23.2 6 16 6Zm0 3.2c5.1 0 9.3 3.5 11.1 6.8-1.8 3.3-6 6.8-11.1 6.8S6.7 19.3 4.9 16C6.7 12.7 10.9 9.2 16 9.2Z" opacity=".55" />
+        <circle cx="16" cy="16" r="4.2" />
       </Icon>
     ),
-    title: ["Migração de", "milestones"],
-    text: "Leve marcos e etapas de um repositório para outro sem refazer o planejamento na mão.",
+    title: ["Transparência", ""],
+    text: "Clareza em tudo o que você contrata, utiliza e recebe.",
   },
   {
-    id: "gh-progress",
+    id: "gh-support",
     icon: (
-      <Icon id="gh-progress">
-        <path d="M15 2 3 14l4 4L19 6l-4-4Z" />
-        <path d="M20 8 8 20l4 4L24 12l-4-4Z" opacity=".7" />
-        <path d="M25 14 13 26l4 4 12-12-4-4Z" opacity=".45" />
+      <Icon id="gh-support">
+        <path d="M16 2a12 12 0 0 0-12 12v6.5a3.5 3.5 0 0 0 3.5 3.5H10V14H7.2a8.8 8.8 0 0 1 17.6 0H22v10h2.5A3.5 3.5 0 0 0 28 20.5V14A12 12 0 0 0 16 2Z" opacity=".55" />
+        <path d="M13.5 26h5a2.5 2.5 0 0 1 0 5h-5a2.5 2.5 0 0 1 0-5ZM6 14h4v10H6V14Zm16 0h4v10h-4V14Z" />
       </Icon>
     ),
-    title: ["Acompanhe", "o progresso"],
-    text: "Veja contribuições e alterações do repositório dentro do próprio espaço de trabalho.",
+    title: ["Suporte", ""],
+    text: "Conte com nosso time para tirar dúvidas e resolver o que precisar.",
   },
   {
-    id: "gh-filter",
+    id: "gh-commitment",
     icon: (
-      <Icon id="gh-filter">
-        <rect x="3" y="3" width="7" height="7" rx="1.6" />
-        <rect x="12.5" y="3" width="7" height="7" rx="1.6" opacity=".55" />
-        <rect x="22" y="3" width="7" height="7" rx="1.6" />
-        <rect x="3" y="12.5" width="7" height="7" rx="1.6" opacity=".55" />
-        <rect x="12.5" y="12.5" width="7" height="7" rx="1.6" />
-        <rect x="22" y="12.5" width="7" height="7" rx="1.6" opacity=".55" />
-        <rect x="3" y="22" width="7" height="7" rx="1.6" />
-        <rect x="12.5" y="22" width="7" height="7" rx="1.6" opacity=".55" />
-        <rect x="22" y="22" width="7" height="7" rx="1.6" />
+      <Icon id="gh-commitment">
+        <path d="M2 11.5 8 9l6.4 4.2a2 2 0 0 1 .3 3.1l-.2.2a2 2 0 0 1-2.6.1L8.6 14v9.4L2 20.8V11.5Z" opacity=".55" />
+        <path d="M30 11.5 24 9l-6.9 3.6-3 2.4 2.5 2.2 3.5-2.3 6.3 5.4a1.9 1.9 0 0 1-2.4 2.9l.6.5a1.9 1.9 0 0 1-2.5 2.8 1.9 1.9 0 0 1-2.6 2.6 1.9 1.9 0 0 1-3 .5l-3.1-2.7V14l6.6 4.6L30 20.8V11.5Z" />
       </Icon>
     ),
-    title: ["Filtros", "avançados"],
-    text: "Encontre exatamente o que precisa com buscas e filtros combinados sobre os dados do projeto.",
+    title: ["Compromisso", ""],
+    text: "Mais do que oferecer uma plataforma, queremos construir uma relação de longo prazo com sua empresa.",
   },
 ];
 
@@ -122,14 +111,14 @@ export function GithubSync({ locale = defaultLocale }: { locale?: Locale }) {
     <Localized locale={locale}><section id="github" className="lp-gh">
       <div className="lp-gh-inner">
         <h2 data-reveal className="lp-gh-title">
-          Sincronize com o GitHub.
+          O Teron se conecta ao
           <br />
-          Nos dois sentidos.
+          que sua empresa já usa.
         </h2>
 
         <p data-reveal className="lp-gh-lead">
-          Gerencie as tarefas do time com sincronização bidirecional. Use a
-          plataforma como interface avançada para issues e projetos do GitHub.
+          GitHub, e-mail, Telegram e outras ferramentas que fazem parte do dia a
+          dia da sua empresa. Tudo conectado para simplificar sua rotina.
         </p>
 
         <div className="lp-gh-shot" data-reveal>
@@ -177,6 +166,12 @@ export function GithubSync({ locale = defaultLocale }: { locale?: Locale }) {
             </li>
           ))}
         </ul>
+
+        {/* Última parada antes do fechamento da página: quem leu até aqui já
+            sabe o que a plataforma faz e a pergunta que sobra é o preço. */}
+        <p data-reveal className="lp-gh-actions">
+          <HeroCta href="/precos" label="Conheça nossos planos" />
+        </p>
       </div>
     </section></Localized>
   );

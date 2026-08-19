@@ -32,7 +32,6 @@ export function SiteFooter({ locale = defaultLocale }: { locale?: Locale }) {
               Política de Privacidade
             </Link>
           </span>
-          <span>Feito com paixão e Teron</span>
         </div>
       </div>
     </footer></Localized>

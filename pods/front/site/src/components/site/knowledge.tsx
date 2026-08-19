@@ -342,17 +342,18 @@ export function Knowledge({ locale = defaultLocale }: { locale?: Locale }) {
               com a transição.
             */}
             <div className="lp-know-card-txt" data-on={face < 0.5}>
-              <strong>Colabore</strong>
+              <strong>Feito para pessoas</strong>
               <span>
-                Potencialize o trabalho em equipe com recursos de colaboração em
-                tempo real.
+                Uma experiência simples e intuitiva para tornar o trabalho mais
+                leve.
               </span>
             </div>
 
             <div className="lp-know-card-txt" data-on={face >= 0.5}>
-              <strong>Histórico de versões</strong>
+              <strong>Feito para empresas</strong>
               <span>
-                Acompanhe cada edição sem esforço e nunca perca uma alteração.
+                Com o Teron, sua empresa tem tudo o que precisa para fazer o
+                trabalho fluir.
               </span>
             </div>
           </div>
@@ -360,16 +361,15 @@ export function Knowledge({ locale = defaultLocale }: { locale?: Locale }) {
 
         <div className="lp-know-col">
           <h2 data-reveal className="lp-know-title">
-            Conhecimento ao alcance
+            Uma plataforma.
             <br />
-            da sua equipe.
+            Todas as formas de trabalhar.
             <Pin author="blue" x={46} y={8} />
           </h2>
 
           <p data-reveal className="lp-know-lead">
-            A plataforma reúne tudo o que sua equipe precisa para criar e manter
-            a documentação dos projetos. As ferramentas de edição colaborativa
-            aceleram o trabalho do time.
+            Uma experiência criada para tornar a rotina da sua empresa mais
+            simples, conectada e eficiente.
           </p>
 
           <div className="lp-know-doc" data-reveal ref={docRef}>
@@ -389,22 +389,21 @@ export function Knowledge({ locale = defaultLocale }: { locale?: Locale }) {
               </div>
 
               <p className="lp-know-p">
-                <strong>Documentos</strong> podem ser usados para compartilhar
-                materiais de referência, colaborar em planos e roadmaps,
-                registrar atas de reunião e distribuir tarefas entre os
-                responsáveis.
+                <strong>Desenvolvemos</strong> nossa plataforma com um objetivo:
+                reunir em um único ambiente tudo o que as equipes precisam para
+                trabalhar, colaborar e crescer.
               </p>
             </div>
 
             <figure className="lp-know-fig">
               {/* eslint-disable-next-line @next/next/no-img-element -- arte solta em public */}
-              <img src="/assets/billboard.jpg" alt="" loading="lazy" />
+              <img src="/assets/remote-work.jpg" alt="" loading="lazy" />
             </figure>
 
             <p className="lp-know-p lp-know-p-pinned">
-              Com colaboração em tempo real, equipes remotas constroem uma visão
-              única na mesma página. Marcar pessoas, vincular issues e atribuir
-              tarefas são apenas parte dos recursos do editor.
+              A plataforma está em constante desenvolvimento, recebendo
+              melhorias e novos recursos para acompanhar as necessidades de
+              empresas e equipes.
               <Pin author="orange" x={52} y={30} />
             </p>
 
@@ -419,9 +418,8 @@ export function Knowledge({ locale = defaultLocale }: { locale?: Locale }) {
             </pre>
 
             <p className="lp-know-p">
-              Documentos aceitam formatação rica, imagens, anexos e blocos de
-              código. Use-os para organizar os planos da equipe, criar
-              documentação técnica e acompanhar o progresso rumo às metas.
+              Nossa tecnologia acompanha as novas formas de trabalhar para
+              manter sua empresa preparada para o futuro.
             </p>
           </div>
         </div>

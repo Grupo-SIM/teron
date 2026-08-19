@@ -19,7 +19,9 @@ import { Localized, defaultLocale, type Locale } from "@/i18n/site";
 /**
  * `price` aceita três formas: `"free"` escreve "Grátis", um objeto escreve o
  * valor (`{ int: "9", cents: "99", per: "por usuário" }`) e `null` deixa o
- * cartão em "Em breve" — o espaço no layout é o mesmo nos três casos.
+ * cartão em "Em breve" — o espaço no layout é o mesmo nos três casos. O `per`
+ * é opcional: o cartão gratuito não cobra por nada, e uma linha vazia embaixo
+ * do valor só abriria um vão.
  */
 type Plan = {
   name: string;
@@ -29,7 +31,7 @@ type Plan = {
    * Por isso ela não acompanha o nome do plano.
    */
   slug: string;
-  price: "free" | { int: string; cents?: string; per: string } | null;
+  price: "free" | { int: string; cents?: string; per?: string } | null;
   text: string;
   cta: string;
   items: { label: string; tip?: string }[];
@@ -47,29 +49,29 @@ const WORKSPACE_SEAT_PRICE = workspaceSeatPrice(process.env.NEXT_PUBLIC_WORKSPAC
 
 const PLANS: Plan[] = [
   {
-    name: "Free",
+    name: "Grátis",
     slug: "essencial",
-    price: "free",
-    text: "Para experimentar a plataforma com o time inteiro.",
+    price: { int: "0", cents: "00" },
+    text: "Comece sem custo e conheça o Teron na prática.",
     cta: "Começar grátis",
     items: [
-      { label: "Usuários ilimitados" },
-      { label: "Armazenamento básico incluso" },
-      { label: "Chamadas de vídeo ilimitadas" },
-      { label: "Limitado a 1 mês de uso" },
+      { label: "30 dias para experimentar" },
+      { label: "Acesso a todos os recursos" },
+      { label: "Suporte para começar" },
+      { label: "Sem cobrança durante o período gratuito" },
     ],
   },
   {
     name: "Empresas",
     slug: "empresa",
     price: { ...WORKSPACE_SEAT_PRICE, per: "por usuário" },
-    text: "Para o time que fica, sem teto de armazenamento.",
+    text: "Pague apenas pelos usuários da sua equipe.",
     cta: "Começar agora",
     items: [
-      { label: "Usuários ilimitados" },
-      { label: "Armazenamento básico incluso" },
-      { label: "Chamadas de vídeo ilimitadas" },
-      { label: "Armazenamento criptografado ilimitado" },
+      { label: "Todos os recursos disponíveis" },
+      { label: "Cashback de até R$ 250 por transação" },
+      { label: "Suporte e atualizações contínuas" },
+      { label: "Adicione ou remova usuários quando precisar" },
     ],
   },
 ];
@@ -220,7 +222,9 @@ export function PricingPlans({ locale = defaultLocale }: { locale?: Locale }) {
                           {plan.price.cents}
                         </span>
                       ) : null}
-                      <span className="lp-pr-per">{plan.price.per}</span>
+                      {plan.price.per ? (
+                        <span className="lp-pr-per">{plan.price.per}</span>
+                      ) : null}
                     </>
                   ) : (
                     <>

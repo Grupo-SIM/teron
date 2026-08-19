@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 
 import { Asset } from "@/components/site/asset";
-import { PricingContact } from "@/components/site/pricing-contact";
 import { PricingIcon } from "@/components/site/pricing-icon";
 import { PricingPlans } from "@/components/site/pricing-plans";
 import { RevealObserver } from "@/components/site/reveal-observer";
@@ -13,7 +12,7 @@ import { Localized, defaultLocale, type Locale } from "@/i18n/site";
 export const metadata: Metadata = {
   title: "Teron — Planos e preços",
   description:
-    "Como funciona a cobrança da Teron: armazenamento, rede e processamento, e os planos disponíveis para times de qualquer tamanho.",
+    "Como funciona a contribuição de cada empresa no Teron e os planos disponíveis para equipes de qualquer tamanho.",
 };
 
 /*
@@ -24,26 +23,31 @@ export const metadata: Metadata = {
  */
 
 const OPENING =
-  "equipe Teron trata software aberto como princípio: a plataforma continua livre para usar.";
+  "Teron foi criado com um princípio: oferecer uma plataforma completa, acessível e transparente para empresas de diferentes tamanhos.";
 
 const INTRO =
-  "Para sustentar a operação em nuvem e o desenvolvimento contínuo, quem usa a nuvem paga pelos recursos que consome. Hoje esses recursos";
+  "Para manter toda a estrutura necessária para o funcionamento da plataforma, incluindo servidores, armazenamento, desenvolvimento contínuo, segurança e novos recursos, cada empresa contribui de acordo com o tamanho da sua equipe.";
+
+const CATEGORIES_BEFORE =
+  "A plataforma foi desenvolvida para atender diferentes necessidades da sua operação,";
 
 const STORAGE_BEFORE =
-  "A cobrança de armazenamento acompanha o volume de dados, sem contar os objetos da Teron, mas contando os anexos. Você pode ter objetos ilimitados sem esbarrar em limite de espaço,";
+  "O armazenamento inclui os arquivos utilizados pela sua equipe no dia a dia.";
 
-const NETWORK =
-  "A cobrança de rede se aplica somente a chamadas de áudio e";
+const NETWORK_BEFORE = "As chamadas de áudio e";
 
-const COMPUTE_BEFORE = "A cobrança de processamento vale para os recursos de";
+const NETWORK_AFTER =
+  "também fazem parte da experiência do Teron, permitindo que sua equipe se reúna diretamente pela plataforma.";
+
+const COMPUTE_BEFORE = "Recursos de";
 
 const COMPUTE_AFTER =
-  "que estão por vir, com custo garantido nunca acima do praticado por líderes do setor como a OpenAI. Dá para pagar esses serviços direto pela conta da";
+  "serão incorporados continuamente ao Teron, trazendo novas possibilidades para ajudar sua equipe a trabalhar de forma mais inteligente e eficiente.";
 
 const CUSTOM =
-  "O plano sob medida é ajustado ao que a sua operação precisa. Recursos específicos, armazenamento extra ou suporte dedicado — o preço acompanha a especificação.";
+  "A melhor forma de entender o Teron é usando. Traga sua equipe, explore os recursos e experimente uma nova forma de organizar, colaborar e conduzir o trabalho dentro da sua empresa.";
 
-const CONTACT = "Pronto para conversar e receber uma proposta personalizada?";
+const CONTACT = "Pronto para simplificar sua rotina?";
 
 export function PrecosContent({ locale = defaultLocale }: { locale?: Locale }) {
   return (
@@ -73,7 +77,7 @@ export function PrecosContent({ locale = defaultLocale }: { locale?: Locale }) {
                 nada foi lido ainda, e se ela dependesse do scroll o visitante
                 chegaria numa tela inteira de texto apagado. */}
             <div className="lp-pr-p" role="paragraph">
-              A{" "}
+              O{" "}
               <span aria-hidden className="lp-pr-mark">
                 <span className="lp-pr-mark-glow" />
                 <Asset
@@ -93,22 +97,25 @@ export function PrecosContent({ locale = defaultLocale }: { locale?: Locale }) {
                 de linha nunca separar os dois — sem isso o ícone cai sozinho no
                 começo da linha seguinte e perde a ligação com o que ilustra. */}
             <div className="lp-pr-p" role="paragraph">
+              <Words text={INTRO} />
+            </div>
+
+            <div className="lp-pr-p" role="paragraph">
               {/* Quando o ícone vem antes da palavra, o espaço que separa os
                   dois fica dentro do grupo, e não antes dele: recolhido o ícone
                   ocupa zero, e um espaço de cada lado viraria espaço duplo. */}
-              <Words text={INTRO} />{" "}
+              <Words text={CATEGORIES_BEFORE} />{" "}
               <br className="lp-pr-br" />
-              <Words text="ficam em três categorias:" />
+              <Words text="reunindo em um só lugar:" />
               <span className="lp-pr-keep">
-                <PricingIcon artboard="storage" />{" "}
-                <Words text="armazenamento," />
+                <PricingIcon artboard="storage" /> <Words text="gestão," />
               </span>{" "}
               <br className="lp-pr-br" />
               {/* Este abre a linha. A arte fica encaixada uns 79px dentro da
                   caixa de 210px, então a margem esquerda precisa puxar quase
                   isso para o desenho nascer rente à coluna — o resto da caixa
                   é transparente e pode passar da margem sem aparecer. A folga
-                  até "rede" vem da margem, não de um espaço: espaço aqui
+                  até "controle" vem da margem, não de um espaço: espaço aqui
                   viraria recuo no começo da linha. */}
               <span className="lp-pr-keep">
                 <PricingIcon
@@ -116,12 +123,12 @@ export function PrecosContent({ locale = defaultLocale }: { locale?: Locale }) {
                   marginLeft={-70}
                   marginRight={-62}
                 />
-                <Words text="rede" />
+                <Words text="controle" />
               </span>{" "}
               <Words text="e" />
               <span className="lp-pr-keep">
                 <PricingIcon artboard="compute" />{" "}
-                <Words text="processamento." />
+                <Words text="recursos avançados." />
               </span>
             </div>
 
@@ -133,9 +140,8 @@ export function PrecosContent({ locale = defaultLocale }: { locale?: Locale }) {
             <div className="lp-pr-p" role="paragraph">
               <Words text={STORAGE_BEFORE} />{" "}
               <br className="lp-pr-br" />
-              <Words text="mas" />{" "}
               <span className="lp-pr-keep">
-                <Words text="documentos" />
+                <Words text="Documentos" />
                 <PricingIcon
                   artboard="docs"
                   marginLeft={-70}
@@ -166,13 +172,13 @@ export function PrecosContent({ locale = defaultLocale }: { locale?: Locale }) {
                   offsetTop={-95}
                 />
               </span>{" "}
-              <Words text="entram na conta do plano." />
+              <Words text="fazem parte do espaço utilizado pela sua empresa." />
             </div>
 
             <div className="lp-pr-p" role="paragraph">
-              <Words text={NETWORK} />{" "}
+              <Words text={NETWORK_BEFORE} />{" "}
               <span className="lp-pr-keep">
-                <Words text="vídeo." />
+                <Words text="vídeo" />
                 <PricingIcon
                   artboard="circle"
                   width={344}
@@ -181,18 +187,17 @@ export function PrecosContent({ locale = defaultLocale }: { locale?: Locale }) {
                   marginRight={-58}
                   offsetTop={-98}
                 />
-              </span>
+              </span>{" "}
+              <Words text={NETWORK_AFTER} />
             </div>
 
             <div className="lp-pr-p" role="paragraph">
               <Words text={COMPUTE_BEFORE} />{" "}
-              <Word className="lp-pr-grad">Teron IA e Teron MetaBrain</Word>{" "}
-              <Words text={COMPUTE_AFTER} />{" "}
               <span className="lp-pr-keep">
-                <Words text="OpenAI" />
+                <Word className="lp-pr-grad">IA e automação</Word>
                 <PricingIcon artboard="chatgpt" marginRight={-58} />
-                <Words text="." />
-              </span>
+              </span>{" "}
+              <Words text={COMPUTE_AFTER} />
             </div>
           </div>
 
@@ -203,19 +208,11 @@ export function PrecosContent({ locale = defaultLocale }: { locale?: Locale }) {
               <Words text={CUSTOM} />
             </div>
 
-            {/* Aqui o ícone do arquivo Rive traz "Contact us" desenhado dentro
-                da arte, sem como traduzir. Vira um link de verdade: fica em
-                português, em linha própria, e é navegável por teclado. */}
+            {/* O texto fecha na pergunta, sem botão: quem chegou até aqui já
+                passou pelo CTA de cada plano, logo acima. */}
             <div className="lp-pr-p" role="paragraph">
               <Words text={CONTACT} />
-              <PricingContact href="mailto:jbmidiadigital@gmail.com">Fale com a gente</PricingContact>
             </div>
-
-            <p className="lp-pr-actions">
-              <a href="/cadastro" className="lp-pr-action">
-                Começar grátis
-              </a>
-            </p>
           </div>
         </div>
       </main>

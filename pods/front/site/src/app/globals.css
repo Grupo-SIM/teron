@@ -582,10 +582,14 @@ a {
   /* Chega nos 84px do teron.io, mas só onde a faixa entre o header e a
      screenshot comporta duas linhas: `5.55vw` mantém as duas linhas e
      `14.34vw - 124px` é a altura que sobra na faixa (ela cresce com a
-     largura, o header não). Acima de ~1500px vale o teto de 84px. */
-  font-size: min(84px, 5.55vw, calc(17.98vw - 120px));
+     largura, o header não). Acima de ~1500px vale o teto de 84px.
+
+     O último termo é o da faixa apertada, e ele conta altura, não corpo:
+     como a entrelinha subiu de 0.9 para 1, ele foi multiplicado por 0.9
+     para as duas linhas continuarem ocupando a mesma altura ali. */
+  font-size: min(84px, 5.55vw, calc(16.18vw - 108px));
   font-weight: 600;
-  line-height: 0.9;
+  line-height: 1;
   letter-spacing: -0.04em;
   max-width: min(14.2em, 100%);
 }
@@ -2070,8 +2074,19 @@ a {
   line-height: 1.6;
 }
 
+/* Botão que fecha a seção. A seção não tem `padding-bottom` — quem dá o
+   respiro até o bloco final é esta margem. */
+.lp-gh-actions {
+  margin: 72px 0 0;
+  text-align: center;
+}
+
 @media (max-width: 899px) {
   .lp-gh-shot {
+    margin-top: 56px;
+  }
+
+  .lp-gh-actions {
     margin-top: 56px;
   }
 

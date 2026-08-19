@@ -11,40 +11,45 @@ import { SiteHeader } from "@/components/site/site-header";
 import { VideoBlock } from "@/components/site/video-block";
 import { Localized, defaultLocale, type Locale } from "@/i18n/site";
 
+/*
+ * Os títulos vêm em duas partes porque cada card escreve a segunda numa linha
+ * própria. Título de uma palavra só deixa a segunda vazia: a linha continua
+ * ali e os três cards mantêm a mesma altura de texto.
+ */
 const PROBLEMS = [
   {
     icon: "/assets/icon-mail.png",
-    title: ["Informações", "Desconectadas"],
-    text: "Projetos, documentos e conversas ficam espalhados em diferentes ferramentas, dificultando o acesso ao que realmente importa.",
+    title: ["Comunicação", ""],
+    text: "Mantenha sua equipe conectada, compartilhe informações e acompanhe tudo o que acontece em um único ambiente.",
   },
   {
     icon: "/assets/icon-chat.png",
-    title: ["Comunicação", "Sem Contexto"],
-    text: "Mensagens, decisões e atualizações acontecem em vários canais, tornando o alinhamento da equipe mais lento e sujeito a falhas.",
+    title: ["Organização", ""],
+    text: "Gerencie projetos, arquivos e documentos. Distribua tarefas, acompanhe prazos e saiba exatamente o que precisa ser feito.",
   },
   {
     icon: "/assets/icon-person.png",
-    title: ["Produtividade", "Comprometida"],
-    text: "Mais tempo procurando informações e menos tempo executando. O resultado são atrasos, retrabalho e perda de eficiência.",
+    title: ["Gestão", "da equipe"],
+    text: "Tenha uma visão clara do que está acontecendo, quem está responsável por cada tarefa e como os projetos estão avançando.",
   },
 ];
 
 const CAPABILITIES = [
   {
-    title: ["Planejamento", "e Execução"],
-    text: "Transforme ideias em entregas com gestão de projetos, tarefas, cronogramas, calendário da equipe e acompanhamento em tempo real para manter cada etapa sob controle.",
+    title: ["Personalize", "seu espaço"],
+    text: "Adapte a plataforma à forma como sua equipe trabalha.",
   },
   {
-    title: ["Comunicação", "e Colaboração"],
-    text: "Converse com sua equipe, realize reuniões por áudio e vídeo, compartilhe documentos e mantenha todas as decisões registradas no contexto de cada projeto.",
+    title: ["Simples", "de usar"],
+    text: "Uma experiência intuitiva para sua equipe começar a trabalhar sem complicação.",
   },
   {
-    title: ["Conhecimento", "Centralizado"],
-    text: "Crie documentos colaborativos, registre processos, organize informações e construa uma base de conhecimento acessível para toda a empresa.",
+    title: ["Para empresas de", "todos os setores"],
+    text: "Ferramentas para organizar equipes, projetos e processos em diferentes segmentos.",
   },
   {
-    title: ["Automação e", "Inteligência"],
-    text: "Automatize processos, utilize inteligência artificial, acompanhe indicadores e elimine tarefas repetitivas para que sua equipe foque no que realmente gera resultados.",
+    title: ["Cresça com", "sua equipe"],
+    text: "Uma plataforma preparada para acompanhar sua empresa em cada etapa do crescimento.",
   },
 ];
 
@@ -75,7 +80,7 @@ export function HomeContent({ locale = defaultLocale }: { locale?: Locale }) {
                 `globals.css` (`.lp-hero-copy h1/p`), onde os degraus do
                 teron.io precisam de media query. */}
             <h1 data-reveal style={{ margin: 0 }}>
-              Tudo o que sua equipe precisa. Em um só lugar.
+              Tudo o que sua equipe precisa para trabalhar melhor.
             </h1>
             <p
               data-reveal
@@ -84,12 +89,12 @@ export function HomeContent({ locale = defaultLocale }: { locale?: Locale }) {
                 color: "#a7a7ad",
               }}
             >
-              Pare de alternar entre dezenas de ferramentas. Centralize
-              projetos, tarefas, reuniões e comunicação em uma única plataforma
-              para sua equipe produzir mais.
+              Sua empresa mais organizada, sua equipe mais produtiva. Organize
+              seu time, centralize o trabalho e simplifique a rotina da sua
+              empresa.
             </p>
             <div data-reveal className="lp-hero-cta">
-              <HeroCta />
+              <HeroCta label="Começar gratuitamente" />
             </div>
           </div>
 
@@ -129,7 +134,7 @@ export function HomeContent({ locale = defaultLocale }: { locale?: Locale }) {
               textWrap: "balance",
             }}
           >
-            Cada ferramenta resolve um problema. Juntas, elas criam outro.
+            Um novo jeito de trabalhar em equipe
           </h2>
           <p
             data-reveal
@@ -141,10 +146,9 @@ export function HomeContent({ locale = defaultLocale }: { locale?: Locale }) {
               maxWidth: "72ch",
             }}
           >
-            Sua equipe alterna entre chats, planilhas, documentos, reuniões e
-            aplicativos o dia inteiro. No meio desse processo, informações se
-            perdem, decisões ficam sem contexto, tarefas atrasam e a
-            produtividade diminui sem que ninguém perceba.
+            Uma plataforma completa para conectar pessoas, organizar o trabalho
+            e manter sua empresa em movimento. Tudo integrado para sua equipe
+            trabalhar de forma mais simples e eficiente.
           </p>
           <div
             style={{
@@ -217,8 +221,7 @@ export function HomeContent({ locale = defaultLocale }: { locale?: Locale }) {
               textWrap: "balance",
             }}
           >
-            Uma plataforma criada para simplificar a forma como as equipes
-            trabalham.
+            Feito para o trabalho do dia a dia
           </h2>
           <div data-reveal style={{ marginTop: 70 }}>
             <Bento />
@@ -241,8 +244,7 @@ export function HomeContent({ locale = defaultLocale }: { locale?: Locale }) {
               textWrap: "balance",
             }}
           >
-            Muito mais do que gerenciar projetos. Um espaço completo para toda a
-            sua operação.
+            Sua equipe, conectada de qualquer lugar
           </h2>
           <p
             data-reveal
@@ -254,10 +256,8 @@ export function HomeContent({ locale = defaultLocale }: { locale?: Locale }) {
               maxWidth: "76ch",
             }}
           >
-            Reúna tudo o que sua equipe precisa para planejar, colaborar,
-            organizar informações e acompanhar resultados sem sair de uma única
-            plataforma. Menos ferramentas espalhadas, mais produtividade,
-            clareza e controle do início ao fim.
+            Tenha seu próprio escritório digital, além de salas de reuniões
+            para fazer videochamadas e reunir sua equipe a qualquer momento.
           </p>
         </div>
         <div data-reveal style={{ margin: "40px auto 0", maxWidth: 1600 }}>
@@ -366,7 +366,8 @@ export function HomeContent({ locale = defaultLocale }: { locale?: Locale }) {
               maxWidth: "16ch",
             }}
           >
-            Uma plataforma feita para evoluir junto com sua equipe.
+            Muito mais do que gerenciar projetos. Um espaço completo para toda
+            a sua operação.
           </h2>
           <Asset
             src="/assets/teronwhite.svg"
@@ -379,24 +380,24 @@ export function HomeContent({ locale = defaultLocale }: { locale?: Locale }) {
           <RiveCard
             src="/animations/hotkeys.riv"
             title="Atalhos de teclado."
-            text="Trabalhe com eficiência e acesso instantâneo às ações mais comuns."
+            text="Trabalhe com mais agilidade e acesse rapidamente as ações mais utilizadas."
           />
           <RiveCard
             src="/animations/team-planner.riv"
-            title="Planner da equipe."
-            text="Acompanhe o quadro geral visualizando todas as tarefas individuais em um calendário único da equipe."
+            title="Espaços e fluxos de trabalho."
+            text="Crie ambientes separados para equipes, projetos ou departamentos."
             variant="wide"
           />
           <RiveCard
             src="/animations/time-blocking.riv"
-            title="Blocos de tempo."
-            text="Transforme as tarefas do dia em blocos de tempo estruturados para manter o foco."
+            title="Atualizações em tempo real."
+            text="Veja alterações e movimentações da equipe instantaneamente. Visualize compromissos, tarefas e eventos em um só lugar."
             variant="wide"
           />
           <RiveCard
             src="/animations/notifications.riv"
-            title="Notificações."
-            text="Fique por dentro de cada mudança recebendo notificações instantâneas."
+            title="Notificações inteligentes."
+            text="Receba apenas as atualizações importantes para você."
             video="/assets/waves.webm"
           />
         </ul>
@@ -412,12 +413,18 @@ export function HomeContent({ locale = defaultLocale }: { locale?: Locale }) {
           <div className="lp-cta-copy" data-reveal>
             <h2 className="lp-cta-title">Junte-se ao movimento</h2>
             <p className="lp-cta-text">
-              Centralize o trabalho da sua equipe com a Teron. Essa jornada
+              Centralize o trabalho da sua equipe com o Teron. Essa jornada
               está apenas começando.
             </p>
             <div className="lp-cta-actions">
-              <HeroCta href="/cadastro" label="Ver em ação" />
-              <a href="mailto:jbmidiadigital@gmail.com" className="lp-btn-pill-dark">
+              {/* O botão de cadastro subiu para o fim da seção de integrações:
+                  quem chega aqui já passou por ele. Sobra o contato direto. */}
+              <a
+                href="https://wa.me/556892078221"
+                className="lp-btn-pill-dark"
+                target="_blank"
+                rel="noreferrer"
+              >
                 Falar com o time
               </a>
             </div>

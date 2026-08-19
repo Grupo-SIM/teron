@@ -22,10 +22,8 @@ type SiteSession =
  * rolagem suave continua valendo.
  */
 const LINKS = [
-  { href: "/#plataforma", label: "Plataforma" },
-  { href: "/#operacao", label: "Operação" },
-  { href: "/#conhecimento", label: "Conhecimento" },
-  { href: "/#github", label: "GitHub" },
+  { href: "/#plataforma", label: "Recursos" },
+  { href: "/#github", label: "Integrações" },
   { href: "/precos", label: "Preços" },
 ];
 

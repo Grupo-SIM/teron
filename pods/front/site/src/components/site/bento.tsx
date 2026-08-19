@@ -11,8 +11,8 @@ export function Bento({ locale = defaultLocale }: { locale?: Locale }) {
       <ul className="lp-bento-col lp-bento-col-a">
         <li className="lp-bento-card lp-bento-tasks">
           <p className="lp-bento-txt">
-            <strong>Crie tarefas.</strong> Agende seus eventos pessoais e suas
-            tarefas.
+            <strong>Crie tarefas.</strong> Defina responsáveis, prazos e
+            prioridades.
           </p>
           <img
             className="lp-bento-d lp-bento-tasks-img"
@@ -34,8 +34,8 @@ export function Bento({ locale = defaultLocale }: { locale?: Locale }) {
 
         <li className="lp-bento-card lp-bento-plan">
           <p className="lp-bento-txt">
-            <strong>Planeje seu trabalho.</strong> Visualize seu dia de trabalho
-            em sua agenda.
+            <strong>Gerencie sua agenda.</strong> Organize compromissos,
+            tarefas e prazos em um só lugar.
           </p>
           <img
             className="lp-bento-d"
@@ -61,9 +61,9 @@ export function Bento({ locale = defaultLocale }: { locale?: Locale }) {
             <span aria-hidden className="lp-bento-pilcrow">
               ¶
             </span>
-            <strong>Faça anotações.</strong>{" "}
+            <strong>Crie documentos.</strong>{" "}
             <br />
-            Crie documentos para acompanhar os recursos da equipe.
+            Escreva, organize e compartilhe informações importantes.
           </p>
           <img
             className="lp-bento-m"
@@ -77,9 +77,8 @@ export function Bento({ locale = defaultLocale }: { locale?: Locale }) {
 
         <li className="lp-bento-card lp-bento-sync">
           <p className="lp-bento-txt lp-bento-txt-sync">
-            <strong>Sincronize em tempo real.</strong> Conecte-se
-            instantaneamente com sua equipe para monitorar o progresso e
-            acompanhar as atualizações.
+            <strong>Veja quem está online.</strong> Acompanhe as atualizações e
+            mantenha seu time alinhado.
           </p>
           <img
             className="lp-bento-d"
@@ -114,8 +113,8 @@ export function Bento({ locale = defaultLocale }: { locale?: Locale }) {
 
         <li className="lp-bento-card lp-bento-chat">
           <p className="lp-bento-txt">
-            <strong>Converse com a equipe.</strong> Envie mensagens diretas e
-            crie grupos de bate-papo.
+            <strong>Converse com a equipe.</strong> Envie mensagens e crie
+            grupos para manter sua equipe conectada.
           </p>
           <img
             className="lp-bento-d"
