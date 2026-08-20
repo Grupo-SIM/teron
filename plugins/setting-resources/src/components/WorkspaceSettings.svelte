@@ -57,7 +57,10 @@
     {},
     (res) => {
       categories = res.filter(
-        (p) => !hiddenCategories.has(p.name) && hasAccountRole(account, p.role) && !isDisabled(p.feature ?? '')
+        (p) =>
+          !hiddenCategories.has(p.name) &&
+          hasAccountRole(account, p.role) &&
+          (p.name === 'billing' || !isDisabled(p.feature ?? ''))
       )
       if (!admin) {
         categories = categories.filter((p) => !(p.adminOnly ?? false))

@@ -701,12 +701,10 @@ export async function configurePlatform() {
     async () => await import(/* webpackChunkName: "communication" */ '@hcengineering/communication-resources')
   )
   addLocation(emojiId, async () => await import(/* webpackChunkName: "emoji" */ '@hcengineering/emoji-resources'))
-  if ((config.BILLING_URL ?? '') !== '') {
-    addLocation(
-      billingId,
-      async () => await import(/* webpackChunkName: "billing" */ '@hcengineering/billing-resources')
-    )
-  }
+  addLocation(
+    billingId,
+    async () => await import(/* webpackChunkName: "billing" */ '@hcengineering/billing-resources')
+  )
   addLocation(
     teronMailId,
     async () => await import(/* webpackChunkName: "teronMail" */ '@hcengineering/teron-mail-resources')

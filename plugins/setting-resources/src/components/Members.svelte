@@ -114,8 +114,10 @@
 
   function openBilling (): void {
     const location = getCurrentResolvedLocation()
-    location.path[3] = 'billing'
-    location.path.length = 4
+    location.path[3] = 'setting'
+    location.path[4] = 'billing'
+    location.path[5] = 'subscriptions'
+    location.path.length = 6
     navigate(location)
   }
 
