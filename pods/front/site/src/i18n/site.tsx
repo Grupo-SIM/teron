@@ -5,7 +5,11 @@ import { ptBR } from "./locales/pt-BR";
 export const locales = ["pt-BR", "en-US"] as const;
 export type Locale = (typeof locales)[number];
 
-export const defaultLocale: Locexport const dictionaries: Readonly<Record<Locale, SiteDictionary>> = {
+export const defaultLocale: Locale = "pt-BR";
+
+export type SiteDictionary = Readonly<Record<string, string>>;
+
+export const dictionaries: Readonly<Record<Locale, SiteDictionary>> = {
   "pt-BR": ptBR,
   "en-US": enUS,
 };
