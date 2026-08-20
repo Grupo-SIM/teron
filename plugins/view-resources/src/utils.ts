@@ -1838,7 +1838,6 @@ function getAttrEditor (key: KeyedAttribute, hierarchy: Hierarchy): AnyComponent
   }
 }
 
-export const allowGuestSignUpStore = writable<boolean>(false)
 export const accessDeniedStore = writable<boolean>(false)
 
 const spaceSpaceQuery = createQuery(true)

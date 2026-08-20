@@ -650,7 +650,7 @@ export class MongoAccountDB implements AccountDB {
               remainingUses: { $gt: 0 }
             })
             const memberSeats = members.filter((it) =>
-              [AccountRole.Owner, AccountRole.Maintainer, AccountRole.User, AccountRole.Guest].includes(it.role)
+              [AccountRole.Owner, AccountRole.Maintainer, AccountRole.User].includes(it.role)
             ).length
             const occupied =
               memberSeats +
@@ -814,7 +814,7 @@ export class MongoAccountDB implements AccountDB {
         })
         const now = Date.now()
         const memberSeats = members.filter((it) =>
-          [AccountRole.Owner, AccountRole.Maintainer, AccountRole.User, AccountRole.Guest].includes(it.role)
+          [AccountRole.Owner, AccountRole.Maintainer, AccountRole.User].includes(it.role)
         ).length
         const used =
           memberSeats +
@@ -919,7 +919,7 @@ export class MongoAccountDB implements AccountDB {
     const invites = await this.invite.find({ workspaceUuid: workspaceId, remainingUses: { $gt: 0 } })
     const now = Date.now()
     const used = members.filter((it) =>
-      [AccountRole.Owner, AccountRole.Maintainer, AccountRole.User, AccountRole.Guest].includes(it.role)
+      [AccountRole.Owner, AccountRole.Maintainer, AccountRole.User].includes(it.role)
     ).length + invites.filter((it) =>
       (it.expiresOn === -1 || it.expiresOn > now) && it.email != null && it.email !== ''
     ).length
@@ -993,15 +993,6 @@ export class MongoAccountDB implements AccountDB {
         uuid: workspaceId
       },
       { allowReadOnlyGuest: readOnlyGuestsAllowed }
-    )
-  }
-
-  async updateAllowGuestSignUp (workspaceId: WorkspaceUuid, guestSignUpAllowed: boolean): Promise<void> {
-    await this.workspace.update(
-      {
-        uuid: workspaceId
-      },
-      { allowGuestSignUp: guestSignUpAllowed }
     )
   }
 

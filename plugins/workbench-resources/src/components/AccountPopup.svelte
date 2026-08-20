@@ -25,7 +25,6 @@
   import login, { openAuthRoute } from '@hcengineering/login'
   import presentation, {
     createQuery,
-    getCurrentWorkspaceUrl,
     hasResource
   } from '@hcengineering/presentation'
   import setting, { settingId, SettingsCategory } from '@hcengineering/setting'
@@ -44,7 +43,6 @@
   import view from '@hcengineering/view'
   import { logOut } from '../utils'
   import { Analytics } from '@hcengineering/analytics'
-  import { allowGuestSignUpStore } from '@hcengineering/view-resources'
   import { getMetadata } from '@hcengineering/platform'
   import { onMount } from 'svelte'
 
@@ -157,16 +155,6 @@
     }
 
     if (account.role === AccountRole.ReadOnlyGuest) {
-      if ($allowGuestSignUpStore) {
-        actions.push({
-          icon: setting.icon.InviteWorkspace,
-          label: view.string.ReadOnlyJoinWorkspace,
-          action: async () => {
-            openAuthRoute('join', { workspace: getCurrentWorkspaceUrl() })
-          },
-          group: 'end'
-        })
-      }
       actions.push({
         icon: setting.icon.InviteWorkspace,
         label: view.string.ReadOnlySignUp,

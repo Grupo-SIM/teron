@@ -17,7 +17,6 @@
   const currentAccount = getCurrentAccount()
   const roles: DropdownIntlItem[] = [
     { id: AccountRole.ReadOnlyGuest, label: setting.string.ReadonlyGuest },
-    { id: AccountRole.Guest, label: setting.string.Guest },
     { id: AccountRole.User, label: setting.string.User },
     { id: AccountRole.Maintainer, label: setting.string.Maintainer }
   ]

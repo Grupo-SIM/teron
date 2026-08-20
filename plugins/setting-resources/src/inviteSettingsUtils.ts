@@ -31,8 +31,6 @@ export function normalizeInviteRole (value: string | AccountRole | undefined, fa
   if (typeof value === 'string') {
     const n = value.toLowerCase()
     switch (n) {
-      case 'guest':
-        return AccountRole.Guest
       case 'user':
         return AccountRole.User
       case 'maintainer':

@@ -427,9 +427,9 @@ describe('account operations', () => {
           accessMode: 'full',
           seatLimit: 5,
           nextSeatLimit: 4,
-          memberSeats: 2,
+          memberSeats: 1,
           pendingInviteSeats: 1,
-          availableSeats: 1
+          availableSeats: 2
         })
       )
       nowSpy.mockRestore()

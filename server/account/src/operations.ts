@@ -129,7 +129,6 @@ import {
   verifyPassword,
   wrap,
   updateAllowReadOnlyGuests,
-  updateAllowGuestSignUp,
   getWorkspaceByDataId,
   assignableRoles,
   getWorkspacesInfoWithStatusByIds,
@@ -158,7 +157,7 @@ const workspaceLimitPerUser =
 
 const FREE_TRIAL_MS = 30 * 24 * 60 * 60 * 1000
 const LEGACY_BUSINESS_PLANS = new Set(['rare', 'epic', 'legendary'])
-const BILLABLE_ROLES = new Set([AccountRole.Owner, AccountRole.Maintainer, AccountRole.User, AccountRole.Guest])
+const BILLABLE_ROLES = new Set([AccountRole.Owner, AccountRole.Maintainer, AccountRole.User])
 
 function effectivePlan (plan: string): WorkspaceSubscriptionPlan {
   if (plan === 'unlimited') return 'unlimited'
@@ -1478,8 +1477,8 @@ export async function checkAutoJoin (
     throw new PlatformError(new Status(Severity.ERROR, platform.status.BadRequest, {}))
   }
 
-  if (invite.role !== AccountRole.Guest) {
-    ctx.warn('Auto-join not for guest role is forbidden', invite)
+  if (!assignableRoles.includes(invite.role)) {
+    ctx.warn('Auto-join for a non-assignable role is forbidden', invite)
     throw new PlatformError(new Status(Severity.ERROR, platform.status.Forbidden, {}))
   }
 
@@ -3877,7 +3876,6 @@ export type AccountMethods =
   | 'getWorkspaceMembers'
   | 'updateWorkspaceRole'
   | 'updateAllowReadOnlyGuests'
-  | 'updateAllowGuestSignUp'
   | 'findPersonBySocialId'
   | 'findSocialIdBySocialKey'
   | 'ensurePerson'
@@ -3956,7 +3954,6 @@ export function getMethods (hasSignUp: boolean = true): Partial<Record<AccountMe
     verify2fa: wrap(verify2fa),
     updateWorkspaceRole: wrap(updateWorkspaceRole),
     updateAllowReadOnlyGuests: wrap(updateAllowReadOnlyGuests),
-    updateAllowGuestSignUp: wrap(updateAllowGuestSignUp),
     updatePasswordAgingRule: wrap(updatePasswordAgingRule),
     checkPasswordAging: wrap(checkPasswordAging),
     createMailbox: wrap(createMailbox),

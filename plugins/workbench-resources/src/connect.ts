@@ -60,7 +60,6 @@ import { get, writable } from 'svelte/store'
 import plugin from './plugin'
 import { logOut, workspaceCreating } from './utils'
 import { WorkbenchEvents } from '@hcengineering/workbench'
-import { allowGuestSignUpStore } from '@hcengineering/view-resources'
 
 export const error = writable<string | undefined>(undefined)
 export const errorActions = writable<ErrorAction[]>([])
@@ -501,8 +500,6 @@ export async function connect (title: string): Promise<Client | undefined> {
   Analytics.handleEvent(WorkbenchEvents.Connect)
   console.log('Logged in with account: ', me)
   setCurrentAccount(me)
-
-  allowGuestSignUpStore.set(workspaceLoginInfo.allowGuestSignUp ?? false)
 
   if (me.role === AccountRole.ReadOnlyGuest || workspaceLoginInfo.readOnly === true) {
     await broadcastEvent(PlatformEvent, new Status(Severity.INFO, platform.status.ReadOnlyAccount, {}))

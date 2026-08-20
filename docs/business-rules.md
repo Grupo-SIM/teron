@@ -3,7 +3,8 @@
 ## Vagas de workspace
 
 - Workspaces Business contratam quantidade fixa de vagas por ciclo de cobrança.
-- Owner, Maintainer, User e Guest consomem vaga. ReadOnlyGuest e DocGuest não consomem.
+- Owner, Maintainer e User consomem vaga. ReadOnlyGuest e DocGuest não consomem.
+- Papel Guest não existe para membros, convites ou cadastro no workspace.
 - Convite personalizado pendente reserva uma vaga até aceite, cancelamento ou expiração.
 - Nenhum convite, aceite, cadastro aberto ou mudança de papel pode exceder capacidade contratada.
 - Somente Owner pode alterar quantidade contratada.

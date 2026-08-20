@@ -50,14 +50,14 @@ describe('inviteSettingsUtils', () => {
 
   describe('normalizeInviteRole', () => {
     it('maps string role names case-insensitively', () => {
-      expect(normalizeInviteRole('GUEST', AccountRole.User)).toBe(AccountRole.Guest)
-      expect(normalizeInviteRole('User', AccountRole.Guest)).toBe(AccountRole.User)
-      expect(normalizeInviteRole('MAINTAINER', AccountRole.Guest)).toBe(AccountRole.Maintainer)
-      expect(normalizeInviteRole('owner', AccountRole.Guest)).toBe(AccountRole.Owner)
+      expect(normalizeInviteRole('GUEST', AccountRole.User)).toBe(AccountRole.User)
+      expect(normalizeInviteRole('User', AccountRole.User)).toBe(AccountRole.User)
+      expect(normalizeInviteRole('MAINTAINER', AccountRole.User)).toBe(AccountRole.Maintainer)
+      expect(normalizeInviteRole('owner', AccountRole.User)).toBe(AccountRole.Owner)
     })
 
     it('returns valid AccountRole numbers as-is', () => {
-      expect(normalizeInviteRole(AccountRole.Maintainer, AccountRole.Guest)).toBe(AccountRole.Maintainer)
+      expect(normalizeInviteRole(AccountRole.Maintainer, AccountRole.User)).toBe(AccountRole.Maintainer)
     })
 
     it('returns fallback for unknown string', () => {
@@ -69,27 +69,27 @@ describe('inviteSettingsUtils', () => {
     })
 
     it('returns fallback for invalid number', () => {
-      expect(normalizeInviteRole(999 as unknown as AccountRole, AccountRole.Guest)).toBe(AccountRole.Guest)
+      expect(normalizeInviteRole(999 as unknown as AccountRole, AccountRole.User)).toBe(AccountRole.User)
     })
   })
 
   describe('normalizeInviteRoles', () => {
     it('returns fallback copy when values missing or empty', () => {
-      const fallback = [AccountRole.Guest, AccountRole.User]
+      const fallback = [AccountRole.User, AccountRole.Maintainer]
       expect(normalizeInviteRoles(undefined, fallback)).toEqual(fallback)
       expect(normalizeInviteRoles([], fallback)).toEqual(fallback)
       expect(normalizeInviteRoles(undefined, fallback)).not.toBe(fallback)
     })
 
     it('maps and deduplicates roles', () => {
-      expect(normalizeInviteRoles(['user', 'USER', 'maintainer'], [AccountRole.Guest])).toEqual([
+      expect(normalizeInviteRoles(['user', 'USER', 'maintainer'], [AccountRole.User])).toEqual([
         AccountRole.User,
         AccountRole.Maintainer
       ])
     })
 
     it('maps unrecognized strings to User (inner fallback)', () => {
-      expect(normalizeInviteRoles(['nope', 'x'], [AccountRole.Guest])).toEqual([AccountRole.User])
+      expect(normalizeInviteRoles(['nope', 'x'], [AccountRole.User])).toEqual([AccountRole.User])
     })
   })
 
@@ -125,14 +125,14 @@ describe('inviteSettingsUtils', () => {
         expirationTime: 12,
         emailMask: '*@corp.test',
         limit: 100,
-        defaultInviteRole: AccountRole.Guest,
+        defaultInviteRole: AccountRole.User,
         inviteLinkGeneratorRoles: [AccountRole.Owner]
       })
       const r = resolveInviteSettings(doc)
       expect(r.expirationTime).toBe(12)
       expect(r.emailMask).toBe('*@corp.test')
       expect(r.limit).toBe(100)
-      expect(r.defaultInviteRole).toBe(AccountRole.Guest)
+      expect(r.defaultInviteRole).toBe(AccountRole.User)
       expect(r.inviteLinkGeneratorRoles).toEqual([AccountRole.Owner])
       expect(r.noLimit).toBe(false)
     })
@@ -170,7 +170,7 @@ describe('inviteSettingsUtils', () => {
         defaultInviteRole: 'guest' as unknown as AccountRole,
         inviteLinkGeneratorRoles: [AccountRole.User]
       })
-      expect(resolveInviteSettings(doc).defaultInviteRole).toBe(AccountRole.Guest)
+      expect(resolveInviteSettings(doc).defaultInviteRole).toBe(AccountRole.User)
     })
   })
 })

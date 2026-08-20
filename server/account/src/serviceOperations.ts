@@ -1062,7 +1062,7 @@ export async function upsertSubscription (
     })
     const now = Date.now()
     const memberSeats = members.filter((it) =>
-      [AccountRole.Owner, AccountRole.Maintainer, AccountRole.User, AccountRole.Guest].includes(it.role)
+      [AccountRole.Owner, AccountRole.Maintainer, AccountRole.User].includes(it.role)
     ).length
     const occupied =
       memberSeats +

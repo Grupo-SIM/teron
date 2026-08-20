@@ -36,12 +36,11 @@
 
   const items: DropdownIntlItem[] = [
     { id: AccountRole.ReadOnlyGuest, label: setting.string.ReadonlyGuest },
-    { id: AccountRole.Guest, label: setting.string.Guest },
     { id: AccountRole.User, label: setting.string.User },
     { id: AccountRole.Maintainer, label: setting.string.Maintainer },
     { id: AccountRole.Owner, label: setting.string.Owner }
   ]
-  const guestRoles = [AccountRole.ReadOnlyGuest, AccountRole.DocGuest, AccountRole.Guest]
+  const guestRoles = [AccountRole.ReadOnlyGuest, AccountRole.DocGuest]
 
   let workspaceMembers: Record<string, AccountRole> = {}
   let pendingInvites: Awaited<ReturnType<typeof accountClient.getWorkspacePendingInvites>> = []

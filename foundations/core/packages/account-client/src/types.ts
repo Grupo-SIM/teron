@@ -68,7 +68,6 @@ export interface WorkspaceLoginInfo extends LoginInfo {
   endpoint: string
   token: string
   role: AccountRole
-  allowGuestSignUp?: boolean
   readOnly?: boolean
   readOnlyAfter?: Timestamp
 }
@@ -158,7 +157,7 @@ export interface AccountAggregatedInfo extends AccountInfo, Person {
   uuid: AccountUuid
   integrations: Omit<Integration, 'data'>[]
   socialIds: SocialId[]
-  workspaces: Omit<WorkspaceInfo, 'allowReadOnlyGuest' | 'allowGuestSignUp'>[]
+  workspaces: Omit<WorkspaceInfo, 'allowReadOnlyGuest'>[]
 }
 
 /**

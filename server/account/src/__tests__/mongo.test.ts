@@ -1151,8 +1151,7 @@ describe('MongoAccountDB', () => {
         const workspaceData = {
           name: 'New Workspace',
           url: 'new-workspace',
-          allowReadOnlyGuest: false,
-          allowGuestSignUp: false
+          allowReadOnlyGuest: false
         }
         const statusData = {
           mode: 'active' as const,
