@@ -4,13 +4,13 @@
 -->
 <script lang="ts">
   import { AccountRole, generateId, getCurrentAccount } from '@hcengineering/core'
-  import platform, { PlatformError } from '@hcengineering/platform'
   import { Card } from '@hcengineering/presentation'
   import { EditBox, DropdownLabelsIntl, Label, type DropdownIntlItem } from '@hcengineering/ui'
   import { createEventDispatcher } from 'svelte'
 
   import setting from '../plugin'
   import { getAccountClient } from '../utils'
+  import { isPendingSeatChange, isWorkspaceLimitReached } from './seat-billing'
 
   const accountClient = getAccountClient()
   const dispatch = createEventDispatcher()
@@ -25,39 +25,76 @@
   let role = AccountRole.User
   let saving = false
   let ownerOnly = false
+  let pendingPayment = false
+  let purchasingSeat = false
+  let errorKind: 'invite' | 'payment' | undefined
   let quote: Awaited<ReturnType<typeof accountClient.getWorkspaceSeatQuote>> | undefined
   let operationId: string | undefined
 
+  async function prepareSeatPurchase (): Promise<void> {
+    if (currentAccount.role !== AccountRole.Owner) {
+      ownerOnly = true
+      return
+    }
+    purchasingSeat = true
+    const entitlement = await accountClient.getWorkspaceEntitlement()
+    quote = await accountClient.getWorkspaceSeatQuote((entitlement.seatLimit ?? 0) + 1)
+  }
+
+  async function sendInvite (): Promise<void> {
+    const entitlement = await accountClient.getWorkspaceEntitlement()
+    if (entitlement.plan === 'business' && (entitlement.availableSeats ?? 0) <= 0) {
+      await prepareSeatPurchase()
+      return
+    }
+    try {
+      await accountClient.sendInvite(email.trim(), role)
+      dispatch('close', true)
+    } catch (err) {
+      if (!isWorkspaceLimitReached(err)) throw err
+      await prepareSeatPurchase()
+    }
+  }
+
+  async function buySeatAndInvite (): Promise<void> {
+    if (quote == null) return
+    operationId ??= generateId()
+    let result = await accountClient.changeWorkspaceSeatLimit(quote.targetQuantity, operationId, {
+      email: email.trim(),
+      role
+    })
+    pendingPayment = isPendingSeatChange(result.status)
+    for (let attempt = 0; attempt < 120 && isPendingSeatChange(result.status); attempt++) {
+      await new Promise((resolve) => setTimeout(resolve, 2000))
+      const refreshed = await accountClient.getWorkspaceSeatChange(operationId)
+      if (refreshed == null) continue
+      result = refreshed
+      pendingPayment = isPendingSeatChange(result.status)
+    }
+    if (result.status === 'APPLIED') {
+      dispatch('close', true)
+      return
+    }
+    if (!isPendingSeatChange(result.status)) {
+      operationId = undefined
+      pendingPayment = false
+      errorKind = 'payment'
+    }
+  }
+
   async function submit (): Promise<void> {
     saving = true
+    errorKind = undefined
     try {
       if (quote == null) {
-        try {
-          await accountClient.sendInvite(email.trim(), role)
-          dispatch('close', true)
-          return
-        } catch (err) {
-          if (!(err instanceof PlatformError) || err.status.code !== platform.status.WorkspaceLimitReached) throw err
-          if (currentAccount.role !== AccountRole.Owner) {
-            ownerOnly = true
-            return
-          }
-          const entitlement = await accountClient.getWorkspaceEntitlement()
-          quote = await accountClient.getWorkspaceSeatQuote((entitlement.seatLimit ?? 0) + 1)
-          return
-        }
+        await sendInvite()
+      } else {
+        await buySeatAndInvite()
       }
-
-      operationId ??= generateId()
-      let result = await accountClient.changeWorkspaceSeatLimit(quote.targetQuantity, operationId, {
-        email: email.trim(),
-        role
-      })
-      for (let attempt = 0; attempt < 120 && ['PENDING_PAYMENT', 'PENDING_RECURRENCE_UPDATE'].includes(result.status); attempt++) {
-        await new Promise((resolve) => setTimeout(resolve, 2000))
-        result = await accountClient.getWorkspaceSeatChange(operationId)
-      }
-      if (result.status === 'APPLIED') dispatch('close', true)
+    } catch {
+      errorKind = purchasingSeat || quote != null ? 'payment' : 'invite'
+      if (errorKind === 'payment') operationId = undefined
+      pendingPayment = false
     } finally {
       saving = false
     }
@@ -88,13 +125,28 @@
     {#if ownerOnly}
       <div class="error-color"><Label label={setting.string.SeatLimitOwnerOnly} /></div>
     {/if}
+    {#if pendingPayment}
+      <div><Label label={setting.string.SeatPurchasePending} /></div>
+    {/if}
+    {#if errorKind != null}
+      <div class="error-color">
+        <Label label={errorKind === 'payment' ? setting.string.SeatPurchaseFailed : setting.string.InviteMemberFailed} />
+      </div>
+    {/if}
     {#if quote != null}
       <div class="antiCard flex-col flex-gap-2 p-3">
         <Label
           label={setting.string.SeatPurchaseSummary}
           params={{
-            proration: Number(quote.estimatedProrationAmount).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' }),
-            recurring: Number(quote.nextRecurringAmount).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
+            proration: Number(quote.estimatedProrationAmount).toLocaleString('pt-BR', {
+              style: 'currency',
+              currency: 'BRL'
+            }),
+            recurring: Number(quote.nextRecurringAmount).toLocaleString('pt-BR', {
+              style: 'currency',
+              currency: 'BRL'
+            }),
+            renewal: new Date(quote.periodEnd).toLocaleDateString('pt-BR')
           }}
         />
       </div>
