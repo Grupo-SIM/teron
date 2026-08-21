@@ -182,6 +182,34 @@ describe('Stripe utils - transformStripeSubscriptionToData', () => {
     )
   })
 
+  test('sets willCancelAt to the period end for a scheduled cancellation', () => {
+    const subscription: Stripe.Subscription = {
+      id: 'sub_scheduled_cancel',
+      status: 'active',
+      metadata: {
+        workspaceUuid: 'ws-123',
+        subscriptionType: 'common',
+        subscriptionPlan: 'pro',
+        accountUuid: 'acc-123'
+      },
+      customer: 'cus_123' as any,
+      items: { data: [] } as any,
+      current_period_start: 1700000000,
+      current_period_end: 1700003600,
+      trial_end: null,
+      canceled_at: null,
+      created: 1700000000,
+      cancel_at_period_end: true,
+      cancellation_details: null,
+      latest_invoice: 'in_123' as any
+    } as any
+
+    const result = transformStripeSubscriptionToData(ctx, subscription)
+
+    expect(result?.willCancelAt).toBe(1700003600000)
+    expect(result?.canceledAt).toBeUndefined()
+  })
+
   test('returns null when subscription status maps to an irrelevant state', () => {
     const subscription: Stripe.Subscription = {
       id: 'sub_incomplete',

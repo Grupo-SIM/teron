@@ -69,6 +69,7 @@ export interface SubscriptionData {
   periodEnd?: number
   trialEnd?: number
   canceledAt?: number
+  willCancelAt?: number
   providerData?: Record<string, any>
 }
 

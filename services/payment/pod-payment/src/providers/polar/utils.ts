@@ -92,6 +92,8 @@ export function transformPolarSubscriptionToData (subscription: any): Subscripti
     periodEnd = new Date(subscription.currentPeriodEnd).getTime()
   }
 
+  const willCancelAt = subscription.cancelAtPeriodEnd === true ? periodEnd : undefined
+
   const subscriptionData: SubscriptionData = {
     id: `polar_${subscription.id}`, // Composite ID with provider prefix to avoid conflicts
     workspaceUuid,
@@ -107,6 +109,7 @@ export function transformPolarSubscriptionToData (subscription: any): Subscripti
     periodEnd,
     trialEnd: subscription.trialEnd !== undefined ? new Date(subscription.trialEnd).getTime() : undefined,
     canceledAt: subscription.canceledAt !== undefined ? new Date(subscription.canceledAt).getTime() : undefined,
+    willCancelAt,
     providerData: {
       modifiedAt:
         subscription.modifiedAt !== null

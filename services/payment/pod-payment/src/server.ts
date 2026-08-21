@@ -121,6 +121,7 @@ export async function createServer (ctx: MeasureContext, config: Config): Promis
         type: SubscriptionType.Tier, status: body.status, plan: 'business',
         seatLimit: body.quantity,
         periodStart: Date.parse(body.periodStart), periodEnd: Date.parse(body.periodEnd),
+        willCancelAt: body.willCancelAt != null ? Date.parse(body.willCancelAt) : undefined,
         providerData: { contractId: body.contractId, quantity: body.quantity, willCancelAt: body.willCancelAt ?? null }
       })
       res.status(204).end()

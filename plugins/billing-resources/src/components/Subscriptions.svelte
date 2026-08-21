@@ -80,7 +80,10 @@
   let quoteLoading = false
   let seatQuoteTimer: number | undefined
 
-  $: isCurrentCanceled = currentSubscription?.canceledAt !== undefined && currentSubscription.canceledAt > 0
+  $: scheduledCancellationDate =
+    currentSubscription?.willCancelAt ??
+    (currentSubscription?.providerData?.cancelAtPeriodEnd === true ? currentSubscription.periodEnd : undefined)
+  $: isCurrentCanceled = scheduledCancellationDate !== undefined && scheduledCancellationDate > 0
   $: canManageProviderSubscription = currentSubscription?.provider !== 'internal'
   $: occupiedSeats = (entitlement?.memberSeats ?? 0) + (entitlement?.pendingInviteSeats ?? 0)
   $: seatOccupancyPercent =
@@ -127,6 +130,7 @@
     try {
       isCanceling = true
       currentSubscription = await paymentClient.cancelSubscription(currentSubscription.id)
+      await fetchSubscriptions()
     } catch (error) {
       console.error('Error canceling subscription:', error)
       await showErrorNotification()
@@ -167,6 +171,7 @@
     try {
       isUncanceling = true
       currentSubscription = await paymentClient.uncancelSubscription(currentSubscription.id)
+      await fetchSubscriptions()
     } catch (error) {
       console.error('Error uncanceling subscription:', error)
       await showErrorNotification()
