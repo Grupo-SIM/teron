@@ -84,9 +84,7 @@
     currentSubscription?.willCancelAt ??
     (currentSubscription?.providerData?.cancelAtPeriodEnd === true ? currentSubscription.periodEnd : undefined)
   $: isCurrentCanceled = scheduledCancellationDate !== undefined && scheduledCancellationDate > 0
-  $: canManageProviderSubscription =
-    currentSubscription?.provider !== 'internal' &&
-    (currentSubscription?.provider !== 'simintpay' || !isCurrentCanceled)
+  $: canManageProviderSubscription = currentSubscription?.provider !== 'internal'
   $: occupiedSeats = (entitlement?.memberSeats ?? 0) + (entitlement?.pendingInviteSeats ?? 0)
   $: seatOccupancyPercent =
     (entitlement?.seatLimit ?? 0) > 0 ? Math.min((occupiedSeats / (entitlement?.seatLimit ?? 1)) * 100, 100) : 0
@@ -164,9 +162,6 @@
   }
 
   async function executeUncancel (): Promise<void> {
-    if (paymentClient == null) {
-      return
-    }
     if (currentSubscription?.id === undefined) {
       return
     }
@@ -176,7 +171,14 @@
 
     try {
       isUncanceling = true
-      currentSubscription = await paymentClient.uncancelSubscription(currentSubscription.id)
+      if (currentSubscription.provider === 'simintpay') {
+        const accountClient = getAccountClient()
+        if (accountClient == null) return
+        currentSubscription = await accountClient.uncancelWorkspaceSubscription()
+      } else {
+        if (paymentClient == null) return
+        currentSubscription = await paymentClient.uncancelSubscription(currentSubscription.id)
+      }
       await fetchSubscriptions()
     } catch (error) {
       console.error('Error uncanceling subscription:', error)
@@ -463,7 +465,7 @@
                 />
               </div>
             {/if}
-            {#if entitlement?.nextSeatLimit !== undefined}
+            {#if entitlement?.nextSeatLimit != null}
               <div>
                 <Label label={plugin.string.ScheduledSeatLimit} params={{ limit: entitlement.nextSeatLimit }} />
               </div>

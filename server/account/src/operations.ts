@@ -83,6 +83,7 @@ import {
   cancelWorkspaceBillingContract,
   getWorkspaceBillingContract,
   getWorkspaceQuantityChange,
+  reactivateWorkspaceBillingContract,
   requestWorkspaceQuantityChange,
   type SimintpayQuantityChange
 } from './simintpay'
@@ -213,7 +214,7 @@ async function getEntitlement (
     periodEnd: subscription?.periodEnd,
     readOnlyAfter,
     seatLimit,
-    nextSeatLimit: subscription?.nextSeatLimit,
+    nextSeatLimit: subscription?.nextSeatLimit ?? undefined,
     memberSeats,
     pendingInviteSeats,
     availableSeats: capacity == null ? undefined : Math.max(0, capacity - usedSeats)
@@ -3522,6 +3523,36 @@ export async function cancelWorkspaceSubscription (
   return { ...subscription, ...update }
 }
 
+export async function uncancelWorkspaceSubscription (
+  ctx: MeasureContext,
+  db: AccountDB,
+  branding: Branding | null,
+  token: string
+): Promise<Subscription> {
+  const { workspace } = await requireSeatBillingOwner(ctx, db, token)
+  const subscription = await db.subscription.findOne({
+    workspaceUuid: workspace,
+    type: SubscriptionType.Tier,
+    provider: 'simintpay'
+  })
+  if (subscription == null || subscription.willCancelAt == null) {
+    throw new PlatformError(new Status(Severity.ERROR, platform.status.BadRequest, {}))
+  }
+
+  const contract = await reactivateWorkspaceBillingContract(subscription.id)
+  const periodStart = Date.parse(contract.currentPeriodStart)
+  const periodEnd = Date.parse(contract.currentPeriodEnd)
+  const providerData = {
+    ...subscription.providerData,
+    cancelAtPeriodEnd: false,
+    contractId: contract.id,
+    willCancelAt: null
+  }
+  const update = { periodStart, periodEnd, willCancelAt: undefined, providerData, updatedOn: Date.now() }
+  await db.subscription.update({ id: subscription.id }, update)
+  return { ...subscription, ...update }
+}
+
 export async function getWorkspacePendingInvites (
   ctx: MeasureContext,
   db: AccountDB,
@@ -3935,6 +3966,7 @@ export type AccountMethods =
   | 'getSubscriptions'
   | 'getWorkspaceEntitlement'
   | 'cancelWorkspaceSubscription'
+  | 'uncancelWorkspaceSubscription'
   | 'getWorkspacePendingInvites'
   | 'getWorkspaceSeatQuote'
   | 'changeWorkspaceSeatLimit'
@@ -4010,6 +4042,7 @@ export function getMethods (hasSignUp: boolean = true): Partial<Record<AccountMe
     getSubscriptions: wrap(getSubscriptions),
     getWorkspaceEntitlement: wrap(getWorkspaceEntitlement),
     cancelWorkspaceSubscription: wrap(cancelWorkspaceSubscription),
+    uncancelWorkspaceSubscription: wrap(uncancelWorkspaceSubscription),
     getWorkspacePendingInvites: wrap(getWorkspacePendingInvites),
     getWorkspaceSeatQuote: wrap(getWorkspaceSeatQuote),
     changeWorkspaceSeatLimit: wrap(changeWorkspaceSeatLimit),
