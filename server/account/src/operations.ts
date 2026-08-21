@@ -80,6 +80,7 @@ import {
   type InviteInfo
 } from './types'
 import {
+  cancelWorkspaceBillingContract,
   getWorkspaceBillingContract,
   getWorkspaceQuantityChange,
   requestWorkspaceQuantityChange,
@@ -3490,6 +3491,37 @@ export async function getWorkspaceEntitlement (
   return await getEntitlement(db, workspaceUuid)
 }
 
+export async function cancelWorkspaceSubscription (
+  ctx: MeasureContext,
+  db: AccountDB,
+  branding: Branding | null,
+  token: string
+): Promise<Subscription> {
+  const { workspace } = await requireSeatBillingOwner(ctx, db, token)
+  const subscription = await db.subscription.findOne({
+    workspaceUuid: workspace,
+    type: SubscriptionType.Tier,
+    provider: 'simintpay'
+  })
+  if (subscription == null) {
+    throw new PlatformError(new Status(Severity.ERROR, platform.status.BadRequest, {}))
+  }
+  if (subscription.willCancelAt != null) return subscription
+
+  const contract = await cancelWorkspaceBillingContract(subscription.id)
+  const periodStart = Date.parse(contract.currentPeriodStart)
+  const periodEnd = Date.parse(contract.currentPeriodEnd)
+  const providerData = {
+    ...subscription.providerData,
+    cancelAtPeriodEnd: true,
+    contractId: contract.id,
+    willCancelAt: contract.currentPeriodEnd
+  }
+  const update = { periodStart, periodEnd, willCancelAt: periodEnd, providerData, updatedOn: Date.now() }
+  await db.subscription.update({ id: subscription.id }, update)
+  return { ...subscription, ...update }
+}
+
 export async function getWorkspacePendingInvites (
   ctx: MeasureContext,
   db: AccountDB,
@@ -3902,6 +3934,7 @@ export type AccountMethods =
   | 'getUserProfile'
   | 'getSubscriptions'
   | 'getWorkspaceEntitlement'
+  | 'cancelWorkspaceSubscription'
   | 'getWorkspacePendingInvites'
   | 'getWorkspaceSeatQuote'
   | 'changeWorkspaceSeatLimit'
@@ -3976,6 +4009,7 @@ export function getMethods (hasSignUp: boolean = true): Partial<Record<AccountMe
     getUserProfile: wrap(getUserProfile),
     getSubscriptions: wrap(getSubscriptions),
     getWorkspaceEntitlement: wrap(getWorkspaceEntitlement),
+    cancelWorkspaceSubscription: wrap(cancelWorkspaceSubscription),
     getWorkspacePendingInvites: wrap(getWorkspacePendingInvites),
     getWorkspaceSeatQuote: wrap(getWorkspaceSeatQuote),
     changeWorkspaceSeatLimit: wrap(changeWorkspaceSeatLimit),

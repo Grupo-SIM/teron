@@ -84,7 +84,9 @@
     currentSubscription?.willCancelAt ??
     (currentSubscription?.providerData?.cancelAtPeriodEnd === true ? currentSubscription.periodEnd : undefined)
   $: isCurrentCanceled = scheduledCancellationDate !== undefined && scheduledCancellationDate > 0
-  $: canManageProviderSubscription = currentSubscription?.provider !== 'internal'
+  $: canManageProviderSubscription =
+    currentSubscription?.provider !== 'internal' &&
+    (currentSubscription?.provider !== 'simintpay' || !isCurrentCanceled)
   $: occupiedSeats = (entitlement?.memberSeats ?? 0) + (entitlement?.pendingInviteSeats ?? 0)
   $: seatOccupancyPercent =
     (entitlement?.seatLimit ?? 0) > 0 ? Math.min((occupiedSeats / (entitlement?.seatLimit ?? 1)) * 100, 100) : 0
@@ -120,16 +122,20 @@
   }
 
   async function executeCancel (): Promise<void> {
-    if (paymentClient == null) {
-      return
-    }
     if (currentSubscription?.id === undefined) {
       return
     }
 
     try {
       isCanceling = true
-      currentSubscription = await paymentClient.cancelSubscription(currentSubscription.id)
+      if (currentSubscription.provider === 'simintpay') {
+        const accountClient = getAccountClient()
+        if (accountClient == null) return
+        currentSubscription = await accountClient.cancelWorkspaceSubscription()
+      } else {
+        if (paymentClient == null) return
+        currentSubscription = await paymentClient.cancelSubscription(currentSubscription.id)
+      }
       await fetchSubscriptions()
     } catch (error) {
       console.error('Error canceling subscription:', error)

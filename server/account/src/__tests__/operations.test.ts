@@ -58,6 +58,7 @@ import {
   getWorkspacePendingInvites,
   getWorkspaceSeatQuote,
   changeWorkspaceSeatLimit,
+  cancelWorkspaceSubscription,
   reconcileWorkspaceSeatChanges,
   leaveWorkspace,
   checkJoin
@@ -544,6 +545,28 @@ describe('account operations', () => {
       expect(mockDb.subscription.update).toHaveBeenCalledWith(
         { id: 'business-subscription' }, expect.objectContaining({ seatLimit: 2 })
       )
+    })
+
+    test('cancels a Simintpay workspace subscription at the current period end', async () => {
+      const periodStart = new Date('2026-08-16T00:00:00.000Z')
+      const periodEnd = new Date('2026-09-16T00:00:00.000Z')
+      ;(mockDb.subscription.findOne as jest.Mock).mockResolvedValue({
+        id: 'business-subscription', workspaceUuid: mockWorkspace.uuid, type: 'tier', provider: 'simintpay',
+        status: 'active', plan: 'business', providerData: { quantity: 1 }
+      })
+      jest.spyOn(simintpay, 'cancelWorkspaceBillingContract').mockResolvedValue({
+        id: 'business-subscription', quantity: 1, pendingQuantity: null, version: 2, unitAmount: '10.00',
+        recurringAmount: '10.00', currentPeriodStart: periodStart.toISOString(), currentPeriodEnd: periodEnd.toISOString()
+      })
+
+      const result = await cancelWorkspaceSubscription(mockCtx, mockDb, mockBranding, mockToken)
+
+      expect(simintpay.cancelWorkspaceBillingContract).toHaveBeenCalledWith('business-subscription')
+      expect(mockDb.subscription.update).toHaveBeenCalledWith(
+        { id: 'business-subscription' },
+        expect.objectContaining({ willCancelAt: periodEnd.getTime(), providerData: expect.objectContaining({ cancelAtPeriodEnd: true }) })
+      )
+      expect(result.willCancelAt).toBe(periodEnd.getTime())
     })
 
     test('rejects a reduction below members and pending invitations', async () => {

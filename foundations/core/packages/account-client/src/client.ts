@@ -254,6 +254,7 @@ export interface AccountClient {
 
   getSubscriptions: (workspaceUuid?: WorkspaceUuid | undefined, activeOnly?: boolean) => Promise<Subscription[]>
   getWorkspaceEntitlement: (workspaceUuid?: WorkspaceUuid) => Promise<WorkspaceEntitlement>
+  cancelWorkspaceSubscription: () => Promise<Subscription>
   getWorkspacePendingInvites: () => Promise<WorkspacePendingInvite[]>
   getWorkspaceSeatQuote: (targetSeatLimit: number) => Promise<WorkspaceSeatQuote>
   changeWorkspaceSeatLimit: (
@@ -1303,6 +1304,10 @@ class AccountClientImpl implements AccountClient {
       method: 'getWorkspaceEntitlement',
       params: { workspaceUuid }
     })
+  }
+
+  async cancelWorkspaceSubscription (): Promise<Subscription> {
+    return await this._rpc({ method: 'cancelWorkspaceSubscription', params: {} })
   }
 
   async getWorkspacePendingInvites (): Promise<WorkspacePendingInvite[]> {
