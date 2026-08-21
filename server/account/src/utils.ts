@@ -639,7 +639,8 @@ export async function sendOtpEmail (
       text,
       html,
       subject,
-      to
+      to,
+      ...(mailAuth != null ? { apiKey: mailAuth } : {})
     })
   })
   if (!response.ok) {
@@ -1331,7 +1332,8 @@ export async function sendEmailConfirmation (
       text,
       html,
       subject,
-      to: email
+      to: email,
+      ...(mailAuth != null ? { apiKey: mailAuth } : {})
     })
   })
   if (!response.ok) {
@@ -1866,7 +1868,8 @@ export async function sendEmail (info: EmailInfo, ctx: MeasureContext): Promise<
       text,
       html,
       subject,
-      to
+      to,
+      ...(mailAuth != null ? { apiKey: mailAuth } : {})
     })
   })
   if (!response.ok) {

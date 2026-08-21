@@ -33,4 +33,18 @@ describe('sendEmail', () => {
       )
     ).rejects.toThrow('Mail service rejected email')
   })
+
+  it('sends the mail service API key in the request body', async () => {
+    ;(getMetadata as jest.Mock).mockImplementation((key) => {
+      if (key === accountPlugin.metadata.MAIL_URL) return 'https://mail.example.com'
+      if (key === accountPlugin.metadata.MAIL_AUTH_TOKEN) return 'mail-api-key'
+      return undefined
+    })
+    global.fetch = jest.fn().mockResolvedValue({ ok: true })
+
+    await sendEmail({ to: 'to@example.com', subject: 'Invite', text: 'Text', html: '<p>Text</p>' }, ctx)
+
+    const request = (global.fetch as jest.Mock).mock.calls[0][1] as RequestInit
+    expect(JSON.parse(request.body as string)).toMatchObject({ apiKey: 'mail-api-key', to: 'to@example.com' })
+  })
 })

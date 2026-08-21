@@ -1844,7 +1844,8 @@ export async function requestPasswordReset (
       text,
       html,
       subject,
-      to: normalizedEmail
+      to: normalizedEmail,
+      ...(mailAuth != null ? { apiKey: mailAuth } : {})
     })
   })
   if (response.ok) {
@@ -1914,7 +1915,8 @@ export async function requestPasswordSetup (
       text,
       html,
       subject,
-      to: emailSocialId.value
+      to: emailSocialId.value,
+      ...(mailAuth != null ? { apiKey: mailAuth } : {})
     })
   })
   if (response.ok) {
