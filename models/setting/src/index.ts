@@ -303,7 +303,7 @@ export function createModel (builder: Builder): void {
     setting.class.WorkspaceSettingCategory,
     core.space.Model,
     {
-      name: 'owners',
+      name: 'members',
       label: setting.string.Members,
       icon: setting.icon.Members,
       component: setting.component.Members,
