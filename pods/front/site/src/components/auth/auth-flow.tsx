@@ -87,6 +87,7 @@ const text = {
     seats: "Quantidade de integrantes",
     billingTitle: "Pagamento mensal",
     billingDescription: "Informe os dados para pagar o primeiro mês de acesso.",
+    billingTotal: "Total mensal",
     document: "CPF ou CNPJ",
     phone: "Telefone",
     cardNumber: "Número do cartão",
@@ -161,6 +162,7 @@ const text = {
     seats: "Number of members",
     billingTitle: "Monthly payment",
     billingDescription: "Enter your details to pay for the first month of access.",
+    billingTotal: "Monthly total",
     document: "Tax ID",
     phone: "Phone",
     cardNumber: "Card number",
@@ -184,6 +186,15 @@ const text = {
     requiredFields: "Complete all required fields.",
   },
 } as const;
+
+function workspaceSeatPriceInCents(value: string): number {
+  const match = /^(\d+)(?:\.(\d{1,2}))?$/.exec(value.trim());
+  if (!match) return 999;
+  return Number(match[1]) * 100 + Number((match[2] ?? "").padEnd(2, "0"));
+}
+
+// Next.js substitutes this direct public environment reference during the build.
+const WORKSPACE_SEAT_PRICE_IN_CENTS = workspaceSeatPriceInCents(process.env.NEXT_PUBLIC_WORKSPACE_SEAT_AMOUNT ?? "9.99");
 
 export function AuthFlow({ variant, locale }: { variant: Variant; locale: Locale }) {
   const copy = text[locale];
@@ -616,6 +627,13 @@ export function AuthFlow({ variant, locale }: { variant: Variant; locale: Locale
                       : step === "confirmation-sent"
                         ? copy.confirmationSent
                         : copy.confirming;
+  const seatsCount = Number(seats);
+  const monthlyTotalInCents = Number.isSafeInteger(seatsCount) && seatsCount > 0
+    ? seatsCount * WORKSPACE_SEAT_PRICE_IN_CENTS
+    : undefined;
+  const monthlyTotal = monthlyTotalInCents != null && Number.isSafeInteger(monthlyTotalInCents)
+    ? new Intl.NumberFormat(locale, { style: "currency", currency: "BRL" }).format(monthlyTotalInCents / 100)
+    : undefined;
 
   return (
     <>
@@ -722,7 +740,7 @@ export function AuthFlow({ variant, locale }: { variant: Variant; locale: Locale
         <form className="auth-form" onSubmit={submitWorkspace}>
           <AuthInput testId="auth-workspace-name" label={copy.workspaceName} value={workspaceName} onChange={setWorkspaceName} autoComplete="organization" />
           {regions.length > 1 ? <label className="auth-label">{copy.region}<select className="auth-input auth-select" value={region} onChange={(event) => setRegion(event.target.value)}>{regions.map((item) => <option key={item.region} value={item.region}>{item.name}</option>)}</select></label> : null}
-          {freeTrialAvailable ? <p className="auth-description">{copy.freeTrialDescription}</p> : <fieldset className="auth-billing"><legend>{copy.billingTitle}</legend><p>{copy.billingDescription}</p><AuthInput label={copy.seats} value={seats} onChange={(value) => setSeats(value.replace(/\D/g, ""))} inputMode="numeric" /><AuthInput name="document" label={copy.document} value={customerDocument} onChange={(value) => setCustomerDocument(formatDocument(value))} placeholder="000.000.000-00" inputMode="numeric" /><AuthInput name="tel" label={copy.phone} value={customerPhone} onChange={(value) => setCustomerPhone(formatPhone(value))} placeholder="(00) 00000-0000" inputMode="numeric" autoComplete="tel" /><AuthInput name="cc-number" label={copy.cardNumber} value={cardNumber} onChange={(value) => setCardNumber(formatCardNumber(value))} placeholder="0000 0000 0000 0000" inputMode="numeric" autoComplete="cc-number" /><div className="auth-fields-row"><AuthInput name="cc-exp" label={copy.cardExpiry} value={cardExpiry} onChange={(value) => setCardExpiry(formatCardExpiry(value))} placeholder="MM/AA" inputMode="numeric" autoComplete="cc-exp" /><AuthInput name="cc-csc" label={copy.cardCvv} value={cardCvv} onChange={(value) => setCardCvv(digitsOnly(value).slice(0, 4))} placeholder="123" inputMode="numeric" autoComplete="cc-csc" /></div><AuthInput name="cc-name" label={copy.cardHolder} value={cardHolder} onChange={setCardHolder} autoComplete="cc-name" /></fieldset>}
+          {freeTrialAvailable ? <p className="auth-description">{copy.freeTrialDescription}</p> : <fieldset className="auth-billing"><legend>{copy.billingTitle}</legend><p>{copy.billingDescription}</p><AuthInput label={copy.seats} value={seats} onChange={(value) => setSeats(value.replace(/\D/g, ""))} inputMode="numeric" />{monthlyTotal ? <p className="auth-billing-total" aria-live="polite"><span>{copy.billingTotal}</span><strong>{monthlyTotal}</strong></p> : null}<AuthInput name="document" label={copy.document} value={customerDocument} onChange={(value) => setCustomerDocument(formatDocument(value))} placeholder="000.000.000-00" inputMode="numeric" /><AuthInput name="tel" label={copy.phone} value={customerPhone} onChange={(value) => setCustomerPhone(formatPhone(value))} placeholder="(00) 00000-0000" inputMode="numeric" autoComplete="tel" /><AuthInput name="cc-number" label={copy.cardNumber} value={cardNumber} onChange={(value) => setCardNumber(formatCardNumber(value))} placeholder="0000 0000 0000 0000" inputMode="numeric" autoComplete="cc-number" /><div className="auth-fields-row"><AuthInput name="cc-exp" label={copy.cardExpiry} value={cardExpiry} onChange={(value) => setCardExpiry(formatCardExpiry(value))} placeholder="MM/AA" inputMode="numeric" autoComplete="cc-exp" /><AuthInput name="cc-csc" label={copy.cardCvv} value={cardCvv} onChange={(value) => setCardCvv(digitsOnly(value).slice(0, 4))} placeholder="123" inputMode="numeric" autoComplete="cc-csc" /></div><AuthInput name="cc-name" label={copy.cardHolder} value={cardHolder} onChange={setCardHolder} autoComplete="cc-name" /></fieldset>}
           <label className="auth-check">
             <input className="auth-check-input" type="checkbox" checked={withDemoContent} onChange={(event) => setWithDemoContent(event.target.checked)} />
             <span className="auth-check-control" aria-hidden="true"><svg viewBox="0 0 12 12"><path d="m2.25 6.25 2.3 2.3 5.2-5.2" /></svg></span>
