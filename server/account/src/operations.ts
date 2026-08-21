@@ -2263,7 +2263,9 @@ export async function getWorkspaceCreationInfo (
 ): Promise<{ freeTrialAvailable: boolean }> {
   const { account } = decodeTokenVerbose(ctx, token)
   const accountInfo = await db.account.findOne({ uuid: account })
-  const owned = await db.workspace.find({ createdBy: account })
+  // Membership does not consume the Free workspace entitlement. Only
+  // workspaces created by this person do.
+  const owned = await db.workspace.find({ createdBy: account as PersonUuid })
   return { freeTrialAvailable: accountInfo?.freeTrialUsedOn == null && owned.length === 0 }
 }
 

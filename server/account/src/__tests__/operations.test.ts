@@ -62,7 +62,8 @@ import {
   uncancelWorkspaceSubscription,
   reconcileWorkspaceSeatChanges,
   leaveWorkspace,
-  checkJoin
+  checkJoin,
+  getWorkspaceCreationInfo
 } from '../operations'
 import { accountPlugin } from '../plugin'
 
@@ -143,6 +144,7 @@ describe('account operations', () => {
     updateWorkspaceRoleWithinCapacity: jest.fn(),
     getWorkspaceRole: jest.fn(),
     getWorkspaceMembers: jest.fn(),
+    getAccountWorkspaces: jest.fn(),
     createWorkspace: jest.fn(),
     assignWorkspace: jest.fn(),
     unassignWorkspace: jest.fn(),
@@ -363,6 +365,29 @@ describe('account operations', () => {
       expect(mockDb.assignWorkspace).toHaveBeenCalledWith(mockAccount.uuid, subscription.workspaceUuid, AccountRole.Owner)
       expect(mockDb.setFreeTrialWorkspace).toHaveBeenCalledWith(mockAccount.uuid, subscription.workspaceUuid)
       nowSpy.mockRestore()
+    })
+  })
+
+  describe('getWorkspaceCreationInfo', () => {
+    test('keeps Free available when the user is only a workspace member', async () => {
+      ;(mockDb.account.findOne as jest.Mock).mockResolvedValue(mockAccount)
+      ;(mockDb.workspace.find as jest.Mock).mockResolvedValue([])
+      ;(mockDb.getAccountWorkspaces as jest.Mock).mockResolvedValue([mockWorkspace])
+
+      const result = await getWorkspaceCreationInfo(mockCtx, mockDb, mockBranding, mockToken)
+
+      expect(result).toEqual({ freeTrialAvailable: true })
+      expect(mockDb.workspace.find).toHaveBeenCalledWith({ createdBy: mockAccount.uuid })
+      expect(mockDb.getAccountWorkspaces).not.toHaveBeenCalled()
+    })
+
+    test('makes Free unavailable after the user creates a workspace', async () => {
+      ;(mockDb.account.findOne as jest.Mock).mockResolvedValue(mockAccount)
+      ;(mockDb.workspace.find as jest.Mock).mockResolvedValue([mockWorkspace])
+
+      const result = await getWorkspaceCreationInfo(mockCtx, mockDb, mockBranding, mockToken)
+
+      expect(result).toEqual({ freeTrialAvailable: false })
     })
   })
 
