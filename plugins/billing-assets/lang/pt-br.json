@@ -113,6 +113,7 @@
     "PreviewSeatChange": "Calcular",
     "ApplySeatChange": "Aplicar alteração",
     "ProrationDueNow": "Cobrança estimada agora:",
+    "ProrationDays": "Cobrança por {days} de {periodDays} dias restantes deste período.",
     "NextRecurringAmount": "Próximo valor mensal:",
     "SeatReductionScheduled": "{limit} vagas agendadas para a próxima renovação",
     "SeatReductionBlocked": "Cancele convites ou remova membros antes de reduzir abaixo da ocupação atual.",

@@ -44,7 +44,7 @@ import { decodeToken, decodeTokenVerbose, generateToken, type PermissionsGrant }
 import { isAdminEmail } from './admin'
 import { renderBrandedEmail } from './email'
 import { accountPlugin } from './plugin'
-import { remainingRatioByStartedDays } from './proration'
+import { getProrationDays } from './proration'
 import { type AccountServiceMethods, getServiceMethods } from './serviceOperations'
 import {
   AccountEventType,
@@ -3539,7 +3539,7 @@ export async function getWorkspaceSeatQuote (
   const contract = await getWorkspaceBillingContract(workspace)
   const periodStart = Date.parse(contract.currentPeriodStart)
   const periodEnd = Date.parse(contract.currentPeriodEnd)
-  const remainingRatio = remainingRatioByStartedDays(periodStart, periodEnd, Date.now())
+  const proration = getProrationDays(periodStart, periodEnd, Date.now())
   const unit = Number(contract.unitAmount)
   const delta = target - contract.quantity
   return {
@@ -3549,7 +3549,9 @@ export async function getWorkspaceSeatQuote (
     unitAmount: unit.toFixed(2),
     currentRecurringAmount: contract.recurringAmount,
     nextRecurringAmount: (Number(contract.recurringAmount) + unit * delta).toFixed(2),
-    estimatedProrationAmount: (delta > 0 ? unit * delta * remainingRatio : 0).toFixed(2),
+    estimatedProrationAmount: (delta > 0 ? unit * delta * proration.remainingRatio : 0).toFixed(2),
+    prorationDays: proration.days,
+    prorationPeriodDays: proration.periodDays,
     currency: 'BRL',
     periodEnd
   }

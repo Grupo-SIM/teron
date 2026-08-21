@@ -70,16 +70,22 @@
   const POLL_INTERVAL = 2000
 
   let usageInfo: UsageStatus | null = null
-  let seatQuote: Awaited<ReturnType<NonNullable<ReturnType<typeof getAccountClient>>['getWorkspaceSeatQuote']>> | undefined
+  type SeatQuote = Awaited<ReturnType<NonNullable<ReturnType<typeof getAccountClient>>['getWorkspaceSeatQuote']>>
+
+  let activeSeatQuote: SeatQuote | undefined
+  let seatQuote: SeatQuote | undefined
   let targetSeatLimit: number | undefined
   let seatChangeStatus: string | undefined
   let changingSeats = false
+  let quoteLoading = false
+  let seatQuoteTimer: number | undefined
 
   $: isCurrentCanceled = currentSubscription?.canceledAt !== undefined && currentSubscription.canceledAt > 0
   $: canManageProviderSubscription = currentSubscription?.provider !== 'internal'
   $: occupiedSeats = (entitlement?.memberSeats ?? 0) + (entitlement?.pendingInviteSeats ?? 0)
   $: seatOccupancyPercent =
     (entitlement?.seatLimit ?? 0) > 0 ? Math.min((occupiedSeats / (entitlement?.seatLimit ?? 1)) * 100, 100) : 0
+  $: currentSeatQuote = seatQuote
 
   async function showErrorNotification (): Promise<void> {
     addNotification(
@@ -190,7 +196,8 @@
       currentTier = plan !== undefined ? tierByPlan[plan] : undefined
       if (currentEntitlement.plan === 'business' && currentEntitlement.seatLimit !== undefined) {
         targetSeatLimit = currentEntitlement.nextSeatLimit ?? currentEntitlement.seatLimit
-        seatQuote = await accountClient.getWorkspaceSeatQuote(currentEntitlement.seatLimit)
+        activeSeatQuote = await accountClient.getWorkspaceSeatQuote(currentEntitlement.seatLimit)
+        seatQuote = activeSeatQuote
       }
     } catch (err) {
       console.error('Error fetching current plan:', err)
@@ -203,7 +210,22 @@
   async function previewSeatChange (): Promise<void> {
     const accountClient = getAccountClient()
     if (accountClient == null || targetSeatLimit == null) return
-    seatQuote = await accountClient.getWorkspaceSeatQuote(targetSeatLimit)
+    if (seatQuoteTimer !== undefined) clearTimeout(seatQuoteTimer)
+    const target = targetSeatLimit
+    quoteLoading = true
+    try {
+      const quote = await accountClient.getWorkspaceSeatQuote(target)
+      if (targetSeatLimit === target) seatQuote = quote
+    } finally {
+      if (targetSeatLimit === target) quoteLoading = false
+    }
+  }
+
+  function scheduleSeatPreview (): void {
+    if (seatQuoteTimer !== undefined) clearTimeout(seatQuoteTimer)
+    seatQuoteTimer = setTimeout(() => {
+      void previewSeatChange()
+    }, 300)
   }
 
   async function applySeatChange (): Promise<void> {
@@ -357,6 +379,9 @@
     if (pollTimer !== undefined) {
       clearTimeout(pollTimer)
     }
+    if (seatQuoteTimer !== undefined) {
+      clearTimeout(seatQuoteTimer)
+    }
   })
 </script>
 
@@ -392,10 +417,10 @@
                   <div class="status-badge ml-2 text-md"><Label label={plugin.string.Active} /></div>
                 {/if}
               </div>
-              {#if entitlement?.plan === 'business' && seatQuote != null}
+              {#if entitlement?.plan === 'business' && activeSeatQuote != null}
                 <div class="flex-row-center items-end">
                   <span class="fs-title text-xl">
-                    {Number(seatQuote.nextRecurringAmount).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
+                    {Number(activeSeatQuote.nextRecurringAmount).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}
                   </span>
                   <span class="ml-1 lower">
                     <Label label={plugin.string.Monthly} />
@@ -503,10 +528,15 @@
               </div>
             {/if}
 
-            {#if seatQuote != null}
+            {#if currentSeatQuote != null}
               <div class="billing-values">
-                <div><Label label={plugin.string.ProrationDueNow} /> <strong>{Number(seatQuote.estimatedProrationAmount).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</strong></div>
-                <div><Label label={plugin.string.NextRecurringAmount} /> <strong>{Number(seatQuote.nextRecurringAmount).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</strong></div>
+                <div class="billing-amounts">
+                  <div><Label label={plugin.string.ProrationDueNow} /> <strong>{Number(currentSeatQuote.estimatedProrationAmount).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</strong></div>
+                  <div><Label label={plugin.string.NextRecurringAmount} /> <strong>{Number(currentSeatQuote.nextRecurringAmount).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</strong></div>
+                </div>
+                <div class="billing-proration-days text-sm dim">
+                  <Label label={plugin.string.ProrationDays} params={{ days: currentSeatQuote.prorationDays, periodDays: currentSeatQuote.prorationPeriodDays }} />
+                </div>
               </div>
             {/if}
 
@@ -527,10 +557,12 @@
                   minValue={entitlement.memberSeats + entitlement.pendingInviteSeats}
                   maxDigitsAfterPoint={0}
                   bind:value={targetSeatLimit}
+                  on:input={scheduleSeatPreview}
+                  on:change={() => void previewSeatChange()}
                 />
               </div>
               <div class="seat-actions flex-row-center flex-gap-2">
-                <Button label={plugin.string.PreviewSeatChange} kind="secondary" disabled={changingSeats} on:click={() => void previewSeatChange()} />
+                <Button label={plugin.string.PreviewSeatChange} kind="secondary" disabled={changingSeats || quoteLoading} on:click={() => void previewSeatChange()} />
                 <Button
                   label={plugin.string.ApplySeatChange}
                   kind="primary"
@@ -662,11 +694,22 @@
 
   .billing-values {
     display: flex;
-    justify-content: space-between;
+    flex-direction: column;
     gap: var(--spacing-2);
     padding: var(--spacing-3);
     border-radius: var(--medium-BorderRadius);
     background: var(--theme-bg-color);
+  }
+
+  .billing-amounts {
+    display: flex;
+    justify-content: space-between;
+    gap: var(--spacing-2);
+  }
+
+  .billing-proration-days {
+    padding-top: var(--spacing-2);
+    border-top: 1px solid var(--theme-divider-color);
   }
 
   .seat-management-card {

@@ -519,6 +519,7 @@ describe('account operations', () => {
 
       expect(quote.nextRecurringAmount).toBe('20.00')
       expect(quote.estimatedProrationAmount).toBe('8.67')
+      expect(quote).toMatchObject({ prorationDays: 26, prorationPeriodDays: 30 })
     })
 
     test('applies paid capacity and stores the idempotent operation', async () => {

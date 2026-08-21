@@ -102,6 +102,7 @@
     "PreviewSeatChange": "Preview",
     "ApplySeatChange": "Apply change",
     "ProrationDueNow": "Estimated charge now:",
+    "ProrationDays": "Charge for {days} of {periodDays} days remaining in this billing period.",
     "NextRecurringAmount": "Next monthly amount:",
     "SeatReductionScheduled": "{limit} seats scheduled for the next renewal",
     "SeatReductionBlocked": "Cancel invites or remove members before reducing below current occupancy.",

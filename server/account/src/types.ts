@@ -358,6 +358,8 @@ export interface WorkspaceSeatQuote {
   currentRecurringAmount: string
   nextRecurringAmount: string
   estimatedProrationAmount: string
+  prorationDays: number
+  prorationPeriodDays: number
   currency: 'BRL'
   periodEnd: Timestamp
 }
