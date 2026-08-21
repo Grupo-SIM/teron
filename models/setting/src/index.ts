@@ -398,21 +398,6 @@ export function createModel (builder: Builder): void {
     setting.class.WorkspaceSettingCategory,
     core.space.Model,
     {
-      name: 'invites',
-      label: setting.string.InviteSettings,
-      icon: setting.icon.InviteSettings,
-      component: setting.component.InviteSetting,
-      group: 'settings-editor',
-      feature: 'invites',
-      role: AccountRole.Maintainer,
-      order: 4700
-    },
-    setting.ids.InviteSettings
-  )
-  builder.createDoc(
-    setting.class.WorkspaceSettingCategory,
-    core.space.Model,
-    {
       name: 'export',
       label: exportPlugin.string.Export,
       icon: exportPlugin.icon.Export,
