@@ -545,7 +545,7 @@ export async function configurePlatform() {
 
   const languages = myBranding.languages
     ? myBranding.languages.split(',').map((l) => l.trim())
-    : ['pt-br', 'en']
+    : ['pt-br']
 
   setMetadata(uiPlugin.metadata.Languages, languages)
 
@@ -733,7 +733,7 @@ export async function configurePlatform() {
 
   setMetadata(uiPlugin.metadata.PlatformTitle, title)
   setMetadata(workbench.metadata.PlatformTitle, title)
-  setDefaultLanguage(myBranding.defaultLanguage ?? 'pt-br')
+  setDefaultLanguage(myBranding.defaultLanguage ?? 'pt-br', languages)
   setMetadata(workbench.metadata.DefaultApplication, myBranding.defaultApplication ?? 'tracker')
   setMetadata(workbench.metadata.DefaultSpace, myBranding.defaultSpace ?? tracker.project.DefaultProject)
   setMetadata(workbench.metadata.DefaultSpecial, myBranding.defaultSpecial ?? 'issues')

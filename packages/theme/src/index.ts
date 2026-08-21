@@ -25,8 +25,9 @@ export { ThemeVariant, type ThemeVariantType } from './variants'
 /**
  * @public
  */
-export const setDefaultLanguage = (language: string): void => {
-  if (localStorage.getItem('lang') === null) {
+export const setDefaultLanguage = (language: string, availableLanguages?: readonly string[]): void => {
+  const currentLanguage = localStorage.getItem('lang')
+  if (currentLanguage === null || (availableLanguages !== undefined && !availableLanguages.includes(currentLanguage))) {
     localStorage.setItem('lang', language)
   }
 }

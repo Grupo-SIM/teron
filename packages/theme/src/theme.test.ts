@@ -93,9 +93,27 @@ describe('default application language', () => {
         value: { getItem: jest.fn(() => 'en'), setItem }
       })
 
-      setDefaultLanguage('pt-br')
+      setDefaultLanguage('pt-br', ['pt-br', 'en'])
 
       expect(setItem).not.toHaveBeenCalled()
+    } finally {
+      if (previousLocalStorage !== undefined) Object.defineProperty(globalThis, 'localStorage', previousLocalStorage)
+      else Reflect.deleteProperty(globalThis, 'localStorage')
+    }
+  })
+
+  it('replaces an unavailable language preference', () => {
+    const previousLocalStorage = Object.getOwnPropertyDescriptor(globalThis, 'localStorage')
+    const setItem = jest.fn()
+    try {
+      Object.defineProperty(globalThis, 'localStorage', {
+        configurable: true,
+        value: { getItem: jest.fn(() => 'en'), setItem }
+      })
+
+      setDefaultLanguage('pt-br', ['pt-br'])
+
+      expect(setItem).toHaveBeenCalledWith('lang', 'pt-br')
     } finally {
       if (previousLocalStorage !== undefined) Object.defineProperty(globalThis, 'localStorage', previousLocalStorage)
       else Reflect.deleteProperty(globalThis, 'localStorage')

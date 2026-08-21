@@ -2,8 +2,10 @@ import { cloneElement, isValidElement, type ReactElement, type ReactNode } from 
 import { enUS } from "./locales/en-US";
 import { ptBR } from "./locales/pt-BR";
 
-export const locales = ["pt-BR", "en-US"] as const;
-export type Locale = (typeof locales)[number];
+export const translationLocales = ["pt-BR", "en-US"] as const;
+export type Locale = (typeof translationLocales)[number];
+
+export const locales = ["pt-BR"] as const satisfies readonly Locale[];
 
 export const defaultLocale: Locale = "pt-BR";
 
