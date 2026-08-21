@@ -552,19 +552,23 @@ describe('account operations', () => {
       const periodStart = new Date('2026-08-16T00:00:00.000Z')
       const periodEnd = new Date('2026-09-16T00:00:00.000Z')
       ;(mockDb.subscription.findOne as jest.Mock).mockResolvedValue({
-        id: 'business-subscription', workspaceUuid: mockWorkspace.uuid, type: 'tier', provider: 'simintpay',
+        id: 'legacy-provider-subscription', workspaceUuid: mockWorkspace.uuid, type: 'tier', provider: 'simintpay',
         status: 'active', plan: 'business', providerData: { quantity: 1 }
       })
+      jest.spyOn(simintpay, 'getWorkspaceBillingContract').mockResolvedValue({
+        id: 'billing-contract', quantity: 1, pendingQuantity: null, version: 2, unitAmount: '10.00',
+        recurringAmount: '10.00', currentPeriodStart: periodStart.toISOString(), currentPeriodEnd: periodEnd.toISOString()
+      })
       jest.spyOn(simintpay, 'cancelWorkspaceBillingContract').mockResolvedValue({
-        id: 'business-subscription', quantity: 1, pendingQuantity: null, version: 2, unitAmount: '10.00',
+        id: 'billing-contract', quantity: 1, pendingQuantity: null, version: 2, unitAmount: '10.00',
         recurringAmount: '10.00', currentPeriodStart: periodStart.toISOString(), currentPeriodEnd: periodEnd.toISOString()
       })
 
       const result = await cancelWorkspaceSubscription(mockCtx, mockDb, mockBranding, mockToken)
 
-      expect(simintpay.cancelWorkspaceBillingContract).toHaveBeenCalledWith('business-subscription')
+      expect(simintpay.cancelWorkspaceBillingContract).toHaveBeenCalledWith('billing-contract')
       expect(mockDb.subscription.update).toHaveBeenCalledWith(
-        { id: 'business-subscription' },
+        { id: 'legacy-provider-subscription' },
         expect.objectContaining({ willCancelAt: periodEnd.getTime(), providerData: expect.objectContaining({ cancelAtPeriodEnd: true }) })
       )
       expect(result.willCancelAt).toBe(periodEnd.getTime())
@@ -574,19 +578,23 @@ describe('account operations', () => {
       const periodStart = new Date('2026-08-16T00:00:00.000Z')
       const periodEnd = new Date('2026-09-16T00:00:00.000Z')
       ;(mockDb.subscription.findOne as jest.Mock).mockResolvedValue({
-        id: 'business-subscription', workspaceUuid: mockWorkspace.uuid, type: 'tier', provider: 'simintpay',
+        id: 'legacy-provider-subscription', workspaceUuid: mockWorkspace.uuid, type: 'tier', provider: 'simintpay',
         status: 'active', plan: 'business', willCancelAt: periodEnd.getTime(), providerData: { cancelAtPeriodEnd: true }
       })
+      jest.spyOn(simintpay, 'getWorkspaceBillingContract').mockResolvedValue({
+        id: 'billing-contract', quantity: 1, pendingQuantity: null, version: 3, unitAmount: '10.00',
+        recurringAmount: '10.00', currentPeriodStart: periodStart.toISOString(), currentPeriodEnd: periodEnd.toISOString()
+      })
       jest.spyOn(simintpay, 'reactivateWorkspaceBillingContract').mockResolvedValue({
-        id: 'business-subscription', quantity: 1, pendingQuantity: null, version: 3, unitAmount: '10.00',
+        id: 'billing-contract', quantity: 1, pendingQuantity: null, version: 3, unitAmount: '10.00',
         recurringAmount: '10.00', currentPeriodStart: periodStart.toISOString(), currentPeriodEnd: periodEnd.toISOString()
       })
 
       const result = await uncancelWorkspaceSubscription(mockCtx, mockDb, mockBranding, mockToken)
 
-      expect(simintpay.reactivateWorkspaceBillingContract).toHaveBeenCalledWith('business-subscription')
+      expect(simintpay.reactivateWorkspaceBillingContract).toHaveBeenCalledWith('billing-contract')
       expect(mockDb.subscription.update).toHaveBeenCalledWith(
-        { id: 'business-subscription' },
+        { id: 'legacy-provider-subscription' },
         expect.objectContaining({ willCancelAt: undefined, providerData: expect.objectContaining({ cancelAtPeriodEnd: false }) })
       )
       expect(result.willCancelAt).toBeUndefined()

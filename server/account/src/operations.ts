@@ -3509,7 +3509,11 @@ export async function cancelWorkspaceSubscription (
   }
   if (subscription.willCancelAt != null) return subscription
 
-  const contract = await cancelWorkspaceBillingContract(subscription.id)
+  // Older workspace subscriptions stored the gateway subscription ID here,
+  // while SimintPay expects its billing contract ID. Resolve the contract from
+  // the workspace so cancel and uncancel work for both record shapes.
+  const currentContract = await getWorkspaceBillingContract(workspace)
+  const contract = await cancelWorkspaceBillingContract(currentContract.id)
   const periodStart = Date.parse(contract.currentPeriodStart)
   const periodEnd = Date.parse(contract.currentPeriodEnd)
   const providerData = {
@@ -3539,7 +3543,10 @@ export async function uncancelWorkspaceSubscription (
     throw new PlatformError(new Status(Severity.ERROR, platform.status.BadRequest, {}))
   }
 
-  const contract = await reactivateWorkspaceBillingContract(subscription.id)
+  // See cancellation above: the persisted subscription ID is not a reliable
+  // SimintPay contract ID for subscriptions created before contract billing.
+  const currentContract = await getWorkspaceBillingContract(workspace)
+  const contract = await reactivateWorkspaceBillingContract(currentContract.id)
   const periodStart = Date.parse(contract.currentPeriodStart)
   const periodEnd = Date.parse(contract.currentPeriodEnd)
   const providerData = {
