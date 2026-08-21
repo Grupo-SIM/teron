@@ -77,6 +77,9 @@
 
   $: isCurrentCanceled = currentSubscription?.canceledAt !== undefined && currentSubscription.canceledAt > 0
   $: canManageProviderSubscription = currentSubscription?.provider !== 'internal'
+  $: occupiedSeats = (entitlement?.memberSeats ?? 0) + (entitlement?.pendingInviteSeats ?? 0)
+  $: seatOccupancyPercent =
+    (entitlement?.seatLimit ?? 0) > 0 ? Math.min((occupiedSeats / (entitlement?.seatLimit ?? 1)) * 100, 100) : 0
 
   async function showErrorNotification (): Promise<void> {
     addNotification(
@@ -475,14 +478,30 @@
       {#if entitlement?.plan === 'business' && entitlement.seatLimit !== undefined}
         <div class="flex-col flex-gap-4">
           <div class="section-title"><Label label={plugin.string.SeatManagement} /></div>
-          <div class="current-tier-card w-full flex-gap-4">
-            <Label label={plugin.string.SeatManagementDescription} />
+          <div class="seat-management-card w-full">
+            <div class="seat-management-header">
+              <div class="text-sm dim"><Label label={plugin.string.SeatManagementDescription} /></div>
+              <div class="seat-total">
+                <strong>{occupiedSeats}</strong>
+                <span class="dim">/ {entitlement.seatLimit}</span>
+              </div>
+            </div>
+
+            <div class="seat-progress" aria-label={`${occupiedSeats} / ${entitlement.seatLimit}`}>
+              <div style={`width: ${seatOccupancyPercent}%`}></div>
+            </div>
+
             <div class="seat-grid">
               <div><strong>{entitlement.seatLimit}</strong><Label label={plugin.string.ContractedSeats} /></div>
-              <div><strong>{entitlement.memberSeats + entitlement.pendingInviteSeats}</strong><Label label={plugin.string.OccupiedSeats} /></div>
+              <div><strong>{occupiedSeats}</strong><Label label={plugin.string.OccupiedSeats} /></div>
               <div><strong>{entitlement.availableSeats ?? 0}</strong><Label label={plugin.string.AvailableSeats} /></div>
-              <div><strong>{entitlement.pendingInviteSeats}</strong><Label label={plugin.string.PendingInviteSeats} /></div>
             </div>
+
+            {#if entitlement.pendingInviteSeats > 0}
+              <div class="pending-invites text-sm">
+                <Label label={plugin.string.PendingInviteSeats} />: <strong>{entitlement.pendingInviteSeats}</strong>
+              </div>
+            {/if}
 
             {#if seatQuote != null}
               <div class="billing-values">
@@ -500,8 +519,9 @@
               <div class="error-color"><Label label={plugin.string.SeatChangeFailed} /></div>
             {/if}
 
-            <div class="flex-row-center flex-gap-2">
-              <div class="max-w-40 flex-grow">
+            <div class="seat-controls">
+              <div class="seat-input flex-col flex-gap-1">
+                <Label label={plugin.string.TargetSeatCount} />
                 <EditBox
                   format="number"
                   minValue={entitlement.memberSeats + entitlement.pendingInviteSeats}
@@ -509,13 +529,15 @@
                   bind:value={targetSeatLimit}
                 />
               </div>
-              <Button label={plugin.string.PreviewSeatChange} kind="secondary" disabled={changingSeats} on:click={() => void previewSeatChange()} />
-              <Button
-                label={plugin.string.ApplySeatChange}
-                kind="primary"
-                disabled={changingSeats || targetSeatLimit == null || targetSeatLimit === entitlement.seatLimit}
-                on:click={confirmSeatChange}
-              />
+              <div class="seat-actions flex-row-center flex-gap-2">
+                <Button label={plugin.string.PreviewSeatChange} kind="secondary" disabled={changingSeats} on:click={() => void previewSeatChange()} />
+                <Button
+                  label={plugin.string.ApplySeatChange}
+                  kind="primary"
+                  disabled={changingSeats || targetSeatLimit == null || targetSeatLimit === entitlement.seatLimit}
+                  on:click={confirmSeatChange}
+                />
+              </div>
             </div>
             {#if targetSeatLimit != null && targetSeatLimit < entitlement.memberSeats + entitlement.pendingInviteSeats}
               <div class="error-color"><Label label={plugin.string.SeatReductionBlocked} /></div>
@@ -617,17 +639,21 @@
 
   .seat-grid {
     display: grid;
-    grid-template-columns: repeat(4, minmax(0, 1fr));
-    gap: var(--spacing-2);
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    border: 1px solid var(--theme-divider-color);
+    border-radius: var(--medium-BorderRadius);
   }
 
   .seat-grid > div {
     display: flex;
     flex-direction: column;
     gap: var(--spacing-1);
-    padding: var(--spacing-2);
-    border: 1px solid var(--theme-divider-color);
-    border-radius: var(--small-BorderRadius);
+    padding: var(--spacing-3);
+    border-right: 1px solid var(--theme-divider-color);
+
+    &:last-child {
+      border-right: 0;
+    }
   }
 
   .seat-grid strong {
@@ -638,6 +664,75 @@
     display: flex;
     justify-content: space-between;
     gap: var(--spacing-2);
+    padding: var(--spacing-3);
+    border-radius: var(--medium-BorderRadius);
+    background: var(--theme-bg-color);
+  }
+
+  .seat-management-card {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-4);
+    width: 31rem;
+    padding: var(--spacing-4);
+    border: 1px solid var(--theme-divider-color);
+    border-radius: var(--large-BorderRadius);
+    background: var(--theme-button-default);
+  }
+
+  .seat-management-header,
+  .seat-controls {
+    display: flex;
+    align-items: flex-end;
+    justify-content: space-between;
+    gap: var(--spacing-3);
+  }
+
+  .seat-total {
+    display: flex;
+    align-items: baseline;
+    flex-shrink: 0;
+  }
+
+  .seat-total strong {
+    font-size: 1.75rem;
+  }
+
+  .seat-progress {
+    height: 0.375rem;
+    overflow: hidden;
+    border-radius: var(--small-BorderRadius);
+    background: var(--theme-divider-color);
+  }
+
+  .seat-progress > div {
+    height: 100%;
+    border-radius: inherit;
+    background: var(--theme-primary-bg-color);
+    transition: width 0.2s ease;
+  }
+
+  .pending-invites {
+    align-self: flex-start;
+    padding: var(--spacing-1) var(--spacing-2);
+    border-radius: var(--small-BorderRadius);
+    background: var(--theme-bg-color);
+  }
+
+  .seat-input {
+    width: 8rem;
+  }
+
+  @media (max-width: 42rem) {
+    .seat-management-header,
+    .seat-controls {
+      align-items: stretch;
+      flex-direction: column;
+    }
+
+    .seat-input {
+      width: 100%;
+    }
   }
 
   .usage-section {

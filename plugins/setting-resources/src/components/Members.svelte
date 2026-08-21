@@ -128,6 +128,7 @@
   $: ownersCount = Object.values(workspaceMembers).filter((role) => role === AccountRole.Owner).length
   $: usedSeats = (entitlement?.memberSeats ?? 0) + (entitlement?.pendingInviteSeats ?? 0)
   $: availableSeats = entitlement?.availableSeats
+  $: hasAvailableSeat = entitlement?.plan !== 'business' || (availableSeats ?? 0) > 0
   $: normalizedSearch = search.trim().toLocaleLowerCase()
 </script>
 
@@ -137,6 +138,7 @@
     <Button
       label={setting.string.InviteMember}
       kind="primary"
+      disabled={!hasAvailableSeat}
       on:click={() => showPopup(InviteMemberPopup, {}, undefined, () => void load())}
     />
     <svelte:fragment slot="search"><SearchInput bind:value={search} collapsed /></svelte:fragment>
@@ -153,9 +155,9 @@
               <div><strong>{usedSeats}</strong><Label label={setting.string.OccupiedSeats} /></div>
               <div><strong>{availableSeats ?? 0}</strong><Label label={setting.string.AvailableSeats} /></div>
             </div>
-            {#if (availableSeats ?? 0) > 0}
+            {#if !hasAvailableSeat}
               <div class="seat-alert flex-row-center flex-gap-3">
-                <div class="flex-grow"><Label label={setting.string.AvailableSeatsHint} params={{ count: availableSeats }} /></div>
+                <div class="flex-grow"><Label label={setting.string.SeatLimitOwnerOnly} /></div>
                 {#if currentAccount.role === AccountRole.Owner}
                   <Button label={setting.string.ManageBilling} kind="secondary" on:click={openBilling} />
                 {/if}
@@ -212,7 +214,7 @@
   .seat-summary { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--spacing-2); }
   .seat-summary > div { display: flex; flex-direction: column; gap: var(--spacing-1); padding: var(--spacing-3); border: 1px solid var(--theme-divider-color); border-radius: var(--medium-BorderRadius); }
   .seat-summary strong { font-size: 1.5rem; }
-  .seat-alert { padding: var(--spacing-2); border: 1px solid var(--theme-state-positive-color); border-radius: var(--medium-BorderRadius); background: var(--theme-state-positive-background-color); }
+  .seat-alert { padding: var(--spacing-2); border: 1px solid var(--theme-state-negative-border-color); border-radius: var(--medium-BorderRadius); background: var(--theme-state-negative-background-color); }
   .section-title { font-size: 1rem; font-weight: 500; }
   .member-row { display: flex; align-items: center; gap: var(--spacing-2); padding: var(--spacing-2); border-bottom: 1px solid var(--theme-divider-color); }
 </style>

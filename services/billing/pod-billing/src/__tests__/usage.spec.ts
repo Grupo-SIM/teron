@@ -13,9 +13,7 @@
 // limitations under the License.
 //
 
-import { getTierLimitsBytes } from '@hcengineering/billing'
-
-import { computeLimitsExceededSince } from '../usage'
+import { computeLimitsExceededSince, isUsageLimitExceeded } from '../usage'
 
 describe('computeLimitsExceededSince', () => {
   const now = 1_700_000_000_000
@@ -38,28 +36,13 @@ describe('computeLimitsExceededSince', () => {
   })
 })
 
-describe('getTierLimitsBytes', () => {
-  it('returns common-tier defaults for unknown plan', () => {
-    const limits = getTierLimitsBytes('mystery')
-    expect(limits.storageBytes).toBe(10 * 1e9)
-    expect(limits.trafficBytes).toBe(10 * 1e9)
+describe('isUsageLimitExceeded', () => {
+  it('treats zero as unlimited', () => {
+    expect(isUsageLimitExceeded(Number.MAX_SAFE_INTEGER, 0)).toBe(false)
   })
 
-  it('returns common-tier defaults when plan is undefined', () => {
-    const limits = getTierLimitsBytes(undefined)
-    expect(limits.storageBytes).toBe(10 * 1e9)
-    expect(limits.trafficBytes).toBe(10 * 1e9)
-  })
-
-  it('matches plan name case-insensitively', () => {
-    expect(getTierLimitsBytes('Rare').storageBytes).toBe(100 * 1e9)
-    expect(getTierLimitsBytes('rare').storageBytes).toBe(100 * 1e9)
-    expect(getTierLimitsBytes('RARE').storageBytes).toBe(100 * 1e9)
-  })
-
-  it('returns Legendary plan limits', () => {
-    const limits = getTierLimitsBytes('legendary')
-    expect(limits.storageBytes).toBe(10000 * 1e9)
-    expect(limits.trafficBytes).toBe(2000 * 1e9)
+  it('enforces positive limits', () => {
+    expect(isUsageLimitExceeded(10, 10)).toBe(false)
+    expect(isUsageLimitExceeded(11, 10)).toBe(true)
   })
 })

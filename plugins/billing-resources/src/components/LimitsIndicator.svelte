@@ -83,9 +83,11 @@
   }}
   on:click={handleClick}
 >
-  <div class="progress-wrapper">
-    <Progress color={storageColor} value={storageUsed} max={limits.storageLimit} fallback={0} small={true} />
-  </div>
+  {#if limits.storageLimit > 0}
+    <div class="progress-wrapper">
+      <Progress color={storageColor} value={storageUsed} max={limits.storageLimit} fallback={0} small={true} />
+    </div>
+  {/if}
   <div class="progress-wrapper">
     <Progress color={bandwidthColor} value={trafficUsed} max={limits.trafficLimit} fallback={0} small={true} />
   </div>

@@ -21,7 +21,8 @@
   export let value: number // in bytes
   export let limit: number // in bytes
 
-  $: color = value >= limit ? PaletteColorIndexes.Firework : undefined
+  $: unlimited = limit <= 0
+  $: color = !unlimited && value >= limit ? PaletteColorIndexes.Firework : undefined
 </script>
 
 <div class="flex-col flex-gap-2">
@@ -29,9 +30,22 @@
     <span class="pr-2"><Label {label} /></span>
     <span class="flex-row-center flex-gap-1">
       {humanReadableFileSize(value, 10, 0)}
-      <Label label={plugin.string.Of} />
-      {humanReadableFileSize(limit, 10, 0)}
+      {#if unlimited}
+        <span class="unlimited"><Label label={plugin.string.Unlimited} /></span>
+      {:else}
+        <Label label={plugin.string.Of} />
+        {humanReadableFileSize(limit, 10, 0)}
+      {/if}
     </span>
   </div>
-  <Progress {color} {value} max={limit} fallback={100} />
+  {#if !unlimited}
+    <Progress {color} {value} max={limit} fallback={100} />
+  {/if}
 </div>
+
+<style lang="scss">
+  .unlimited {
+    color: var(--theme-state-positive-color);
+    padding-left: var(--spacing-1);
+  }
+</style>
