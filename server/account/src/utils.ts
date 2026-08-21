@@ -1871,6 +1871,7 @@ export async function sendEmail (info: EmailInfo, ctx: MeasureContext): Promise<
   })
   if (!response.ok) {
     ctx.error(`Failed to send mail: ${response.statusText}`, { to })
+    throw new Error(`Mail service rejected email: ${response.status} ${response.statusText}`)
   }
 }
 

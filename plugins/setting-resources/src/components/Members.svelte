@@ -48,6 +48,7 @@
   let employees: Employee[] = []
   let loading = true
   let search = ''
+  let failedInviteEmail: string | undefined
 
   async function load (): Promise<void> {
     loading = true
@@ -108,8 +109,13 @@
   }
 
   async function resendInvite (email: string, role: AccountRole): Promise<void> {
-    await accountClient.resendInvite(email, role)
-    await load()
+    failedInviteEmail = undefined
+    try {
+      await accountClient.resendInvite(email, role)
+      await load()
+    } catch {
+      failedInviteEmail = email
+    }
   }
 
   function openBilling (): void {
@@ -201,6 +207,9 @@
                 <Label label={items.find((item) => item.id === invite.role)?.label ?? setting.string.User} />
                 <Button label={setting.string.ResendInvite} kind="secondary" on:click={() => void resendInvite(invite.email, invite.role)} />
                 <Button label={setting.string.CancelInvite} kind="secondary" on:click={() => void cancelInvite(invite.id)} />
+                {#if failedInviteEmail === invite.email}
+                  <div class="error-color text-sm"><Label label={setting.string.InviteMemberFailed} /></div>
+                {/if}
               </div>
             {/each}
           {/if}

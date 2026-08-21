@@ -25,6 +25,7 @@
   let saving = false
   let noAvailableSeats = false
   let inviteFailed = false
+  let retryPendingInvite = false
 
   async function sendInvite (): Promise<void> {
     const entitlement = await accountClient.getWorkspaceEntitlement()
@@ -42,10 +43,20 @@
     noAvailableSeats = false
     inviteFailed = false
     try {
-      await sendInvite()
+      if (retryPendingInvite) {
+        await accountClient.resendInvite(email.trim(), role)
+        dispatch('close', true)
+      } else {
+        await sendInvite()
+      }
     } catch (err) {
       noAvailableSeats = isWorkspaceLimitReached(err)
       inviteFailed = !noAvailableSeats
+      if (inviteFailed && !retryPendingInvite) {
+        const normalizedEmail = email.trim().toLowerCase()
+        const pendingInvites = await accountClient.getWorkspacePendingInvites().catch(() => [])
+        retryPendingInvite = pendingInvites.some((invite) => invite.email.trim().toLowerCase() === normalizedEmail)
+      }
     } finally {
       saving = false
     }

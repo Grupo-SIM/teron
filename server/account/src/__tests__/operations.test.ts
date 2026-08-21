@@ -506,17 +506,19 @@ describe('account operations', () => {
 
     test('quotes an immediate prorated increase from authoritative contract data', async () => {
       const now = Date.now()
+      const day = 24 * 60 * 60 * 1000
+      const dateNow = jest.spyOn(Date, 'now').mockReturnValue(now)
       jest.spyOn(simintpay, 'getWorkspaceBillingContract').mockResolvedValue({
         id: 'contract', quantity: 1, pendingQuantity: null, version: 2, unitAmount: '10.00',
-        recurringAmount: '10.00', currentPeriodStart: new Date(now - 5000).toISOString(),
-        currentPeriodEnd: new Date(now + 5000).toISOString()
+        recurringAmount: '10.00', currentPeriodStart: new Date(now - 4 * day).toISOString(),
+        currentPeriodEnd: new Date(now + 26 * day).toISOString()
       })
 
       const quote = await getWorkspaceSeatQuote(mockCtx, mockDb, mockBranding, mockToken, { targetSeatLimit: 2 })
+      dateNow.mockRestore()
 
       expect(quote.nextRecurringAmount).toBe('20.00')
-      expect(Number(quote.estimatedProrationAmount)).toBeGreaterThan(4)
-      expect(Number(quote.estimatedProrationAmount)).toBeLessThanOrEqual(5)
+      expect(quote.estimatedProrationAmount).toBe('8.67')
     })
 
     test('applies paid capacity and stores the idempotent operation', async () => {

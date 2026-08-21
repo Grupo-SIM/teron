@@ -135,6 +135,8 @@ export async function handleSendMail (
     await client.sendMessage(message, ctx, password)
   } catch (err: any) {
     ctx.error(err.message)
+    res.status(500).send({ err: 'Failed to send email' })
+    return
   }
 
   res.send()
