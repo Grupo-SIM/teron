@@ -266,7 +266,6 @@ export function start (
     modelVersion: string
     version: string
     rekoniUrl: string
-    telegramUrl: string
     gmailUrl: string
     calendarUrl: string
     collaborator?: string
@@ -345,7 +344,6 @@ export function start (
       MODEL_VERSION: config.modelVersion,
       VERSION: config.version,
       REKONI_URL: config.rekoniUrl,
-      TELEGRAM_URL: config.telegramUrl,
       GMAIL_URL: config.gmailUrl,
       CALENDAR_URL: config.calendarUrl,
       COLLABORATOR: config.collaborator,

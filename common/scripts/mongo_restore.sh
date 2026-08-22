@@ -13,7 +13,6 @@ mongorestore --uri="${MONGO_URL}" --gzip ${do_drop} --nsFrom "%github.*" --nsTo 
 mongorestore --uri="${MONGO_URL}" --gzip ${do_drop} --nsFrom "calendar-service.*" --nsTo "%calendar-service${postfix}.*" --archive=./calendar-service.gz
 mongorestore --uri="${MONGO_URL}" --gzip ${do_drop} --nsFrom "analytics-collector.*" --nsTo "%analytics-collector${postfix}.*" --archive=./analytics-collector.gz
 mongorestore --uri="${MONGO_URL}" --gzip ${do_drop} --nsFrom "gmail-service.*" --nsTo "%gmail-service${postfix}.*" --archive=./gmail-service.gz
-mongorestore --uri="${MONGO_URL}" --gzip ${do_drop} --nsFrom "telegram-service.*" --nsTo "%telegram-service${postfix}.*" --archive=./telegram-service.gz
 
 
 while IFS= read -r line; do

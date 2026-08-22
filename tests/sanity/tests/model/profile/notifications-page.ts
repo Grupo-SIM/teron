@@ -9,7 +9,6 @@ export enum MenuItems {
   VACANCY = 'Vacancy',
   TALENT = 'Talent',
   SETTING = 'Setting',
-  TELEGRAM = 'Telegram',
   EMAIL = 'Email',
   NOTIFICATIONS = 'Notifications',
   ISSUES = 'Issues',
@@ -29,7 +28,6 @@ export class NotificationsPage {
   vacancy = (): Locator => this.page.getByRole('button', { name: 'Vacancy' })
   talent = (): Locator => this.page.getByRole('button', { name: 'Talent' })
   setting = (): Locator => this.page.getByRole('button', { name: 'Setting' })
-  telegram = (): Locator => this.page.getByRole('button', { name: 'Telegram' })
   email = (): Locator => this.page.getByRole('button', { name: 'Email' })
   notifications = (): Locator => this.page.getByRole('button', { name: 'Notifications' })
   issues = (): Locator => this.page.getByRole('button', { name: 'Issues' })
@@ -67,9 +65,6 @@ export class NotificationsPage {
         break
       case MenuItems.SETTING:
         await this.setting().click()
-        break
-      case MenuItems.TELEGRAM:
-        await this.telegram().click()
         break
       case MenuItems.EMAIL:
         await this.email().click()

@@ -19,7 +19,6 @@ mongodump --uri="${MONGO_URL}" --gzip --db '%github' --archive="${dump}/github.g
 mongodump --uri="${MONGO_URL}" --gzip --db 'calendar-service' --archive="${dump}/calendar-service.gz"
 mongodump --uri="${MONGO_URL}" --gzip --db 'analytics-collector' --archive="${dump}/analytics-collector.gz"
 mongodump --uri="${MONGO_URL}" --gzip --db 'gmail-service' --archive="${dump}/gmail-service.gz"
-mongodump --uri="${MONGO_URL}" --gzip --db 'telegram-service' --archive="${dump}/telegram-service.gz"
 
 while IFS= read -r line; do
     arr=($line)
@@ -33,4 +32,3 @@ while IFS= read -r line; do
         mongodump --uri="$MONGO_URL" --gzip --db $db --archive=$aName
     fi
 done < ${dump}/databases.list
-

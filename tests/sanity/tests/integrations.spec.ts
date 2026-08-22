@@ -50,7 +50,7 @@ test.describe('integrations in accounts tests', () => {
 
     const integration2: Integration = {
       socialId: personId2,
-      kind: 'telegram-bot' as IntegrationKind,
+      kind: 'google-calendar' as IntegrationKind,
       workspaceUuid,
       data: {
         chatId: '123',
@@ -106,18 +106,18 @@ test.describe('integrations in accounts tests', () => {
 
     const secret2: IntegrationSecret = {
       socialId: personId2,
-      kind: 'telegram-bot' as IntegrationKind,
+      kind: 'google-calendar' as IntegrationKind,
       workspaceUuid,
       key: 'bot_token',
-      secret: 'telegram_bot_token_123'
+      secret: 'calendar_token_123'
     }
 
     const secret3: IntegrationSecret = {
       socialId: personId2,
-      kind: 'telegram-bot' as IntegrationKind,
+      kind: 'google-calendar' as IntegrationKind,
       workspaceUuid,
       key: 'api_key',
-      secret: 'telegram_api_key_123'
+      secret: 'calendar_api_key_123'
     }
 
     // Add and verify secrets one by one
@@ -161,9 +161,9 @@ test.describe('integrations in accounts tests', () => {
     expect(githubIntegrations).toHaveLength(1)
     expect(githubIntegrations[0]).toEqual(integration1)
 
-    const telegramIntegrations = await accountClient.listIntegrations({ kind: 'telegram-bot' as IntegrationKind })
-    expect(telegramIntegrations).toHaveLength(1)
-    expect(telegramIntegrations[0]).toEqual(integration2)
+    const calendarIntegrations = await accountClient.listIntegrations({ kind: 'google-calendar' as IntegrationKind })
+    expect(calendarIntegrations).toHaveLength(1)
+    expect(calendarIntegrations[0]).toEqual(integration2)
 
     // Test listing secrets with filters
     const allSecrets = await accountClient.listIntegrationsSecrets({})
@@ -176,9 +176,9 @@ test.describe('integrations in accounts tests', () => {
     expect(workspaceSecrets).toHaveLength(2)
     expect(workspaceSecrets).toEqual(expect.arrayContaining([secret2, secret3]))
 
-    const telegramSecrets = await accountClient.listIntegrationsSecrets({ kind: 'telegram-bot' as IntegrationKind })
-    expect(telegramSecrets).toHaveLength(2)
-    expect(telegramSecrets).toEqual(expect.arrayContaining([secret2, secret3]))
+    const calendarSecrets = await accountClient.listIntegrationsSecrets({ kind: 'google-calendar' as IntegrationKind })
+    expect(calendarSecrets).toHaveLength(2)
+    expect(calendarSecrets).toEqual(expect.arrayContaining([secret2, secret3]))
 
     // Test updates
     const updatedIntegration2: Integration = {
@@ -199,7 +199,7 @@ test.describe('integrations in accounts tests', () => {
 
     const updatedSecret2: IntegrationSecret = {
       ...secret2,
-      secret: 'telegram_bot_token_456'
+      secret: 'calendar_token_456'
     }
     await accountClient.updateIntegrationSecret(updatedSecret2)
     checkSecret2 = await accountClient.getIntegrationSecret({

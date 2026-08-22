@@ -50,12 +50,6 @@ export function startFront (ctx: MeasureContext, extraConfig?: Record<string, st
     process.exit(1)
   }
 
-  const telegramUrl = process.env.TELEGRAM_URL
-  if (telegramUrl === undefined) {
-    console.error('please provide telegram url')
-    process.exit(1)
-  }
-
   const rekoniUrl = process.env.REKONI_URL
   if (rekoniUrl === undefined) {
     console.error('please provide rekoni url')
@@ -140,7 +134,6 @@ export function startFront (ctx: MeasureContext, extraConfig?: Record<string, st
     modelVersion,
     version,
     gmailUrl,
-    telegramUrl,
     rekoniUrl,
     calendarUrl,
     collaboratorUrl,

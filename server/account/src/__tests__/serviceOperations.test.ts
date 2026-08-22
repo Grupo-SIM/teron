@@ -218,7 +218,7 @@ describe('integration methods', () => {
   const mockBranding = null
   const mockToken = 'test-token'
 
-  const integrationServices = ['github', 'telegram-bot', 'terongram', 'mailbox']
+  const integrationServices = ['github', 'gmail', 'terongram', 'mailbox']
 
   beforeEach(() => {
     jest.clearAllMocks()

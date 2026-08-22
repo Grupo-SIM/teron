@@ -5,7 +5,6 @@
   "FILES_URL": "http://teron.local:4030/blob/:workspace/:blobId/:filename",
   "UPLOAD_URL": "/files",
   "DATALAKE_URL": "http://teron.local:4030",
-  "TELEGRAM_URL": "http://teron.local:8086",
   "GMAIL_URL": "http://teron.local:8093",
   "CALENDAR_URL": "http://localhost:8095",
   "REKONI_URL": "/rekoni",

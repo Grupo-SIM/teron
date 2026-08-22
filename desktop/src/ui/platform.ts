@@ -63,7 +63,6 @@ import support, { supportId, supportLink, reportBugLink, docsLink, privacyPolicy
 import { surveyId } from '@hcengineering/survey'
 import { tagsId } from '@hcengineering/tags'
 import { taskId } from '@hcengineering/task'
-import telegram, { telegramId } from '@hcengineering/telegram'
 import { templatesId } from '@hcengineering/templates'
 import { testManagementId } from '@hcengineering/test-management'
 import { timeId } from '@hcengineering/time'
@@ -123,7 +122,6 @@ import '@hcengineering/support-assets'
 import '@hcengineering/survey-assets'
 import '@hcengineering/tags-assets'
 import '@hcengineering/task-assets'
-import '@hcengineering/telegram-assets'
 import '@hcengineering/templates-assets'
 import '@hcengineering/test-management-assets'
 import '@hcengineering/text-editor-assets'
@@ -233,7 +231,6 @@ function configureI18n (): void {
   addStringsLoader(supportId, async (lang: string) => await import(`@hcengineering/support-assets/lang/${lang}.json`))
   addStringsLoader(tagsId, async (lang: string) => await import(`@hcengineering/tags-assets/lang/${lang}.json`))
   addStringsLoader(taskId, async (lang: string) => await import(`@hcengineering/task-assets/lang/${lang}.json`))
-  addStringsLoader(telegramId, async (lang: string) => await import(`@hcengineering/telegram-assets/lang/${lang}.json`))
   addStringsLoader(
     templatesId,
     async (lang: string) => await import(`@hcengineering/templates-assets/lang/${lang}.json`)
@@ -380,8 +377,6 @@ export async function configurePlatform (onWorkbenchConnect?: () => Promise<void
     console.log('Minimal version requirement', config.VERSION)
     setMetadata(presentation.metadata.FrontVersion, config.VERSION)
   }
-  setMetadata(telegram.metadata.TelegramURL, config.TELEGRAM_URL ?? 'http://localhost:8086')
-  setMetadata(telegram.metadata.BotUrl, config.TELEGRAM_BOT_URL ?? 'http://teron.local:4020')
   setMetadata(gmail.metadata.GmailURL, config.GMAIL_URL ?? 'http://localhost:8087')
   setMetadata(calendar.metadata.CalendarServiceURL, config.CALENDAR_URL ?? 'http://localhost:8095')
   setMetadata(calendar.metadata.PublicScheduleURL, config.PUBLIC_SCHEDULE_URL)
@@ -446,7 +441,6 @@ export async function configurePlatform (onWorkbenchConnect?: () => Promise<void
   addLocation(activityId, async () => await import('@hcengineering/activity-resources'))
   addLocation(settingId, async () => await import('@hcengineering/setting-resources'))
   addLocation(leadId, async () => await import('@hcengineering/lead-resources'))
-  addLocation(telegramId, async () => await import('@hcengineering/telegram-resources'))
   addLocation(attachmentId, async () => await import('@hcengineering/attachment-resources'))
   addLocation(gmailId, async () => await import('@hcengineering/gmail-resources'))
   addLocation(imageCropperId, async () => await import('@hcengineering/image-cropper-resources'))

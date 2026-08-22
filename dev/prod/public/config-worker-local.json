@@ -2,7 +2,6 @@
   "ACCOUNTS_URL":"http://localhost:3000",
   "COLLABORATOR_URL": "ws://localhost:3078",
   "UPLOAD_URL":"/files",
-  "TELEGRAM_URL": "http://localhost:8086",
   "GMAIL_URL": "http://localhost:8088",
   "CALENDAR_URL": "http://localhost:8095",
   "REKONI_URL": "/rekoni",
