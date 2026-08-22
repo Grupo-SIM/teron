@@ -301,10 +301,7 @@ export function AuthFlow({ variant, locale }: { variant: Variant; locale: Locale
           const info = await api!.getLoginInfo();
           const authToken = info && "token" in info ? info.token : undefined;
           if (authToken) setToken(authToken);
-          setFreeTrialAvailable((await api!.getWorkspaceCreationInfo(authToken)).freeTrialAvailable);
-          const availableRegions = await api!.getRegions(authToken);
-          setRegions(availableRegions.filter((item) => item.name));
-          setRegion(availableRegions.find((item) => item.name)?.region ?? "");
+          await loadWorkspaceCreationData(authToken);
           setStep("create-workspace");
         } else if (mode === "change-password") {
           setStep("change-password");
@@ -414,15 +411,23 @@ export function AuthFlow({ variant, locale }: { variant: Variant; locale: Locale
     if (!api) return;
     const result = await api.getWorkspaces(authToken);
     setWorkspaces(result.toSorted((a, b) => (b.lastVisit ?? 0) - (a.lastVisit ?? 0)));
+    await loadWorkspaceCreationData(authToken);
     if (result.length === 0) {
-      setFreeTrialAvailable((await api.getWorkspaceCreationInfo(authToken)).freeTrialAvailable);
-      const availableRegions = await api.getRegions(authToken);
-      setRegions(availableRegions.filter((item) => item.name));
-      setRegion(availableRegions.find((item) => item.name)?.region ?? "");
       setStep("create-workspace");
     } else {
       setStep("workspaces");
     }
+  }
+
+  async function loadWorkspaceCreationData(authToken?: string) {
+    if (!api) return;
+    const [creationInfo, availableRegions] = await Promise.all([
+      api.getWorkspaceCreationInfo(authToken),
+      api.getRegions(authToken),
+    ]);
+    setFreeTrialAvailable(creationInfo.freeTrialAvailable);
+    setRegions(availableRegions.filter((item) => item.name));
+    setRegion(availableRegions.find((item) => item.name)?.region ?? "");
   }
 
   async function finishWorkspace(result: WorkspaceLoginInfo) {
