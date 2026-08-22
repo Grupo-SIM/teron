@@ -11,7 +11,7 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  DOCKER_CONTEXT_IMAGE: docker.io/${{ github.repository }}_workspace:build-context
+  DOCKER_CONTEXT_IMAGE: docker.io/jbmidia/teron_workspace:build-context
   INIT_SCRIPTS_BRANCH: main
 
 jobs:
@@ -267,7 +267,7 @@ jobs:
       - name: Build and publish image
         uses: hyoretsu/gh-actions/ghcr@main
         with:
-          image: ${{ github.repository }}_${{ matrix.image }}
+          image: jbmidia/teron_${{ matrix.image }}
           context: ${{ matrix.context }}
           dockerfile: ${{ matrix.context }}/Dockerfile
           build-args: ${{ matrix.build-args }}
@@ -288,7 +288,7 @@ jobs:
       - name: Build and publish image
         uses: hyoretsu/gh-actions/ghcr@main
         with:
-          image: ${{ github.repository }}_hulypulse
+          image: jbmidia/teron_hulypulse
           context: foundations/hulypulse
           dockerfile: foundations/hulypulse/Dockerfile
           cache-scope: hulypulse
