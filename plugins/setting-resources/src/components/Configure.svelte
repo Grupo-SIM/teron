@@ -53,9 +53,6 @@
     <Breadcrumb icon={setting.icon.Setting} label={setting.string.Configuration} size={'large'} isCurrent />
   </Header>
   <div class="teronComponent-content__column content">
-    <div class="flex-row-center flex-wrap m-4 px-4">
-      <Label label={setting.string.BetaWarning} />
-    </div>
     <Scroller align={'center'} padding={'var(--spacing-3)'} bottomPadding={'var(--spacing-3)'}>
       <div class="modules-grid">
         {#each $pluginConfigurationStore.list as config}
@@ -67,7 +64,6 @@
               description={config.description}
               icon={config.icon}
               enabled={config.enabled ?? true}
-              beta={config.beta}
               suffix={ratingSuffix}
               on:toggle={(e) => change(config, e.detail.enabled)}
             />

@@ -11,7 +11,7 @@
     "MemberCount": "{count, plural, =0 {keine Mitarbeiter} =1 {1 Mitarbeiter} other {# Mitarbeiter}}",
     "AssignLead": "Teamleiter zuweisen",
     "TeamLeadTooltip": "{value}",
-    "HRApplication": "Personalwesen (beta)",
+    "HRApplication": "Personalwesen",
     "MoveStaff": "Mitarbeiterversetzung",
     "MoveStaffDescr": "Möchten Sie den Mitarbeiter von {current} nach {department} versetzen",
     "Departments": "Abteilungen",

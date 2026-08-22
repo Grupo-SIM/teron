@@ -14,16 +14,13 @@
 -->
 <script lang="ts">
   import type { Asset, IntlString } from '@hcengineering/platform'
-  import { Icon, IconInfo, Label, Toggle, tooltip } from '@hcengineering/ui'
+  import { Icon, IconInfo, Label, Toggle } from '@hcengineering/ui'
   import { createEventDispatcher } from 'svelte'
-
-  import presentation from '../plugin'
 
   export let label: IntlString
   export let description: IntlString | undefined = undefined
   export let icon: Asset | undefined = undefined
   export let enabled: boolean = true
-  export let beta: boolean = false
   /** Optional small text rendered next to the label, e.g. usage rating "(45%)". */
   export let suffix: string | undefined = undefined
 
@@ -41,11 +38,6 @@
       </span>
       {#if suffix !== undefined && suffix !== ''}
         <span class="plugin-card__suffix">({suffix})</span>
-      {/if}
-      {#if beta}
-        <span class="plugin-card__beta" use:tooltip={{ label: presentation.string.BetaVersion, direction: 'top' }}
-          >β</span
-        >
       {/if}
     </span>
     <span class="plugin-card__spacer" />
@@ -120,16 +112,6 @@
   .plugin-card__suffix {
     color: var(--theme-darker-color);
     font-size: 0.75rem;
-  }
-
-  .plugin-card__beta {
-    color: var(--theme-darker-color);
-    font-size: 0.75rem;
-    font-weight: 500;
-    padding: 0.0625rem 0.375rem;
-    border: 1px solid var(--theme-divider-color);
-    border-radius: 0.5rem;
-    cursor: help;
   }
 
   .plugin-card__spacer {
