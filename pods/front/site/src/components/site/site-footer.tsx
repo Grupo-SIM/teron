@@ -14,9 +14,9 @@ export function SiteFooter({ locale = defaultLocale }: { locale?: Locale }) {
       <div style={{ maxWidth: 1240, margin: "0 auto" }}>
         <div style={{ textAlign: "center", marginBottom: 40 }}>
           <Asset
-            src="/assets/LOGO TERON  - BRANCA.svg"
+            src="/assets/brand/logo-horizontal-light.svg"
             alt="Teron"
-            ratio="580 / 134"
+            ratio="1694 / 479"
             style={{ height: 44, width: "auto", display: "inline-block" }}
           />
         </div>

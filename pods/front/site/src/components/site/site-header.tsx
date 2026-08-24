@@ -92,9 +92,9 @@ export function SiteHeader({ locale = defaultLocale }: { locale?: Locale }) {
       >
         <Link href="/" aria-label="Teron — início" style={{ display: "block" }}>
           <Asset
-            src="/assets/teronwhite.svg"
+            src="/assets/brand/logo-horizontal-light.svg"
             alt="Teron"
-            ratio="595 / 550"
+            ratio="1694 / 479"
             style={{ height: 30, width: "auto", display: "block" }}
           />
         </Link>
@@ -170,9 +170,9 @@ export function SiteHeader({ locale = defaultLocale }: { locale?: Locale }) {
               style={{ display: "block" }}
             >
               <Asset
-                src="/assets/teronwhite.svg"
+                src="/assets/brand/logo-horizontal-light.svg"
                 alt="Teron"
-                ratio="595 / 550"
+                ratio="1694 / 479"
                 style={{ height: 30, width: "auto", display: "block" }}
               />
             </Link>

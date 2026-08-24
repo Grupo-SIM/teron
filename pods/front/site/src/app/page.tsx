@@ -370,9 +370,9 @@ export function HomeContent({ locale = defaultLocale }: { locale?: Locale }) {
             a sua operação.
           </h2>
           <Asset
-            src="/assets/teronwhite.svg"
+            src="/assets/brand/logo-horizontal-light.svg"
             alt=""
-            ratio="595 / 550"
+            ratio="1694 / 479"
             style={{ width: 118, height: "auto", display: "block" }}
           />
         </div>

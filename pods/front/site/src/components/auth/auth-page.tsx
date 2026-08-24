@@ -48,9 +48,9 @@ export function AuthPage({ variant, locale = defaultLocale }: { variant: AuthVar
         <div className="auth-card auth-card--flow">
           <main className="auth-card-body">
             <Asset
-              src="/assets/teronwhite.svg"
+              src="/assets/brand/logo-horizontal-light.svg"
               alt="Teron"
-              ratio="595 / 550"
+              ratio="1694 / 479"
               className="auth-logo"
             />
             <AuthFlow variant={variant} locale={locale} />

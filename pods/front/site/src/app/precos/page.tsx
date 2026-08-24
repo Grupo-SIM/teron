@@ -81,9 +81,9 @@ export function PrecosContent({ locale = defaultLocale }: { locale?: Locale }) {
               <span aria-hidden className="lp-pr-mark">
                 <span className="lp-pr-mark-glow" />
                 <Asset
-                  src="/assets/teron-icon.png"
+                  src="/assets/brand/icon-dark.svg"
                   alt=""
-                  ratio="1 / 1"
+                  ratio="1761 / 1629"
                   className="lp-pr-mark-img"
                 />
               </span>
