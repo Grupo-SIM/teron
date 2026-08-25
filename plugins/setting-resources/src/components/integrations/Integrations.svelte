@@ -39,6 +39,7 @@
   import { IntegrationKind } from '@hcengineering/core'
 
   const typeQuery = createQuery()
+  const temporarilyHiddenIntegrationKinds = new Set<IntegrationKind>(['gmail' as IntegrationKind])
 
   const accountClient = getAccountClient()
 
@@ -60,7 +61,7 @@
   let mode: 'all' | 'connected' | 'available' = 'all'
 
   typeQuery.query(setting.class.IntegrationType, { kind: { $ne: 'teron-mail' as IntegrationKind } }, (res) => {
-    integrationTypes = res
+    integrationTypes = res.filter(({ kind }) => !temporarilyHiddenIntegrationKinds.has(kind))
   })
 
   function getIntegrations (type: IntegrationType, integrations: Integration[]): Integration[] {
