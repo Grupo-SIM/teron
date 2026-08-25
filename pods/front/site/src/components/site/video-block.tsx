@@ -65,8 +65,8 @@ export function VideoBlock({ locale = defaultLocale }: { locale?: Locale }) {
         )}
 
         <div className="lp-office-head">
-          <strong>Reunião de integração</strong>
-          <span>4 participantes</span>
+          <strong>{"meeting.title"}</strong>
+          <span>{"meeting.participants"}</span>
         </div>
 
         <div className="lp-office-controls" aria-hidden>

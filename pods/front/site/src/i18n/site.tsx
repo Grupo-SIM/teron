@@ -1,17 +1,17 @@
 import { cloneElement, isValidElement, type ReactElement, type ReactNode } from "react";
-import { enUS } from "./locales/en-US";
-import { ptBR } from "./locales/pt-BR";
+
+import enUS from "./locales/en-US.json";
+import ptBR from "./locales/pt-BR.json";
 
 export const translationLocales = ["pt-BR", "en-US"] as const;
 export type Locale = (typeof translationLocales)[number];
 
 export const locales = ["pt-BR"] as const satisfies readonly Locale[];
-
 export const defaultLocale: Locale = "pt-BR";
 
-export type SiteDictionary = Readonly<Record<string, string>>;
+export type SiteDictionary = typeof ptBR;
 
-export const dictionaries: Readonly<Record<Locale, SiteDictionary>> = {
+const dictionaries: Readonly<Record<Locale, SiteDictionary>> = {
   "pt-BR": ptBR,
   "en-US": enUS,
 };
@@ -32,10 +32,23 @@ const localizableProps = new Set([
   "updatedAt",
 ]);
 
+export function getDictionary(locale: Locale): SiteDictionary {
+  return dictionaries[locale];
+}
+
+function dictionaryValue(dictionary: SiteDictionary, key: string): string | undefined {
+  let value: unknown = dictionary;
+  for (const segment of key.split(".")) {
+    if (typeof value !== "object" || value === null || !(segment in value)) return undefined;
+    value = (value as Record<string, unknown>)[segment];
+  }
+  return typeof value === "string" ? value : undefined;
+}
+
 function translateText(text: string, locale: Locale): string {
-  const value = text.trim();
-  if (value === "") return text;
-  const translated = dictionaries[locale][value];
+  const key = text.trim();
+  if (key === "") return text;
+  const translated = dictionaryValue(dictionaries[locale], key);
   if (translated === undefined) return text;
   return `${text.match(/^\s*/)?.[0] ?? ""}${translated}${text.match(/\s*$/)?.[0] ?? ""}`;
 }

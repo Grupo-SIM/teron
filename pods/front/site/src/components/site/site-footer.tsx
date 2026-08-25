@@ -22,15 +22,12 @@ export function SiteFooter({ locale = defaultLocale }: { locale?: Locale }) {
         </div>
         <div className="lp-footer-bar">
           <span>
-            © {new Date().getFullYear()} Teron. Todos os direitos reservados.
-          </span>
+            © {new Date().getFullYear()} {"common.copyright"}</span>
           <span style={{ display: "flex", gap: 26 }}>
             <Link href="/termos" className="lp-footer-link">
-              Termos de Serviço
-            </Link>
+              {"common.terms"}</Link>
             <Link href="/privacidade" className="lp-footer-link">
-              Política de Privacidade
-            </Link>
+              {"common.privacy"}</Link>
           </span>
         </div>
       </div>

@@ -49,29 +49,29 @@ const WORKSPACE_SEAT_PRICE = workspaceSeatPrice(process.env.NEXT_PUBLIC_WORKSPAC
 
 const PLANS: Plan[] = [
   {
-    name: "Grátis",
+    name: "pricing.plans.free.name",
     slug: "essencial",
     price: { int: "0", cents: "00" },
-    text: "Comece sem custo e conheça o Teron na prática.",
-    cta: "Começar grátis",
+    text: "pricing.plans.free.description",
+    cta: "common.startFree",
     items: [
-      { label: "30 dias para experimentar" },
-      { label: "Acesso a todos os recursos" },
-      { label: "Suporte para começar" },
-      { label: "Sem cobrança durante o período gratuito" },
+      { label: "pricing.plans.free.features.0" },
+      { label: "pricing.plans.free.features.1" },
+      { label: "pricing.plans.free.features.2" },
+      { label: "pricing.plans.free.features.3" },
     ],
   },
   {
-    name: "Empresas",
+    name: "pricing.plans.business.name",
     slug: "empresa",
-    price: { ...WORKSPACE_SEAT_PRICE, per: "por usuário" },
-    text: "Pague apenas pelos usuários da sua equipe.",
-    cta: "Começar agora",
+    price: { ...WORKSPACE_SEAT_PRICE, per: "pricing.perUser" },
+    text: "pricing.plans.business.description",
+    cta: "common.getStarted",
     items: [
-      { label: "Todos os recursos disponíveis" },
-      { label: "Cashback de até R$ 250 por transação" },
-      { label: "Suporte e atualizações contínuas" },
-      { label: "Adicione ou remova usuários quando precisar" },
+      { label: "pricing.plans.business.features.0" },
+      { label: "pricing.plans.business.features.1" },
+      { label: "pricing.plans.business.features.2" },
+      { label: "pricing.plans.business.features.3" },
     ],
   },
 ];
@@ -158,7 +158,7 @@ export function PricingPlans({ locale = defaultLocale }: { locale?: Locale }) {
 
   return (
     <Localized locale={locale}><div className="lp-pr-rail-wrap">
-      <h2 className="lp-pr-sr">Planos da Teron</h2>
+      <h2 className="lp-pr-sr">{"pricing.plansTitle"}</h2>
       <div ref={railRef} className="lp-pr-rail">
         <div className="lp-pr-track">
           {PLANS.map((plan, index) => {
@@ -210,7 +210,7 @@ export function PricingPlans({ locale = defaultLocale }: { locale?: Locale }) {
 
                 <p className="lp-pr-price">
                   {plan.price === "free" ? (
-                    <span className="lp-pr-amount">Grátis</span>
+                    <span className="lp-pr-amount">{"pricing.plans.free.name"}</span>
                   ) : plan.price ? (
                     <>
                       <span className="lp-pr-amount">
@@ -229,9 +229,8 @@ export function PricingPlans({ locale = defaultLocale }: { locale?: Locale }) {
                   ) : (
                     <>
                       <span className="lp-pr-amount lp-pr-amount-soon">
-                        Em breve
-                      </span>
-                      <span className="lp-pr-per">preço a definir</span>
+                        {"pricing.comingSoon"}</span>
+                      <span className="lp-pr-per">{"pricing.pricePending"}</span>
                     </>
                   )}
                 </p>

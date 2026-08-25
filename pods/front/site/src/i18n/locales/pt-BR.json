@@ -1,0 +1,568 @@
+{
+  "metadata": {
+    "site": {
+      "title": "Teron — Tudo o que sua equipe precisa para trabalhar melhor.",
+      "description": "Sua empresa mais organizada, sua equipe mais produtiva. Organize seu time, centralize o trabalho e simplifique a rotina da sua empresa."
+    },
+    "login": {
+      "title": "Teron — Entrar",
+      "description": "Acesse sua conta Teron."
+    },
+    "signup": {
+      "title": "Teron — Criar conta",
+      "description": "Crie sua conta Teron."
+    },
+    "pricing": {
+      "title": "Teron — Planos e preços",
+      "description": "Como funciona a contribuição de cada empresa no Teron e os planos disponíveis para equipes de qualquer tamanho."
+    },
+    "privacy": {
+      "title": "Teron — Política de Privacidade",
+      "description": "Como a Teron coleta, usa, compartilha e protege dados pessoais, e como exercer os direitos previstos na LGPD."
+    },
+    "terms": {
+      "title": "Teron — Termos de Serviço",
+      "description": "Condições de uso da plataforma Teron: conta, planos e cobrança, uso aceitável, propriedade do conteúdo e encerramento."
+    }
+  },
+  "common": {
+    "home": "Início",
+    "signIn": "Entrar",
+    "signUp": "Cadastre-se",
+    "getStarted": "Começar agora",
+    "startFree": "Começar grátis",
+    "talkToTeam": "Falar com o time",
+    "workspace": "Ir para o workspace",
+    "terms": "Termos de Serviço",
+    "termsOfUse": "Termos de Uso",
+    "privacy": "Política de Privacidade",
+    "lastUpdated": "Última atualização:",
+    "brandHomeLabel": "Teron — início",
+    "copyright": "Teron. Todos os direitos reservados.",
+    "menu": "Menu",
+    "closeMenu": "Fechar menu"
+  },
+  "header": {
+    "resources": "Recursos",
+    "integrations": "Integrações",
+    "pricing": "Preços"
+  },
+  "auth": {
+    "loginTitle": "Entrar na Teron",
+    "signupTitle": "Criar nova conta",
+    "email": "E-mail",
+    "emailPlaceholder": "nome@empresa.com.br",
+    "password": "Senha",
+    "repeatPassword": "Repita a senha",
+    "firstName": "Nome",
+    "lastName": "Sobrenome",
+    "enter": "Entrar",
+    "createAccount": "Criar conta",
+    "useCode": "Entrar com código",
+    "usePassword": "Entrar com senha",
+    "setPassword": "Definir senha agora",
+    "useCodeSignup": "Definir senha depois",
+    "forgotPassword": "Esqueci minha senha",
+    "or": "ou",
+    "googleLogin": "Entrar com Google",
+    "githubLogin": "Entrar com GitHub",
+    "googleSignup": "Cadastrar com Google",
+    "githubSignup": "Cadastrar com GitHub",
+    "continueWith": "Continuar com",
+    "codeTitle": "Digite o código",
+    "codeDescription": "Enviamos um código de 6 dígitos para",
+    "code": "Código de acesso",
+    "verify": "Verificar",
+    "resend": "Reenviar código",
+    "changeEmail": "Alterar e-mail",
+    "tfaTitle": "Autenticação em duas etapas",
+    "profileTitle": "Como devemos chamar você?",
+    "continue": "Continuar",
+    "recoverTitle": "Recuperar senha",
+    "recoverAction": "Enviar link de recuperação",
+    "recoverySent": "Confira seu e-mail",
+    "recoverySentBody": "Enviamos um link para você redefinir sua senha.",
+    "restoreTitle": "Definir nova senha",
+    "restoreAction": "Salvar nova senha",
+    "changePasswordTitle": "Alterar senha",
+    "currentPassword": "Senha atual",
+    "changePasswordAction": "Alterar senha",
+    "confirming": "Confirmando seu e-mail…",
+    "confirmationSent": "Confirme seu e-mail",
+    "confirmationSentBody": "Enviamos uma mensagem de confirmação para o endereço informado.",
+    "workspacesTitle": "Escolha um workspace",
+    "restoreWorkspaceTitle": "Restaurar workspace arquivado",
+    "restoreWorkspaceBody": "Este workspace está arquivado. Restaure-o para acessá-lo novamente.",
+    "restoreWorkspace": "Restaurar workspace",
+    "createWorkspace": "Criar workspace",
+    "workspaceName": "Nome do workspace",
+    "seats": "Quantidade de integrantes",
+    "billingTitle": "Pagamento mensal",
+    "billingDescription": "Informe os dados para pagar o primeiro mês de acesso.",
+    "billingTotal": "Total mensal",
+    "document": "CPF ou CNPJ",
+    "phone": "Telefone",
+    "cardNumber": "Número do cartão",
+    "cardExpiry": "Validade (MM/AA)",
+    "cardCvv": "CVV",
+    "cardHolder": "Nome impresso no cartão",
+    "documentPlaceholder": "000.000.000-00",
+    "phonePlaceholder": "(00) 00000-0000",
+    "cardNumberPlaceholder": "0000 0000 0000 0000",
+    "cardExpiryPlaceholder": "MM/AA",
+    "cardCvvPlaceholder": "123",
+    "paidCreate": "Pagar e criar workspace",
+    "freeTrialDescription": "Seu primeiro workspace inclui 30 dias gratuitos.",
+    "region": "Região",
+    "create": "Criar e continuar",
+    "demoContent": "Criar projetos de exemplo e conteúdo demonstrativo",
+    "changeAccount": "Entrar com outra conta",
+    "joinTitle": "Participar do workspace",
+    "joinCurrent": "Participar com esta conta",
+    "joinLogin": "Entrar e participar",
+    "joinSignup": "Criar conta e participar",
+    "joining": "Convite para",
+    "loading": "Carregando…",
+    "back": "Voltar",
+    "passwordsMismatch": "As senhas não coincidem.",
+    "requiredFields": "Preencha todos os campos obrigatórios."
+  },
+  "authPage": {
+    "loginPrompt": "Não tem uma conta?",
+    "signupPrompt": "Já tem uma conta?",
+    "archived": "arquivado"
+  },
+  "authErrors": {
+    "configUnavailable": "Não foi possível carregar a configuração de acesso.",
+    "accountServiceMissing": "O serviço de contas não está configurado.",
+    "sessionStartFailed": "Não foi possível concluir a sessão.",
+    "sessionEndFailed": "Não foi possível encerrar a sessão.",
+    "unknown": "Algo deu errado. Tente novamente.",
+    "InvalidPassword": "E-mail ou senha incorretos.",
+    "AccountNotFound": "Conta não encontrada.",
+    "InvalidOtp": "Código inválido ou expirado.",
+    "AccountAlreadyExists": "Já existe uma conta com este e-mail.",
+    "Unauthorized": "Sua sessão expirou. Entre novamente.",
+    "WorkspaceNotFound": "Workspace não encontrado.",
+    "WorkspacePaymentRequired": "Conclua o pagamento para criar outro workspace.",
+    "WorkspacePaymentFailed": "Não foi possível aprovar o pagamento. Revise os dados do cartão.",
+    "WorkspacePaymentDeclined": "Pagamento recusado pelo gateway. Verifique o cartão ou tente outro.",
+    "WorkspacePaymentInvalidDetails": "Revise os dados de cobrança e tente novamente.",
+    "WorkspacePaymentUnavailable": "Serviço de pagamento indisponível. Tente novamente em instantes.",
+    "SimintpayNotConfigured": "O pagamento ainda não está configurado.",
+    "InvalidWorkspaceSeats": "Informe uma quantidade válida de integrantes."
+  },
+  "home": {
+    "hero": {
+      "title": "Tudo o que sua equipe precisa para trabalhar melhor.",
+      "description": "Sua empresa mais organizada, sua equipe mais produtiva. Organize seu time, centralize o trabalho e simplifique a rotina da sua empresa.",
+      "cta": "Começar gratuitamente"
+    },
+    "problem": {
+      "title": "Um novo jeito de trabalhar em equipe",
+      "description": "Uma plataforma completa para conectar pessoas, organizar o trabalho e manter sua empresa em movimento. Tudo integrado para sua equipe trabalhar de forma mais simples e eficiente.",
+      "cards": {
+        "communication": {
+          "title": "Comunicação",
+          "description": "Mantenha sua equipe conectada, compartilhe informações e acompanhe tudo o que acontece em um único ambiente."
+        },
+        "organization": {
+          "title": "Organização",
+          "description": "Gerencie projetos, arquivos e documentos. Distribua tarefas, acompanhe prazos e saiba exatamente o que precisa ser feito."
+        },
+        "management": {
+          "title": "Gestão",
+          "titleComplement": "da equipe",
+          "description": "Tenha uma visão clara do que está acontecendo, quem está responsável por cada tarefa e como os projetos estão avançando."
+        }
+      }
+    },
+    "platform": {
+      "title": "Feito para o trabalho do dia a dia"
+    },
+    "operation": {
+      "title": "Sua equipe, conectada de qualquer lugar",
+      "description": "Tenha seu próprio escritório digital, além de salas de reuniões para fazer videochamadas e reunir sua equipe a qualquer momento.",
+      "capabilities": {
+        "customize": {
+          "title": "Personalize",
+          "titleComplement": "seu espaço",
+          "description": "Adapte a plataforma à forma como sua equipe trabalha."
+        },
+        "simple": {
+          "title": "Simples",
+          "titleComplement": "de usar",
+          "description": "Uma experiência intuitiva para sua equipe começar a trabalhar sem complicação."
+        },
+        "industries": {
+          "title": "Para empresas de",
+          "titleComplement": "todos os setores",
+          "description": "Ferramentas para organizar equipes, projetos e processos em diferentes segmentos."
+        },
+        "growth": {
+          "title": "Cresça com",
+          "titleComplement": "sua equipe",
+          "description": "Uma plataforma preparada para acompanhar sua empresa em cada etapa do crescimento."
+        }
+      }
+    },
+    "evolution": {
+      "title": "Muito mais do que gerenciar projetos. Um espaço completo para toda a sua operação.",
+      "cards": {
+        "shortcuts": {
+          "title": "Atalhos de teclado.",
+          "description": "Trabalhe com mais agilidade e acesse rapidamente as ações mais utilizadas."
+        },
+        "workflows": {
+          "title": "Espaços e fluxos de trabalho.",
+          "description": "Crie ambientes separados para equipes, projetos ou departamentos."
+        },
+        "realtime": {
+          "title": "Atualizações em tempo real.",
+          "description": "Veja alterações e movimentações da equipe instantaneamente. Visualize compromissos, tarefas e eventos em um só lugar."
+        },
+        "notifications": {
+          "title": "Notificações inteligentes.",
+          "description": "Receba apenas as atualizações importantes para você."
+        }
+      }
+    },
+    "finalCta": {
+      "title": "Junte-se ao movimento",
+      "description": "Centralize o trabalho da sua equipe com o Teron. Essa jornada está apenas começando."
+    }
+  },
+  "bento": {
+    "tasks": {
+      "title": "Crie tarefas.",
+      "description": "Defina responsáveis, prazos e prioridades."
+    },
+    "calendar": {
+      "title": "Gerencie sua agenda.",
+      "description": "Organize compromissos, tarefas e prazos em um só lugar."
+    },
+    "documents": {
+      "title": "Crie documentos.",
+      "description": "Escreva, organize e compartilhe informações importantes."
+    },
+    "presence": {
+      "title": "Veja quem está online.",
+      "description": "Acompanhe as atualizações e mantenha seu time alinhado."
+    },
+    "chat": {
+      "title": "Converse com a equipe.",
+      "description": "Envie mensagens e crie grupos para manter sua equipe conectada."
+    },
+    "projects": {
+      "title": "Gerencie projetos.",
+      "description": "Personalize seu espaço de trabalho para atender às necessidades de suas equipes."
+    }
+  },
+  "meeting": {
+    "title": "Reunião de integração",
+    "participants": "4 participantes"
+  },
+  "knowledge": {
+    "people": {
+      "title": "Feito para pessoas",
+      "description": "Uma experiência simples e intuitiva para tornar o trabalho mais leve."
+    },
+    "companies": {
+      "title": "Feito para empresas",
+      "description": "Com o Teron, sua empresa tem tudo o que precisa para fazer o trabalho fluir."
+    },
+    "platform": {
+      "title": "Uma plataforma.",
+      "titleComplement": "Todas as formas de trabalhar.",
+      "description": "Uma experiência criada para tornar a rotina da sua empresa mais simples, conectada e eficiente."
+    },
+    "mission": {
+      "prefix": "Desenvolvemos",
+      "description": "nossa plataforma com um objetivo: reunir em um único ambiente tudo o que as equipes precisam para trabalhar, colaborar e crescer."
+    },
+    "evolution": "A plataforma está em constante desenvolvimento, recebendo melhorias e novos recursos para acompanhar as necessidades de empresas e equipes.",
+    "future": "Nossa tecnologia acompanha as novas formas de trabalhar para manter sua empresa preparada para o futuro.",
+    "linkButton": "+ Link"
+  },
+  "integrations": {
+    "title": "O Teron se conecta ao",
+    "titleComplement": "que sua empresa já usa.",
+    "description": "GitHub, e-mail, Telegram e outras ferramentas que fazem parte do dia a dia da sua empresa. Tudo conectado para simplificar sua rotina.",
+    "cta": "Conheça nossos planos",
+    "features": {
+      "security": { "title": "Segurança", "titleComplement": "e privacidade" },
+      "belonging": { "title": "Pertencimento" },
+      "trust": { "title": "Confiança" },
+      "transparency": { "title": "Transparência" },
+      "support": { "title": "Suporte" },
+      "commitment": { "title": "Compromisso" }
+    },
+    "cards": {
+      "privacy": "Suas informações são privadas e acessíveis somente por quem sua empresa autorizar.",
+      "identity": "Sua empresa tem seu próprio jeito. O Teron acompanha essa identidade.",
+      "trust": "Seu trabalho merece uma plataforma na qual você possa confiar.",
+      "transparency": "Clareza em tudo o que você contrata, utiliza e recebe.",
+      "support": "Conte com nosso time para tirar dúvidas e resolver o que precisar.",
+      "relationship": "Mais do que oferecer uma plataforma, queremos construir uma relação de longo prazo com sua empresa."
+    }
+  },
+  "faq": {
+    "title": "FAQ",
+    "items": {
+      "rollout": {
+        "question": "Quanto tempo leva para implantar a plataforma?",
+        "answer": "A configuração inicial leva poucos minutos. Times pequenos costumam começar no mesmo dia; operações maiores contam com apoio na migração de projetos e documentos."
+      },
+      "migration": {
+        "question": "Consigo migrar dados das ferramentas que já uso?",
+        "answer": "Sim. É possível importar projetos, tarefas, documentos e histórico das ferramentas mais comuns do mercado, mantendo responsáveis, prazos e anexos."
+      },
+      "billing": {
+        "question": "Como funciona a cobrança?",
+        "answer": "A cobrança é mensal por usuário ativo, com desconto no plano anual. Não há taxa de implantação e o plano pode ser alterado a qualquer momento."
+      },
+      "security": {
+        "question": "Meus dados ficam seguros?",
+        "answer": "Os dados são criptografados em trânsito e em repouso, com controle de permissões por projeto, registro de auditoria e backups diários."
+      },
+      "mobile": {
+        "question": "A plataforma funciona no celular?",
+        "answer": "Sim. Tarefas, conversas, documentos e notificações estão disponíveis no navegador móvel e nos aplicativos, com sincronização em tempo real."
+      },
+      "support": {
+        "question": "Existe suporte em português?",
+        "answer": "Sim. O suporte é feito em português por time próprio, com atendimento por chat dentro da plataforma e por e-mail."
+      }
+    }
+  },
+  "pricing": {
+    "pageTitle": "Preços da Teron",
+    "brandArticle": "O",
+    "perUser": "por usuário",
+    "opening": "Teron foi criado com um princípio: oferecer uma plataforma completa, acessível e transparente para empresas de diferentes tamanhos.",
+    "intro": "Para manter toda a estrutura necessária para o funcionamento da plataforma, incluindo servidores, armazenamento, desenvolvimento contínuo, segurança e novos recursos, cada empresa contribui de acordo com o tamanho da sua equipe.",
+    "categoriesBefore": "A plataforma foi desenvolvida para atender diferentes necessidades da sua operação,",
+    "categoriesTogether": "reunindo em um só lugar:",
+    "management": "gestão,",
+    "control": "controle",
+    "and": "e",
+    "advancedResources": "recursos avançados.",
+    "storageBefore": "O armazenamento inclui os arquivos utilizados pela sua equipe no dia a dia.",
+    "documents": "Documentos",
+    "images": "imagens",
+    "videos": "vídeos",
+    "storageAfter": "fazem parte do espaço utilizado pela sua empresa.",
+    "networkBefore": "As chamadas de áudio e",
+    "video": "vídeo",
+    "networkAfter": "também fazem parte da experiência do Teron, permitindo que sua equipe se reúna diretamente pela plataforma.",
+    "computeBefore": "Recursos de",
+    "automation": "IA e automação",
+    "computeAfter": "serão incorporados continuamente ao Teron, trazendo novas possibilidades para ajudar sua equipe a trabalhar de forma mais inteligente e eficiente.",
+    "closing": "A melhor forma de entender o Teron é usando. Traga sua equipe, explore os recursos e experimente uma nova forma de organizar, colaborar e conduzir o trabalho dentro da sua empresa.",
+    "contact": "Pronto para simplificar sua rotina?",
+    "plansTitle": "Planos da Teron",
+    "plans": {
+      "free": {
+        "name": "Grátis",
+        "description": "Comece sem custo e conheça o Teron na prática.",
+        "cta": "Começar grátis",
+        "features": [
+          "30 dias para experimentar",
+          "Acesso a todos os recursos",
+          "Suporte para começar",
+          "Sem cobrança durante o período gratuito"
+        ]
+      },
+      "business": {
+        "name": "Empresas",
+        "description": "Pague apenas pelos usuários da sua equipe.",
+        "cta": "Começar agora",
+        "features": [
+          "Todos os recursos disponíveis",
+          "Cashback de até R$ 250 por transação",
+          "Suporte e atualizações contínuas",
+          "Adicione ou remova usuários quando precisar"
+        ]
+      }
+    },
+    "comingSoon": "Em breve",
+    "pricePending": "preço a definir"
+  },
+  "privacy": {
+    "title": "Política de Privacidade",
+    "updatedAt": "11 de agosto de 2026",
+    "intro": "Esta Política explica quais dados pessoais a Teron trata, para quê, com quem compartilha e como você exerce seus direitos. Ela segue a Lei Geral de Proteção de Dados (Lei nº 13.709/2018).",
+    "sections": {
+      "controller": {
+        "title": "1. Quem trata seus dados",
+        "controllerPrefix": "O controlador é",
+        "companySuffix": ", CNPJ 37.778.392/0001-24.",
+        "organizationPrefix": "Quando você usa a plataforma como membro de uma organização, é essa organização que decide o que entra nos documentos, tarefas e mensagens — nesse caso ela é a controladora desse conteúdo e a Teron atua como",
+        "processor": "operadora",
+        "organizationSuffix": ", tratando os dados conforme as instruções dela."
+      },
+      "collected": {
+        "title": "2. Dados que coletamos",
+        "provided": "Dados que você fornece",
+        "automatic": "Dados coletados automaticamente",
+        "registration": "Cadastro",
+        "registrationDetails": ": nome, e-mail, senha (armazenada com hash), foto de perfil e organização.",
+        "payment": "Pagamento",
+        "paymentDetails": ": dados de cobrança necessários à assinatura. Os dados do cartão são processados diretamente pelo provedor de pagamento — não guardamos o número completo.",
+        "content": "Conteúdo",
+        "contentDetails": ": o que você cria na plataforma — documentos, tarefas, mensagens, arquivos e gravações.",
+        "support": "Suporte",
+        "supportDetails": ": o que você nos envia ao pedir ajuda.",
+        "usage": "Uso",
+        "usageDetails": ": páginas e recursos acessados, ações realizadas, data e hora.",
+        "technical": "Técnicos",
+        "technicalDetails": ": endereço IP, tipo de dispositivo, navegador, sistema operacional e identificadores de sessão.",
+        "cookies": "Cookies",
+        "cookiesDetails": "e tecnologias semelhantes, conforme a seção 5."
+      },
+      "purposes": {
+        "title": "3. Para que usamos e com que base legal",
+        "platform": "Fornecer a plataforma",
+        "platformDetails": "— criar sua conta, sincronizar o trabalho do time, realizar chamadas e armazenar seu conteúdo.",
+        "contractBasis": "Base: execução de contrato.",
+        "billing": "Cobrar e emitir documentos fiscais",
+        "billingBasis": "Base: execução de contrato e obrigação legal.",
+        "security": "Segurança",
+        "securityDetails": "— prevenir fraude, abuso e acesso não autorizado; manter registros de acesso.",
+        "securityBasis": "Base: obrigação legal (Marco Civil da Internet) e legítimo interesse.",
+        "support": "Suporte e comunicação operacional",
+        "supportDetails": "— responder pedidos e avisar sobre mudanças no serviço.",
+        "improvement": "Melhorar o produto",
+        "improvementDetails": "— entender como os recursos são usados, em base agregada.",
+        "legitimateInterest": "Base: legítimo interesse.",
+        "marketing": "Marketing",
+        "marketingDetails": "— novidades e conteúdos, quando você optar por recebê-los.",
+        "consentBasis": "Base: consentimento, revogável a qualquer momento.",
+        "noSale": "Não vendemos dados pessoais e não usamos o conteúdo dos seus documentos e mensagens para publicidade."
+      },
+      "sharing": {
+        "title": "4. Com quem compartilhamos",
+        "providers": "Provedores que operam a plataforma",
+        "providersDetails": "— hospedagem em nuvem, processamento de pagamentos, e-mail transacional, análise de uso e suporte. Eles tratam os dados apenas conforme nossas instruções e sob contrato.",
+        "organization": "Sua organização",
+        "organizationDetails": "— administradores do workspace têm acesso aos dados de conta e ao conteúdo criado nele.",
+        "authorities": "Autoridades",
+        "authoritiesDetails": "— quando houver obrigação legal, ordem judicial ou necessidade de defesa em processo.",
+        "successors": "Sucessores",
+        "successorsDetails": "— em caso de reorganização societária, fusão ou aquisição, mantidas as condições desta Política."
+      },
+      "cookies": {
+        "title": "5. Cookies",
+        "body": "Usamos cookies necessários (sessão, autenticação e segurança), que não podem ser desligados sem quebrar o funcionamento da plataforma, e cookies de análise, que dependem do seu consentimento e ajudam a entender o uso do produto. Você pode gerenciar as preferências no próprio navegador."
+      },
+      "security": {
+        "title": "6. Segurança e armazenamento",
+        "safeguards": "Adotamos medidas técnicas e administrativas para proteger seus dados: criptografia em trânsito (TLS) e em repouso, controle de acesso por permissão, registro de atividades e cópias de segurança. No plano Empresas, o armazenamento é criptografado e sem limite de volume.",
+        "incidents": "Nenhum sistema é totalmente imune. Em caso de incidente de segurança com risco relevante, comunicaremos você e a ANPD nos prazos previstos em lei."
+      },
+      "retention": {
+        "title": "7. Por quanto tempo guardamos",
+        "content": "Conteúdo e dados de conta",
+        "contentDetails": "— enquanto a conta estiver ativa e por até 30 dias após o encerramento, prazo para exportação.",
+        "accessLogs": "Registros de acesso",
+        "accessLogsDetails": "— 6 meses, conforme o Marco Civil da Internet.",
+        "billing": "Dados fiscais e de cobrança",
+        "billingDetails": "— 5 anos, conforme a legislação aplicável."
+      },
+      "rights": {
+        "title": "8. Seus direitos",
+        "body": "A LGPD garante a você os direitos de confirmar a existência de tratamento, acessar seus dados, corrigir dados incompletos ou desatualizados, solicitar anonimização, bloqueio ou eliminação de dados desnecessários, pedir a portabilidade, revogar consentimento e se opor a tratamentos feitos com base em legítimo interesse.",
+        "contactPrefix": "Para exercer qualquer um deles, escreva para",
+        "contactSuffix": ". Respondemos em até 15 dias. Se você usa a Teron por meio de uma organização, encaminharemos o pedido a ela quando o tratamento estiver sob a responsabilidade dela."
+      },
+      "transfers": {
+        "title": "9. Transferência internacional",
+        "body": "Parte da infraestrutura pode estar fora do Brasil. Nesses casos, a transferência é feita com as garantias exigidas pela LGPD, por meio de cláusulas contratuais com os provedores e de países que ofereçam grau de proteção adequado."
+      },
+      "children": {
+        "title": "10. Crianças e adolescentes",
+        "body": "A plataforma não se destina a menores de 18 anos e não coletamos dados dessa faixa etária de forma consciente. Se identificarmos esse caso, os dados serão excluídos."
+      },
+      "changes": {
+        "title": "11. Alterações desta Política",
+        "body": "Podemos atualizar esta Política. A data de última atualização fica no topo da página e mudanças relevantes serão comunicadas por e-mail ou dentro da plataforma.",
+        "termsPrefix": "Sobre as condições de uso do serviço, veja os"
+      }
+    }
+  },
+  "terms": {
+    "title": "Termos de Serviço",
+    "updatedAt": "11 de agosto de 2026",
+    "intro": "Estes Termos regem o uso da Teron — a plataforma de trabalho que reúne projetos, tarefas, documentos e comunicação em um só lugar. Ao criar uma conta ou usar a plataforma, você concorda com o que está escrito aqui.",
+    "sections": {
+      "about": {
+        "title": "1. Quem somos",
+        "companyPrefix": "A Teron é operada por",
+        "companySuffix": ", inscrita no CNPJ sob o nº 37.778.392/0001-24. Neste documento, “Teron”, “nós” e “nosso” se referem a essa empresa; “você” se refere a quem usa a plataforma, seja por conta própria ou em nome de uma organização.",
+        "authority": "Se você aceita estes Termos em nome de uma empresa, declara ter poderes para vinculá-la — e, nesse caso, “você” significa essa empresa."
+      },
+      "account": {
+        "title": "2. Conta",
+        "responsibility": "Para usar a plataforma é preciso criar uma conta com informações verdadeiras e mantê-las atualizadas. Você é responsável pela guarda das suas credenciais e por tudo o que acontecer na sua conta.",
+        "age": "É preciso ter ao menos 18 anos, ou a idade mínima exigida na sua jurisdição, com autorização de quem for responsável.",
+        "unauthorizedUse": "Avise imediatamente em caso de uso não autorizado ou suspeita de comprometimento da conta.",
+        "administrators": "Contas de organização podem ter administradores com poder de gerenciar, suspender ou excluir os acessos do time."
+      },
+      "billing": {
+        "title": "3. Planos, cobrança e cancelamento",
+        "intro": "Os planos disponíveis e o que cada um inclui estão descritos na página de",
+        "plansLink": "planos e preços",
+        "summary": ". Em resumo:",
+        "free": "— sem custo, com usuários ilimitados, armazenamento básico e chamadas de vídeo ilimitadas, limitado a 1 mês de uso.",
+        "business": "— R$ 9,99 por usuário, com tudo do plano Free e armazenamento criptografado ilimitado.",
+        "recurring": "A cobrança é mensal e recorrente, feita no início de cada ciclo, com base nas vagas contratadas do workspace. Vagas adicionadas durante o ciclo são cobradas imediatamente pelo valor proporcional ao tempo restante; reduções valem na renovação seguinte.",
+        "cancellation": "Você pode cancelar a qualquer momento: o acesso ao plano pago continua até o fim do período já pago e não há renovação depois disso. Valores já pagos não são reembolsados, salvo quando a lei exigir — incluindo o direito de arrependimento em até 7 dias da contratação, previsto no Código de Defesa do Consumidor.",
+        "priceChanges": "Preços podem mudar. Quando isso acontecer, avisaremos com pelo menos 30 dias de antecedência, e a mudança só vale para os ciclos seguintes."
+      },
+      "acceptableUse": {
+        "title": "4. Uso aceitável",
+        "intro": "Ao usar a Teron, você concorda em não:",
+        "unlawful": "violar a lei, direitos de terceiros ou publicar conteúdo ilícito, difamatório ou que viole propriedade intelectual;",
+        "malware": "enviar malware, tentar obter acesso não autorizado a sistemas ou contornar limites técnicos e de uso da plataforma;",
+        "spam": "usar a plataforma para envio de spam ou para sobrecarregar a infraestrutura de forma automatizada;",
+        "resale": "revender, sublicenciar ou disponibilizar o serviço a terceiros fora do seu workspace sem autorização por escrito."
+      },
+      "content": {
+        "title": "5. Seu conteúdo",
+        "ownershipPrefix": "Tudo o que você cria ou envia para a plataforma — documentos, tarefas, mensagens, arquivos — continua sendo",
+        "yours": "seu",
+        "ownershipSuffix": ". Nós não reivindicamos propriedade sobre esse conteúdo.",
+        "license": "Você nos concede apenas a licença necessária para operar o serviço: armazenar, processar, transmitir e exibir esse conteúdo para você e para quem você autorizar, além de fazer cópias de segurança. Essa licença termina quando o conteúdo é excluído.",
+        "privacyPrefix": "O tratamento de dados pessoais dentro desse conteúdo segue a nossa"
+      },
+      "intellectualProperty": {
+        "title": "6. Nossa propriedade intelectual",
+        "body": "A plataforma, o código, a marca, a identidade visual e a documentação são da Teron ou de seus licenciantes. Estes Termos concedem a você um direito de uso limitado, não exclusivo e intransferível — não uma transferência de propriedade."
+      },
+      "availability": {
+        "title": "7. Disponibilidade e mudanças no serviço",
+        "body": "Trabalhamos para manter a plataforma disponível, mas ela pode passar por manutenções programadas e interrupções fora do nosso controle. A plataforma evolui continuamente: recursos podem ser adicionados, alterados ou descontinuados. Quando a mudança for significativa e afetar o seu uso, avisaremos com antecedência razoável."
+      },
+      "termination": {
+        "title": "8. Suspensão e encerramento",
+        "body": "Podemos suspender ou encerrar o acesso em caso de violação destes Termos, falta de pagamento ou uso que coloque em risco a segurança da plataforma ou de outros usuários. Sempre que for razoável, avisaremos antes e daremos a chance de corrigir o problema.",
+        "exportPrefix": "Encerrada a conta, você tem",
+        "exportPeriod": "30 dias",
+        "exportSuffix": "para exportar seu conteúdo. Depois desse prazo, os dados podem ser excluídos em definitivo, ressalvado o que a lei exigir que seja mantido."
+      },
+      "liability": {
+        "title": "9. Garantias e responsabilidade",
+        "warranty": "A plataforma é fornecida no estado em que se encontra. Não garantimos que o serviço será ininterrupto ou livre de erros, nem que atenderá a um objetivo específico não acordado por escrito.",
+        "limitation": "Na medida permitida pela lei, nossa responsabilidade total em relação ao serviço fica limitada ao valor pago por você nos 12 meses anteriores ao evento que deu origem à reclamação. Não respondemos por lucros cessantes ou danos indiretos. Nada aqui afasta direitos que a legislação consumerista garante de forma inafastável."
+      },
+      "changes": {
+        "title": "10. Alterações destes Termos",
+        "body": "Podemos atualizar estes Termos. Mudanças relevantes serão comunicadas por e-mail ou dentro da plataforma com pelo menos 30 dias de antecedência. Continuar usando a Teron depois da entrada em vigor significa concordar com a nova versão."
+      },
+      "contact": {
+        "title": "11. Contato",
+        "body": "Dúvidas sobre estes Termos:"
+      }
+    }
+  }
+}

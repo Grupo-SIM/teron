@@ -33,7 +33,7 @@ export function LegalPage({
 
       <main className="lp-legal">
         <h1 className="lp-legal-title">{title}</h1>
-        <p className="lp-legal-date">Última atualização: {updatedAt}</p>
+        <p className="lp-legal-date">{"common.lastUpdated"}{updatedAt}</p>
         <p className="lp-legal-intro">{intro}</p>
         {children}
       </main>

@@ -5,28 +5,28 @@ import { Localized, defaultLocale, type Locale } from "@/i18n/site";
 
 const FAQS = [
   {
-    q: "Quanto tempo leva para implantar a plataforma?",
-    a: "A configuração inicial leva poucos minutos. Times pequenos costumam começar no mesmo dia; operações maiores contam com apoio na migração de projetos e documentos.",
+    q: "faq.items.rollout.question",
+    a: "faq.items.rollout.answer",
   },
   {
-    q: "Consigo migrar dados das ferramentas que já uso?",
-    a: "Sim. É possível importar projetos, tarefas, documentos e histórico das ferramentas mais comuns do mercado, mantendo responsáveis, prazos e anexos.",
+    q: "faq.items.migration.question",
+    a: "faq.items.migration.answer",
   },
   {
-    q: "Como funciona a cobrança?",
-    a: "A cobrança é mensal por usuário ativo, com desconto no plano anual. Não há taxa de implantação e o plano pode ser alterado a qualquer momento.",
+    q: "faq.items.billing.question",
+    a: "faq.items.billing.answer",
   },
   {
-    q: "Meus dados ficam seguros?",
-    a: "Os dados são criptografados em trânsito e em repouso, com controle de permissões por projeto, registro de auditoria e backups diários.",
+    q: "faq.items.security.question",
+    a: "faq.items.security.answer",
   },
   {
-    q: "A plataforma funciona no celular?",
-    a: "Sim. Tarefas, conversas, documentos e notificações estão disponíveis no navegador móvel e nos aplicativos, com sincronização em tempo real.",
+    q: "faq.items.mobile.question",
+    a: "faq.items.mobile.answer",
   },
   {
-    q: "Existe suporte em português?",
-    a: "Sim. O suporte é feito em português por time próprio, com atendimento por chat dentro da plataforma e por e-mail.",
+    q: "faq.items.support.question",
+    a: "faq.items.support.answer",
   },
 ];
 
@@ -37,10 +37,9 @@ export function Faq({ locale = defaultLocale }: { locale?: Locale }) {
   return (
     <Localized locale={locale}><section id="faq" className="lp-faq">
       <a href="/cadastro" className="lp-faq-cta">
-        Começar agora
-      </a>
+        {"common.getStarted"}</a>
       <div className="lp-faq-card" data-reveal>
-        <h2 className="lp-faq-title">FAQ</h2>
+        <h2 className="lp-faq-title">{"faq.title"}</h2>
         <div className="lp-faq-panel">
           <div className="lp-acc">
             {FAQS.map((faq, index) => {

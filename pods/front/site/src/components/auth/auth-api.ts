@@ -1,3 +1,5 @@
+import { getDictionary, type Locale } from "@/i18n/site";
+
 export type AuthConfig = {
   accountsUrl: string;
   disableSignup: boolean;
@@ -54,11 +56,12 @@ function joinUrl(base: string, path: string): string {
   return `${base.replace(/\/$/, "")}/${path.replace(/^\//, "")}`;
 }
 
-export async function loadAuthConfig(): Promise<AuthConfig> {
+export async function loadAuthConfig(locale: Locale): Promise<AuthConfig> {
+  const errors = getDictionary(locale).authErrors;
   const response = await fetch("/config.json", { credentials: "same-origin", cache: "no-store" });
-  if (!response.ok) throw new Error("Não foi possível carregar a configuração de acesso.");
+  if (!response.ok) throw new Error(errors.configUnavailable);
   const config = (await response.json()) as Record<string, string | undefined>;
-  if (!config.ACCOUNTS_URL) throw new Error("O serviço de contas não está configurado.");
+  if (!config.ACCOUNTS_URL) throw new Error(errors.accountServiceMissing);
 
   return {
     accountsUrl: config.ACCOUNTS_URL,
@@ -69,7 +72,7 @@ export async function loadAuthConfig(): Promise<AuthConfig> {
 }
 
 export class AuthApi {
-  constructor(readonly config: AuthConfig) {}
+  constructor(readonly config: AuthConfig, readonly locale: Locale) {}
 
   private async rpc<T>(method: string, params: Record<string, unknown>, token?: string): Promise<T> {
     const response = await fetch(this.config.accountsUrl, {
@@ -229,7 +232,7 @@ export class AuthApi {
       credentials: "include",
       headers: { Authorization: `Bearer ${token}` },
     });
-    if (!response.ok) throw new Error("Não foi possível concluir a sessão.");
+    if (!response.ok) throw new Error(getDictionary(this.locale).authErrors.sessionStartFailed);
   }
 
   async deleteCookie(): Promise<void> {
@@ -237,7 +240,7 @@ export class AuthApi {
       method: "DELETE",
       credentials: "include",
     });
-    if (!response.ok) throw new Error("Não foi possível encerrar a sessão.");
+    if (!response.ok) throw new Error(getDictionary(this.locale).authErrors.sessionEndFailed);
   }
 
   providerUrl(provider: string, query?: { inviteId?: string; autoJoin?: boolean; navigateUrl?: string }): string {
@@ -249,26 +252,11 @@ export class AuthApi {
   }
 }
 
-export function authErrorMessage(error: unknown, locale: "pt-BR" | "en-US"): string {
-  const english = locale === "en-US";
+export function authErrorMessage(error: unknown, locale: Locale): string {
   const code = error instanceof AuthApiError ? (error.code.split(":").at(-1) ?? "") : "";
-  const messages: Record<string, [string, string]> = {
-    InvalidPassword: ["E-mail ou senha incorretos.", "Incorrect email or password."],
-    AccountNotFound: ["Conta não encontrada.", "Account not found."],
-    InvalidOtp: ["Código inválido ou expirado.", "Invalid or expired code."],
-    AccountAlreadyExists: ["Já existe uma conta com este e-mail.", "An account with this email already exists."],
-    Unauthorized: ["Sua sessão expirou. Entre novamente.", "Your session has expired. Sign in again."],
-    WorkspaceNotFound: ["Workspace não encontrado.", "Workspace not found."],
-    WorkspacePaymentRequired: ["Conclua o pagamento para criar outro workspace.", "Complete payment to create another workspace."],
-    WorkspacePaymentFailed: ["Não foi possível aprovar o pagamento. Revise os dados do cartão.", "We could not approve the payment. Check your card details."],
-    WorkspacePaymentDeclined: ["Pagamento recusado pelo gateway. Verifique o cartão ou tente outro.", "Payment was declined by the gateway. Check the card or try another one."],
-    WorkspacePaymentInvalidDetails: ["Revise os dados de cobrança e tente novamente.", "Review your billing details and try again."],
-    WorkspacePaymentUnavailable: ["Serviço de pagamento indisponível. Tente novamente em instantes.", "Payment service is unavailable. Try again shortly."],
-    SimintpayNotConfigured: ["O pagamento ainda não está configurado.", "Payment is not configured yet."],
-    InvalidWorkspaceSeats: ["Informe uma quantidade válida de integrantes.", "Enter a valid number of members."],
-  };
-  const match = messages[code];
-  if (match) return match[english ? 1 : 0];
+  const messages = getDictionary(locale).authErrors;
+  const match = code in messages ? messages[code as keyof typeof messages] : undefined;
+  if (match) return match;
   if (error instanceof Error && error.message) return error.message;
-  return english ? "Something went wrong. Please try again." : "Algo deu errado. Tente novamente.";
+  return messages.unknown;
 }

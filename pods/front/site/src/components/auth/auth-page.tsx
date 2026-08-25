@@ -21,13 +21,13 @@ export type AuthVariant = "login" | "signup";
 
 const COPY = {
   login: {
-    switchText: "Não tem uma conta?",
-    switchLabel: "Cadastre-se",
+    switchText: "authPage.loginPrompt",
+    switchLabel: "common.signUp",
     switchHref: "/cadastro",
   },
   signup: {
-    switchText: "Já tem uma conta?",
-    switchLabel: "Entrar",
+    switchText: "authPage.signupPrompt",
+    switchLabel: "common.signIn",
     switchHref: "/entrar",
   },
 } as const satisfies Record<AuthVariant, unknown>;
@@ -40,8 +40,7 @@ export function AuthPage({ variant, locale = defaultLocale }: { variant: AuthVar
       <header className="auth-topbar">
         <Link href="/" className="auth-home">
           <BackArrow />
-          Início
-        </Link>
+          {"common.home"}</Link>
       </header>
 
       <section className="auth-stage">
@@ -65,9 +64,9 @@ export function AuthPage({ variant, locale = defaultLocale }: { variant: AuthVar
         </p>
 
         <div className="auth-legal">
-          <Link href="/termos">Termos de Uso</Link>
+          <Link href="/termos">{"common.termsOfUse"}</Link>
           <span aria-hidden className="auth-legal-sep" />
-          <Link href="/privacidade">Política de Privacidade</Link>
+          <Link href="/privacidade">{"common.privacy"}</Link>
         </div>
       </section>
     </div></Localized>

@@ -19,37 +19,37 @@ import { Localized, defaultLocale, type Locale } from "@/i18n/site";
 const PROBLEMS = [
   {
     icon: "/assets/icon-mail.png",
-    title: ["Comunicação", ""],
-    text: "Mantenha sua equipe conectada, compartilhe informações e acompanhe tudo o que acontece em um único ambiente.",
+    title: ["home.problem.cards.communication.title", ""],
+    text: "home.problem.cards.communication.description",
   },
   {
     icon: "/assets/icon-chat.png",
-    title: ["Organização", ""],
-    text: "Gerencie projetos, arquivos e documentos. Distribua tarefas, acompanhe prazos e saiba exatamente o que precisa ser feito.",
+    title: ["home.problem.cards.organization.title", ""],
+    text: "home.problem.cards.organization.description",
   },
   {
     icon: "/assets/icon-person.png",
-    title: ["Gestão", "da equipe"],
-    text: "Tenha uma visão clara do que está acontecendo, quem está responsável por cada tarefa e como os projetos estão avançando.",
+    title: ["home.problem.cards.management.title", "home.problem.cards.management.titleComplement"],
+    text: "home.problem.cards.management.description",
   },
 ];
 
 const CAPABILITIES = [
   {
-    title: ["Personalize", "seu espaço"],
-    text: "Adapte a plataforma à forma como sua equipe trabalha.",
+    title: ["home.operation.capabilities.customize.title", "home.operation.capabilities.customize.titleComplement"],
+    text: "home.operation.capabilities.customize.description",
   },
   {
-    title: ["Simples", "de usar"],
-    text: "Uma experiência intuitiva para sua equipe começar a trabalhar sem complicação.",
+    title: ["home.operation.capabilities.simple.title", "home.operation.capabilities.simple.titleComplement"],
+    text: "home.operation.capabilities.simple.description",
   },
   {
-    title: ["Para empresas de", "todos os setores"],
-    text: "Ferramentas para organizar equipes, projetos e processos em diferentes segmentos.",
+    title: ["home.operation.capabilities.industries.title", "home.operation.capabilities.industries.titleComplement"],
+    text: "home.operation.capabilities.industries.description",
   },
   {
-    title: ["Cresça com", "sua equipe"],
-    text: "Uma plataforma preparada para acompanhar sua empresa em cada etapa do crescimento.",
+    title: ["home.operation.capabilities.growth.title", "home.operation.capabilities.growth.titleComplement"],
+    text: "home.operation.capabilities.growth.description",
   },
 ];
 
@@ -80,8 +80,7 @@ export function HomeContent({ locale = defaultLocale }: { locale?: Locale }) {
                 `globals.css` (`.lp-hero-copy h1/p`), onde os degraus do
                 teron.io precisam de media query. */}
             <h1 data-reveal style={{ margin: 0 }}>
-              Tudo o que sua equipe precisa para trabalhar melhor.
-            </h1>
+              {"home.hero.title"}</h1>
             <p
               data-reveal
               style={{
@@ -89,12 +88,9 @@ export function HomeContent({ locale = defaultLocale }: { locale?: Locale }) {
                 color: "#a7a7ad",
               }}
             >
-              Sua empresa mais organizada, sua equipe mais produtiva. Organize
-              seu time, centralize o trabalho e simplifique a rotina da sua
-              empresa.
-            </p>
+              {"home.hero.description"}</p>
             <div data-reveal className="lp-hero-cta">
-              <HeroCta label="Começar gratuitamente" />
+              <HeroCta label="home.hero.cta" />
             </div>
           </div>
 
@@ -134,8 +130,7 @@ export function HomeContent({ locale = defaultLocale }: { locale?: Locale }) {
               textWrap: "balance",
             }}
           >
-            Um novo jeito de trabalhar em equipe
-          </h2>
+            {"home.problem.title"}</h2>
           <p
             data-reveal
             style={{
@@ -146,10 +141,7 @@ export function HomeContent({ locale = defaultLocale }: { locale?: Locale }) {
               maxWidth: "72ch",
             }}
           >
-            Uma plataforma completa para conectar pessoas, organizar o trabalho
-            e manter sua empresa em movimento. Tudo integrado para sua equipe
-            trabalhar de forma mais simples e eficiente.
-          </p>
+            {"home.problem.description"}</p>
           <div
             style={{
               marginTop: 64,
@@ -221,8 +213,7 @@ export function HomeContent({ locale = defaultLocale }: { locale?: Locale }) {
               textWrap: "balance",
             }}
           >
-            Feito para o trabalho do dia a dia
-          </h2>
+            {"home.platform.title"}</h2>
           <div data-reveal style={{ marginTop: 70 }}>
             <Bento />
           </div>
@@ -244,8 +235,7 @@ export function HomeContent({ locale = defaultLocale }: { locale?: Locale }) {
               textWrap: "balance",
             }}
           >
-            Sua equipe, conectada de qualquer lugar
-          </h2>
+            {"home.operation.title"}</h2>
           <p
             data-reveal
             style={{
@@ -256,9 +246,7 @@ export function HomeContent({ locale = defaultLocale }: { locale?: Locale }) {
               maxWidth: "76ch",
             }}
           >
-            Tenha seu próprio escritório digital, além de salas de reuniões
-            para fazer videochamadas e reunir sua equipe a qualquer momento.
-          </p>
+            {"home.operation.description"}</p>
         </div>
         <div data-reveal style={{ margin: "40px auto 0", maxWidth: 1600 }}>
           <VideoBlock />
@@ -337,8 +325,7 @@ export function HomeContent({ locale = defaultLocale }: { locale?: Locale }) {
               borderRadius: 10,
             }}
           >
-            Começar agora
-          </a>
+            {"common.getStarted"}</a>
         </div>
       </section>
 
@@ -366,9 +353,7 @@ export function HomeContent({ locale = defaultLocale }: { locale?: Locale }) {
               maxWidth: "16ch",
             }}
           >
-            Muito mais do que gerenciar projetos. Um espaço completo para toda
-            a sua operação.
-          </h2>
+            {"home.evolution.title"}</h2>
           <Asset
             src="/assets/brand/logo-horizontal-light.svg"
             alt=""
@@ -379,25 +364,25 @@ export function HomeContent({ locale = defaultLocale }: { locale?: Locale }) {
         <ul className="lp-prod-grid">
           <RiveCard
             src="/animations/hotkeys.riv"
-            title="Atalhos de teclado."
-            text="Trabalhe com mais agilidade e acesse rapidamente as ações mais utilizadas."
+            title="home.evolution.cards.shortcuts.title"
+            text="home.evolution.cards.shortcuts.description"
           />
           <RiveCard
             src="/animations/team-planner.riv"
-            title="Espaços e fluxos de trabalho."
-            text="Crie ambientes separados para equipes, projetos ou departamentos."
+            title="home.evolution.cards.workflows.title"
+            text="home.evolution.cards.workflows.description"
             variant="wide"
           />
           <RiveCard
             src="/animations/time-blocking.riv"
-            title="Atualizações em tempo real."
-            text="Veja alterações e movimentações da equipe instantaneamente. Visualize compromissos, tarefas e eventos em um só lugar."
+            title="home.evolution.cards.realtime.title"
+            text="home.evolution.cards.realtime.description"
             variant="wide"
           />
           <RiveCard
             src="/animations/notifications.riv"
-            title="Notificações inteligentes."
-            text="Receba apenas as atualizações importantes para você."
+            title="home.evolution.cards.notifications.title"
+            text="home.evolution.cards.notifications.description"
             video="/assets/waves.webm"
           />
         </ul>
@@ -411,11 +396,9 @@ export function HomeContent({ locale = defaultLocale }: { locale?: Locale }) {
       <section id="comecar" className="lp-cta">
         <div className="lp-cta-row">
           <div className="lp-cta-copy" data-reveal>
-            <h2 className="lp-cta-title">Junte-se ao movimento</h2>
+            <h2 className="lp-cta-title">{"home.finalCta.title"}</h2>
             <p className="lp-cta-text">
-              Centralize o trabalho da sua equipe com o Teron. Essa jornada
-              está apenas começando.
-            </p>
+              {"home.finalCta.description"}</p>
             <div className="lp-cta-actions">
               {/* O botão de cadastro subiu para o fim da seção de integrações:
                   quem chega aqui já passou por ele. Sobra o contato direto. */}
@@ -425,8 +408,7 @@ export function HomeContent({ locale = defaultLocale }: { locale?: Locale }) {
                 target="_blank"
                 rel="noreferrer"
               >
-                Falar com o time
-              </a>
+                {"common.talkToTeam"}</a>
             </div>
           </div>
 

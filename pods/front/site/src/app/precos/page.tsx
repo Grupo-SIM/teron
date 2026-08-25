@@ -7,12 +7,13 @@ import { RevealObserver } from "@/components/site/reveal-observer";
 import { Word, Words, WordsObserver } from "@/components/site/scroll-words";
 import { SiteFooter } from "@/components/site/site-footer";
 import { SiteHeader } from "@/components/site/site-header";
-import { Localized, defaultLocale, type Locale } from "@/i18n/site";
+import { Localized, defaultLocale, getDictionary, type Locale } from "@/i18n/site";
+
+const metadataCopy = getDictionary(defaultLocale).metadata.pricing;
 
 export const metadata: Metadata = {
-  title: "Teron — Planos e preços",
-  description:
-    "Como funciona a contribuição de cada empresa no Teron e os planos disponíveis para equipes de qualquer tamanho.",
+  title: metadataCopy.title,
+  description: metadataCopy.description,
 };
 
 /*
@@ -23,31 +24,31 @@ export const metadata: Metadata = {
  */
 
 const OPENING =
-  "Teron foi criado com um princípio: oferecer uma plataforma completa, acessível e transparente para empresas de diferentes tamanhos.";
+  "pricing.opening";
 
 const INTRO =
-  "Para manter toda a estrutura necessária para o funcionamento da plataforma, incluindo servidores, armazenamento, desenvolvimento contínuo, segurança e novos recursos, cada empresa contribui de acordo com o tamanho da sua equipe.";
+  "pricing.intro";
 
 const CATEGORIES_BEFORE =
-  "A plataforma foi desenvolvida para atender diferentes necessidades da sua operação,";
+  "pricing.categoriesBefore";
 
 const STORAGE_BEFORE =
-  "O armazenamento inclui os arquivos utilizados pela sua equipe no dia a dia.";
+  "pricing.storageBefore";
 
-const NETWORK_BEFORE = "As chamadas de áudio e";
+const NETWORK_BEFORE = "pricing.networkBefore";
 
 const NETWORK_AFTER =
-  "também fazem parte da experiência do Teron, permitindo que sua equipe se reúna diretamente pela plataforma.";
+  "pricing.networkAfter";
 
-const COMPUTE_BEFORE = "Recursos de";
+const COMPUTE_BEFORE = "pricing.computeBefore";
 
 const COMPUTE_AFTER =
-  "serão incorporados continuamente ao Teron, trazendo novas possibilidades para ajudar sua equipe a trabalhar de forma mais inteligente e eficiente.";
+  "pricing.computeAfter";
 
 const CUSTOM =
-  "A melhor forma de entender o Teron é usando. Traga sua equipe, explore os recursos e experimente uma nova forma de organizar, colaborar e conduzir o trabalho dentro da sua empresa.";
+  "pricing.closing";
 
-const CONTACT = "Pronto para simplificar sua rotina?";
+const CONTACT = "pricing.contact";
 
 export function PrecosContent({ locale = defaultLocale }: { locale?: Locale }) {
   return (
@@ -62,7 +63,7 @@ export function PrecosContent({ locale = defaultLocale }: { locale?: Locale }) {
       <SiteHeader />
 
       <main className="lp-pr">
-        <h1 className="lp-pr-sr">Preços da Teron</h1>
+        <h1 className="lp-pr-sr">{"pricing.pageTitle"}</h1>
 
         <div className="lp-pr-inner">
           <div className="lp-pr-prose">
@@ -77,7 +78,7 @@ export function PrecosContent({ locale = defaultLocale }: { locale?: Locale }) {
                 nada foi lido ainda, e se ela dependesse do scroll o visitante
                 chegaria numa tela inteira de texto apagado. */}
             <div className="lp-pr-p" role="paragraph">
-              O{" "}
+              {"pricing.brandArticle"}{" "}
               <span aria-hidden className="lp-pr-mark">
                 <span className="lp-pr-mark-glow" />
                 <Asset
@@ -106,9 +107,9 @@ export function PrecosContent({ locale = defaultLocale }: { locale?: Locale }) {
                   ocupa zero, e um espaço de cada lado viraria espaço duplo. */}
               <Words text={CATEGORIES_BEFORE} />{" "}
               <br className="lp-pr-br" />
-              <Words text="reunindo em um só lugar:" />
+              <Words text="pricing.categoriesTogether" />
               <span className="lp-pr-keep">
-                <PricingIcon artboard="storage" /> <Words text="gestão," />
+                <PricingIcon artboard="storage" /> <Words text="pricing.management" />
               </span>{" "}
               <br className="lp-pr-br" />
               {/* Este abre a linha. A arte fica encaixada uns 79px dentro da
@@ -123,12 +124,12 @@ export function PrecosContent({ locale = defaultLocale }: { locale?: Locale }) {
                   marginLeft={-70}
                   marginRight={-62}
                 />
-                <Words text="controle" />
+                <Words text="pricing.control" />
               </span>{" "}
-              <Words text="e" />
+              <Words text="pricing.and" />
               <span className="lp-pr-keep">
                 <PricingIcon artboard="compute" />{" "}
-                <Words text="recursos avançados." />
+                <Words text="pricing.advancedResources" />
               </span>
             </div>
 
@@ -141,7 +142,7 @@ export function PrecosContent({ locale = defaultLocale }: { locale?: Locale }) {
               <Words text={STORAGE_BEFORE} />{" "}
               <br className="lp-pr-br" />
               <span className="lp-pr-keep">
-                <Words text="Documentos" />
+                <Words text="pricing.documents" />
                 <PricingIcon
                   artboard="docs"
                   marginLeft={-70}
@@ -151,7 +152,7 @@ export function PrecosContent({ locale = defaultLocale }: { locale?: Locale }) {
                 <Words text="," />
               </span>{" "}
               <span className="lp-pr-keep">
-                <Words text="imagens" />
+                <Words text="pricing.images" />
                 <PricingIcon
                   artboard="gallery"
                   width={210}
@@ -162,9 +163,9 @@ export function PrecosContent({ locale = defaultLocale }: { locale?: Locale }) {
                 />
               </span>{" "}
               <br className="lp-pr-br" />
-              <Words text="e" />{" "}
+              <Words text="pricing.and" />{" "}
               <span className="lp-pr-keep">
-                <Words text="vídeos" />
+                <Words text="pricing.videos" />
                 <PricingIcon
                   artboard="play"
                   marginLeft={-72}
@@ -172,13 +173,13 @@ export function PrecosContent({ locale = defaultLocale }: { locale?: Locale }) {
                   offsetTop={-95}
                 />
               </span>{" "}
-              <Words text="fazem parte do espaço utilizado pela sua empresa." />
+              <Words text="pricing.storageAfter" />
             </div>
 
             <div className="lp-pr-p" role="paragraph">
               <Words text={NETWORK_BEFORE} />{" "}
               <span className="lp-pr-keep">
-                <Words text="vídeo" />
+                <Words text="pricing.video" />
                 <PricingIcon
                   artboard="circle"
                   width={344}
@@ -194,7 +195,7 @@ export function PrecosContent({ locale = defaultLocale }: { locale?: Locale }) {
             <div className="lp-pr-p" role="paragraph">
               <Words text={COMPUTE_BEFORE} />{" "}
               <span className="lp-pr-keep">
-                <Word className="lp-pr-grad">IA e automação</Word>
+                <Word className="lp-pr-grad">{"pricing.automation"}</Word>
                 <PricingIcon artboard="chatgpt" marginRight={-58} />
               </span>{" "}
               <Words text={COMPUTE_AFTER} />

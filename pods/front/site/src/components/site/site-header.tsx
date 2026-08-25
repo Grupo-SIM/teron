@@ -22,9 +22,9 @@ type SiteSession =
  * rolagem suave continua valendo.
  */
 const LINKS = [
-  { href: "/#plataforma", label: "Recursos" },
-  { href: "/#github", label: "Integrações" },
-  { href: "/precos", label: "Preços" },
+  { href: "/#plataforma", label: "header.resources" },
+  { href: "/#github", label: "header.integrations" },
+  { href: "/precos", label: "header.pricing" },
 ];
 
 export function SiteHeader({ locale = defaultLocale }: { locale?: Locale }) {
@@ -90,7 +90,7 @@ export function SiteHeader({ locale = defaultLocale }: { locale?: Locale }) {
           gap: 34,
         }}
       >
-        <Link href="/" aria-label="Teron — início" style={{ display: "block" }}>
+        <Link href="/" aria-label="common.brandHomeLabel" style={{ display: "block" }}>
           <Asset
             src="/assets/brand/logo-horizontal-light.svg"
             alt="Teron"
@@ -122,8 +122,7 @@ export function SiteHeader({ locale = defaultLocale }: { locale?: Locale }) {
                 className="lp-link-plain"
                 style={{ fontSize: 14, fontWeight: 600 }}
               >
-                Entrar
-              </a>
+                {"common.signIn"}</a>
               <a
                 href="/cadastro"
                 className="lp-btn-white"
@@ -134,15 +133,14 @@ export function SiteHeader({ locale = defaultLocale }: { locale?: Locale }) {
                   borderRadius: 8,
                 }}
               >
-                Cadastre-se
-              </a>
+                {"common.signUp"}</a>
             </>
           )}
         </div>
         <button
           type="button"
           onClick={() => setMenuOpen(true)}
-          aria-label="Menu"
+          aria-label="common.menu"
           aria-expanded={menuOpen}
           className="lp-burger"
           style={{
@@ -161,11 +159,11 @@ export function SiteHeader({ locale = defaultLocale }: { locale?: Locale }) {
       </div>
 
       {menuOpen && (
-        <div className="lp-menu" role="dialog" aria-modal="true" aria-label="Menu">
+        <div className="lp-menu" role="dialog" aria-modal="true" aria-label="common.menu">
           <div className="lp-menu-top">
             <Link
               href="/"
-              aria-label="Teron — início"
+              aria-label="common.brandHomeLabel"
               onClick={() => setMenuOpen(false)}
               style={{ display: "block" }}
             >
@@ -179,7 +177,7 @@ export function SiteHeader({ locale = defaultLocale }: { locale?: Locale }) {
             <button
               type="button"
               onClick={() => setMenuOpen(false)}
-              aria-label="Fechar menu"
+              aria-label="common.closeMenu"
               className="lp-menu-close"
             >
               ✕
@@ -206,8 +204,7 @@ export function SiteHeader({ locale = defaultLocale }: { locale?: Locale }) {
                 onClick={() => setMenuOpen(false)}
                 className="lp-menu-btn"
               >
-                Ir para o workspace
-              </a>
+                {"common.workspace"}</a>
             ) : session === null ? null : (
               <>
                 <a
@@ -215,15 +212,13 @@ export function SiteHeader({ locale = defaultLocale }: { locale?: Locale }) {
                   onClick={() => setMenuOpen(false)}
                   className="lp-menu-btn"
                 >
-                  Entrar
-                </a>
+                  {"common.signIn"}</a>
                 <a
                   href="/cadastro"
                   onClick={() => setMenuOpen(false)}
                   className="lp-menu-btn"
                 >
-                  Começar agora
-                </a>
+                  {"common.getStarted"}</a>
               </>
             )}
           </div>
@@ -245,7 +240,6 @@ function WorkspaceLink({ href, locale = defaultLocale }: { href: string; locale?
         borderRadius: 8,
       }}
     >
-      Ir para o workspace
-    </a></Localized>
+      {"common.workspace"}</a></Localized>
   );
 }
