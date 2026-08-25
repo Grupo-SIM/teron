@@ -280,6 +280,7 @@ services:
       - UPLOAD_URL=/files
       - GMAIL_URL=http://teron.local:8088
       - CALENDAR_URL=http://teron.local:8095
+      - TELEGRAM_URL=http://teron.local:8086
       - REKONI_URL=http://teron.local:4007
       - COLLABORATOR_URL=ws://teron.local:3079
       - STORAGE_CONFIG=${STORAGE_CONFIG}

@@ -45,7 +45,7 @@ services:
       - MAIL_URL=
       - STORAGE_CONFIG=${STORAGE_CONFIG}
       - FRONT_URL=http://localhost:8087
-      - RESERVED_DB_NAMES=gmail,github
+      - RESERVED_DB_NAMES=telegram,gmail,github
       - LAST_NAME_FIRST=true
       - ACCOUNTS_URL=http://localhost:3000
       - BRANDING_PATH=/var/cfg/branding.json
@@ -88,6 +88,7 @@ services:
       - UPLOAD_URL=/files
       - GMAIL_URL=http://localhost:8088
       - CALENDAR_URL=http://localhost:8095
+      - TELEGRAM_URL=http://localhost:8086
       - REKONI_URL=http://localhost:4004
       - COLLABORATOR_URL=ws://localhost:3078
       - STORAGE_CONFIG=${STORAGE_CONFIG}
@@ -212,6 +213,22 @@ services:
       resources:
         limits:
           memory: 300M
+#  telegram-bot:
+#    image: hardcoreeng/telegram-bot
+#    restart: unless-stopped
+#    environment:
+#      - PORT=4020
+#      - BOT_TOKEN=token
+#      - MONGO_URL=mongodb://teron.local:27017
+#      - MONGO_DB=telegram-bot
+#      - SECRET=secret
+#      - DOMAIN=domain
+#      - ACCOUNTS_URL=http://account:3000
+#      - SERVICE_ID=telegram-bot-service
+#    deploy:
+#      resources:
+#        limits:
+#          memory: 300M
 volumes:
   db:
   files:

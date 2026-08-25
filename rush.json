@@ -1081,6 +1081,26 @@
       "shouldPublish": false
     },
     {
+      "packageName": "@hcengineering/telegram",
+      "projectFolder": "plugins/telegram",
+      "shouldPublish": true
+    },
+    {
+      "packageName": "@hcengineering/telegram-assets",
+      "projectFolder": "plugins/telegram-assets",
+      "shouldPublish": false
+    },
+    {
+      "packageName": "@hcengineering/telegram-resources",
+      "projectFolder": "plugins/telegram-resources",
+      "shouldPublish": false
+    },
+    {
+      "packageName": "@hcengineering/model-telegram",
+      "projectFolder": "models/telegram",
+      "shouldPublish": false
+    },
+    {
       "packageName": "@hcengineering/devmodel-resources",
       "projectFolder": "plugins/devmodel-resources",
       "shouldPublish": false
@@ -1473,6 +1493,21 @@
     {
       "packageName": "@hcengineering/server-gmail-resources",
       "projectFolder": "server-plugins/gmail-resources",
+      "shouldPublish": false
+    },
+    {
+      "packageName": "@hcengineering/server-telegram",
+      "projectFolder": "server-plugins/telegram",
+      "shouldPublish": false
+    },
+    {
+      "packageName": "@hcengineering/model-server-telegram",
+      "projectFolder": "models/server-telegram",
+      "shouldPublish": false
+    },
+    {
+      "packageName": "@hcengineering/server-telegram-resources",
+      "projectFolder": "server-plugins/telegram-resources",
       "shouldPublish": false
     },
     {
@@ -2187,6 +2222,11 @@
       "shouldPublish": false
     },
     {
+      "packageName": "@hcengineering/pod-telegram",
+      "projectFolder": "services/telegram/pod-telegram",
+      "shouldPublish": false
+    },
+    {
       "packageName": "@hcengineering/pod-gmail",
       "projectFolder": "services/gmail/pod-gmail",
       "shouldPublish": false
@@ -2314,6 +2354,11 @@
     {
       "packageName": "@hcengineering/server-ai-bot-resources",
       "projectFolder": "server-plugins/ai-bot-resources",
+      "shouldPublish": false
+    },
+    {
+      "packageName": "@hcengineering/pod-telegram-bot",
+      "projectFolder": "services/telegram-bot/pod-telegram-bot",
       "shouldPublish": false
     },
     {

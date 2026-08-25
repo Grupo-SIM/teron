@@ -2890,7 +2890,7 @@ export async function ensurePerson (
 ): Promise<{ uuid: PersonUuid, socialId: PersonId }> {
   const { account, workspace, extra } = decodeTokenVerbose(ctx, token)
   const allowedService = verifyAllowedServices(
-    ['tool', 'workspace', 'schedule', 'mail', 'github', 'terongram'],
+    ['tool', 'workspace', 'schedule', 'mail', 'github', 'telegram'],
     extra,
     false
   )

@@ -149,6 +149,7 @@ services:
       - GMAIL_URL=http://teron.local:8088
       - CALENDAR_URL=http://teron.local:8095
       - REKONI_URL=http://rekoni:4007
+      - TELEGRAM_URL=http://teron.local:8086
       - COLLABORATOR_URL=ws://teron.local:3079
       - STORAGE_CONFIG=${STORAGE_CONFIG}
       - BRANDING_URL=http://teron.local:8083/branding-test.json

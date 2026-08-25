@@ -53,6 +53,8 @@ export interface Config {
   REKONI_URL: string
   SIGN_URL?: string
   STATS_URL?: string
+  TELEGRAM_BOT_URL?: string
+  TELEGRAM_URL: string
   VERSION: string
   STREAM_URL?: string
   BACKUP_URL?: string

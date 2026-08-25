@@ -66,6 +66,7 @@ import { serverRequestId, createModel as serverRequestModel } from '@hcengineeri
 import { serverSettingId, createModel as serveSettingModel } from '@hcengineering/model-server-setting'
 import { serverTagsId, createModel as serverTagsModel } from '@hcengineering/model-server-tags'
 import { serverTaskId, createModel as serverTaskModel } from '@hcengineering/model-server-task'
+import { serverTelegramId, createModel as serverTelegramModel } from '@hcengineering/model-server-telegram'
 import { serverTemplatesId, createModel as serverTemplatesModel } from '@hcengineering/model-server-templates'
 import { serverTrackerId, createModel as serverTrackerModel } from '@hcengineering/model-server-tracker'
 import { serverViewId, createModel as serverViewModel } from '@hcengineering/model-server-view'
@@ -73,6 +74,7 @@ import setting, { settingId, createModel as settingModel } from '@hcengineering/
 import { supportId, createModel as supportModel } from '@hcengineering/model-support'
 import { tagsId, createModel as tagsModel } from '@hcengineering/model-tags'
 import { taskId, createModel as taskModel } from '@hcengineering/model-task'
+import telegram, { telegramId, createModel as telegramModel } from '@hcengineering/model-telegram'
 import { templatesId, createModel as templatesModel } from '@hcengineering/model-templates'
 import { textEditorId, createModel as textEditorModel } from '@hcengineering/model-text-editor'
 import { timeId, createModel as timeModel } from '@hcengineering/model-time'
@@ -236,6 +238,18 @@ export default function buildModel (): Builder {
       }
     ],
     [settingModel, settingId],
+    [
+      telegramModel,
+      telegramId,
+      {
+        label: telegram.string.ConfigLabel,
+        description: telegram.string.ConfigDescription,
+        enabled: true,
+        beta: true,
+        icon: contact.icon.Telegram,
+        classFilter: defaultFilter
+      }
+    ],
     [
       leadModel,
       leadId,
@@ -537,6 +551,7 @@ export default function buildModel (): Builder {
     [serverRecruitModel, serverRecruitId],
     [serverGmailModel, serverGmailId],
     [serverTemplatesModel, serverTemplatesId],
+    [serverTelegramModel, serverTelegramId],
     [serverHrModel, serverHrId],
     [serverNotificationModel, serverNotificationId],
     [serverRequestModel, serverRequestId],

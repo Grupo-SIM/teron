@@ -621,7 +621,7 @@ export async function addSocialIdToPerson (
 
   if (extra?.admin !== 'true') {
     verifyAllowedServices(
-      ['github', 'gmail', 'tool', 'workspace', 'terongram', 'google-calendar', 'ai-assistant'],
+      ['github', 'telegram-bot', 'gmail', 'tool', 'workspace', 'telegram', 'google-calendar', 'ai-assistant'],
       extra
     )
   }
@@ -643,7 +643,7 @@ export async function updateSocialId (
   const { personId, displayValue } = params
   const { extra } = decodeTokenVerbose(ctx, token)
 
-  verifyAllowedServices(['gmail'], extra)
+  verifyAllowedServices(['telegram-bot', 'gmail'], extra)
 
   if (personId == null || personId === '') {
     throw new PlatformError(new Status(Severity.ERROR, platform.status.BadRequest, {}))
@@ -935,7 +935,7 @@ export async function findFullSocialIdBySocialKey (
   params: { socialKey: string }
 ): Promise<SocialId | null> {
   const { extra } = decodeTokenVerbose(ctx, token)
-  verifyAllowedServices(['gmail', 'tool', 'workspace', 'google-calendar'], extra)
+  verifyAllowedServices(['telegram-bot', 'gmail', 'tool', 'workspace', 'google-calendar'], extra)
 
   const { socialKey } = params
 

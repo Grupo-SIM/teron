@@ -2,6 +2,7 @@
   "ACCOUNTS_URL": "/account",
   "COLLABORATOR_URL": "ws://teron.local:3079",
   "UPLOAD_URL": "/files",
+  "TELEGRAM_URL": "http://teron.local:8088",
   "GMAIL_URL": "http://teron.local:8089",
   "CALENDAR_URL": "http://teron.local:8096",
   "REKONI_URL": "/rekoni",

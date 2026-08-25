@@ -21,6 +21,7 @@ import { settingId } from '@hcengineering/setting'
 import { supportId } from '@hcengineering/support'
 import { tagsId } from '@hcengineering/tags'
 import { taskId } from '@hcengineering/task'
+import { telegramId } from '@hcengineering/telegram'
 import { templatesId } from '@hcengineering/templates'
 import { trackerId } from '@hcengineering/tracker'
 import { viewId } from '@hcengineering/view'
@@ -52,6 +53,7 @@ import settingEn from '@hcengineering/setting-assets/lang/en.json'
 import supportEn from '@hcengineering/support-assets/lang/en.json'
 import tagsEn from '@hcengineering/tags-assets/lang/en.json'
 import taskEn from '@hcengineering/task-assets/lang/en.json'
+import telegramEn from '@hcengineering/telegram-assets/lang/en.json'
 import templatesEn from '@hcengineering/templates-assets/lang/en.json'
 import trackerEn from '@hcengineering/tracker-assets/lang/en.json'
 import viewEn from '@hcengineering/view-assets/lang/en.json'
@@ -72,6 +74,7 @@ export function registerLoaders (): void {
   addStringsLoader(recruitId, async (lang: string) => recruitEn)
   addStringsLoader(activityId, async (lang: string) => activityEn)
   addStringsLoader(settingId, async (lang: string) => settingEn)
+  addStringsLoader(telegramId, async (lang: string) => telegramEn)
   addStringsLoader(leadId, async (lang: string) => leadEn)
   addStringsLoader(gmailId, async (lang: string) => gmailEn)
   addStringsLoader(workbenchId, async (lang: string) => workbenchEn)

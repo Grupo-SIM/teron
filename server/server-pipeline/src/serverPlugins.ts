@@ -22,6 +22,7 @@ import { serverRequestId } from '@hcengineering/server-request'
 import { serverSettingId } from '@hcengineering/server-setting'
 import { serverTagsId } from '@hcengineering/server-tags'
 import { serverTaskId } from '@hcengineering/server-task'
+import { serverTelegramId } from '@hcengineering/server-telegram'
 import { serverTimeId } from '@hcengineering/server-time'
 import { serverTrackerId } from '@hcengineering/server-tracker'
 import { serverTrainingId } from '@hcengineering/server-training'
@@ -46,6 +47,7 @@ export function registerServerPlugins (): void {
   addLocation(serverCardId, () => import('@hcengineering/server-card-resources'))
   addLocation(serverCalendarId, () => import('@hcengineering/server-calendar-resources'))
   addLocation(serverGmailId, () => import('@hcengineering/server-gmail-resources'))
+  addLocation(serverTelegramId, () => import('@hcengineering/server-telegram-resources'))
   addLocation(serverRequestId, () => import('@hcengineering/server-request-resources'))
   addLocation(serverViewId, () => import('@hcengineering/server-view-resources'))
   addLocation(serverHrId, () => import('@hcengineering/server-hr-resources'))

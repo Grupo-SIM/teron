@@ -10,6 +10,7 @@ Front service is suited to deliver application bundles and resource assets, it a
 * UPLOAD_URL: Specifies the URL for uploading files.
 * GMAIL_URL: Specifies the URL of the Gmail service.
 * CALENDAR_URL: Specifies the URL of the calendar service.
+* TELEGRAM_URL: Specifies the URL of the Telegram service.
 * REKONI_URL: Specifies the URL of the Rekoni service.
 * COLLABORATOR_URL: Specifies the URL of the collaborator service.
 * MODEL_VERSION: Specifies the required model version.

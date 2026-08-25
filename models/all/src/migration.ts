@@ -53,6 +53,7 @@ import { settingOperation } from '@hcengineering/model-setting'
 import { surveyOperation } from '@hcengineering/model-survey'
 import { tagsOperation } from '@hcengineering/model-tags'
 import { taskOperation } from '@hcengineering/model-task'
+import { telegramOperation } from '@hcengineering/model-telegram'
 import { templatesOperation } from '@hcengineering/model-templates'
 import { testManagementOperation } from '@hcengineering/model-test-management'
 import { textEditorOperation } from '@hcengineering/model-text-editor'
@@ -71,6 +72,7 @@ export const migrateOperations: [string, MigrateOperation][] = [
   ['calendar', calendarOperation],
   ['gmail', gmailOperation],
   ['templates', templatesOperation],
+  ['telegram', telegramOperation],
   ['task', taskOperation],
   ['attachment', attachmentOperation],
   ['lead', leadOperation],

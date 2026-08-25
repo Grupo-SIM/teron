@@ -3,6 +3,7 @@
   "UPLOAD_URL": "/files",
   "FILES_URL": "/files/:workspace/:filename?file=:blobId&workspace=:workspace",
   "REKONI_URL": "https://rekoni.teron.app",
+  "TELEGRAM_URL": "https://telegram.teron.app",
   "GMAIL_URL": "https://gmail.teron.app/",
   "CALENDAR_URL": "https://calendar.teron.app/",
   "COLLABORATOR_URL": "wss://collaborator.teron.app",
@@ -17,5 +18,6 @@
   "SIGN_URL": "https://sign.teron.app",
   "PRINT_URL": "https://print.teron.app",
   "DESKTOP_UPDATES_CHANNEL": "teron",
+  "TELEGRAM_BOT_URL": "https://telegram-bot.teron.app",
   "STATS_URL": "https://stats.teron.app"
 }

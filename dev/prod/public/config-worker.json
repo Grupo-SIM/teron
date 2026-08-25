@@ -18,6 +18,8 @@
   "REKONI_URL": "https://rekoni.hc.engineering",
   "SIGN_URL": "https://sign.hc.engineering",
   "STATS_URL": "https://stats.hc.engineering",
+  "TELEGRAM_BOT_URL": "https://telegram-bot.hc.engineering",
+  "TELEGRAM_URL": "https://telegram.hc.engineering",
   "UPLOAD_URL": "https://dl.hc.engineering/upload/form-data/:workspace",
   "TRANSACTOR_OVERRIDE": "ws://localhost:3335"
 }

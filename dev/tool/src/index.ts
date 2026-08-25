@@ -1686,6 +1686,47 @@ export function devTool (
   //   await diffWorkspace(dbUrl, workspace, txes)
   // })
 
+  // program
+  // .command('clear-telegram-history <workspace>')
+  // .description('clear telegram history')
+  // .option('-w, --workspace <workspace>', 'target workspace')
+  // .action(async (workspace: string, cmd) => {
+  //   const { dbUrl } = prepareTools()
+  //   await withStorage(async (adapter) => {
+  //     const telegramDB = process.env.TELEGRAM_DATABASE
+  //     if (telegramDB === undefined) {
+  //       console.error('please provide TELEGRAM_DATABASE.')
+  //       process.exit(1)
+  //     }
+
+  //     console.log(`clearing ${workspace} history:`)
+  //     await clearTelegramHistory(toolCtx, dbUrl, getWorkspaceId(workspace), telegramDB, adapter)
+  //   })
+  // })
+
+  // program
+  // .command('clear-telegram-all-history')
+  // .description('clear telegram history')
+  // .action(async (cmd) => {
+  //   const { dbUrl } = prepareTools()
+  //   await withStorage(async (adapter) => {
+  //     await withAccountDatabase(async (db) => {
+  //       const telegramDB = process.env.TELEGRAM_DATABASE
+  //       if (telegramDB === undefined) {
+  //         console.error('please provide TELEGRAM_DATABASE.')
+  //         process.exit(1)
+  //       }
+
+  //       const workspaces = await listWorkspacesPure(db)
+
+  //       for (const w of workspaces) {
+  //         console.log(`clearing ${w.workspace} history:`)
+  //         await clearTelegramHistory(toolCtx, dbUrl, getWorkspaceId(w.workspace), telegramDB, adapter)
+  //       }
+  //     })
+  //   })
+  // })
+
   program
     .command('generate-token <name> <workspace>')
     .description('generate token')
