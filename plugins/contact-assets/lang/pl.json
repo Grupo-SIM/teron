@@ -152,5 +152,7 @@
     "WorkspaceStatusPickDate": "Wybierz datę",
     "HideInactive": "Ukryj nieaktywnych",
     "Timezone": "Strefa czasowa"
+  ,
+    "Enabled": "Enabled"
   }
 }

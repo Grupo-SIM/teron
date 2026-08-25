@@ -18,8 +18,8 @@
   import { createQuery } from '@hcengineering/presentation'
   import { ActivityMessage } from '@hcengineering/activity'
   import { Doc } from '@hcengineering/core'
-  import { getEmbeddedLabel } from '@hcengineering/platform'
   import { EmojiPresenter } from '@hcengineering/emoji-resources'
+  import notification from '../../plugin'
 
   export let object: Doc | undefined
   export let value: ReactionInboxNotification
@@ -37,7 +37,7 @@
 
 <div class="reaction-notification" on:click>
   <BasePreview
-    intlLabel={getEmbeddedLabel('Reacted to your message')}
+    intlLabel={notification.string.ReactedToYourMessage}
     color="secondary"
     lower
     account={socialId}

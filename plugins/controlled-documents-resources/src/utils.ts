@@ -63,7 +63,7 @@ import { type IntlString, translate } from '@hcengineering/platform'
 import { createQuery, getClient, MessageBox } from '@hcengineering/presentation'
 import request, { type Request, RequestStatus } from '@hcengineering/request'
 import { isEmptyMarkup } from '@hcengineering/text'
-import { type Location, getUserTimezone, showPopup } from '@hcengineering/ui'
+import { type Location, getDateLocale, getUserTimezone, showPopup } from '@hcengineering/ui'
 import { type KeyFilter, type ReferenceVersion } from '@hcengineering/view'
 
 import { makeRank } from '@hcengineering/rank'
@@ -1050,7 +1050,7 @@ export async function createFolder (space: DocumentSpace): Promise<void> {
 export function formatSignatureDate (date: number): string {
   const timeZone: string = getUserTimezone()
 
-  return new Date(date).toLocaleDateString('default', {
+  return new Date(date).toLocaleDateString(getDateLocale(), {
     year: 'numeric',
     month: 'short',
     day: 'numeric',

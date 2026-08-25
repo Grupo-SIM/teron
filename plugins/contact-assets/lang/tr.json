@@ -152,5 +152,7 @@
     "WorkspaceStatusEndOfDay": "Gün sonu",
     "WorkspaceStatusPickDate": "Tarih seç",
     "HideInactive": "Etkin olmayanları gizle"
+  ,
+    "Enabled": "Enabled"
   }
 }

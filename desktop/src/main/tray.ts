@@ -18,6 +18,7 @@ import { WindowAction } from '../ui/types'
 import { Settings } from './settings'
 import { getFileInPublicBundledFolder } from './path'
 import { getBadgeIconInfo } from './trayUtils'
+import { translateDesktop } from '../i18n'
 
 export class TrayController {
   private tray: Tray | undefined = undefined
@@ -105,13 +106,13 @@ function createTray (activateWindow: WindowAction, quitApplication: WindowAction
 
   const contextMenu = Menu.buildFromTemplate([
     {
-      label: 'Show',
+      label: translateDesktop('menu.show'),
       click: () => {
         activateWindow()
       }
     },
     {
-      label: 'Exit',
+      label: translateDesktop('menu.exit'),
       click: () => {
         quitApplication()
       }

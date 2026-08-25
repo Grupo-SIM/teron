@@ -57,5 +57,9 @@
     "CommonNotificationCollectionRemoved": "{senderName} eliminó {collection}",
     "NoAccessToObject": "Ya no tienes acceso a este objeto",
     "ViewIn": "Ver en {app}"
+  ,
+    "ReactedToYourMessage": "Reacted to your message",
+    "InboxNotifications": "Inbox notifications",
+    "InboxSettings": "Inbox settings"
   }
 }

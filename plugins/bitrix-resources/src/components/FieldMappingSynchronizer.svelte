@@ -22,6 +22,7 @@
     IconClose,
     Label,
     DropdownLabels,
+    DropdownLabelsIntl,
     EditBox
   } from '@hcengineering/ui'
   import { NumberEditor } from '@hcengineering/view-resources'
@@ -147,11 +148,11 @@
       autoSelect
       spaceQuery={{ _id: { $in: [contact.space.Contacts] } }}
     />
-    <DropdownLabels
-      label={getEmbeddedLabel('Direction')}
+    <DropdownLabelsIntl
+      label={bitrix.string.Direction}
       items={[
-        { id: 'ASC', label: 'Ascending' },
-        { id: 'DSC', label: 'Descending' }
+        { id: 'ASC', label: bitrix.string.Ascending },
+        { id: 'DSC', label: bitrix.string.Descending }
       ]}
       bind:selected={direction}
     />
@@ -159,7 +160,7 @@
       kind={'button'}
       value={syncPeriod}
       autoFocus={false}
-      placeholder={getEmbeddedLabel('Period')}
+      placeholder={bitrix.string.Period}
       onChange={(val) => {
         if (val) {
           syncPeriod = val
@@ -171,7 +172,7 @@
         kind={'button'}
         value={limit}
         autoFocus={false}
-        placeholder={getEmbeddedLabel('Limit')}
+        placeholder={bitrix.string.Limit}
         onChange={(val) => {
           if (val) {
             limit = val
@@ -186,7 +187,7 @@
       <div class="p-1">
         {state}
       </div>
-      <Button size={'large'} label={getEmbeddedLabel('Synchronize')} {loading} on:click={doSync} />
+      <Button size={'large'} label={bitrix.string.Synchronize} {loading} on:click={doSync} />
     </div>
   </svelte:fragment>
   <div class="flex-row flex-grow bottom-divider p-2">
@@ -214,15 +215,15 @@
 
 <div class="flex-row-center">
   <div class="flex-row-center mr-4">
-    <div class="mr-2">Sync comments</div>
+    <div class="mr-2"><Label label={bitrix.string.SyncComments} /></div>
     <CheckBox bind:checked={syncComments} />
   </div>
   <div class="flex-row-center mr-4">
-    <div class="mr-2">Sync email</div>
+    <div class="mr-2"><Label label={bitrix.string.SyncEmail} /></div>
     <CheckBox bind:checked={syncEmails} />
   </div>
   <div class="flex-row-center">
-    <div class="mr-2">Sync Attachments</div>
+    <div class="mr-2"><Label label={bitrix.string.SyncAttachments} /></div>
     <CheckBox bind:checked={syncAttachments} />
   </div>
 </div>

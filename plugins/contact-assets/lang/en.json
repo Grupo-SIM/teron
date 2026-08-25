@@ -152,5 +152,7 @@
     "WorkspaceStatusEndOfDay": "End of day",
     "WorkspaceStatusPickDate": "Choose date",
     "HideInactive": "Hide inactive"
+  ,
+    "Enabled": "Enabled"
   }
 }

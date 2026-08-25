@@ -58,5 +58,9 @@
         "SoundNotificationsDescription": "이벤트 발생 시 사운드 알림을 받습니다.",
         "NoAccessToObject": "이 객체에 더 이상 접근할 수 없습니다",
         "ViewIn": "{app}에서 보기"
+    ,
+      "ReactedToYourMessage": "Reacted to your message",
+      "InboxNotifications": "Inbox notifications",
+      "InboxSettings": "Inbox settings"
     }
 }

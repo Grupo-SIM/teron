@@ -66,7 +66,7 @@
   $: value && formatTime($ticker, value)
 
   $: tooltipValue = value
-    ? new Date(value).toLocaleString('default', {
+    ? new Date(value).toLocaleString($themeStore.language, {
       minute: '2-digit',
       hour: 'numeric',
       day: '2-digit',

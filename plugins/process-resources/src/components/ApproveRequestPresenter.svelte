@@ -16,7 +16,7 @@
 <script lang="ts">
   import { getEmbeddedLabel } from '@hcengineering/platform'
   import { ApproveRequest } from '@hcengineering/process'
-  import { getUserTimezone, tooltip } from '@hcengineering/ui'
+  import { getUserTimezone, themeStore, tooltip } from '@hcengineering/ui'
   import { BooleanPresenter } from '@hcengineering/view-resources'
 
   export let value: ApproveRequest
@@ -24,7 +24,7 @@
   export function formatSignatureDate (date: number): string {
     const timeZone: string = getUserTimezone()
 
-    return new Date(date).toLocaleDateString('default', {
+    return new Date(date).toLocaleDateString($themeStore.language, {
       year: 'numeric',
       month: 'short',
       day: 'numeric',

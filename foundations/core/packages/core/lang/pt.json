@@ -65,6 +65,9 @@
     "AddRelation": "Adicionar relação",
     "PersonId": "ID de pessoa",
     "AccountId": "Conta",
-    "Version": "Versão"
+    "Version": "Versão",
+    "Body": "Corpo",
+    "Content": "Conteúdo",
+    "ObjectId": "ID do objeto"
   }
 }

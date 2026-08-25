@@ -14,7 +14,7 @@
 <script lang="ts">
   import { Applet, Poll, PollAnswer, UserVote } from '@hcengineering/communication'
   import { AppletAttachment } from '@hcengineering/communication-types'
-  import { DAY, getEventPositionElement, Label, Menu, showPopup, ticker, TimeSince } from '@hcengineering/ui'
+  import { DAY, getEventPositionElement, Label, Menu, showPopup, themeStore, ticker, TimeSince } from '@hcengineering/ui'
   import contact, { getCurrentEmployeeSpace } from '@hcengineering/contact'
   import { employeeByAccountStore, CombineAvatars } from '@hcengineering/contact-resources'
   import { notEmpty, getCurrentAccount, isOtherDay, Timestamp, getDay } from '@hcengineering/core'
@@ -155,7 +155,7 @@
     if (!isOtherDay(date, Date.now())) {
       return {
         label: type === 'start' ? communication.string.StartsAt : communication.string.EndsAt,
-        date: new Date(date).toLocaleString('default', {
+        date: new Date(date).toLocaleString($themeStore.language, {
           minute: '2-digit',
           hour: 'numeric'
         })
@@ -165,7 +165,7 @@
     if (isTomorrow(date)) {
       return {
         label: type === 'start' ? communication.string.StartsTomorrow : communication.string.EndsTomorrow,
-        date: new Date(date).toLocaleString('default', {
+        date: new Date(date).toLocaleString($themeStore.language, {
           minute: '2-digit',
           hour: 'numeric'
         })
@@ -174,7 +174,7 @@
 
     return {
       label: type === 'start' ? communication.string.StartsAt : communication.string.EndsAt,
-      date: new Date(date).toLocaleString('default', {
+      date: new Date(date).toLocaleString($themeStore.language, {
         minute: '2-digit',
         hour: 'numeric',
         day: '2-digit',

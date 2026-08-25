@@ -4,7 +4,7 @@
     "PrintingDocumentOf": "Imprimindo documento {current} de {total}",
     "DownloadAll": "Baixar tudo",
     "PrintFailed": "Falha na impressão",
-    "PrintSettings": "Print settings",
-    "LandscapeMode": "Landscape mode"
+    "PrintSettings": "Configurações de impressão",
+    "LandscapeMode": "Modo paisagem"
   }
 }

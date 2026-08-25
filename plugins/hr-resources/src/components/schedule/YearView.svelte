@@ -17,7 +17,7 @@
   import contact from '@hcengineering/contact-resources/src/plugin'
   import { Ref } from '@hcengineering/core'
   import type { Request, RequestType, Staff } from '@hcengineering/hr'
-  import { Label, LabelAndProps, Scroller, tableHRscheduleY, tooltip } from '@hcengineering/ui'
+  import { Label, LabelAndProps, Scroller, tableHRscheduleY, themeStore, tooltip } from '@hcengineering/ui'
   import hr from '../../plugin'
   import {
     getHolidayDatesForEmployee,
@@ -52,7 +52,7 @@
   $: values = [...Array(12).keys()]
 
   function getMonthName (date: Date): string {
-    return new Intl.DateTimeFormat('default', { month: 'long' }).format(date)
+    return new Intl.DateTimeFormat($themeStore.language, { month: 'long' }).format(date)
   }
 
   // let hoveredIndex: number = -1

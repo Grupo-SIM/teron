@@ -72,6 +72,9 @@
     "AddRelation": "Přidat vztah",
     "PersonId": "Osoba",
     "AccountId": "Účet",
-    "Version": "Verze"
+    "Version": "Verze",
+    "Body": "Body",
+    "Content": "Content",
+    "ObjectId": "Object ID"
   }
 }

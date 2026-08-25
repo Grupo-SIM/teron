@@ -58,5 +58,9 @@
     "SoundNotificationsDescription": "イベントのサウンド通知を受け取ります。",
     "NoAccessToObject": "このオブジェクトへのアクセス権がありません",
     "ViewIn": "{app} で表示"
+  ,
+    "ReactedToYourMessage": "Reacted to your message",
+    "InboxNotifications": "Inbox notifications",
+    "InboxSettings": "Inbox settings"
   }
 }

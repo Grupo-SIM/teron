@@ -15,7 +15,7 @@
 -->
 <script lang="ts">
   import { Ref, SortingOrder, Status } from '@hcengineering/core'
-  import { Asset, getEmbeddedLabel, getResource } from '@hcengineering/platform'
+  import { Asset, getResource } from '@hcengineering/platform'
   import { AttributeEditor, MessageBox, createQuery, getClient } from '@hcengineering/presentation'
   import { ClassAttributes, settingsStore } from '@hcengineering/setting-resources'
   import task, { ProjectType, TaskType, calculateStatuses, findStatusAttr } from '@hcengineering/task'
@@ -235,11 +235,11 @@
 
             <div class="flex-row-center mt-4 ml-4 mr-4 gap-4">
               <div class="flex-no-shrink trans-title uppercase">
-                <Label label={getEmbeddedLabel('Parent type restrictions')} />
+                <Label label={task.string.ParentTypeRestrictions} />
               </div>
               {#if taskType.kind === 'subtask' || taskType.kind === 'both'}
                 <TaskTypeRefEditor
-                  label={getEmbeddedLabel('Allowed parents')}
+                  label={task.string.AllowedParents}
                   value={taskType.allowedAsChildOf}
                   types={taskTypes.filter((it) => it.kind === 'task' || it.kind === 'both')}
                   onChange={(evt) => {

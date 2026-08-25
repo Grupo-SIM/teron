@@ -94,5 +94,8 @@
     "WriteMessageEllipsis": "Napisz wiadomość...",
     "EditMessageEllipsis": "Edytuj wiadomość...",
     "ArrowDownMessages": "↓ Najnowsze wiadomości"
+  ,
+    "Attachments": "Attachments",
+    "Title": "Title"
   }
 }

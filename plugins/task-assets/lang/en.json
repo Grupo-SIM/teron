@@ -97,5 +97,9 @@
     "UpdateTasksStatusRequest": "Status is used with {total} tasks, it will require update of all of them. Please approve.",
     "TaskTypes": "Task types",
     "Collections": "Collections"
+  ,
+    "AllowedParents": "Allowed parents",
+    "ParentTypeRestrictions": "Parent type restrictions",
+    "StatusCategory": "Status category"
   }
 }

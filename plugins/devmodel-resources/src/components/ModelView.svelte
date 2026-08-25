@@ -16,8 +16,7 @@
 <script lang="ts">
   import core, { Doc, TxCUD } from '@hcengineering/core'
   import { createQuery } from '@hcengineering/presentation'
-  import { ScrollBox, tooltip } from '@hcengineering/ui'
-  import { toIntl } from '..'
+  import { Label, ScrollBox, tooltip } from '@hcengineering/ui'
   import ContentPopup from './ContentPopup.svelte'
 
   type TxCUDIndex = TxCUD<Doc> & { index: number }
@@ -36,10 +35,10 @@
     <table class="table">
       <thead>
         <tr>
-          <th>ID</th>
-          <th>Class</th>
-          <th>ObjectID</th>
-          <th>Body</th>
+          <th><Label label={core.string.Id} /></th>
+          <th><Label label={core.string.Class} /></th>
+          <th><Label label={core.string.ObjectId} /></th>
+          <th><Label label={core.string.Body} /></th>
         </tr>
       </thead>
       <tbody>
@@ -50,8 +49,8 @@
             <td>{tx.objectId}</td>
             <td>{tx.objectClass}</td>
             <td>
-              <span use:tooltip={{ label: toIntl('Content'), component: ContentPopup, props: { content: tx } }}>
-                Content
+              <span use:tooltip={{ label: core.string.Content, component: ContentPopup, props: { content: tx } }}>
+                <Label label={core.string.Content} />
               </span>
             </td>
           </tr>

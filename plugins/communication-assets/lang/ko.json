@@ -94,5 +94,8 @@
         "WriteMessageEllipsis": "메시지 입력...",
         "EditMessageEllipsis": "메시지 편집...",
         "ArrowDownMessages": "↓ 최신 메시지"
+    ,
+      "Attachments": "Attachments",
+      "Title": "Title"
     }
 }

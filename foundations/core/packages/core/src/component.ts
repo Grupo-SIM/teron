@@ -231,7 +231,10 @@ export default plugin(coreId, {
     Model: '' as Ref<Version>
   },
   string: {
+    Body: '' as IntlString,
+    Content: '' as IntlString,
     Id: '' as IntlString,
+    ObjectId: '' as IntlString,
     Space: '' as IntlString,
     Spaces: '' as IntlString,
     SpacesDescription: '' as IntlString,

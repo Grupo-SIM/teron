@@ -33,6 +33,11 @@ export default mergeIds(recruitId, recruit, {
     VacancyRequired: '' as StatusCode
   },
   string: {
+    Analyse: '' as IntlString,
+    ExportExpertSkills: '' as IntlString,
+    ExportPlan: '' as IntlString,
+    Optimize: '' as IntlString,
+    SkillsOptimizer: '' as IntlString,
     CreateVacancy: '' as IntlString,
     VacancyName: '' as IntlString,
     VacancyPlaceholder: '' as IntlString,

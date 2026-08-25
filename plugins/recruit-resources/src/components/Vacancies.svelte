@@ -167,7 +167,7 @@
         label={recruit.string.Export}
         on:click={() => {
           // Download it
-          const filename = 'vacancies' + new Date().toLocaleDateString() + '.csv'
+          const filename = 'vacancies' + new Date().toISOString().slice(0, 10) + '.csv'
           const link = document.createElement('a')
           link.style.display = 'none'
           link.setAttribute('target', '_blank')

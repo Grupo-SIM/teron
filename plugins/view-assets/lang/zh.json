@@ -82,6 +82,7 @@
     "FilteredViews": "筛选视图",
     "NewFilteredView": "新筛选视图",
     "FilteredViewName": "筛选视图名称",
+    "LegacyMyTasks": "我的任务",
     "Then": "然后",
     "ShowPreviewOnClick": "请点击显示文档索引预览...",
     "Shown": "显示 {len} 结果 {total, plural, =-1 {} other {共筛选 # 个项目}}",

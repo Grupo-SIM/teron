@@ -97,5 +97,9 @@
     "UpdateTasksStatusRequest": "Stav je použit u {total} úkolů, bude třeba je aktualizovat. Prosím schvalte.",
     "TaskTypes": "Typy úkolů",
     "Collections": "Kolekce"
+  ,
+    "AllowedParents": "Allowed parents",
+    "ParentTypeRestrictions": "Parent type restrictions",
+    "StatusCategory": "Status category"
   }
 }

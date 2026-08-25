@@ -184,6 +184,8 @@
     "AskSubclass": "Спросить подкласс",
     "AskRequired": "Запросить все обязательные поля",
     "TextFromIdentifier": "Текст из идентификатора"
+  ,
+    "NoSlotsDefined": "No slots defined for this process"
   },
   "error": {
     "MethodNotFound": "Метод не найден: {methodId}",

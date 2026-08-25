@@ -22,6 +22,7 @@ import { type GetAllValuesFunc, type SortFunc } from '@hcengineering/view'
 
 export default mergeIds(taskId, task, {
   string: {
+    AllowedParents: '' as IntlString,
     Description: '' as IntlString,
     DescriptionPlaceholder: '' as IntlString,
     ShortDescription: '' as IntlString,
@@ -89,7 +90,9 @@ export default mergeIds(taskId, task, {
     RenameStatus: '' as IntlString,
     UpdateTasksStatusRequest: '' as IntlString,
     TaskTypes: '' as IntlString,
-    Collections: '' as IntlString
+    Collections: '' as IntlString,
+    ParentTypeRestrictions: '' as IntlString,
+    StatusCategory: '' as IntlString
   },
   status: {
     AssigneeRequired: '' as IntlString

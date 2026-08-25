@@ -78,6 +78,7 @@
     "FilteredViews": "フィルターされたビュー",
     "NewFilteredView": "新しいフィルターされたビュー",
     "FilteredViewName": "フィルターされたビュー名",
+    "LegacyMyTasks": "自分のタスク",
     "Then": "次に",
     "ShowPreviewOnClick": "クリックしてドキュメントインデックスプレビューを表示してください...",
     "Shown": " {total, plural, =-1 {} other {フィルターされた # 件のアイテムのうち}} {len} 件の結果を表示中",

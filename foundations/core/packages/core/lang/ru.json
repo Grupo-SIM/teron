@@ -72,6 +72,9 @@
     "AddRelation": "Добавить связь",
     "PersonId": "Персона",
     "AccountId": "Аккаунт",
-    "Version": "Версия"
+    "Version": "Версия",
+    "Body": "Body",
+    "Content": "Content",
+    "ObjectId": "Object ID"
   }
 }

@@ -14,7 +14,7 @@
 -->
 <script lang="ts">
   import { Milestone } from '@hcengineering/tracker'
-  import { getMonthName, Icon } from '@hcengineering/ui'
+  import { getMonthName, Icon, themeStore } from '@hcengineering/ui'
   import tracker from '../../plugin'
   export let value: Milestone | undefined
 </script>
@@ -27,7 +27,7 @@
     </div>
     <span class="flex flex-grow justify-end">
       {new Date(value.targetDate).getDate()}
-      {getMonthName(new Date(value.targetDate), 'short')}
+      {getMonthName(new Date(value.targetDate), 'short', $themeStore.language)}
     </span>
   </span>
 {/if}

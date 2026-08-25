@@ -8,7 +8,6 @@
     TagField
   } from '@hcengineering/bitrix'
   import { AnyAttribute } from '@hcengineering/core'
-  import { getEmbeddedLabel } from '@hcengineering/platform'
   import { getClient } from '@hcengineering/presentation'
   import tags from '@hcengineering/tags'
   import { WeightPopup } from '@hcengineering/tags-resources'
@@ -62,7 +61,7 @@
   $: items = getItems(fields)
 
   const tagLevel = [tags.icon.Level1, tags.icon.Level2, tags.icon.Level3]
-  const labels = [getEmbeddedLabel('Initial'), getEmbeddedLabel('Meaningfull'), getEmbeddedLabel('Expert')]
+  const labels = [bitrix.string.Initial, bitrix.string.Meaningful, bitrix.string.Expert]
 </script>
 
 <div class="flex-col flex-wrap">
@@ -90,7 +89,7 @@
         kind={'editbox'}
         bind:value={p.split}
         maxWidth={'5rem'}
-        placeholder={getEmbeddedLabel('Separator...')}
+        placeholder={bitrix.string.Separator}
         fullSize
       />
 

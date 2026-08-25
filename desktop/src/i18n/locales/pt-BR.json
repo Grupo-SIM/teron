@@ -1,0 +1,13 @@
+{
+  "find.close": "Fechar",
+  "find.matchOf": "Resultado {current} de {total}",
+  "find.noMatches": "Nenhum resultado",
+  "menu.exit": "Sair",
+  "menu.file": "Arquivo",
+  "menu.find": "Localizar…",
+  "menu.logout": "Sair da conta",
+  "menu.search": "Pesquisar",
+  "menu.selectWorkspace": "Selecionar espaço de trabalho",
+  "menu.settings": "Configurações",
+  "menu.show": "Mostrar"
+}

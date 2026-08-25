@@ -1,10 +1,11 @@
 <script lang="ts">
   import core, { RateLimiter, concatLink, metricsAggregate, platformNow, type Metrics } from '@hcengineering/core'
   import login from '@hcengineering/login'
-  import { getEmbeddedLabel, getMetadata } from '@hcengineering/platform'
+  import { getMetadata, translate } from '@hcengineering/platform'
   import presentation, { getClient, isAdminUser, uiContext } from '@hcengineering/presentation'
-  import { Button, EditBox, IconArrowLeft, IconArrowRight, fetchMetadataLocalStorage, ticker } from '@hcengineering/ui'
+  import { Button, EditBox, IconArrowLeft, IconArrowRight, Label, fetchMetadataLocalStorage, ticker } from '@hcengineering/ui'
   import MetricsInfo from './statistics/MetricsInfo.svelte'
+  import workbench from '../plugin'
 
   const _endpoint: string = fetchMetadataLocalStorage(login.metadata.LoginEndpoint) ?? ''
   const token: string = getMetadata(presentation.metadata.Token) ?? ''
@@ -140,7 +141,10 @@
 
   $: update($ticker)
 
-  let maintenanceMessage = 'A new version is planned to be installed in'
+  let maintenanceMessage = ''
+  void translate(workbench.string.MaintenanceMessage, {}).then((value) => {
+    maintenanceMessage = value
+  })
 </script>
 
 {#if isAdminUser()}
@@ -153,7 +157,7 @@
         </div>
         <Button
           icon={IconArrowRight}
-          label={getEmbeddedLabel('Set maintenance warning')}
+          label={workbench.string.SetMaintenanceWarning}
           on:click={() => {
             const endpoint = getMetadata(login.metadata.AccountsUrl) ?? ''
             if (endpoint !== '') {
@@ -173,12 +177,13 @@
       </div>
       <div class="flex-col p-1">
         <div class="flex-row-center p-1">
-          <EditBox kind={'underline'} format={'number'} bind:value={warningTimeout} /> min
+          <EditBox kind={'underline'} format={'number'} bind:value={warningTimeout} />
+          <Label label={workbench.string.MinutesShort} />
         </div>
       </div>
       <Button
         icon={IconArrowLeft}
-        label={getEmbeddedLabel('Clear warning')}
+        label={workbench.string.ClearWarning}
         on:click={() => {
           const endpoint = getMetadata(login.metadata.AccountsUrl) ?? ''
           if (endpoint !== '') {
@@ -191,24 +196,30 @@
     </div>
     <div class="flex-col p-1">
       <div class="flex-row-center p-1">
-        Command benchmark {Math.round((avgTime / opss) * 100) / 100}
-        {Math.round(maxTime * 100) / 100} - {active}
+        <Label
+          label={workbench.string.CommandBenchmark}
+          params={{ average: Math.round((avgTime / opss) * 100) / 100, maximum: Math.round(maxTime * 100) / 100, active }}
+        />
       </div>
       <div class="flex-row-center p-1">
         <div class="flex-row-center p-1">
-          <EditBox kind={'underline'} format={'number'} bind:value={commandsToSend} /> total
+          <EditBox kind={'underline'} format={'number'} bind:value={commandsToSend} />
+          <Label label={workbench.string.Total} />
         </div>
         <div class="flex-row-center p-1">
-          <EditBox kind={'underline'} format={'number'} bind:value={commandsToSendParallel} /> parallel
+          <EditBox kind={'underline'} format={'number'} bind:value={commandsToSendParallel} />
+          <Label label={workbench.string.Parallel} />
         </div>
         <div class="flex-row-center p-1">
-          <EditBox kind={'underline'} format={'number'} bind:value={dataSize} /> dsize
+          <EditBox kind={'underline'} format={'number'} bind:value={dataSize} />
+          <Label label={workbench.string.DataSize} />
         </div>
         <div class="flex-row-center p-1">
-          <EditBox kind={'underline'} format={'number'} bind:value={responseSize} /> rsize
+          <EditBox kind={'underline'} format={'number'} bind:value={responseSize} />
+          <Label label={workbench.string.ResponseSize} />
         </div>
         <Button
-          label={getEmbeddedLabel('Benchmark')}
+          label={workbench.string.Benchmark}
           on:click={() => {
             running = !running
             void doBenchmark()
@@ -221,7 +232,7 @@
       <div class="p-3">2.</div>
       <Button
         icon={IconArrowRight}
-        label={getEmbeddedLabel('Reboot workspace')}
+        label={workbench.string.RebootWorkspace}
         on:click={() => {
           void fetch(endpoint + `/api/v1/manage?token=${token}&operation=force-close`, {
             method: 'PUT'
@@ -233,7 +244,7 @@
       <div class="p-3">3.</div>
       {#if !profiling}
         <Button
-          label={getEmbeddedLabel('Profile server')}
+          label={workbench.string.ProfileServer}
           on:click={() => {
             void fetch(endpoint + `/api/v1/manage?token=${token}&operation=profile-start`, {
               method: 'PUT'
@@ -242,7 +253,7 @@
           }}
         />
       {:else}
-        <Button label={getEmbeddedLabel('Profile Stop')} on:click={downloadProfile} />
+        <Button label={workbench.string.StopProfiling} on:click={downloadProfile} />
       {/if}
     </div>
   </div>

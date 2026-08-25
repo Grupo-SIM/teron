@@ -97,5 +97,9 @@
     "UpdateTasksStatusRequest": "Status wird bei {total} Aufgaben verwendet, dies erfordert eine Aktualisierung aller Aufgaben. Bitte bestätigen.",
     "TaskTypes": "Aufgabentypen",
     "Collections": "Sammlungen"
+  ,
+    "AllowedParents": "Allowed parents",
+    "ParentTypeRestrictions": "Parent type restrictions",
+    "StatusCategory": "Status category"
   }
 }

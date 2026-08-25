@@ -17,7 +17,7 @@ import { loginRoute } from '@hcengineering/login'
 import { loveId } from '@hcengineering/love'
 import { timeId } from '@hcengineering/time'
 
-import { getEmbeddedLabel, getMetadata, getResource, translate } from '@hcengineering/platform'
+import { getMetadata, getResource, translate } from '@hcengineering/platform'
 import presentation, { MessageBox, setDownloadProgress, getClient } from '@hcengineering/presentation'
 import setting, { settingId } from '@hcengineering/setting'
 import {
@@ -285,7 +285,7 @@ window.addEventListener('DOMContentLoaded', () => {
 
   ipcMain.on('backup', (evt: any, ...args: any) => {
     pushRootBarProgressComponent('backup',
-      getEmbeddedLabel('Backup'),
+      setting.string.Backup,
       () => { return args[0] },
       () => {
         ipcMain.cancelBackup()

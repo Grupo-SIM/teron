@@ -152,5 +152,7 @@
     "WorkspaceStatusEndOfDay": "Do konce dne",
     "WorkspaceStatusPickDate": "Vyberte datum",
     "HideInactive": "Skrýt neaktivní"
+  ,
+    "Enabled": "Enabled"
   }
 }

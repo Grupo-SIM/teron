@@ -97,5 +97,9 @@
     "AtualizarPedidoDeStatusDaTarefa": "O status está sendo usado em {total} tarefas e precisará ser atualizado em todas elas. Por favor, confirme.",
     "TaskTypes": "Tipos de Tarefas",
     "Collections": "Coleções"
+  ,
+    "AllowedParents": "Pais permitidos",
+    "ParentTypeRestrictions": "Restrições de tipo pai",
+    "StatusCategory": "Categoria do status"
   }
 }

@@ -12,7 +12,7 @@
   import { getClient, InlineAttributeBarEditor } from '@hcengineering/presentation'
   import recruit from '@hcengineering/recruit'
   import task from '@hcengineering/task'
-  import { Button, DropdownLabels, DropdownLabelsIntl, DropdownTextItem, IconAdd } from '@hcengineering/ui'
+  import { Button, DropdownLabels, DropdownLabelsIntl, DropdownTextItem, IconAdd, Label } from '@hcengineering/ui'
   import { ObjectBox } from '@hcengineering/view-resources'
   import bitrix from '../../plugin'
 
@@ -78,30 +78,33 @@
 
   const states: Status[] = []
 
-  $: stateTitles = [{ id: '', label: 'None' }, ...states.map((it) => ({ id: it.name, label: it.name }))]
+  $: stateTitles = [
+    { id: '', label: bitrix.string.None },
+    ...states.map((it) => ({ id: it.name, label: getEmbeddedLabel(it.name) }))
+  ]
 </script>
 
 <div class="flex-col flex-wrap">
   <div class="flex-row-center gap-2">
     <div class="flex-col w-120">
       <div class="flex-row-center p-1">
-        <span class="w-22"> Vacancy: </span>
+        <span class="w-22"><Label label={bitrix.string.Vacancy} />:</span>
         <DropdownLabels
           width={'10rem'}
-          label={getEmbeddedLabel('Vacancy field')}
+          label={bitrix.string.VacancyField}
           {items}
           bind:selected={vacancyField}
         />
       </div>
       <div class="flex-row-center p-1">
-        <span class="w-22"> State: </span>
-        <DropdownLabels width={'10rem'} label={getEmbeddedLabel('State field')} {items} bind:selected={stateField} />
+        <span class="w-22"><Label label={bitrix.string.State} />:</span>
+        <DropdownLabels width={'10rem'} label={bitrix.string.StateField} {items} bind:selected={stateField} />
       </div>
       <div class="flex-row-center p-1">
-        <span class="w-22"> Template: </span>
+        <span class="w-22"><Label label={bitrix.string.Template} />:</span>
         <ObjectBox
           width={'10rem'}
-          label={getEmbeddedLabel('Template')}
+          label={bitrix.string.Template}
           searchField={'title'}
           _class={task.class.ProjectType}
           docQuery={{ category: recruit.category.VacancyTypeCategories }}
@@ -110,7 +113,7 @@
       </div>
 
       <div class="mt-2 mb-1 flex-row-center p-1">
-        <span class="mr-2"> Copy following fields: </span>
+        <span class="mr-2"><Label label={bitrix.string.CopyFollowingFields} />:</span>
         <Button
           icon={IconAdd}
           size={'small'}
@@ -127,13 +130,13 @@
           <div class="flex-row-center pattern">
             <DropdownLabelsIntl
               width={'10rem'}
-              label={getEmbeddedLabel('Copy field')}
+              label={bitrix.string.CopyField}
               items={attrs}
               bind:selected={f.candidate}
             /> =>
             <DropdownLabelsIntl
               width={'10rem'}
-              label={getEmbeddedLabel('Copy field')}
+              label={bitrix.string.CopyField}
               items={applicantAttrs}
               bind:selected={f.applicant}
             />
@@ -141,7 +144,7 @@
         {/each}
       </div>
       <div class="mt-2 mb-1 flex-row-center p-1">
-        <span class="mr-2"> State mapping: </span>
+        <span class="mr-2"><Label label={bitrix.string.StateMapping} />:</span>
         <Button
           icon={IconAdd}
           size={'small'}
@@ -153,17 +156,17 @@
       <div class="flex-co">
         {#each stateMapping as m}
           <div class="flex-row-center pattern flex-between flex-wrap">
-            <DropdownLabels
+            <DropdownLabelsIntl
               width={'10rem'}
-              label={getEmbeddedLabel('Source state')}
+              label={bitrix.string.SourceState}
               items={sourceStates}
               kind={m.sourceName !== '' ? 'primary' : 'regular'}
               bind:selected={m.sourceName}
             /> =>
-            <DropdownLabels
+            <DropdownLabelsIntl
               width={'10rem'}
               kind={m.targetName !== '' ? 'primary' : 'regular'}
-              label={getEmbeddedLabel('Final state')}
+              label={bitrix.string.FinalState}
               items={stateTitles}
               bind:selected={m.targetName}
             />
@@ -171,7 +174,7 @@
               {@const attribute = allAttrs.find((it) => it.name === c.attr)}
               <DropdownLabelsIntl
                 width={'10rem'}
-                label={getEmbeddedLabel('Field to fill')}
+                label={bitrix.string.FieldToFill}
                 items={attrs}
                 bind:selected={c.attr}
               />

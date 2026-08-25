@@ -97,7 +97,7 @@
     if (areDatesEqual(day, tomorrow)) return time.string.Tomorrow
     const isCurrentYear = day.getFullYear() === new Date().getFullYear()
     return getEmbeddedLabel(
-      day.toLocaleDateString('default', {
+      day.toLocaleDateString($deviceInfo.language, {
         month: 'long',
         day: 'numeric',
         year: isCurrentYear ? undefined : 'numeric'
@@ -199,7 +199,9 @@
       <ButtonBase
         icon={IconSun}
         label={showLabel ? time.string.TodayColon : undefined}
-        title={showLabel ? getFormattedDate(todayDate.getTime(), { weekday: 'short', day: 'numeric' }) : undefined}
+        title={showLabel
+          ? getFormattedDate(todayDate.getTime(), { weekday: 'short', day: 'numeric' }, $deviceInfo.language)
+          : undefined}
         type={showLabel ? 'type-button' : 'type-button-icon'}
         kind={'secondary'}
         size={'small'}

@@ -109,5 +109,9 @@
     "Identifier": "Identificador",
     "RenameStatus": "Renomear o status",
     "UpdateTasksStatusRequest": "O status é usado em {total} tarefas; todas elas precisarão ser atualizadas. Confirme para continuar."
+  ,
+    "AllowedParents": "Pais permitidos",
+    "ParentTypeRestrictions": "Restrições de tipo pai",
+    "StatusCategory": "Categoria do status"
   }
 }

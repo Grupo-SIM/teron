@@ -72,6 +72,9 @@
     "Descriptor": "Descritor",
     "TargetClass": "Classe de destino",
     "Role": "Função",
-    "Roles": "Funções"
+    "Roles": "Funções",
+    "Body": "Corpo",
+    "Content": "Conteúdo",
+    "ObjectId": "ID do objeto"
   }
 }

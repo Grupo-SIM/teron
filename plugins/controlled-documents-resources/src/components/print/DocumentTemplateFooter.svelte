@@ -13,7 +13,7 @@
 // limitations under the License.
 -->
 <script lang="ts">
-  import { Label } from '@hcengineering/ui'
+  import { Label, themeStore } from '@hcengineering/ui'
   import plugin from '../../plugin'
 
   export let templateReference: string
@@ -34,7 +34,7 @@
   `
 
   // Note: cannot use standard puppeteer "date" class as format cannot be easily adjusted for it
-  const dtf = new Intl.DateTimeFormat('default', {
+  $: dtf = new Intl.DateTimeFormat($themeStore.language, {
     day: 'numeric',
     month: 'short',
     year: 'numeric',

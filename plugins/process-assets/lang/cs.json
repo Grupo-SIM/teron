@@ -179,6 +179,8 @@
     "RequiredSlots": "Požadované sloty",
     "Bindings": "Vazby",
     "AskRequired": "zeptat se na prázdná povinná pole"
+  ,
+    "NoSlotsDefined": "No slots defined for this process"
   },
   "error": {
     "MethodNotFound": "Metoda nenalezena: {methodId}",

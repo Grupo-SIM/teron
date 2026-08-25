@@ -208,6 +208,7 @@ const view = plugin(viewId, {
     FilteredViews: '' as IntlString,
     NewFilteredView: '' as IntlString,
     FilteredViewName: '' as IntlString,
+    LegacyMyTasks: '' as IntlString,
     Move: '' as IntlString,
     MoveClass: '' as IntlString,
     SelectToMove: '' as IntlString,

@@ -14,7 +14,6 @@
 -->
 <script lang="ts">
   import { Class, Doc, platformNow, platformNowDiff, Ref, toIdMap } from '@hcengineering/core'
-  import { getEmbeddedLabel } from '@hcengineering/platform'
   import { Card, getClient } from '@hcengineering/presentation'
   import tags, { TagCategory, TagElement, TagReference } from '@hcengineering/tags'
   import { Button, CheckBox, EditBox, Expandable, Lazy, ListView, Loading } from '@hcengineering/ui'
@@ -564,7 +563,7 @@
   }
 
   function exportCSV (name: string, data: string): void {
-    const filename = name + new Date().toLocaleDateString() + '.csv'
+    const filename = name + new Date().toISOString().slice(0, 10) + '.csv'
     const link = document.createElement('a')
     link.style.display = 'none'
     link.setAttribute('target', '_blank')
@@ -616,9 +615,9 @@
 </script>
 
 <Card
-  label={getEmbeddedLabel('Skills optimizer')}
+  label={recruit.string.SkillsOptimizer}
   okAction={applyPlan}
-  okLabel={getEmbeddedLabel('Apply')}
+  okLabel={recruit.string.Apply}
   canSave={true}
   on:close={() => {
     dispatch('close')
@@ -704,19 +703,19 @@
   </Expandable>
   <svelte:fragment slot="footer">
     <Button
-      label={getEmbeddedLabel('Analyse')}
+      label={recruit.string.Analyse}
       on:click={() => {
         doAnalyse()
       }}
     />
     <Button
-      label={getEmbeddedLabel('Export expert skills')}
+      label={recruit.string.ExportExpertSkills}
       on:click={() => {
         exportCSV('experts', exportExpertSkills())
       }}
     />
     <Button
-      label={getEmbeddedLabel('Export plan')}
+      label={recruit.string.ExportPlan}
       on:click={() => {
         exportCSV('plan', exportPlan())
       }}

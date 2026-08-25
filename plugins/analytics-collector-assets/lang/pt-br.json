@@ -15,8 +15,8 @@
     "WorkspaceName": "Nome do espaço de trabalho",
     "WorkspaceUrl": "URL do espaço de trabalho",
     "Account": "Conta",
-    "UserName": "User name",
-    "DisableAIReplies": "Disable AI replies",
-    "ShowAIReplies": "Show AI replies"
+    "UserName": "Nome do usuário",
+    "DisableAIReplies": "Desativar respostas da IA",
+    "ShowAIReplies": "Mostrar respostas da IA"
   }
 }

@@ -137,7 +137,7 @@
       <div class="antiTitle icon-wrapper ml-2">
         <div class="wrapped-icon"><Icon icon={contact.icon.Email} size={'small'} /></div>
         <div class="title-wrapper">
-          <span class="wrapped-title">Email</span>
+          <span class="wrapped-title"><Label label={gmail.string.Email} /></span>
           <span class="wrapped-subtitle">
             {getName(client.getHierarchy(), object)}
           </span>

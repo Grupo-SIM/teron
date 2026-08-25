@@ -359,7 +359,7 @@
 
   function formatEndDate (endDate: number): string {
     const date = new Date(endDate)
-    return date.toLocaleDateString(undefined, { year: 'numeric', month: 'long', day: 'numeric' })
+    return date.toLocaleDateString($themeStore.language, { year: 'numeric', month: 'long', day: 'numeric' })
   }
 
   function getTypeAndPlan (tierId: Ref<Tier>): { type: SubscriptionType, plan: string } {

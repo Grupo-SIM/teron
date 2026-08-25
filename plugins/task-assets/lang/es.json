@@ -96,5 +96,9 @@
     "UpdateTasksStatusRequest": "El estado se usa con {total} tareas, se requerirá la actualización de todas ellas. Por favor, apruebe.",
     "TaskTypes": "Tipos de Tareas",
     "Collections": "Colecciones"
+  ,
+    "AllowedParents": "Allowed parents",
+    "ParentTypeRestrictions": "Parent type restrictions",
+    "StatusCategory": "Status category"
   }
 }

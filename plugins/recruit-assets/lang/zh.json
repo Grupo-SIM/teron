@@ -125,6 +125,12 @@
     "SwapFirstAndLastNames": "交换名字和姓氏",
     "ForbidCreateVacancyPermission": "禁止创建职位",
     "ForbidCreateVacancyPermissionDescription": "禁止用户创建新职位"
+  ,
+    "Analyse": "Analyze",
+    "ExportExpertSkills": "Export expert skills",
+    "ExportPlan": "Export plan",
+    "Optimize": "Optimize",
+    "SkillsOptimizer": "Skills optimizer"
   },
   "status": {
     "ApplicationExists": "申请已存在",

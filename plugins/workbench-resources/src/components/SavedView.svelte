@@ -281,7 +281,8 @@
     {#each myFilteredViews as fv}
       <TreeItem
         _id={fv._id}
-        title={fv.name}
+        title={fv.name === 'My Tasks' ? undefined : fv.name}
+        label={fv.name === 'My Tasks' ? view.string.LegacyMyTasks : undefined}
         selected={selectedId === fv._id}
         on:click={async () => {
           await load(fv)
@@ -293,7 +294,13 @@
     <svelte:fragment slot="visible">
       {#if visibleFilter}
         {@const item = visibleFilter}
-        <TreeItem _id={item._id} title={item.name} selected actions={async (ov) => await viewAction(item, ov)} />
+        <TreeItem
+          _id={item._id}
+          title={item.name === 'My Tasks' ? undefined : item.name}
+          label={item.name === 'My Tasks' ? view.string.LegacyMyTasks : undefined}
+          selected
+          actions={async (ov) => await viewAction(item, ov)}
+        />
       {/if}
     </svelte:fragment>
   </TreeNode>

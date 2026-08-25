@@ -120,6 +120,12 @@
     "HideApplicantsFromArchivedVacancies": "Arşivlenmiş İlanlardan gizle",
     "CreateNewSkills": "Mevcut bulunamazsa yeni yetenekler oluştur",
     "SwapFirstAndLastNames": "Ad ve soyadı değiştir"
+  ,
+    "Analyse": "Analyze",
+    "ExportExpertSkills": "Export expert skills",
+    "ExportPlan": "Export plan",
+    "Optimize": "Optimize",
+    "SkillsOptimizer": "Skills optimizer"
   },
   "status": {
     "ApplicationExists": "Başvuru zaten mevcut",

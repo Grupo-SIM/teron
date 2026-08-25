@@ -16,6 +16,7 @@
 <script lang="ts">
   import { createEventDispatcher, onDestroy } from 'svelte'
   import { Timestamp } from '@hcengineering/core'
+  import { themeStore } from '@hcengineering/theme'
 
   import { Label } from '..'
   import ui from '../plugin'
@@ -66,7 +67,7 @@
       options.hour = 'numeric'
     }
 
-    return new Date(time).toLocaleString('default', options)
+    return new Date(time).toLocaleString($themeStore.language, options)
   }
 </script>
 

@@ -22,15 +22,23 @@
   import { createEventDispatcher } from 'svelte'
   import { ListView } from '@hcengineering/ui'
   import { getClient } from '@hcengineering/presentation'
+  import { translateCB } from '@hcengineering/platform'
+  import { themeStore } from '@hcengineering/theme'
 
   import { InboxNotificationsClientImpl } from '../../inboxNotificationsClient'
   import DocNotifyContextCard from '../DocNotifyContextCard.svelte'
   import { archiveContextNotifications, notificationsComparator, unarchiveContextNotifications } from '../../utils'
   import { InboxData } from '../../types'
+  import notificationResources from '../../plugin'
 
   export let data: InboxData
   export let selectedContext: Ref<DocNotifyContext> | undefined
   export let archived = false
+
+  let inboxNotificationsLabel = ''
+  $: translateCB(notificationResources.string.InboxNotifications, {}, $themeStore.language, (value) => {
+    inboxNotificationsLabel = value
+  })
 
   const client = getClient()
   const dispatch = createEventDispatcher()
@@ -164,7 +172,7 @@
   bind:this={element}
   tabindex="0"
   role="listbox"
-  aria-label="Inbox notifications"
+  aria-label={inboxNotificationsLabel}
   on:keydown={onKeydown}
 >
   <ListView

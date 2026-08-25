@@ -26,7 +26,8 @@
     MILLISECONDS_IN_WEEK,
     IconArrowLeft,
     IconArrowRight,
-    IconAdd
+    IconAdd,
+    themeStore
   } from '..'
   import { createEventDispatcher, onMount } from 'svelte'
 
@@ -57,7 +58,7 @@
   let scroller: Scroller
   let scrollDir: 'horizontal' | 'vertical' | 'none' = 'none'
 
-  const locale = new Intl.NumberFormat().resolvedOptions().locale
+  $: locale = $themeStore.language
   const nillPoint: TimelinePoint = { label: '', date: currentDate, x: 0 }
   const nillRect: DOMRect = { x: 0, y: 0, width: 0, height: 0, left: 0, right: 0, top: 0, bottom: 0, toJSON: () => {} }
   const time: TimelineState = {

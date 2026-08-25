@@ -152,5 +152,7 @@
     "WorkspaceStatusEndOfDay": "До конца дня",
     "WorkspaceStatusPickDate": "Выбрать дату",
     "HideInactive": "Скрыть неактивных"
+  ,
+    "Enabled": "Enabled"
   }
 }

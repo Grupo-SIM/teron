@@ -36,7 +36,7 @@ export function getHour (time: Timestamp): Timestamp {
   return date.getTime()
 }
 
-export function getDisplayTime (time: number): string {
+export function getDisplayTime (time: number, locale?: string): string {
   let options: Intl.DateTimeFormatOptions = { hour: 'numeric', minute: 'numeric' }
   if (!isToday(time)) {
     options = {
@@ -46,7 +46,7 @@ export function getDisplayTime (time: number): string {
     }
   }
 
-  return new Date(time).toLocaleString('default', options)
+  return new Date(time).toLocaleString(locale, options)
 }
 
 export function isOtherDay (time1: Timestamp, time2: Timestamp): boolean {

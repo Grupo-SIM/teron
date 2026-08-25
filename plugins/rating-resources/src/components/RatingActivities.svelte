@@ -47,10 +47,10 @@
   }
 
   import ratingPlugin from '@hcengineering/rating'
-  import { tooltip } from '@hcengineering/ui'
+  import { themeStore, tooltip } from '@hcengineering/ui'
 
   // Formatter for localized month names (short form, e.g. 'Jan', 'Feb' or localized equivalent)
-  const monthFormatter = new Intl.DateTimeFormat(undefined, { month: 'short' })
+  $: monthFormatter = new Intl.DateTimeFormat($themeStore.language, { month: 'short' })
 </script>
 
 {#if rating}

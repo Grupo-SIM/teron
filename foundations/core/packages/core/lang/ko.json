@@ -72,6 +72,9 @@
         "AddRelation": "관계 추가",
         "PersonId": "인물",
         "AccountId": "계정",
-        "Version": "버전"
+        "Version": "버전",
+      "Body": "Body",
+      "Content": "Content",
+      "ObjectId": "Object ID"
     }
 }

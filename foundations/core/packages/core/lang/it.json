@@ -72,6 +72,9 @@
     "AddRelation": "Aggiungi relazione",
     "PersonId": "ID persona",
     "AccountId": "ID account",
-    "Version": "Versione"
+    "Version": "Versione",
+    "Body": "Body",
+    "Content": "Content",
+    "ObjectId": "Object ID"
   }
 }

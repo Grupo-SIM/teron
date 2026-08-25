@@ -18,6 +18,7 @@
   import { formatName, Person } from '@hcengineering/contact'
   import { Message } from '@hcengineering/communication-types'
   import { Card } from '@hcengineering/card'
+  import { themeStore } from '@hcengineering/ui'
 
   import MessageContentViewer from './MessageContentViewer.svelte'
   import MessageFooter from './MessageFooter.svelte'
@@ -29,7 +30,7 @@
   export let hideHeader: boolean = false
 
   function formatDate (date: Date): string {
-    return date.toLocaleTimeString('default', {
+    return date.toLocaleTimeString($themeStore.language, {
       hour: 'numeric',
       minute: 'numeric'
     })

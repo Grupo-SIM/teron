@@ -13,7 +13,7 @@
 // limitations under the License.
 -->
 <script lang="ts">
-  import { getUserTimezone } from '@hcengineering/ui'
+  import { getUserTimezone, themeStore } from '@hcengineering/ui'
 
   export let date: number
   export let timeZone: string = getUserTimezone()
@@ -32,4 +32,4 @@
   }
 </script>
 
-{new Date(date).toLocaleDateString('default', options)}
+{new Date(date).toLocaleDateString($themeStore.language, options)}

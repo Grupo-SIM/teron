@@ -67,7 +67,7 @@
         classes: getDateStyle(tempDate)
       })
     }
-    monthYear = capitalizeFirstLetter(getMonthName(viewDate)) + ' ' + viewDate.getFullYear()
+    monthYear = capitalizeFirstLetter(getMonthName(viewDate, 'long', $deviceInfo.language)) + ' ' + viewDate.getFullYear()
     return result
   }
   $: days = renderCellStyles(viewDate, $deviceInfo.firstDayOfWeek)
@@ -114,7 +114,7 @@
     <div class="caption">
       {#each [...Array(7).keys()] as dayOfWeek}
         <span class="weekdays ui-regular-12">
-          {capitalizeFirstLetter(getWeekDayName(day(firstDayOfCurrentMonth, dayOfWeek), 'short'))}
+          {capitalizeFirstLetter(getWeekDayName(day(firstDayOfCurrentMonth, dayOfWeek), 'short', $deviceInfo.language))}
         </span>
       {/each}
     </div>

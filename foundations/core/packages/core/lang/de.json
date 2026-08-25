@@ -72,6 +72,9 @@
     "AddRelation": "Beziehung hinzufügen",
     "PersonId": "Person",
     "AccountId": "Konto",
-    "Version": "Version"
+    "Version": "Version",
+    "Body": "Body",
+    "Content": "Content",
+    "ObjectId": "Object ID"
   }
 }

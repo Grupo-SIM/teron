@@ -76,7 +76,7 @@
     }
   }
 
-  const ampm = new Intl.DateTimeFormat([], { hour: 'numeric' }).resolvedOptions().hour12
+  $: ampm = new Intl.DateTimeFormat($deviceInfo.language, { hour: 'numeric' }).resolvedOptions().hour12
   const getTimeFormat = (hour: number, min: number = 0): string => {
     if (min === 0) {
       return ampm
@@ -498,7 +498,7 @@
   }
 
   const getTimeZone = (): string => {
-    return new Intl.DateTimeFormat([], { timeZoneName: 'short' }).format(Date.now()).split(' ')[1]
+    return new Intl.DateTimeFormat($deviceInfo.language, { timeZoneName: 'short' }).format(Date.now()).split(' ')[1]
   }
 
   const getTopOffset = (date: Date): number => {
@@ -868,10 +868,10 @@
           {#if tday}
             <div class="flex-col">
               <span class="today"><Label label={calendar.string.Today} /></span>
-              <span class="weekday">{getWeekDayName(day, weekFormat)}</span>
+              <span class="weekday">{getWeekDayName(day, weekFormat, $deviceInfo.language)}</span>
             </div>
           {:else}
-            <span class="weekday">{getWeekDayName(day, weekFormat)}</span>
+            <span class="weekday">{getWeekDayName(day, weekFormat, $deviceInfo.language)}</span>
           {/if}
           {#if tEvents !== 0}
             <div class="header-time">

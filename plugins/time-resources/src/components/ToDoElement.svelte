@@ -16,7 +16,7 @@
   import { SortingOrder, WithLookup } from '@hcengineering/core'
   import { createQuery, getClient } from '@hcengineering/presentation'
   import tags from '@hcengineering/tags'
-  import { Component, IconMoreV2, Spinner, showPanel, Icon } from '@hcengineering/ui'
+  import { Component, IconMoreV2, Spinner, showPanel, Icon, themeStore } from '@hcengineering/ui'
   import { showMenu } from '@hcengineering/view-resources'
   import time, { ToDo, ToDoPriority, WorkSlot } from '@hcengineering/time'
   import plugin from '../plugin'
@@ -108,7 +108,7 @@
     {/if}
     {#if todo.dueDate}
       <span class="font-regular-12 secondary-textColor">
-        {new Date(todo.dueDate).toLocaleDateString('default', { month: 'short', day: 'numeric' })}
+        {new Date(todo.dueDate).toLocaleDateString($themeStore.language, { month: 'short', day: 'numeric' })}
       </span>
     {/if}
   </div>

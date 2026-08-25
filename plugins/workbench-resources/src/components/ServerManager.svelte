@@ -5,25 +5,25 @@
 
   import ServerManagerGeneral from './ServerManagerGeneral.svelte'
 
-  import { getEmbeddedLabel } from '@hcengineering/platform'
   import presentation from '@hcengineering/presentation'
   import { Breadcrumb, ButtonIcon, Header, IconClose, IconSettings, Switcher, TabItem } from '@hcengineering/ui'
   import { createEventDispatcher } from 'svelte'
+  import workbench from '../plugin'
 
   const dispatch = createEventDispatcher()
 
   const tabs: TabItem[] = [
     {
       id: 'general',
-      labelIntl: getEmbeddedLabel('General')
+      labelIntl: workbench.string.General
     },
     {
       id: 'statistics',
-      labelIntl: getEmbeddedLabel('Servers')
+      labelIntl: workbench.string.Servers
     },
     {
       id: 'users',
-      labelIntl: getEmbeddedLabel('Users')
+      labelIntl: workbench.string.Users
     }
   ]
   let selectedTab: string | number = tabs[0].id
@@ -41,7 +41,7 @@
       />
     </svelte:fragment>
 
-    <Breadcrumb icon={IconSettings} title={'Server manager'} size={'large'} isCurrent />
+    <Breadcrumb icon={IconSettings} label={workbench.string.ServerManager} size={'large'} isCurrent />
 
     <svelte:fragment slot="actions">
       <Switcher

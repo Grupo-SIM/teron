@@ -250,7 +250,7 @@
   }}
 >
   <svelte:fragment slot="title">
-    <div class="title not-active">Email</div>
+    <div class="title not-active"><Label label={plugin.string.Email} /></div>
   </svelte:fragment>
 
   <svelte:fragment slot="utils">

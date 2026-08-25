@@ -16,7 +16,7 @@
   import { AccountRole, getCurrentAccount, hasAccountRole } from '@hcengineering/core'
   import { getMetadata } from '@hcengineering/platform'
   import presentation, { copyTextToClipboard, getFileUrl } from '@hcengineering/presentation'
-  import { Breadcrumb, Button, Expandable, Header, Label, Loading, Scroller } from '@hcengineering/ui'
+  import { Breadcrumb, Button, Expandable, Header, Label, Loading, Scroller, themeStore } from '@hcengineering/ui'
   import view from '@hcengineering/view'
   import { onMount } from 'svelte'
   import setting from '../plugin'
@@ -52,7 +52,7 @@
   $: fileSizes = new Map(backupInfo?.files?.map((it) => [it.name, it.size ?? 0]))
 
   function formatDate (timestamp: number): string {
-    return new Date(timestamp).toLocaleString()
+    return new Date(timestamp).toLocaleString($themeStore.language)
   }
 
   function getSize (size: number): string {

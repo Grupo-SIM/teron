@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { getUserTimezone } from '@hcengineering/ui'
+  import { getUserTimezone, themeStore } from '@hcengineering/ui'
   import value from '*.svelte'
 
   export let width: number
@@ -29,7 +29,7 @@
     <g transform={`translate(${index * lineStep} 0)`}>
       <line y1={0} y2={6} stroke="#bdc3c7" />
       <text y={10} dy="1.0em" text-anchor="middle" fill="var(--theme-halfcontent-color)">
-        {new Date(Math.round(minValue + valueStep * index)).toLocaleDateString('default', {
+        {new Date(Math.round(minValue + valueStep * index)).toLocaleDateString($themeStore.language, {
           timeZone: getUserTimezone(),
           day: 'numeric',
           month: 'numeric'

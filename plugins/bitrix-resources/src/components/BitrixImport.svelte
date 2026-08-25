@@ -1,6 +1,5 @@
 <script lang="ts">
   import { BitrixClient, BitrixEntityMapping } from '@hcengineering/bitrix'
-  import { getEmbeddedLabel } from '@hcengineering/platform'
   import { Card, createQuery } from '@hcengineering/presentation'
   import setting, { Integration } from '@hcengineering/setting'
   import { Label } from '@hcengineering/ui'
@@ -43,13 +42,13 @@
 </script>
 
 <Card
-  label={getEmbeddedLabel('Bitrix Synchronization...')}
+  label={bitrix.string.BitrixSynchronization}
   canSave={!loading}
   fullSize={false}
   okAction={() => {
     dispatch('close')
   }}
-  okLabel={getEmbeddedLabel('Close')}
+  okLabel={bitrix.string.Close}
   on:close
   on:changeContent
 >
@@ -58,6 +57,6 @@
       <FieldMappingSynchronizer {mapping} {bitrixClient} bind:loading />
     {/each}
   {:else}
-    <Label label={getEmbeddedLabel('No integration configured')} />
+    <Label label={bitrix.string.NoIntegrationConfigured} />
   {/if}
 </Card>

@@ -152,5 +152,7 @@
     "WorkspaceStatusEndOfDay": "今天结束",
     "WorkspaceStatusPickDate": "选择日期",
     "HideInactive": "隐藏非活跃"
+  ,
+    "Enabled": "Enabled"
   }
 }

@@ -19,6 +19,9 @@ import { type AnyComponent } from '@hcengineering/ui'
 import { type ViewQueryAction, type Viewlet } from '@hcengineering/view'
 
 export default mergeIds(processId, process, {
+  string: {
+    NoSlotsDefined: '' as IntlString
+  },
   viewlet: {
     ExecutionsList: '' as Ref<Viewlet>,
     ExecutionLogList: '' as Ref<Viewlet>,

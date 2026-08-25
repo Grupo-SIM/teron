@@ -13,7 +13,7 @@
 // limitations under the License.
 -->
 <script lang="ts">
-  import { Icon, IconDPCalendar, Label, areDatesEqual, getMonthName } from '@hcengineering/ui'
+  import { Icon, IconDPCalendar, Label, areDatesEqual, getMonthName, themeStore } from '@hcengineering/ui'
   import view from '../../plugin'
   export let value: Date
 
@@ -28,7 +28,7 @@
       <Icon icon={IconDPCalendar} size="full" />
     </div>
     {value.getDate()}
-    {getMonthName(value, 'short')}
+    {getMonthName(value, 'short', $themeStore.language)}
     {#if value.getFullYear() !== today.getFullYear()}
       {value.getFullYear()}
     {/if}

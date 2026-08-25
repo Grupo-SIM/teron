@@ -72,6 +72,9 @@
     "AddRelation": "İlişki ekle",
     "PersonId": "Kişi",
     "AccountId": "Hesap",
-    "Version": "Sürüm"
+    "Version": "Sürüm",
+    "Body": "Body",
+    "Content": "Content",
+    "ObjectId": "Object ID"
   }
 }

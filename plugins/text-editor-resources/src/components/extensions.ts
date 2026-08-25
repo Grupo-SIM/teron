@@ -13,7 +13,7 @@
 // limitations under the License.
 //
 
-import textEditor from '@hcengineering/text-editor'
+import textEditor from '../plugin'
 import { IconScribble } from '@hcengineering/ui'
 import view from '@hcengineering/view'
 import { type Editor, type Range } from '@tiptap/core'
@@ -25,61 +25,71 @@ import { SvelteRenderer } from './node-view'
 
 export const mInsertTable = [
   {
-    label: '2x2',
+    id: '2x2',
+    label: textEditor.string.Table2x2,
     rows: 2,
     cols: 2,
     header: false
   },
   {
-    label: '3x3',
+    id: '3x3',
+    label: textEditor.string.Table3x3,
     rows: 3,
     cols: 3,
     header: false
   },
   {
-    label: '2x1',
+    id: '2x1',
+    label: textEditor.string.Table2x1,
     rows: 2,
     cols: 1,
     header: false
   },
   {
-    label: '5x5',
+    id: '5x5',
+    label: textEditor.string.Table5x5,
     rows: 5,
     cols: 5,
     header: false
   },
   {
-    label: '1x2',
+    id: '1x2',
+    label: textEditor.string.Table1x2,
     rows: 1,
     cols: 2,
     header: false
   },
   {
-    label: 'Headed 2x2',
+    id: 'headed-2x2',
+    label: textEditor.string.HeadedTable2x2,
     rows: 2,
     cols: 2,
     header: true
   },
   {
-    label: 'Headed 3x3',
+    id: 'headed-3x3',
+    label: textEditor.string.HeadedTable3x3,
     rows: 3,
     cols: 3,
     header: true
   },
   {
-    label: 'Headed 2x1',
+    id: 'headed-2x1',
+    label: textEditor.string.HeadedTable2x1,
     rows: 2,
     cols: 1,
     header: true
   },
   {
-    label: 'Headed 5x5',
+    id: 'headed-5x5',
+    label: textEditor.string.HeadedTable5x5,
     rows: 5,
     cols: 5,
     header: true
   },
   {
-    label: 'Headed 1x2',
+    id: 'headed-1x2',
+    label: textEditor.string.HeadedTable1x2,
     rows: 1,
     cols: 2,
     header: true

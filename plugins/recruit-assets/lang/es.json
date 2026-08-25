@@ -122,6 +122,12 @@
     "SwapFirstAndLastNames": "Intercambie nombres y apellidos",
     "ForbidCreateVacancyPermission": "Prohibir crear vacante",
     "ForbidCreateVacancyPermissionDescription": "Prohíbe a los usuarios crear nuevas vacantes"
+  ,
+    "Analyse": "Analyze",
+    "ExportExpertSkills": "Export expert skills",
+    "ExportPlan": "Export plan",
+    "Optimize": "Optimize",
+    "SkillsOptimizer": "Skills optimizer"
   },
   "status": {
     "ApplicationExists": "La solicitud ya existe",

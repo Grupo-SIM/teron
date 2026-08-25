@@ -97,5 +97,9 @@
     "UpdateTasksStatusRequest": "Status jest używany w {total, plural, =1 {1 zadaniu} other {# zadaniach}}, wymagana będzie aktualizacja wszystkich z nich. Czy zatwierdzasz zmianę?",
     "TaskTypes": "Typy zadań",
     "Collections": "Kolekcje"
+  ,
+    "AllowedParents": "Allowed parents",
+    "ParentTypeRestrictions": "Parent type restrictions",
+    "StatusCategory": "Status category"
   }
 }

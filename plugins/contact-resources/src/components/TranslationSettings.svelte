@@ -15,7 +15,6 @@
   import core, { Data } from '@hcengineering/core'
   import { getClient } from '@hcengineering/presentation'
   import { Breadcrumb, Header, Label, Toggle } from '@hcengineering/ui'
-  import { getEmbeddedLabel } from '@hcengineering/platform'
   import view from '@hcengineering/view'
   import { getCurrentEmployee, Translation } from '@hcengineering/contact'
 
@@ -58,7 +57,7 @@
   <div class="flex-row-stretch flex-grow p-10">
     <div class="flex-grow flex-col flex-gap-4">
       <div class="flex-row-center flex-gap-4">
-        <Label label={getEmbeddedLabel('Enabled')} />
+        <Label label={contact.string.Enabled} />
         <Toggle on={enabled} on:change={changeEnable} />
       </div>
       <div class="flex-row-center flex-gap-4">

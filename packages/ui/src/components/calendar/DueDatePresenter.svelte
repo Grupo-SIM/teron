@@ -20,6 +20,7 @@
   import DatePresenter from './DatePresenter.svelte'
   import { getDaysDifference, getDueDateIconModifier, getFormattedDate } from './internal/DateUtils'
   import { ButtonKind, ButtonSize } from '../../types'
+  import { themeStore } from '@hcengineering/theme'
 
   export let value: number | null = null
   export let shouldRender: boolean = true
@@ -35,8 +36,8 @@
   $: dueDate = value === null ? null : new Date(value)
   $: daysDifference = dueDate === null ? null : getDaysDifference(today, dueDate)
   $: iconModifier = getDueDateIconModifier(isOverdue, daysDifference, shouldIgnoreOverdue)
-  let formattedDate = getFormattedDate(value)
-  $: formattedDate = getFormattedDate(value)
+  let formattedDate = getFormattedDate(value, undefined, $themeStore.language)
+  $: formattedDate = getFormattedDate(value, undefined, $themeStore.language)
 
   const handleDueDateChanged = async (event: CustomEvent<Timestamp>) => {
     const newDate = event.detail

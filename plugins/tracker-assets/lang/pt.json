@@ -1,6 +1,6 @@
 {
   "string": {
-    "TrackerApplication": "Tracker",
+    "TrackerApplication": "Tarefas",
     "Projects": "Os teus projetos",
     "More": "Mais",
     "Default": "Padrão",
@@ -146,7 +146,7 @@
     "GotoBacklog": "Ir para o backlog",
     "GotoComponents": "Ir para os componentes",
     "GotoMyIssues": "Ir para as minhas tarefas",
-    "GotoTrackerApplication": "Alternar para o Tracker",
+    "GotoTrackerApplication": "Mudar para Tarefas",
     "CreatedOne": "Criada",
     "MoveIssues": "Mover tarefas",
     "MoveIssuesDescription": "Selecione o projeto para o qual pretende mover as tarefas",
@@ -252,7 +252,7 @@
     "CreatedIssue": "Tarefa criada",
     "CreatedSubIssue": "Subtarefa criada",
     "ChangeStatus": "Alterar estado",
-    "ConfigLabel": "Tracker",
+    "ConfigLabel": "Tarefas",
     "ConfigDescription": "Extensão para gerir itens de trabalho e tarefas.",
     "NoStatusFound": "Nenhum estado correspondente encontrado",
     "CreateMissingStatus": "Criar estado em falta",

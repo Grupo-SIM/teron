@@ -386,7 +386,7 @@
   </div>
   <div class="teronModal-content__settingsSet">
     <div class="teronModal-content__settingsSet-line">
-      <span class="label"><Label label={getEmbeddedLabel('Status Category')} /></span>
+      <span class="label"><Label label={task.string.StatusCategory} /></span>
       <ButtonMenu
         items={categories}
         selected={category}

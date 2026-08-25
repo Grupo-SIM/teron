@@ -35,7 +35,8 @@
     getWeekStart,
     showPopup,
     AnySvelteComponent,
-    deviceOptionsStore as deviceInfo
+    deviceOptionsStore as deviceInfo,
+    themeStore
   } from '@hcengineering/ui'
 
   import { CalendarMode, DayCalendar, calendarByIdStore, hidePrivateEvents } from '../index'
@@ -203,7 +204,7 @@
     currentDate = currentDate
   }
   function getMonthName (date: Date): string {
-    return new Intl.DateTimeFormat('default', {
+    return new Intl.DateTimeFormat($themeStore.language, {
       month: 'long'
     }).format(date)
   }

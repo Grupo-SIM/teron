@@ -179,6 +179,8 @@
     "RequiredSlots": "Gerekli slotlar",
     "Bindings": "Bağlamalar",
     "AskRequired": "Gerekli alanları sor"
+  ,
+    "NoSlotsDefined": "No slots defined for this process"
   },
   "error": {
     "MethodNotFound": "Metod bulunamadı: {methodId}",

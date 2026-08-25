@@ -43,7 +43,8 @@
       <div class="day-name">
         {getWeekDayName(
           day(firstDayOfCurrentMonth, dayOfWeek),
-          shortName && weekFormat === 'long' ? 'short' : weekFormat
+          shortName && weekFormat === 'long' ? 'short' : weekFormat,
+          $deviceInfo.language
         )}
       </div>
     {/each}

@@ -1,0 +1,13 @@
+{
+  "find.close": "Close",
+  "find.matchOf": "Match {current} of {total}",
+  "find.noMatches": "No matches",
+  "menu.exit": "Exit",
+  "menu.file": "File",
+  "menu.find": "Find…",
+  "menu.logout": "Log out",
+  "menu.search": "Search",
+  "menu.selectWorkspace": "Select workspace",
+  "menu.settings": "Settings",
+  "menu.show": "Show"
+}

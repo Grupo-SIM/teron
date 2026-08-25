@@ -47,7 +47,7 @@
   const today: Date = new Date(Date.now())
 
   afterUpdate(() => {
-    monthYear = capitalizeFirstLetter(getMonthName(viewDate)) + ' ' + viewDate.getFullYear()
+    monthYear = capitalizeFirstLetter(getMonthName(viewDate, 'long', $deviceInfo.language)) + ' ' + viewDate.getFullYear()
     firstDayOfCurrentMonth = firstDay(viewDate, $deviceInfo.firstDayOfWeek)
   })
 
@@ -141,7 +141,7 @@
     <div class="calendar" class:noPadding>
       {#each [...Array(7).keys()] as dayOfWeek}
         <span class="caption">
-          {capitalizeFirstLetter(getWeekDayName(day(firstDayOfCurrentMonth, dayOfWeek), 'short'))}
+          {capitalizeFirstLetter(getWeekDayName(day(firstDayOfCurrentMonth, dayOfWeek), 'short', $deviceInfo.language))}
         </span>
       {/each}
 

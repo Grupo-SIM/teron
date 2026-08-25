@@ -14,9 +14,8 @@
 <script lang="ts">
   import { Message } from '@hcengineering/communication-types'
   import { Icon, Label, tooltip } from '@hcengineering/ui'
-  import communication from '@hcengineering/communication'
+  import communication from '../plugin'
   import { isAppletAttachment, isBlobAttachment } from '@hcengineering/communication-shared'
-  import { getEmbeddedLabel } from '@hcengineering/platform'
 
   import AttachmentsTooltip from './AttachmentsTooltip.svelte'
   import AttachmentName from './AttachmentName.svelte'
@@ -34,7 +33,7 @@
     </span>
   {:else}
     <span class="attachments-text font-normal overflow-label">
-      <Label label={getEmbeddedLabel('Attachments')} />:
+      <Label label={communication.string.Attachments} />:
       <span class="ml-1 overflow-label" use:tooltip={{ component: AttachmentsTooltip, props: { attachments } }}>
         {#each attachments as att, i}
           <AttachmentName attachment={att} lower={i > 0} />

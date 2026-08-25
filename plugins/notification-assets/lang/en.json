@@ -58,5 +58,9 @@
     "SoundNotificationsDescription": "Receive sound notifications for events.",
     "NoAccessToObject": "You no longer have access to this object",
     "ViewIn": "View in {app}"
+  ,
+    "ReactedToYourMessage": "Reacted to your message",
+    "InboxNotifications": "Inbox notifications",
+    "InboxSettings": "Inbox settings"
   }
 }

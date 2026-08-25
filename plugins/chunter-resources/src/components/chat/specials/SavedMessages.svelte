@@ -19,7 +19,7 @@
   import { getPersonByPersonId } from '@hcengineering/contact-resources'
   import { getDisplayTime, Ref, WithLookup } from '@hcengineering/core'
   import { getClient } from '@hcengineering/presentation'
-  import { Label, Scroller, Lazy } from '@hcengineering/ui'
+  import { Label, Scroller, Lazy, themeStore } from '@hcengineering/ui'
   import activity, { ActivityMessage, SavedMessage } from '@hcengineering/activity'
   import { ActivityMessagePresenter, savedMessagesStore } from '@hcengineering/activity-resources'
 
@@ -99,7 +99,7 @@
                   label={chunter.string.SharedBy}
                   params={{
                     name,
-                    time: getDisplayTime(attach.modifiedOn)
+                    time: getDisplayTime(attach.modifiedOn, $themeStore.language)
                   }}
                 />
               {/await}

@@ -21,7 +21,8 @@
     SearchInput,
     getCurrentResolvedLocation,
     navigate,
-    showPopup
+    showPopup,
+    themeStore
   } from '@hcengineering/ui'
   import { onMount } from 'svelte'
 
@@ -202,7 +203,12 @@
               <div class="member-row">
                 <div class="flex-grow">
                   <div>{invite.email}</div>
-                  <div class="text-sm text-secondary"><Label label={setting.string.InviteExpires} params={{ date: new Date(invite.expiresOn).toLocaleDateString() }} /></div>
+                  <div class="text-sm text-secondary">
+                    <Label
+                      label={setting.string.InviteExpires}
+                      params={{ date: new Date(invite.expiresOn).toLocaleDateString($themeStore.language) }}
+                    />
+                  </div>
                 </div>
                 <Label label={items.find((item) => item.id === invite.role)?.label ?? setting.string.User} />
                 <Button label={setting.string.ResendInvite} kind="secondary" on:click={() => void resendInvite(invite.email, invite.role)} />

@@ -97,5 +97,9 @@
     "UpdateTasksStatusRequest": "Durum {total} görevle kullanılıyor, hepsinin güncellenmesini gerektirecek. Lütfen onaylayın.",
     "TaskTypes": "Görev tipleri",
     "Collections": "Koleksiyonlar"
+  ,
+    "AllowedParents": "Allowed parents",
+    "ParentTypeRestrictions": "Parent type restrictions",
+    "StatusCategory": "Status category"
   }
 }

@@ -152,5 +152,7 @@
     "WorkspaceStatusEndOfDay": "今日の終わりまで",
     "WorkspaceStatusPickDate": "日付を選択",
     "HideInactive": "非アクティブを非表示"
+  ,
+    "Enabled": "Enabled"
   }
 }

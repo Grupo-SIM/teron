@@ -292,7 +292,7 @@
     return Array.from(groups)
   }
   const getDateStr = (date: Date): string => {
-    return date.toLocaleDateString('default', { month: 'long', day: 'numeric', year: 'numeric' })
+    return date.toLocaleDateString($deviceInfo.language, { month: 'long', day: 'numeric', year: 'numeric' })
   }
   $: filteredGroups = groups.filter(
     (gr) =>

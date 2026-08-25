@@ -94,5 +94,8 @@
     "WriteMessageEllipsis": "Написать сообщение...",
     "EditMessageEllipsis": "Редактировать сообщение...",
     "ArrowDownMessages": "↓ Последние сообщения"
+  ,
+    "Attachments": "Attachments",
+    "Title": "Title"
   }
 }

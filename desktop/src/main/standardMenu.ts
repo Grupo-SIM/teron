@@ -16,6 +16,7 @@
 import { BrowserWindow, Menu, MenuItemConstructorOptions } from 'electron'
 import { Command, CommandOpenSettings, CommandSelectWorkspace, CommandLogout } from '../ui/types'
 import { openFindInPageBar } from './findInPage'
+import { translateDesktop } from '../i18n'
 
 const isMac = process.platform === 'darwin'
 const isLinux = process.platform === 'linux'
@@ -23,29 +24,29 @@ const isLinux = process.platform === 'linux'
 export const addMenus = (sendCommand: (cmd: Command, ...args: any[]) => void): void => {
   const template: MenuItemConstructorOptions[] = [
     {
-      label: 'File',
+      label: translateDesktop('menu.file'),
       submenu: [
         {
-          label: 'Settings',
+          label: translateDesktop('menu.settings'),
           accelerator: isLinux ? 'Ctrl+,' : 'Meta+,',
           click: () => { sendCommand(CommandOpenSettings) }
         },
         {
-          label: 'Select workspace',
+          label: translateDesktop('menu.selectWorkspace'),
           click: () => { sendCommand(CommandSelectWorkspace) }
         },
         {
-          label: 'Logout',
+          label: translateDesktop('menu.logout'),
           click: () => { sendCommand(CommandLogout) }
         },
         { role: isMac ? 'close' : 'quit' }
       ]
     },
     {
-      label: 'Search',
+      label: translateDesktop('menu.search'),
       submenu: [
         {
-          label: 'Find…',
+          label: translateDesktop('menu.find'),
           click: (_item, browserWindow) => {
             openFindInPageBar(browserWindow as BrowserWindow | undefined)
           }

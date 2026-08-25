@@ -19,6 +19,7 @@ import { type Editor, type Attribute } from '@tiptap/core'
 import { type ActionContext } from '@hcengineering/text-editor'
 import { hideTextEditorToolbar } from './components/extension/toolbar/toolbar'
 import { mInsertTable } from './components/extensions'
+import { translate } from '@hcengineering/platform'
 import LinkPopup from './components/LinkPopup.svelte'
 
 export function getDataAttribute (
@@ -51,12 +52,12 @@ export async function addTableHandler (
   showPopup(
     SelectPopup,
     {
-      value: mInsertTable.map((it) => ({ id: it.label, text: it.label }))
+      value: await Promise.all(mInsertTable.map(async (it) => ({ id: it.id, text: await translate(it.label, {}) })))
     },
     alignment ?? 'center',
     (val) => {
       if (val !== undefined) {
-        const tab = mInsertTable.find((it) => it.label === val)
+        const tab = mInsertTable.find((it) => it.id === val)
         if (tab !== undefined) {
           insertTable({
             cols: tab.cols,

@@ -14,15 +14,13 @@
 -->
 <script lang="ts">
   import { createEventDispatcher } from 'svelte'
-  import textEditor from '@hcengineering/text-editor'
-  import { getEmbeddedLabel } from '@hcengineering/platform'
+  import textEditor from '../plugin'
   import { Card } from '@hcengineering/presentation'
   import { EditBox } from '@hcengineering/ui'
 
   export let link = ''
 
   const dispatch = createEventDispatcher()
-  const linkPlaceholder = getEmbeddedLabel('http://my.link.net')
 
   function save (): void {
     dispatch('update', link)
@@ -41,5 +39,5 @@
   }}
   on:changeContent
 >
-  <EditBox placeholder={linkPlaceholder} bind:value={link} autoFocus />
+  <EditBox placeholder={textEditor.string.LinkPlaceholder} bind:value={link} autoFocus />
 </Card>
