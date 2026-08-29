@@ -242,6 +242,10 @@ jobs:
             context: services/rekoni
           - image: stats
             context: pods/stats
+          - image: telegram
+            context: services/telegram/pod-telegram
+          - image: telegram-bot
+            context: services/telegram-bot/pod-telegram-bot
           - image: transactor
             context: pods/server
           - image: workspace
