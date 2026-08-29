@@ -71,6 +71,29 @@ export class PlatformWorker {
     return (await this.storage.findOne({ phone, workspace })) ?? undefined
   }
 
+  async getSession (account: string, phone: string): Promise<UserRecord | undefined> {
+    return (await this.storage.findOne({ account, phone })) ?? undefined
+  }
+
+  async saveSession ({ account, phone, token }: { account: string, phone: string, token?: string }): Promise<void> {
+    if (token === undefined || token === '') {
+      throw new Error('Unable to save Telegram session')
+    }
+
+    await this.storage.updateOne(
+      { account, phone },
+      {
+        $set: { account, phone, token },
+        $setOnInsert: { workspace: '', userId: account, email: account }
+      },
+      { upsert: true }
+    )
+  }
+
+  async removeSession (account: string, phone: string): Promise<void> {
+    await this.storage.deleteOne({ account, phone })
+  }
+
   static async createStorages (): Promise<
   [Collection<UserRecord>, Collection<LastMsgRecord>, Collection<WorkspaceChannel>]
   > {
@@ -79,6 +102,7 @@ export class PlatformWorker {
     const lastMsgStorage = db.collection<LastMsgRecord>('last-msgs')
     const channelStorage = db.collection<WorkspaceChannel>('channels')
 
+    await userStorage.createIndex({ account: 1, phone: 1 }, { unique: true })
     await userStorage.createIndex({ phone: 1, workspace: 1 }, { unique: true })
     await userStorage.createIndex({ email: 1, workspace: 1 }, { unique: true })
 
@@ -93,7 +117,9 @@ export class PlatformWorker {
 
   static async create (ctx: MeasureContext, storageAdapter: StorageAdapter): Promise<PlatformWorker> {
     const [userStorage, lastMsgStorage, channelStorage] = await PlatformWorker.createStorages()
-    const workspaces = new Set((await userStorage.find().toArray()).map((p) => p.workspace))
+    const workspaces = new Set(
+      (await userStorage.find().toArray()).map((p) => p.workspace).filter((workspace) => workspace.length > 0)
+    )
     const clients: Array<[string, WorkspaceWorker]> = []
     for (const workspace of workspaces) {
       try {

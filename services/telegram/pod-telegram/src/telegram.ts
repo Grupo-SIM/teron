@@ -102,6 +102,13 @@ class SignInFlow {
 
 type Listener = (user: Api.User, msg: Api.Message) => void
 
+export interface TelegramDialog {
+  id: string
+  name: string
+  type: 'channel' | 'group' | 'user'
+  mode: 'none'
+}
+
 class TelegramConnection {
   private _signInFlow: SignInFlow | undefined
   private readonly listeners = new Map<number, Listener>()
@@ -247,6 +254,31 @@ class TelegramConnection {
     }
 
     return res
+  }
+
+  async getDialogs (): Promise<TelegramDialog[]> {
+    const dialogs = this.client.iterDialogs({})
+    const result: TelegramDialog[] = []
+
+    for await (const dialog of dialogs) {
+      const entity = (dialog as Dialog).entity
+      if (entity === undefined) continue
+
+      if (entity.className === 'User' && entity.bot === false) {
+        result.push({
+          id: entity.id.toString(),
+          name: [entity.firstName, entity.lastName].filter((value) => value !== undefined).join(' ') || entity.phone ?? '',
+          type: 'user',
+          mode: 'none'
+        })
+      } else if (entity.className === 'Chat') {
+        result.push({ id: entity.id.toString(), name: entity.title, type: 'group', mode: 'none' })
+      } else if (entity.className === 'Channel') {
+        result.push({ id: entity.id.toString(), name: entity.title, type: 'channel', mode: 'none' })
+      }
+    }
+
+    return result
   }
 
   async getUser (value: string): Promise<Api.User | undefined> {

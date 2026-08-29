@@ -9,6 +9,7 @@ export interface Doc extends Document {
 }
 
 export interface UserRecord extends Doc {
+  account: string
   phone: string
   workspace: string
   userId: string

@@ -1,0 +1,713 @@
+services:
+  account:
+    image: jbmidia/teron_account:latest
+    environment:
+      - SERVER_PORT=3000
+      - SERVER_SECRET=${SECRET}
+      - DB_URL=${CR_DB_URL}
+      - TRANSACTOR_URL=ws://transactor:3333;wss://${HOST_ADDRESS}/_transactor
+      - STORAGE_CONFIG=minio|minio?accessKey=minioadmin&secretKey=minioadmin
+      - FRONT_URL=https://${HOST_ADDRESS}
+      - STATS_URL=https://${HOST_ADDRESS}/_stats
+      #      - STATS_URL=http://stats:4900
+      - MAIL_URL=http://mail:8097
+      - MODEL_ENABLED=*
+      - ACCOUNTS_URL=https://${HOST_ADDRESS}/_accounts
+      - ACCOUNT_PORT=3000
+      - QUEUE_CONFIG=redpanda:9092
+      - SIMINTPAY_API_URL=${SIMINTPAY_API_URL}
+      - SIMINTPAY_BILLING_OWNER_ID=${SIMINTPAY_BILLING_OWNER_ID}
+      - SIMINTPAY_INTERNAL_TOKEN=${SIMINTPAY_INTERNAL_TOKEN}
+    networks:
+      - interna
+      - externa
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.role == manager
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+      labels:
+        - traefik.enable=true
+        - traefik.http.routers.huly-account.entrypoints=websecure
+        - traefik.http.routers.huly-account.rule=Host(`${HOST_ADDRESS}`) && PathPrefix(`/_accounts`)
+        - traefik.http.routers.huly-account.tls=true
+        - traefik.http.routers.huly-account.tls.certresolver=le
+        - traefik.http.routers.huly-account.middlewares=huly-strip-accounts
+        - traefik.http.middlewares.huly-strip-accounts.stripprefix.prefixes=/_accounts
+        - traefik.http.services.huly-account.loadbalancer.passHostHeader=true
+        - traefik.http.services.huly-account.loadbalancer.server.port=3000
+
+  #  calendar:
+  #    image: hardcoreeng/calendar:${HULY_VERSION}
+  #    environment:
+  #      - MONGO_URI=mongodb://mongodb:27017
+  #      - MONGO_DB=%calendar-service
+  #      - Credentials={"web":{"client_id":"867023322066-93ia2lsqpkoprpjkqd335krk2piifjvv.apps.googleusercontent.com","project_id":"teron-506620","auth_uri":"https://accounts.google.com/o/oauth2/auth","token_uri":"https://oauth2.googleapis.com/token","auth_provider_x509_cert_url":"https://www.googleapis.com/oauth2/v1/certs","client_secret":"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","redirect_uris":["https://teron.app/_calendar/signin/code"]}}
+  #      - WATCH_URL=https://${HOST_ADDRESS}/_calendar/push
+  #      - ACCOUNTS_URL=http://account:3000
+  #      - STATS_URL=http://stats:4900
+  #      - SECRET=${SECRET}
+  #      - KVS_URL=http://kvs:8094
+  #    deploy:
+  #      replicas: 1
+  #      placement:
+  #        constraints:
+  #          - node.role == manager
+  #      restart_policy:
+  #        condition: on-failure
+  #        delay: 5s
+  #      resources:
+  #        limits:
+  #          memory: 512M
+  #      labels:
+  #        - traefik.enable=true
+  #        - traefik.http.routers.huly-calendar.entrypoints=websecure
+  #        - traefik.http.routers.huly-calendar.rule=Host(`${HOST_ADDRESS}`) && PathPrefix(`/_calendar`)
+  #        - traefik.http.routers.huly-calendar.tls=true
+  #        - traefik.http.routers.huly-calendar.tls.certresolver=le
+  #        - traefik.http.routers.huly-calendar.middlewares=huly-strip-calendar
+  #        - traefik.http.middlewares.huly-strip-calendar.stripprefix.prefixes=/_calendar
+  #        - traefik.http.services.huly-calendar.loadbalancer.passHostHeader=true
+  #        - traefik.http.services.huly-calendar.loadbalancer.server.port=8099
+  #    networks:
+  #      - interna
+  #      - externa
+
+  cockroach:
+    image: cockroachdb/cockroach:latest-v24.2
+    volumes:
+      - ${VOLUME_CR_DATA_PATH:-cr_data}:/cockroach/cockroach-data
+      - ${VOLUME_CR_CERTS_PATH:-cr_certs}:/cockroach/certs
+    environment:
+      - COCKROACH_DATABASE=${CR_DATABASE}
+      - COCKROACH_USER=${CR_USERNAME}
+      - COCKROACH_PASSWORD=${CR_USER_PASSWORD}
+    ports:
+      - 26257:26257
+    networks:
+      - interna
+    command: start-single-node --accept-sql-without-tls
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.role == manager
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+
+  collaborator:
+    image: jbmidia/teron_collaborator:latest
+    environment:
+      - COLLABORATOR_PORT=3078
+      - SECRET=${SECRET}
+      - ACCOUNTS_URL=http://account:3000
+      - STATS_URL=http://stats:4900
+      - STORAGE_CONFIG=minio|minio?accessKey=minioadmin&secretKey=minioadmin
+    networks:
+      - interna
+      - externa
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.role == manager
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+      labels:
+        - traefik.enable=true
+        - traefik.http.routers.huly-collaborator.entrypoints=websecure
+        - traefik.http.routers.huly-collaborator.rule=Host(`${HOST_ADDRESS}`) && PathPrefix(`/_collaborator`)
+        - traefik.http.routers.huly-collaborator.tls=true
+        - traefik.http.routers.huly-collaborator.tls.certresolver=le
+        - traefik.http.routers.huly-collaborator.middlewares=huly-strip-collaborator
+        - traefik.http.middlewares.huly-strip-collaborator.stripprefix.prefixes=/_collaborator
+        - traefik.http.services.huly-collaborator.loadbalancer.passHostHeader=true
+        - traefik.http.services.huly-collaborator.loadbalancer.server.port=3078
+
+  elastic:
+    image: "elasticsearch:7.14.2"
+    volumes:
+      - ${VOLUME_ELASTIC_PATH:-elastic}:/usr/share/elasticsearch/data
+    environment:
+      - ELASTICSEARCH_PORT_NUMBER=9200
+      - BITNAMI_DEBUG=true
+      - discovery.type=single-node
+      - ES_JAVA_OPTS=-Xms1024m -Xmx1024m
+      - http.cors.enabled=true
+      - http.cors.allow-origin=http://localhost:8082
+    ports:
+      - 9200:9200
+    networks:
+      - interna
+    command: |
+      /bin/sh -c "./bin/elasticsearch-plugin list | grep -q ingest-attachment || yes | ./bin/elasticsearch-plugin install --silent ingest-attachment;
+      /usr/local/bin/docker-entrypoint.sh eswrapper"
+    healthcheck:
+      interval: 20s
+      retries: 10
+      test: curl -s http://localhost:9200/_cluster/health | grep -vq '"status":"red"'
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.role == manager
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+
+  front:
+    image: jbmidia/teron_front:latest
+    environment:
+      - ACCOUNTS_URL_INTERNAL=http://account:3000
+      - ACCOUNTS_URL=https://${HOST_ADDRESS}/_accounts
+      - CALENDAR_URL=https://${HOST_ADDRESS}/_calendar
+      - COLLABORATOR_URL=wss://${HOST_ADDRESS}/_collaborator
+      - DEFAULT_LANGUAGE=${DEFAULT_LANGUAGE:-en}
+      - DESKTOP_UPDATES_CHANNEL=${DESKTOP_CHANNEL}
+      - ELASTIC_INDEX_NAME=huly_storage_index
+      - ELASTIC_URL=http://elastic:9200
+      - GITHUB_APP=teron-gestao-de-equipes
+      - GITHUB_CLIENTID=Ov23liCxLZ4IRJfzpRo1
+      - GITHUB_URL=https://${HOST_ADDRESS}/_github
+      - GMAIL_URL=https://${HOST_ADDRESS}/_gmail
+      - LAST_NAME_FIRST=${LAST_NAME_FIRST:-true}
+      - LIVEKIT_WS=wss://livekit.jbmidia.com
+      - LOVE_ENDPOINT=https://${HOST_ADDRESS}/_love
+      - PULSE_URL=https://${HOST_ADDRESS}/_pulse/ws
+      - REKONI_URL=https://${HOST_ADDRESS}/_rekoni
+      - SERVER_PORT=8080
+      - SERVER_SECRET=${SECRET}
+      - STATS_URL=https://${HOST_ADDRESS}/_stats
+      #      - STATS_URL=http://stats:4900
+      - STORAGE_CONFIG=minio|minio?accessKey=minioadmin&secretKey=minioadmin
+      - TELEGRAM_BOT_URL=https://${HOST_ADDRESS}/_telegram
+      - TELEGRAM_URL=https://${HOST_ADDRESS}/_telegram-personal
+      - TITLE=${TITLE:-Huly Self Host}
+      - UPLOAD_URL=/files
+    networks:
+      - interna
+      - externa
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.role == manager
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+      labels:
+        - traefik.enable=true
+        - traefik.http.routers.huly-front.entrypoints=websecure
+        - traefik.http.routers.huly-front.rule=Host(`${HOST_ADDRESS}`)
+        - traefik.http.routers.huly-front.tls=true
+        - traefik.http.routers.huly-front.tls.certresolver=le
+        - traefik.http.routers.huly-front.priority=1
+        - traefik.http.services.huly-front.loadbalancer.passHostHeader=true
+        - traefik.http.services.huly-front.loadbalancer.server.port=8080
+
+  fulltext:
+    image: jbmidia/teron_fulltext:latest
+    environment:
+      - SERVER_SECRET=${SECRET}
+      - DB_URL=${CR_DB_URL}
+      - FULLTEXT_DB_URL=http://elastic:9200
+      - ELASTIC_INDEX_NAME=huly_storage_index
+      - STORAGE_CONFIG=minio|minio?accessKey=minioadmin&secretKey=minioadmin
+      - REKONI_URL=http://rekoni:4004
+      - ACCOUNTS_URL=http://account:3000
+      - STATS_URL=http://stats:4900
+      - QUEUE_CONFIG=redpanda:9092
+    networks:
+      - interna
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.role == manager
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+
+  github:
+    image: hardcoreeng/github:${HULY_VERSION}
+    environment:
+      PORT: 3500
+      STORAGE_CONFIG: minio
+      SERVER_SECRET: ${SECRET}
+      ACCOUNTS_URL: http://account:3000
+      STATS_URL: http://stats:4900
+      APP_ID: 4718628
+      CLIENT_ID: Iv23liOEEYXqVLwJzc5R
+      CLIENT_SECRET: 3a740d806e85a592bb7ca85d859e90584bfdbf0b
+      COLLABORATOR_URL: wss://${HOST_ADDRESS}/_collaborator
+      WEBHOOK_SECRET: aZhS1RdkJZC9oMSvSYSv8QMzwtGXaNXj0xQDYUgKXt8=
+      FRONT_URL: https://${HOST_ADDRESS}
+      BOT_NAME: teron-gestao-de-equipes[bot]
+      PRIVATE_KEY: LS0tLS1CRUdJTiBSU0EgUFJJVkFURSBLRVktLS0tLQpNSUlFcFFJQkFBS0NBUUVBd054YUtlb3gxOUYxTS9pTGU4SCs4SUlvWllXaTlUWUVFVmViV3QrdXg5bDI4SVA3CkEwMzZQdG0razhOT1pqTWRGck5TZzlWcW5VbXVTN2RGNXNlaTFLMytHNS9CSGc0R0dZcEg5NVUvQmJ4bkszQm4KRG1QV3NIdFFHQlBpMnA3aU1TajdmdjR3Ny8xUU5MQjVndUFCNzJJWjlOdWZUUVF5ZGtkd0s3c1lIRFIxZWFGegorTFdHVkRpMk83SlB4YlVhRXkxcVUyT21Qemk2K3l5UXB6eGxqbFYyTVVSQzJxNG91UkgyV1dCKzBjZTVHdXE4CjcvWldiVXNYUWZzM0NwNFRxbHF4N3JSZkZZZTZ2WnlQdDRMK1VNK3RZZkQ3UGt6TDVINEd6UGVCN0JwZnFSOUUKQTRIVTN6YWlveDB6T3ZtY1hjQnd2RGs2OWkzZnNITWdIbHBkK3dJREFRQUJBb0lCQUJKbDh3UUVuM1NqT3JjVwpndGZ2amM2TDNDYXpOUFNIanFQSTQ3MHJrWlRuSGYyYjJacGJHZ0JjN1YxVFNHdGZmT3JwZUhtekpsU1M3dG15ClJpelo1cUs3Wm41a0l4d200bFlWWndBcmNMT3ZZWGczWk4xdWtOQ05NdnJaQ3M4b1VSTzNnU2FBUVZManEzOGIKUnJ4QmVtM0h3Z29sMlhDVGNlenVxN2pBUkhDTU5lNCtEL0g2Nm5QeWNkZldqSnlzVVR2eCtxU2xPUmdCdWJQOQpTZVN1QlpQNndJTkhNSlc2aGNzeFNneXptN3V4N2hVdHM5UUMwN1ZidXpjVmZRTTY5Mm01cFluS0xHS2lrK3V1CjVCcFdlQk5MdUVyaENiK2FHSmFTUkozak1KNG4rUWV0M2tRa1ZmOEVKRThmTW1CaUxDZ1R1aHlmcW92NzNHdnQKVENqQTJHRUNnWUVBK00zKzB2SXJnRTkwMzlEVk83TnBhTEROZEdtT0NUSVRZV2VRbVJxTnlEaGt1N3BWSUZLLwpDajdTVmVZY3FZRys5c3o4d1lNbVpWQVFtYzZaQWltTHBQOUZBUFRUNHh5di9EdkxiWVpZS0hQRXU5emxZV3pRCllBTmJDU3Y2bFNoeVNhMWZFWDVNR2QrZ2oxNDJKbGxKWDBTdmoyNUlkZEtMVmxsN0wwbUJ5UTBDZ1lFQXhuQXUKUUEvQ0JXajNXM3UzdDJaSDJRS1hZT3hMOWZBS1FVUU12Vk1JUnhuN0J0N0pvaFY3cXhuUXNSTTNzZmFKd0RZdwpjRXlaNTBlQ05KMGU0c3JNT1JUWkhyeWgxQTZCVXM1YXVWRlVBdFV3ZDdnWHNnaGNlWnc2bkFGTmtjNmJMaE1OCndNVDdBY2Y1aFo5L1Q3bGZ5LzRMdG9xaUJhK1RIN1NWcWlldWNTY0NnWUVBcDdtV2szWVZ4VVhMTUNhRDJOODEKckJHa0wxb0pHa0hidHNvdVBFZ2VWRjlQNlEzUDNSNXJFdWtPdWtHS0NPc2laUllEUGlDL2ZZVGY3QS9PTGhyNwp2SnNwVlYrMmgyQUxjeXFNRktXQVFLVHFkd3FPeDRLblpsSmN5RzRSV3dRTko0WHNsTXBqV3YzYUswd0RqUTZiCjI5RmQySDhyOGVHaGRQQ1ZqbWNyU3ZFQ2dZRUFvelN1aFZld2ZweVhITEhESnQ3RFp0TS94Nkp3MHlTS2VxVksKU1FnYWZjZjdjdW9YTWV5eldzVVBwQ09uSWdJZngydUtLVUtITGZYZFBBS2gzV3RuemVhOHNBLzZsUnNjK0FycQpDUksvb3RqT1ZSaWV2SGt0L1lNbG5SdGhQZk9NSTdmZUR0YXpqd0oyMFpTZHMrZEZ4OVA0dERpUEMxZ2RDKzJOClRuWDJmZThDZ1lFQTAyOC9lVjFCNXYra1ZPL3pPWk0xbnpBT3N0R1BoN3lYd2ZJOXRtSnNiRnE1aGhXV3dHWFcKdlgyeUhGMmFrMzc1M0FKRFNTaTFaNzBaak9oc3FORFJIREpWeDJ5cW0rRzUwR0pWcTNRVW0xRmh2UTNSc3k1NwpKVkdyTTVkZ2V4TFE5dVBpMXJILzJ4QmxWdXdkRTN4QnAzN3BvTjJVeXZ1TDVzSjBuaWl2NTRNPQotLS0tLUVORCBSU0EgUFJJVkFURSBLRVktLS0tLQo=
+    networks:
+      - interna
+      - externa
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.role == manager
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+      resources:
+        limits:
+          memory: 512M
+      labels:
+        - traefik.enable=true
+        - traefik.http.routers.huly-github.entrypoints=websecure
+        - traefik.http.routers.huly-github.rule=Host(`${HOST_ADDRESS}`) && PathPrefix(`/_github`)
+        - traefik.http.routers.huly-github.tls=true
+        - traefik.http.routers.huly-github.tls.certresolver=le
+        - traefik.http.routers.huly-github.middlewares=huly-strip-pulse
+        - traefik.http.middlewares.huly-strip-github.stripprefix.prefixes=/_github
+        - traefik.http.services.huly-github.loadbalancer.passHostHeader=true
+        - traefik.http.services.huly-github.loadbalancer.server.port=8099
+
+  hulypulse:
+    image: jbmidia/teron_hulypulse:latest
+    environment:
+      - HULY_BIND_PORT=8099
+      - HULY_LOG=info
+      - HULY_TOKEN_SECRET=${SECRET}
+      - HULY_HEARTBEAT_TIMEOUT=60
+      - HULY_BACKEND=memory
+      # For Redis backend instead of in-memory (optional, e.g. multi-node setups):
+      # - HULY_BACKEND=redis
+      # - HULY_REDIS_MODE=direct
+      # - HULY_REDIS_URLS=redis://redis:6379
+    networks:
+      - interna
+      - externa
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.role == manager
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+      resources:
+        limits:
+          memory: 512M
+      labels:
+        - traefik.enable=true
+        - traefik.http.routers.huly-pulse.entrypoints=websecure
+        - traefik.http.routers.huly-pulse.rule=Host(`${HOST_ADDRESS}`) && PathPrefix(`/_pulse`)
+        - traefik.http.routers.huly-pulse.tls=true
+        - traefik.http.routers.huly-pulse.tls.certresolver=le
+        - traefik.http.routers.huly-pulse.middlewares=huly-strip-pulse
+        - traefik.http.middlewares.huly-strip-pulse.stripprefix.prefixes=/_pulse
+        - traefik.http.services.huly-pulse.loadbalancer.passHostHeader=true
+        - traefik.http.services.huly-pulse.loadbalancer.server.port=8099
+
+  kvs:
+    image: hardcoreeng/hulykvs:${HULY_VERSION}
+    environment:
+      - HULY_DB_CONNECTION=${CR_DB_URL}
+      - HULY_TOKEN_SECRET=${SECRET}
+    ports:
+      - target: 8094
+        published: 8094
+        protocol: tcp
+        mode: ingress
+    networks:
+      - interna
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.role == manager
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+
+  livekit:
+    image: livekit/livekit-server:latest
+    environment:
+      - "LIVEKIT_KEYS=devkey: secret"
+    ports:
+      - "7881:7881"
+      - "7882:7882/udp"
+    networks:
+      - interna
+      - externa
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.role == manager
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+      labels:
+        # Traefik cuidando da porta 7880 (Sinalização WebSocket segura)
+        - traefik.enable=true
+        - traefik.http.routers.huly-livekit.entrypoints=websecure
+        - traefik.http.routers.huly-livekit.rule=Host(`livekit.jbmidia.com`)
+        - traefik.http.routers.huly-livekit.tls=true
+        - traefik.http.routers.huly-livekit.tls.certresolver=le
+        - traefik.http.routers.huly-livekit.tls.domains[0].main=livekit.jbmidia.com
+        - traefik.http.services.huly-livekit.loadbalancer.server.port=7880
+        - traefik.http.services.huly-livekit.loadbalancer.passHostHeader=true
+
+  love:
+    image: jbmidia/teron_love:latest
+    environment:
+      - PORT=8096
+      - SECRET=${SECRET}
+      - DB_URL=${CR_DB_URL}
+      - STORAGE_CONFIG=minio|minio?accessKey=minioadmin&secretKey=minioadmin
+      - ACCOUNTS_URL=http://account:3000
+      - LIVEKIT_HOST=https://livekit.jbmidia.com
+      - LIVEKIT_API_KEY=devkey
+      - LIVEKIT_API_SECRET=secret
+    networks:
+      - interna
+      - externa
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.role == manager
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+      labels:
+        - traefik.enable=true
+        - traefik.http.routers.huly-love.entrypoints=websecure
+        - traefik.http.routers.huly-love.rule=Host(`${HOST_ADDRESS}`) && PathPrefix(`/_love`)
+        - traefik.http.routers.huly-love.tls=true
+        - traefik.http.routers.huly-love.tls.certresolver=le
+        - traefik.http.routers.huly-love.middlewares=huly-strip-love
+        - traefik.http.middlewares.huly-strip-love.stripprefix.prefixes=/_love
+        - traefik.http.services.huly-love.loadbalancer.passHostHeader=true
+        - traefik.http.services.huly-love.loadbalancer.server.port=8096
+
+  mail:
+    image: jbmidia/teron_mail:latest
+    environment:
+      - PORT=8097
+      - SOURCE=${EMAIL}
+      - SMTP_HOST=${SMTP_HOST}
+      - SMTP_PORT=${SMTP_PORT}
+      - SMTP_USERNAME=${SMTP_USER}
+      - SMTP_PASSWORD=${SMTP_PASSWORD}
+    ports:
+      - 8097:8097
+    networks:
+      - interna
+      - externa
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.role == manager
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+
+  minio:
+    image: "minio/minio"
+    volumes:
+      - ${VOLUME_FILES_PATH:-files}:/data
+    networks:
+      - interna
+      - externa
+    command: server /data --address ":9000" --console-address ":9001"
+    healthcheck:
+      test: ["CMD", "mc", "ready", "local"]
+      interval: 5s
+      retries: 10
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.role == manager
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+
+  mongodb:
+    image: mongo:7-jammy
+    volumes:
+      - ${VOLUME_MONGO_PATH:-mongodb}:/data/db
+    networks:
+      - externa
+      - interna
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.role == manager
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+
+  # redis:
+  #   image: redis:7-alpine
+  #   command: redis-server --maxmemory 512mb --maxmemory-policy allkeys-lru
+  #   restart: unless-stopped
+  #   networks:
+  #     - huly_net
+  #   # Required by HulyPulse (push notifications / real-time updates)
+
+  redpanda:
+    image: docker.redpanda.com/redpandadata/redpanda:v24.3.6
+    volumes:
+      - ${VOLUME_REDPANDA_PATH:-redpanda}:/var/lib/redpanda/data
+    environment:
+      - REDPANDA_SUPERUSER_USERNAME=${REDPANDA_ADMIN_USER}
+      - REDPANDA_SUPERUSER_PASSWORD=${REDPANDA_ADMIN_PWD}
+    networks:
+      interna:
+        aliases:
+          - redpanda
+    command:
+      - redpanda
+      - start
+      - --smp 1
+      - --overprovisioned
+      - --kafka-addr internal://0.0.0.0:9092,external://0.0.0.0:19092
+      - --advertise-kafka-addr internal://redpanda:9092,external://localhost:19092
+      - --pandaproxy-addr internal://0.0.0.0:8082,external://0.0.0.0:18082
+      - --advertise-pandaproxy-addr internal://redpanda:8082,external://localhost:18082
+      - --schema-registry-addr internal://0.0.0.0:8081,external://0.0.0.0:18081
+      - --rpc-addr 0.0.0.0:33145
+      - --advertise-rpc-addr redpanda:33145
+      - --mode dev-container
+      - --default-log-level=info
+    healthcheck:
+      test:
+        ["CMD", "curl", "-f", "http://localhost:9644/v1/status/ready"]
+        # ["rpk", "cluster", "info", "-X", "user=${REDPANDA_ADMIN_USER}", "-X", "pass=${REDPANDA_ADMIN_PWD}"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.role == manager
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+
+  rekoni:
+    image: jbmidia/teron_rekoni-service:latest
+    environment:
+      - SECRET=${SECRET}
+    networks:
+      - interna
+      - externa
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.role == manager
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+      resources:
+        limits:
+          memory: 500M
+      labels:
+        - traefik.enable=true
+        - traefik.http.routers.huly-rekoni.entrypoints=websecure
+        - traefik.http.routers.huly-rekoni.rule=Host(`${HOST_ADDRESS}`) && PathPrefix(`/_rekoni`)
+        - traefik.http.routers.huly-rekoni.tls=true
+        - traefik.http.routers.huly-rekoni.tls.certresolver=le
+        - traefik.http.routers.huly-rekoni.middlewares=huly-strip-rekoni
+        - traefik.http.middlewares.huly-strip-rekoni.stripprefix.prefixes=/_rekoni
+        - traefik.http.services.huly-rekoni.loadbalancer.passHostHeader=true
+        - traefik.http.services.huly-rekoni.loadbalancer.server.port=4004
+
+  stats:
+    image: jbmidia/teron_stats:latest
+    environment:
+      - PORT=4900
+      - SERVER_SECRET=${SECRET}
+    networks:
+      - interna
+      - externa
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.role == manager
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+      labels:
+        - traefik.enable=true
+        - traefik.http.routers.huly-stats.entrypoints=websecure
+        - traefik.http.routers.huly-stats.rule=Host(`${HOST_ADDRESS}`) && PathPrefix(`/_stats`)
+        - traefik.http.routers.huly-stats.tls=true
+        - traefik.http.routers.huly-stats.tls.certresolver=le
+        - traefik.http.routers.huly-stats.middlewares=huly-strip-stats
+        - traefik.http.middlewares.huly-strip-stats.stripprefix.prefixes=/_stats
+        - traefik.http.services.huly-stats.loadbalancer.passHostHeader=true
+        - traefik.http.services.huly-stats.loadbalancer.server.port=4900
+
+  telegram-personal:
+    image: jbmidia/teron_telegram:latest
+    environment:
+      - ACCOUNTS_URL=http://account:3000
+      - MONGO_URI=mongodb://mongodb:27017
+      - MONGO_DB=telegram-service
+      - PORT=8086
+      - SECRET=${SECRET}
+      - SERVICE_ID=telegram-service
+      - STORAGE_CONFIG=minio|minio?accessKey=minioadmin&secretKey=minioadmin
+      - TELEGRAM_API_ID=${TELEGRAM_API_ID}
+      - TELEGRAM_API_HASH=${TELEGRAM_API_HASH}
+    networks:
+      - externa
+      - interna
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.role == manager
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+      labels:
+        - traefik.enable=true
+        - traefik.http.routers.huly-telegram-personal.entrypoints=websecure
+        - traefik.http.routers.huly-telegram-personal.rule=Host(`${HOST_ADDRESS}`) && PathPrefix(`/_telegram-personal`)
+        - traefik.http.routers.huly-telegram-personal.tls=true
+        - traefik.http.routers.huly-telegram-personal.tls.certresolver=le
+        - traefik.http.routers.huly-telegram-personal.middlewares=huly-strip-telegram-personal
+        - traefik.http.middlewares.huly-strip-telegram-personal.stripprefix.prefixes=/_telegram-personal
+        - traefik.http.services.huly-telegram-personal.loadbalancer.passHostHeader=true
+        - traefik.http.services.huly-telegram-personal.loadbalancer.server.port=8086
+
+  #  telegram:
+  #    image: hardcoreeng/telegram-bot:${HULY_VERSION}
+  #    environment:
+  #      - ACCOUNTS_URL=http://account:3000
+  #      - BOT_TOKEN=8793026204:AAFo9MJZAWmct_SoUjFdh4W5tMlcSFRCDpI
+  #      - DB_URL=${CR_DB_URL}
+  #      #      - MONGO_DB=telegram-service
+  #      #      - MONGO_URL=mongodb://mongodb:27017
+  #      - PORT=4020
+  #      - QUEUE_CONFIG=redpanda:9092
+  #      - QUEUE_REGION=
+  #      - SECRET=${SECRET}
+  #      - SERVICE_ID=telegram-bot-service
+  #      - STORAGE_CONFIG=minio|minio?accessKey=minioadmin&secretKey=minioadmin
+  #    networks:
+  #      - externa
+  #      - interna
+  #    deploy:
+  #      replicas: 1
+  #      placement:
+  #        constraints:
+  #          - node.role == manager
+  #      restart_policy:
+  #        condition: on-failure
+  #        delay: 5s
+  #      resources:
+  #        limits:
+  #          memory: 500M
+  #      labels:
+  #        - traefik.enable=true
+  #        - traefik.http.routers.huly-telegram.entrypoints=websecure
+  #        - traefik.http.routers.huly-telegram.rule=Host(`${HOST_ADDRESS}`) && PathPrefix(`/_telegram`)
+  #        - traefik.http.routers.huly-telegram.tls=true
+  #        - traefik.http.routers.huly-telegram.tls.certresolver=le
+  #        - traefik.http.routers.huly-telegram.middlewares=huly-strip-telegram
+  #        - traefik.http.middlewares.huly-strip-telegram.stripprefix.prefixes=/_telegram
+  #        - traefik.http.services.huly-telegram.loadbalancer.passHostHeader=true
+  #        - traefik.http.services.huly-telegram.loadbalancer.server.port=4020
+
+  transactor:
+    image: jbmidia/teron_transactor:latest
+    environment:
+      - SERVER_PORT=3333
+      - SERVER_SECRET=${SECRET}
+      - DB_URL=${CR_DB_URL}
+      - STORAGE_CONFIG=minio|minio?accessKey=minioadmin&secretKey=minioadmin
+      - FRONT_URL=https://${HOST_ADDRESS}
+      - ACCOUNTS_URL=http://account:3000
+      - FULLTEXT_URL=http://fulltext:4700
+      - STATS_URL=http://stats:4900
+      - PULSE_URL=http://hulypulse:8099
+      - MAIL_URL=http://mail:8097
+      - LAST_NAME_FIRST=${LAST_NAME_FIRST:-true}
+      - QUEUE_CONFIG=redpanda:9092
+    networks:
+      - interna
+      - externa
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.role == manager
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+      labels:
+        - traefik.enable=true
+        - traefik.http.routers.huly-transactor.entrypoints=websecure
+        - traefik.http.routers.huly-transactor.rule=Host(`${HOST_ADDRESS}`) && PathPrefix(`/_transactor`)
+        - traefik.http.routers.huly-transactor.tls=true
+        - traefik.http.routers.huly-transactor.tls.certresolver=le
+        - traefik.http.routers.huly-transactor.middlewares=huly-strip-transactor
+        - traefik.http.middlewares.huly-strip-transactor.stripprefix.prefixes=/_transactor
+        - traefik.http.routers.huly-transactor-token.entrypoints=websecure
+        - traefik.http.routers.huly-transactor-token.rule=Host(`${HOST_ADDRESS}`) && PathPrefix(`/eyJ`)
+        - traefik.http.routers.huly-transactor-token.tls=true
+        - traefik.http.routers.huly-transactor-token.tls.certresolver=le
+        - traefik.http.routers.huly-transactor-token.service=huly-transactor
+        - traefik.http.services.huly-transactor.loadbalancer.passHostHeader=true
+        - traefik.http.services.huly-transactor.loadbalancer.server.port=3333
+
+  workspace:
+    image: jbmidia/teron_workspace:latest
+    environment:
+      - SERVER_SECRET=${SECRET}
+      - DB_URL=${CR_DB_URL}
+      - TRANSACTOR_URL=ws://transactor:3333;wss://${HOST_ADDRESS}/_transactor
+      - STORAGE_CONFIG=minio|minio?accessKey=minioadmin&secretKey=minioadmin
+      - MODEL_ENABLED=*
+      - ACCOUNTS_URL=http://account:3000
+      - STATS_URL=http://stats:4900
+      - QUEUE_CONFIG=redpanda:9092
+      - ACCOUNTS_DB_URL=${CR_DB_URL}
+    networks:
+      - interna
+    deploy:
+      replicas: 1
+      placement:
+        constraints:
+          - node.role == manager
+      restart_policy:
+        condition: on-failure
+        delay: 5s
+networks:
+  externa:
+    external: true
+  interna:
+    external: true
+
+volumes:
+  # These named volumes are used when custom volume paths are not specified
+  # If VOLUME_*_PATH variables are set, these volumes will be ignored
+  elastic:
+  files:
+  cr_data:
+  cr_certs:
+  redpanda:
+  mongodb:

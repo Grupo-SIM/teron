@@ -9,9 +9,10 @@ import { IncomingHttpHeaders } from 'http'
 
 import { createOpenTelemetryMetricsContext, SplitLogger } from '@hcengineering/analytics-service'
 import { join } from 'path'
+import { TelegramIntegrationApi, getCommand, getPhone } from './api'
 import config from './config'
 import { PlatformWorker } from './platform'
-import { createServer, Handler, listen } from './server'
+import { createServer, type Endpoint, listen } from './server'
 
 const extractTokenRaw = (headers: IncomingHttpHeaders): string | undefined => {
   return headers.authorization?.slice(7)
@@ -49,8 +50,54 @@ export const main = async (): Promise<void> => {
   const storageAdapter = buildStorageFromConfig(storageConfig)
 
   const platformWorker = await PlatformWorker.create(ctx, storageAdapter)
-  // TODO: FIXME
-  const endpoints: Array<[string, Handler]> = []
+  const api = new TelegramIntegrationApi(platformWorker)
+  const requestContext = (headers: IncomingHttpHeaders) => {
+    const token = extractToken(headers)
+    const rawToken = extractTokenRaw(headers)
+    if (token === undefined || rawToken === undefined) {
+      throw new Error('Unauthorized')
+    }
+    return { token, rawToken }
+  }
+  const endpoints: Endpoint[] = [
+    [
+      'get',
+      '/api/integrations/:phone',
+      async (req, res) => {
+        res.send(await api.getState(requestContext(req.headers), getPhone(req)))
+      }
+    ],
+    [
+      'post',
+      '/api/integrations/:phone',
+      async (req, res) => {
+        const { command, input } = getCommand(req)
+        res.send(await api.command(requestContext(req.headers), getPhone(req), command, input))
+      }
+    ],
+    [
+      'delete',
+      '/api/integrations/:phone',
+      async (req, res) => {
+        await api.disconnect(requestContext(req.headers), getPhone(req))
+        res.status(204).send()
+      }
+    ],
+    [
+      'post',
+      '/api/integrations/:phone/restart',
+      async (req, res) => {
+        res.send(await api.restart(requestContext(req.headers), getPhone(req)))
+      }
+    ],
+    [
+      'get',
+      '/api/integrations/:phone/chats',
+      async (req, res) => {
+        res.send(await api.listChats(requestContext(req.headers), getPhone(req)))
+      }
+    ]
+  ]
   // [
   //   [
   //     '/signin',
