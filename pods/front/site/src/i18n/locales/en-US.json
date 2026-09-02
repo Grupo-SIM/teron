@@ -396,7 +396,7 @@
       "controller": {
         "title": "1. Who processes your data",
         "controllerPrefix": "The data controller is",
-        "companySuffix": ", registered under CNPJ 37.778.392/0001-24.",
+        "companySuffix": ", registered under CNPJ 38.486.051/0001-48.",
         "organizationPrefix": "When you use the platform as a member of an organization, that organization decides what goes into documents, tasks, and messages. In that case, it is the controller of that content and Teron acts as a",
         "processor": "processor",
         "organizationSuffix": ", processing data according to its instructions."
@@ -498,7 +498,7 @@
       "about": {
         "title": "1. About us",
         "companyPrefix": "Teron is operated by",
-        "companySuffix": ", registered under CNPJ 37.778.392/0001-24. In this document, “Teron,” “we,” and “our” refer to that company, while “you” refers to anyone using the platform personally or for an organization.",
+        "companySuffix": ", registered under CNPJ 38.486.051/0001-48. In this document, “Teron,” “we,” and “our” refer to that company, while “you” refers to anyone using the platform personally or for an organization.",
         "authority": "If you accept these Terms for a company, you represent that you have authority to bind it, and “you” means that company."
       },
       "account": {

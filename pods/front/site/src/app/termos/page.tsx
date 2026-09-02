@@ -20,7 +20,7 @@ export function TermosContent({ locale = defaultLocale }: { locale?: Locale }) {
     >
       <LegalSection title="terms.sections.about.title">
         <p>
-          {"terms.sections.about.companyPrefix"}<strong>J B Marketing Digital LTDA</strong>{"terms.sections.about.companySuffix"}</p>
+          {"terms.sections.about.companyPrefix"}<strong>Sim Intermediações LTDA</strong>{"terms.sections.about.companySuffix"}</p>
         <p>
           {"terms.sections.about.authority"}</p>
       </LegalSection>

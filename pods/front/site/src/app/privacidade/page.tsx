@@ -20,7 +20,7 @@ export function PrivacidadeContent({ locale = defaultLocale }: { locale?: Locale
     >
       <LegalSection title="privacy.sections.controller.title">
         <p>
-          {"privacy.sections.controller.controllerPrefix"}<strong>J B Marketing Digital LTDA</strong>{"privacy.sections.controller.companySuffix"}</p>
+          {"privacy.sections.controller.controllerPrefix"}<strong>Sim Intermediações LTDA</strong>{"privacy.sections.controller.companySuffix"}</p>
         <p>
           {"privacy.sections.controller.organizationPrefix"}{" "}
           <strong>{"privacy.sections.controller.processor"}</strong>{"privacy.sections.controller.organizationSuffix"}</p>
