@@ -213,6 +213,7 @@ export interface Branding {
     href: string
     type?: string
     sizes?: string
+    media?: string
   }>
   support?: {
     supportLink?: string
@@ -462,6 +463,10 @@ export async function configurePlatform() {
 
       if (link.sizes !== undefined) {
         htmlLink.setAttribute('sizes', link.sizes)
+      }
+
+      if (link.media !== undefined) {
+        htmlLink.media = link.media
       }
 
       document.head.appendChild(htmlLink)

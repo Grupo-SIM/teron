@@ -19,10 +19,10 @@ export const metadata: Metadata = {
   manifest: "/teron/site.webmanifest",
   icons: {
     icon: [
-      { url: "/teron/favicon.svg", type: "image/svg+xml" },
       { url: "/teron/favicon.ico", sizes: "any" },
+      { url: "/teron/favicon.svg", type: "image/svg+xml", media: "(prefers-color-scheme: light)" },
+      { url: "/teron/favicon-dark.svg", type: "image/svg+xml", media: "(prefers-color-scheme: dark)" },
     ],
-    shortcut: "/teron/favicon.ico",
     apple: "/teron/apple-touch-icon.png",
   },
 };

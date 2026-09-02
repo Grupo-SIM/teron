@@ -15,7 +15,14 @@
       {
         "rel": "icon",
         "href": "/teron/favicon.svg",
-        "type": "image/svg+xml"
+        "type": "image/svg+xml",
+        "media": "(prefers-color-scheme: light)"
+      },
+      {
+        "rel": "icon",
+        "href": "/teron/favicon-dark.svg",
+        "type": "image/svg+xml",
+        "media": "(prefers-color-scheme: dark)"
       },
       {
         "rel": "shortcut icon",
@@ -44,7 +51,14 @@
       {
         "rel": "icon",
         "href": "/teron/favicon.svg",
-        "type": "image/svg+xml"
+        "type": "image/svg+xml",
+        "media": "(prefers-color-scheme: light)"
+      },
+      {
+        "rel": "icon",
+        "href": "/teron/favicon-dark.svg",
+        "type": "image/svg+xml",
+        "media": "(prefers-color-scheme: dark)"
       },
       {
         "rel": "shortcut icon",
