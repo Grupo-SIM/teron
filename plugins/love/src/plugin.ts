@@ -40,6 +40,7 @@ const love = plugin(loveId, {
   },
   string: {
     ChangeOfficeAssignee: '' as IntlString,
+    OfficeCannotBeDeleted: '' as IntlString,
     Office: '' as IntlString,
     MyOffice: '' as IntlString,
     Room: '' as IntlString,

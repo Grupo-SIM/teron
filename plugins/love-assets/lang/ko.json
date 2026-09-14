@@ -1,6 +1,7 @@
 {
     "string": {
         "ChangeOfficeAssignee": "이 사무실의 담당자를 변경하려면 이 사무실을 삭제한 뒤 새 사무실에 담당자를 할당하세요.",
+        "OfficeCannotBeDeleted": "This office cannot be deleted while it is in use or its assigned person is online.",
         "Office": "오피스",
         "Room": "룸",
         "RoomType": "룸 유형",

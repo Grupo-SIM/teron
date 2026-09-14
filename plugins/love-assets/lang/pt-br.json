@@ -1,6 +1,7 @@
 {
   "string": {
     "ChangeOfficeAssignee": "Para trocar a pessoa deste escritório, exclua este escritório e atribua a pessoa a um novo escritório.",
+    "OfficeCannotBeDeleted": "Não é possível excluir este escritório enquanto ele estiver em uso ou a pessoa atribuída estiver online.",
     "Office": "Escritório",
     "Room": "Sala",
     "RoomType": "Tipo de sala",

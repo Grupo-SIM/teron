@@ -1,6 +1,7 @@
 {
   "string": {
     "ChangeOfficeAssignee": "Chcete-li změnit osobu přiřazenou k této kanceláři, odstraňte tuto kancelář a přiřaďte osobu k nové kanceláři.",
+    "OfficeCannotBeDeleted": "This office cannot be deleted while it is in use or its assigned person is online.",
     "Office": "Kancelář",
     "Room": "Místnost",
     "RoomType": "Typ místnosti",

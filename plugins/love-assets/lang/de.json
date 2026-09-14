@@ -1,6 +1,7 @@
 {
   "string": {
     "ChangeOfficeAssignee": "Um die diesem Büro zugewiesene Person zu ändern, löschen Sie dieses Büro und weisen Sie die Person einem neuen Büro zu.",
+    "OfficeCannotBeDeleted": "This office cannot be deleted while it is in use or its assigned person is online.",
     "Office": "Büro",
     "Room": "Raum",
     "RoomType": "Raumtyp",

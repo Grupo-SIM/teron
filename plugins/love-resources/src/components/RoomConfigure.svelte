@@ -17,7 +17,7 @@
   import { AssigneeBox } from '@hcengineering/contact-resources'
   import { Ref } from '@hcengineering/core'
   import { getClient } from '@hcengineering/presentation'
-  import { ActionIcon, EditBox, Icon, IconDelete, resizeObserver } from '@hcengineering/ui'
+  import { ActionIcon, EditBox, Icon, IconDelete, resizeObserver, tooltip } from '@hcengineering/ui'
   import { Room, RoomAccess, RoomType, isOffice } from '@hcengineering/love'
   import { createEventDispatcher, onMount } from 'svelte'
   import { cubicOut } from 'svelte/easing'
@@ -69,7 +69,9 @@
     await client.remove(room)
   }
 
-  $: removable = $infos.filter((i) => i.room === room._id).length === 0
+  $: roomIsInUse = $infos.some((info) => info.room === room._id)
+  $: assignedPersonOnline = isOffice(room) && room.person !== null && $infos.some((info) => info.person === room.person)
+  $: removable = !roomIsInUse && !assignedPersonOnline
   $: dispatch('cursor', cursor)
   $: zoomOut = cellSize < 40
 
@@ -151,7 +153,7 @@
     shadowColor.set(shadowNormal)
   }
 
-  $: showButtons = room.access === RoomAccess.DND || room.type === RoomType.Video || removable
+  $: showButtons = room.access === RoomAccess.DND || room.type === RoomType.Video || removable || isOffice(room)
   $: updateStyle(top, left, room, roomRect)
 
   const updateStyle = (t: number | undefined, l: number | undefined, r: Room, rect: DOMRect): void => {
@@ -234,13 +236,18 @@
         {#if room.type === RoomType.Video}
           <Icon icon={love.icon.CamEnabled} size={zoomOut ? 'x-small' : 'small'} />
         {/if}
-        {#if removable}
-          <ActionIcon
-            icon={IconDelete}
-            size={zoomOut ? 'x-small' : 'small'}
-            label={isOffice(room) && room.person !== null ? love.string.ChangeOfficeAssignee : undefined}
-            action={remove}
-          />
+        {#if removable || isOffice(room)}
+          <span
+            class="flex-row-center"
+            use:tooltip={!removable ? { label: love.string.OfficeCannotBeDeleted } : undefined}
+          >
+            <ActionIcon
+              icon={IconDelete}
+              size={zoomOut ? 'x-small' : 'small'}
+              disabled={!removable}
+              action={remove}
+            />
+          </span>
         {/if}
       </div>
     {/if}
