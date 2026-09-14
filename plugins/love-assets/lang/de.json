@@ -39,6 +39,8 @@
     "ChangeAccess": "Zugriff ändern",
     "AddAFloor": "Etage hinzufügen",
     "RenameAFloor": "Etage umbenennen",
+    "DeleteFloor": "Delete floor",
+    "DeleteFloorConfirm": "Delete {name} and all of its rooms? This action cannot be undone.",
     "StartWithoutVideo": "Immer mit ausgeschalteter Kamera starten",
     "StartWithMutedMic": "Immer mit stummgeschaltetem Mikrofon starten",
     "InvitingYou": "{name} lädt Sie ein beizutreten",

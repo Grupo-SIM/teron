@@ -39,6 +39,8 @@
     "ChangeAccess": "Изменить доступ",
     "AddAFloor": "Добавить этаж",
     "RenameAFloor": "Переименовать этаж",
+    "DeleteFloor": "Delete floor",
+    "DeleteFloorConfirm": "Delete {name} and all of its rooms? This action cannot be undone.",
     "StartWithoutVideo": "Всегда начинать с выключенной камерой",
     "StartWithMutedMic": "Всегда начинать с выключенным звуком",
     "Invite": "Пригласить",

@@ -15,7 +15,7 @@
 <script lang="ts">
   import { AccountRole, getCurrentAccount, hasAccountRole, Ref } from '@hcengineering/core'
   import love, { Floor, Room } from '@hcengineering/love'
-  import { Breadcrumbs, ButtonIcon, eventToHTMLElement, Header, IconAdd, Scroller, showPopup } from '@hcengineering/ui'
+  import { Breadcrumbs, eventToHTMLElement, Header, IconAdd, ModernButton, Scroller, showPopup } from '@hcengineering/ui'
   import { floors, rooms, selectedFloor } from '../stores'
   import FloorPreview from './FloorPreview.svelte'
   import EditFloorPopup from './EditFloorPopup.svelte'
@@ -37,6 +37,12 @@
     showPopup(EditFloorPopup, {}, eventToHTMLElement(e))
   }
 
+  function handleFloorRemoved (removedFloor: Floor): void {
+    const nextFloor = $floors.find((candidate) => candidate._id !== removedFloor._id)
+    floor = nextFloor
+    selectedFloor.set(nextFloor?._id)
+  }
+
   let editable: boolean = false
   $: editable = hasAccountRole(me, AccountRole.Maintainer)
 </script>
@@ -54,7 +60,7 @@
   <Breadcrumbs items={[{ label: love.string.Office }]} currentOnly />
   <svelte:fragment slot="extra">
     {#if editable}
-      <ButtonIcon icon={IconAdd} kind={'primary'} size={'small'} on:click={addFloor} />
+      <ModernButton icon={IconAdd} label={love.string.AddAFloor} size={'small'} on:click={addFloor} />
     {/if}
   </svelte:fragment>
 </Header>
@@ -66,6 +72,7 @@
           showRoomName
           floor={_floor}
           configurable
+          removable={$floors.length > 1}
           configure={configure && floor?._id === _floor._id}
           rooms={getRooms($rooms, _floor._id)}
           selected={floor?._id === _floor._id}
@@ -83,6 +90,7 @@
             selectedFloor.set(_floor?._id)
             floor = _floor
           }}
+          on:remove={() => handleFloorRemoved(_floor)}
         />
       {/each}
     </Scroller>

@@ -39,6 +39,8 @@
     "ChangeAccess": "Cambiar acceso",
     "AddAFloor": "Añadir un piso",
     "RenameAFloor": "Cambiar el nombre de un piso",
+    "DeleteFloor": "Delete floor",
+    "DeleteFloorConfirm": "Delete {name} and all of its rooms? This action cannot be undone.",
     "StartWithoutVideo": "Siempre empezar sin video",
     "StartWithMutedMic": "Siempre empezar con el micrófono silenciado",
     "InvitingYou": "{name} te está invitando a unirte",

@@ -39,6 +39,8 @@
     "ChangeAccess": "Změnit přístup",
     "AddAFloor": "Přidat patro",
     "RenameAFloor": "Přejmenovat patro",
+    "DeleteFloor": "Delete floor",
+    "DeleteFloorConfirm": "Delete {name} and all of its rooms? This action cannot be undone.",
     "StartWithoutVideo": "Vždy začít s vypnutou kamerou",
     "StartWithMutedMic": "Vždy začít se ztlumeným mikrofonem",
     "InvitingYou": "{name} vás zve k připojení",

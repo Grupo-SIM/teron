@@ -39,6 +39,8 @@
     "ChangeAccess": "更改访问权限",
     "AddAFloor": "添加楼层",
     "RenameAFloor": "重命名楼层",
+    "DeleteFloor": "Delete floor",
+    "DeleteFloorConfirm": "Delete {name} and all of its rooms? This action cannot be undone.",
     "StartWithoutVideo": "始终关闭摄像头启动",
     "StartWithMutedMic": "始终静音启动",
     "InvitingYou": "{name} 邀请你加入",

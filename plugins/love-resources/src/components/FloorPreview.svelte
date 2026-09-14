@@ -15,7 +15,7 @@
 <script lang="ts">
   import { AccountRole, Ref, getCurrentAccount, hasAccountRole } from '@hcengineering/core'
   import { IntlString } from '@hcengineering/platform'
-  import { getClient } from '@hcengineering/presentation'
+  import { getClient, MessageBox } from '@hcengineering/presentation'
   import {
     AccordionItem,
     ButtonIcon,
@@ -50,6 +50,7 @@
   export let background: string | undefined = undefined
   export let kind: 'default' | 'second' | 'no-border' = 'default'
   export let configure: boolean = false
+  export let removable: boolean = true
 
   const me = getCurrentAccount()
   const dispatch = createEventDispatcher()
@@ -73,8 +74,20 @@
 
   const client = getClient()
 
-  async function remove (): Promise<void> {
-    await client.remove(floor)
+  function remove (): void {
+    showPopup(MessageBox, {
+      label: plugin.string.DeleteFloor,
+      message: plugin.string.DeleteFloorConfirm,
+      params: { name: floor.name },
+      dangerous: true,
+      action: async () => {
+        for (const room of rooms) {
+          await client.remove(room)
+        }
+        await client.remove(floor)
+        dispatch('remove', floor)
+      }
+    })
   }
 
   function renameFloor (): void {
@@ -87,11 +100,15 @@
   const clickMore = (e: MouseEvent): void => {
     pressed = true
     const value: SelectPopupValueType[] = [{ id: 'rename', icon: IconEdit, label: plugin.string.RenameAFloor }]
+    if (removable) {
+      value.push({ id: 'delete', icon: IconDelete, label: plugin.string.DeleteFloor })
+    }
     showPopup(SelectPopup, { value }, eventToHTMLElement(e), (result) => {
       if (result === 'configure') {
         dispatch('configure', floor)
         pressed = false
       } else if (result === 'rename') renameFloor()
+      else if (result === 'delete') remove()
     })
   }
 </script>
@@ -115,11 +132,6 @@
       <span class="content-color overflow-label"><Label label={roomName} /></span>
     {/if}
     {#if configurable && editable}
-      {#if rooms.length === 0}
-        <div class="mr-2">
-          <ButtonIcon icon={IconDelete} kind={'negative'} size={'small'} on:click={remove} />
-        </div>
-      {/if}
       <ButtonIcon icon={IconMoreH} kind={'tertiary'} size={'small'} {pressed} on:click={clickMore} />
     {/if}
   </svelte:fragment>

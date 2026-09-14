@@ -15,9 +15,12 @@
 <script lang="ts">
   import { AccountRole, getCurrentAccount, hasAccountRole, Ref, WithLookup } from '@hcengineering/core'
   import { Floor, Room } from '@hcengineering/love'
+  import { getClient } from '@hcengineering/presentation'
   import { Component, DropdownLabels, Header, IconEdit, ModernButton } from '@hcengineering/ui'
   import { Viewlet, ViewletPreference } from '@hcengineering/view'
   import { ViewletSelector } from '@hcengineering/view-resources'
+  import workbench, { Widget } from '@hcengineering/workbench'
+  import { openWidget } from '@hcengineering/workbench-resources'
   import { createEventDispatcher } from 'svelte'
 
   import lovePlg from '../plugin'
@@ -52,19 +55,30 @@
       selectedFloor.set(event.detail)
     }
   }
+
+  function openOfficeDrawer (): void {
+    const widget = getClient().getModel().findAllSync<Widget>(workbench.class.Widget, { _id: lovePlg.ids.LoveWidget })[0]
+    if (widget !== undefined) {
+      openWidget(widget, undefined, { active: true, openedByUser: true })
+    }
+  }
 </script>
 
 <div class="teronComponent">
   <Header adaptive={'disabled'}>
-    <DropdownLabels
-      {items}
-      selected={selected?._id}
-      size={'large'}
-      kind={'ghost'}
-      enableSearch={false}
-      autoSelect={false}
-      on:selected={changeFloor}
-    />
+    {#if editable}
+      <DropdownLabels
+        {items}
+        selected={selected?._id}
+        size={'large'}
+        kind={'ghost'}
+        enableSearch={false}
+        autoSelect={false}
+        on:selected={changeFloor}
+      />
+    {:else}
+      <span class="overflow-label">{selected?.name}</span>
+    {/if}
     <svelte:fragment slot="beforeTitle">
       <ViewletSelector bind:viewlet bind:preference bind:loading viewletQuery={{ attachTo: lovePlg.class.Floor }} />
     </svelte:fragment>
@@ -76,6 +90,8 @@
           size={'small'}
           on:click={() => dispatch('configure')}
         />
+      {:else}
+        <ModernButton label={lovePlg.string.ChangeFloor} size={'small'} on:click={openOfficeDrawer} />
       {/if}
     </svelte:fragment>
   </Header>

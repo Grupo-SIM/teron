@@ -39,6 +39,8 @@
     "ChangeAccess": "Erişimi değiştir",
     "AddAFloor": "Kat ekle",
     "RenameAFloor": "Katı yeniden adlandır",
+    "DeleteFloor": "Delete floor",
+    "DeleteFloorConfirm": "Delete {name} and all of its rooms? This action cannot be undone.",
     "StartWithoutVideo": "Her zaman kamera kapalı başlat",
     "StartWithMutedMic": "Her zaman mikrofon kapalı başlat",
     "InvitingYou": "{name} sizi katılmaya davet ediyor",

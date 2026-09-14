@@ -39,6 +39,8 @@
     "ChangeAccess": "アクセスを変更",
     "AddAFloor": "フロアを追加",
     "RenameAFloor": "フロア名を変更",
+    "DeleteFloor": "Delete floor",
+    "DeleteFloorConfirm": "Delete {name} and all of its rooms? This action cannot be undone.",
     "StartWithoutVideo": "常にカメラオフで開始",
     "StartWithMutedMic": "常にマイクミュートで開始",
     "InvitingYou": "{name} があなたを招待しています",

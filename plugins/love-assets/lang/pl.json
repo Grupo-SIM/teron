@@ -39,6 +39,8 @@
     "ChangeAccess": "Zmień dostęp",
     "AddAFloor": "Dodaj piętro",
     "RenameAFloor": "Zmień nazwę piętra",
+    "DeleteFloor": "Delete floor",
+    "DeleteFloorConfirm": "Delete {name} and all of its rooms? This action cannot be undone.",
     "StartWithoutVideo": "Zawsze uruchamiaj z wyłączoną kamerą",
     "StartWithMutedMic": "Zawsze uruchamiaj z wyciszonym mikrofonem",
     "InvitingYou": "{name} prosi cię o dołączenie",
