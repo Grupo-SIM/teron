@@ -206,10 +206,11 @@
           if (isOffice(room) && rX === 0 && rY === 0) e.stopPropagation()
         }}
       >
-        {#if isOffice(room) && rX === 0 && rY === 0 && !room.person}
+        {#if isOffice(room) && rX === 0 && rY === 0}
           <AssigneeBox
             _class={contact.class.Person}
-            excluded={excludedPersons}
+            excluded={excludedPersons.filter((person) => person !== room.person)}
+            docQuery={{ active: true, role: { $ne: 'GUEST' } }}
             shouldShowName={false}
             showNavigate={false}
             width={'100%'}
