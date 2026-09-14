@@ -189,6 +189,7 @@ export interface Employee extends Person {
   role?: 'USER' | 'GUEST' // Informational only
   statuses?: number
   position?: string | null
+  functions?: number
   personUuid?: AccountUuid
   timezone?: string
 }

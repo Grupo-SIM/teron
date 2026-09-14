@@ -89,6 +89,7 @@ import workbench from '@hcengineering/model-workbench'
 import notification from '@hcengineering/notification'
 import { getEmbeddedLabel, type Asset, type IntlString, type Resource } from '@hcengineering/platform'
 import setting from '@hcengineering/setting'
+import tags from '@hcengineering/tags'
 import templates from '@hcengineering/templates'
 import { type AnyComponent } from '@hcengineering/ui/src/types'
 import { type Action } from '@hcengineering/view'
@@ -272,6 +273,9 @@ export class TEmployee extends TPerson implements Employee {
   @Prop(TypeString(), contact.string.Position)
   @Hidden()
     position?: string | null
+
+  @Prop(CollectionType(tags.class.TagReference, contact.string.Position), contact.string.Position)
+    functions?: number
 
   declare personUuid?: AccountUuid
 
@@ -584,7 +588,6 @@ export function createModel (builder: Builder): void {
         'city',
         'attachments',
         'modifiedOn',
-        { key: '', presenter: view.component.RolePresenter, label: view.string.Role },
         {
           key: '$lookup.channels',
           label: contact.string.ContactInfo,
@@ -615,7 +618,12 @@ export function createModel (builder: Builder): void {
         'city',
         'attachments',
         'modifiedOn',
-        { key: '', presenter: view.component.RolePresenter, label: view.string.Role },
+        {
+          key: 'functions',
+          presenter: tags.component.LabelsPresenter,
+          label: contact.string.Position,
+          props: { kind: 'list', full: false }
+        },
         {
           key: '$lookup.channels',
           label: contact.string.ContactInfo,
@@ -655,7 +663,6 @@ export function createModel (builder: Builder): void {
         'city',
         'attachments',
         'modifiedOn',
-        { key: '', presenter: view.component.RolePresenter, label: view.string.Role },
         {
           key: '$lookup.channels',
           label: contact.string.ContactInfo,

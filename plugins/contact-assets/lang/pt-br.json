@@ -98,7 +98,7 @@
     "CategoryCurrentUser": "Usuário atual",
     "CategoryOther": "Outro",
     "NumberMembers": "{count, plural, =0 {sem membros} =1 {1 membro} other {# membros}}",
-    "Position": "Posição",
+    "Position": "Função",
     "ConfigLabel": "Contatos",
     "ConfigDescription": "Extensão para armazenar informações sobre todos os funcionários e outros contatos de pessoas e organizações.",
     "HasMessagesIn": "tem mensagens em",

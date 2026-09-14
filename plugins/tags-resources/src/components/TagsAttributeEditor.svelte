@@ -2,40 +2,68 @@
   import { AnyAttribute, Class, Doc, Ref } from '@hcengineering/core'
   import { IntlString } from '@hcengineering/platform'
   import { createQuery, getClient } from '@hcengineering/presentation'
-  import tags, { TagReference, TagsEvents } from '@hcengineering/tags'
+  import tags, { TagElement, TagReference, TagsEvents } from '@hcengineering/tags'
   import { Icon, Label, getEventPopupPositionElement, showPopup } from '@hcengineering/ui'
   import { getObjectId } from '@hcengineering/view-resources'
   import { Analytics } from '@hcengineering/analytics'
 
   import TagReferencePresenter from './TagReferencePresenter.svelte'
-  import TagsEditorPopup from './TagsEditorPopup.svelte'
+  import TagsPopup from './TagsPopup.svelte'
   import TagIcon from './icons/TagIcon.svelte'
 
   export let object: Doc
   export let label: IntlString = tags.string.AddLabel
   export let readonly: boolean = false
-  export let attr: AnyAttribute | undefined = undefined
-  export let targetClass: Ref<Class<Doc>> = object._class
+  export let attribute: AnyAttribute | undefined = undefined
+  export let attributeKey = 'labels'
 
   let items: TagReference[] = []
   const query = createQuery()
   const client = getClient()
   const hierarchy = client.getHierarchy()
 
-  $: query.query(tags.class.TagReference, { attachedTo: object._id }, (result) => {
-    items = result
-  })
+  $: targetClass = (attribute?.attributeOf as Ref<Class<Doc>> | undefined) ?? object._class
+
+  $: query.query(
+    tags.class.TagReference,
+    { attachedTo: object._id, attachedToClass: targetClass, collection: attributeKey },
+    (result) => {
+      items = result
+    }
+  )
   async function tagsHandler (evt: MouseEvent): Promise<void> {
     if (readonly) return
-    showPopup(TagsEditorPopup, { object, targetClass }, getEventPopupPositionElement(evt), undefined, undefined, {
-      refId: 'TagsPopup',
-      category: 'popup',
-      overlay: true
+    showPopup(
+      TagsPopup,
+      { targetClass, selected: items.map((item) => item.tag) },
+      getEventPopupPositionElement(evt),
+      undefined,
+      async (result) => {
+        if (result === undefined) return
+        if (result.action === 'add') {
+          await addTag(result.tag)
+        } else if (result.action === 'remove') {
+          const reference = items.find((item) => item.tag === result.tag._id)
+          if (reference !== undefined) await removeTag(reference)
+        }
+      },
+      {
+        refId: 'TagsPopup',
+        category: 'popup',
+        overlay: true
+      }
+    )
+  }
+  async function addTag ({ title, color, _id: tag }: TagElement): Promise<void> {
+    await client.addCollection(tags.class.TagReference, object.space, object._id, targetClass, attributeKey, {
+      title,
+      color,
+      tag
     })
   }
   async function removeTag (tag: TagReference): Promise<void> {
     if (tag !== undefined) {
-      await client.remove(tag)
+      await client.removeCollection(tags.class.TagReference, object.space, tag._id, object._id, targetClass, attributeKey)
       const id = await getObjectId(object, hierarchy)
       Analytics.handleEvent(TagsEvents.TagRemoved, { object: id })
     }
@@ -47,7 +75,7 @@
     {#each items as value}
       <div class="step-container clear-mins">
         <TagReferencePresenter
-          {attr}
+          attr={attribute}
           {value}
           isEditable={!readonly}
           kind={'list'}
