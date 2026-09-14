@@ -235,7 +235,12 @@
           <Icon icon={love.icon.CamEnabled} size={zoomOut ? 'x-small' : 'small'} />
         {/if}
         {#if removable}
-          <ActionIcon icon={IconDelete} size={zoomOut ? 'x-small' : 'small'} action={remove} />
+          <ActionIcon
+            icon={IconDelete}
+            size={zoomOut ? 'x-small' : 'small'}
+            label={isOffice(room) && room.person !== null ? love.string.ChangeOfficeAssignee : undefined}
+            action={remove}
+          />
         {/if}
       </div>
     {/if}

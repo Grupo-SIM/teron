@@ -1,5 +1,6 @@
 {
   "string": {
+    "ChangeOfficeAssignee": "要更换分配给此办公室的人员，请删除此办公室，然后将该人员分配到新办公室。",
     "Office": "办公室",
     "Room": "房间",
     "RoomType": "房间类型",

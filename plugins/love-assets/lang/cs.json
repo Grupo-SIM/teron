@@ -1,5 +1,6 @@
 {
   "string": {
+    "ChangeOfficeAssignee": "Chcete-li změnit osobu přiřazenou k této kanceláři, odstraňte tuto kancelář a přiřaďte osobu k nové kanceláři.",
     "Office": "Kancelář",
     "Room": "Místnost",
     "RoomType": "Typ místnosti",

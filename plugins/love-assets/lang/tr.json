@@ -1,5 +1,6 @@
 {
   "string": {
+    "ChangeOfficeAssignee": "Bu ofise atanan kişiyi değiştirmek için bu ofisi silin ve kişiyi yeni bir ofise atayın.",
     "Office": "Ofis",
     "Room": "Oda",
     "RoomType": "Oda tipi",

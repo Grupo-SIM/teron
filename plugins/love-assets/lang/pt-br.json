@@ -1,5 +1,6 @@
 {
   "string": {
+    "ChangeOfficeAssignee": "Para trocar a pessoa deste escritório, exclua este escritório e atribua a pessoa a um novo escritório.",
     "Office": "Escritório",
     "Room": "Sala",
     "RoomType": "Tipo de sala",

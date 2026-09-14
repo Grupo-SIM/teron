@@ -39,6 +39,7 @@ const love = plugin(loveId, {
     ToggleVideo: '' as Ref<Action>
   },
   string: {
+    ChangeOfficeAssignee: '' as IntlString,
     Office: '' as IntlString,
     MyOffice: '' as IntlString,
     Room: '' as IntlString,
