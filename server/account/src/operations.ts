@@ -1355,12 +1355,30 @@ export async function getInviteInfo (
     return { workspaceName: null }
   }
 
+  if (invite.remainingUses === 0 || (invite.expiresOn > 0 && invite.expiresOn < Date.now())) {
+    return { workspaceName: null }
+  }
+
   const workspace = await getWorkspaceById(db, invite.workspaceUuid)
   if (workspace === null) {
     return { workspaceName: null }
   }
 
-  return { workspaceName: workspace.name }
+  if (invite.email == null || invite.email === '') {
+    return { workspaceName: workspace.name }
+  }
+
+  const email = cleanEmail(invite.email)
+  const socialId = await getEmailSocialId(db, email)
+  const account = socialId == null
+    ? null
+    : await getAccount(db, socialId.personUuid as AccountUuid)
+
+  return {
+    workspaceName: workspace.name,
+    email,
+    accountExists: account != null
+  }
 }
 
 /**

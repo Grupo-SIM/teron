@@ -41,7 +41,7 @@ export type LoginInfoByToken = LoginInfo | WorkspaceLoginInfo | LoginInfoRequest
 export type OtpInfo = { sent: boolean; retryOn: number };
 export type RegionInfo = { region: string; name: string };
 export type ProviderInfo = { name: string; displayName?: string };
-export type InviteInfo = { workspaceName: string | null };
+export type InviteInfo = { workspaceName: string | null; email?: string; accountExists?: boolean };
 export type WorkspaceInviteInfo = { workspace: string; email?: string; name?: string };
 
 type RpcResponse<T> = { result?: T; error?: { code?: string; message?: string; params?: Record<string, unknown> } };

@@ -84,6 +84,7 @@ export function AuthFlow({ variant, locale }: { variant: Variant; locale: Locale
   const [inviteId, setInviteId] = useState("");
   const [joinWorkspaceUrl, setJoinWorkspaceUrl] = useState("");
   const [inviteWorkspace, setInviteWorkspace] = useState("");
+  const [inviteEmail, setInviteEmail] = useState("");
   const [joinSignup, setJoinSignup] = useState(false);
   const [hasCurrentAccount, setHasCurrentAccount] = useState(false);
 
@@ -341,6 +342,9 @@ export function AuthFlow({ variant, locale }: { variant: Variant; locale: Locale
     ]);
     const accountToken = account && "token" in account ? account.token : undefined;
     setInviteWorkspace(invite.workspaceName ?? "");
+    setInviteEmail(invite.email ?? "");
+    if (invite.email) setEmail(invite.email);
+    setJoinSignup(invite.accountExists === false);
     setToken(accountToken);
     setHasCurrentAccount(accountToken !== undefined);
     try {
@@ -443,6 +447,10 @@ export function AuthFlow({ variant, locale }: { variant: Variant; locale: Locale
     event.preventDefault();
     if (!api) return;
     await run(async () => {
+      if (joinSignup && password !== password2) {
+        setError(copy.passwordsMismatch);
+        return;
+      }
       const result = joinSignup
         ? await api.signUpJoin(email, password, firstName, lastName, inviteId, joinWorkspaceUrl)
         : await api.join(email, password, inviteId, joinWorkspaceUrl);
@@ -607,12 +615,13 @@ export function AuthFlow({ variant, locale }: { variant: Variant; locale: Locale
         <form className="auth-form" onSubmit={submitJoin}>
           {inviteWorkspace ? <p className="auth-description">{copy.joining} <strong>{inviteWorkspace}</strong>.</p> : null}
           {hasCurrentAccount ? <button data-testid="join-with-this-account" className="auth-secondary" type="button" onClick={() => void run(async () => finishWorkspace(await api!.joinByToken(inviteId, token)))}>{copy.joinCurrent}</button> : null}
-          {joinSignup ? <div className="auth-fields-row"><AuthInput label={copy.firstName} value={firstName} onChange={setFirstName} /><AuthInput label={copy.lastName} value={lastName} onChange={setLastName} /></div> : null}
-          <AuthInput label={copy.email} value={email} onChange={setEmail} type="email" autoComplete="email" />
+          {joinSignup ? <div className="auth-fields-row"><AuthInput name="given-name" label={copy.firstName} value={firstName} onChange={setFirstName} autoComplete="given-name" /><AuthInput name="family-name" label={copy.lastName} value={lastName} onChange={setLastName} autoComplete="family-name" /></div> : null}
+          <AuthInput name="email" label={copy.email} value={email} onChange={setEmail} type="email" autoComplete="email" placeholder={copy.emailPlaceholder} readOnly={Boolean(inviteEmail)} />
           <AuthInput testId="auth-password" label={copy.password} value={password} onChange={setPassword} type="password" autoComplete={joinSignup ? "new-password" : "current-password"} />
-          <AuthSubmit testId="join-form-submit" disabled={!email || !password || (joinSignup && (!firstName || !lastName))} loading={loading} label={joinSignup ? copy.joinSignup : copy.joinLogin} />
+          {joinSignup ? <AuthInput testId="auth-password-repeat" label={copy.repeatPassword} value={password2} onChange={setPassword2} type="password" autoComplete="new-password" /> : null}
+          <AuthSubmit testId="join-form-submit" disabled={!email || !password || (joinSignup && (!firstName || !lastName || !password2))} loading={loading} label={joinSignup ? copy.joinSignup : copy.joinLogin} />
           <BackButton testId="join-form-toggle" label={joinSignup ? copy.enter : copy.createAccount} onClick={() => setJoinSignup((value) => !value)} />
-          <Providers api={api} providers={providers} variant="signup" copy={copy} query={{ inviteId, navigateUrl: navigateUrl.current }} />
+          <Providers api={api} providers={providers} variant={joinSignup ? "signup" : "login"} copy={copy} query={{ inviteId, navigateUrl: navigateUrl.current }} />
         </form>
       ) : null}
     </>
@@ -666,7 +675,7 @@ function isValidCardExpiry(value: string) {
   return match !== null && Number(match[1]) >= 1 && Number(match[1]) <= 12;
 }
 
-function AuthInput({ label, value, onChange, type = "text", required = true, testId, ...props }: { label: string; value: string; onChange: (value: string) => void; type?: string; required?: boolean; testId?: string; name?: string; placeholder?: string; autoComplete?: string; inputMode?: "numeric" }) {
+function AuthInput({ label, value, onChange, type = "text", required = true, testId, ...props }: { label: string; value: string; onChange: (value: string) => void; type?: string; required?: boolean; testId?: string; name?: string; placeholder?: string; autoComplete?: string; inputMode?: "numeric"; readOnly?: boolean }) {
   return <label className="auth-label">{label}<span className="auth-input-row"><input data-testid={testId} className="auth-input" required={required} value={value} onChange={(event) => onChange(event.target.value)} type={type} {...props} /></span></label>;
 }
 

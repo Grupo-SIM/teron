@@ -90,6 +90,8 @@ export interface WorkspaceInviteInfo {
 /** Public invite details from getInviteInfo (no auth required). */
 export interface InviteInfo {
   workspaceName: string | null
+  email?: string
+  accountExists?: boolean
 }
 
 export interface OtpInfo {

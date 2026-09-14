@@ -56,6 +56,7 @@ import {
   getSubscriptions,
   getWorkspaceEntitlement,
   getWorkspacePendingInvites,
+  getInviteInfo,
   getWorkspaceSeatQuote,
   changeWorkspaceSeatLimit,
   cancelWorkspaceSubscription,
@@ -298,6 +299,56 @@ describe('account operations', () => {
           role: AccountRole.User
         })
       ).rejects.toThrow(new PlatformError(new Status(Severity.ERROR, platform.status.BadRequest, {})))
+    })
+  })
+
+  describe('getInviteInfo', () => {
+    const invite = {
+      id: 'invite-id',
+      workspaceUuid: mockWorkspace.uuid,
+      expiresOn: Date.now() + 60_000,
+      email: 'invited@example.com',
+      remainingUses: 1,
+      role: AccountRole.User
+    }
+
+    test('should indicate signup for an invited email without an account', async () => {
+      ;(mockDb.invite.findOne as jest.Mock).mockResolvedValue(invite)
+      ;(mockDb.workspace.findOne as jest.Mock).mockResolvedValue(mockWorkspace)
+      ;(mockDb.socialId.findOne as jest.Mock).mockResolvedValue(null)
+
+      const result = await getInviteInfo(mockCtx, mockDb, mockBranding, mockToken, { inviteId: invite.id })
+
+      expect(result).toEqual({
+        workspaceName: mockWorkspace.name,
+        email: invite.email,
+        accountExists: false
+      })
+    })
+
+    test('should indicate login for an invited email with an account', async () => {
+      ;(mockDb.invite.findOne as jest.Mock).mockResolvedValue(invite)
+      ;(mockDb.workspace.findOne as jest.Mock).mockResolvedValue(mockWorkspace)
+      ;(mockDb.socialId.findOne as jest.Mock).mockResolvedValue({
+        personUuid: mockAccount.uuid,
+        type: SocialIdType.EMAIL,
+        value: invite.email
+      })
+      ;(mockDb.account.findOne as jest.Mock).mockResolvedValue(mockAccount)
+
+      const result = await getInviteInfo(mockCtx, mockDb, mockBranding, mockToken, { inviteId: invite.id })
+
+      expect(result.accountExists).toBe(true)
+    })
+
+    test('should not expose details for an expired invite', async () => {
+      ;(mockDb.invite.findOne as jest.Mock).mockResolvedValue({ ...invite, expiresOn: Date.now() - 1 })
+
+      const result = await getInviteInfo(mockCtx, mockDb, mockBranding, mockToken, { inviteId: invite.id })
+
+      expect(result).toEqual({ workspaceName: null })
+      expect(mockDb.workspace.findOne).not.toHaveBeenCalled()
+      expect(mockDb.socialId.findOne).not.toHaveBeenCalled()
     })
   })
 

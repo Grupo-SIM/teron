@@ -604,6 +604,8 @@ export interface WorkspaceInviteInfo {
 
 export interface InviteInfo {
   workspaceName: string | null
+  email?: string
+  accountExists?: boolean
 }
 
 export interface MailboxOptions {

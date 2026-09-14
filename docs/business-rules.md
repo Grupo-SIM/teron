@@ -6,6 +6,7 @@
 - Owner, Maintainer e User consomem vaga. ReadOnlyGuest e DocGuest não consomem.
 - Papel Guest não existe para membros, convites ou cadastro no workspace.
 - Convite personalizado pendente reserva uma vaga até aceite, cancelamento ou expiração.
+- Convite personalizado para e-mail sem conta abre cadastro com o e-mail preenchido; após confirmar o e-mail, a conta entra automaticamente no workspace.
 - Nenhum convite, aceite, cadastro aberto ou mudança de papel pode exceder capacidade contratada.
 - Somente Owner pode alterar quantidade contratada.
 - Aumento entra em vigor após pagamento aprovado do valor proporcional ao tempo restante do ciclo.
