@@ -58,6 +58,7 @@ import { getMetadata } from '@hcengineering/platform'
 import { makeRank } from '@hcengineering/rank'
 import { getAccountBySocialId, getCurrentPerson } from '@hcengineering/server-contact'
 import serverCore, { TriggerControl } from '@hcengineering/server-core'
+import task from '@hcengineering/task'
 import { workbenchId } from '@hcengineering/workbench'
 
 export async function OnSpaceTypeMembers (txes: Tx[], control: TriggerControl): Promise<Tx[]> {
@@ -242,6 +243,34 @@ export async function OnEmployeeCreate (_txes: Tx[], control: TriggerControl): P
       result.push(
         control.txFactory.createTxUpdateDoc(space._class, space.space, space._id, {
           owners: [account.uuid]
+        })
+      )
+    }
+  }
+
+  return result
+}
+
+export async function OnEmployeeDeactivate (txes: Tx[], control: TriggerControl): Promise<Tx[]> {
+  const result: Tx[] = []
+
+  for (const tx of txes) {
+    if (tx._class !== core.class.TxMixin) continue
+
+    const mixinTx = tx as TxMixin<Person, Employee>
+    if (mixinTx.mixin !== contact.mixin.Employee || mixinTx.attributes.active !== false) continue
+
+    const person = (await control.findAll(control.ctx, contact.class.Person, { _id: mixinTx.objectId }))[0]
+    if (person?.personUuid === undefined) continue
+
+    const projects = await control.findAll(control.ctx, task.class.Project, {
+      members: person.personUuid as AccountUuid
+    })
+
+    for (const project of projects) {
+      result.push(
+        control.txFactory.createTxUpdateDoc(project._class, project.space, project._id, {
+          $pull: { members: person.personUuid as AccountUuid }
         })
       )
     }
@@ -505,6 +534,7 @@ export async function getContactFirstName (
 export default async () => ({
   trigger: {
     OnEmployeeCreate,
+    OnEmployeeDeactivate,
     OnTypedSpaceCreate,
     OnPersonCreate,
     OnContactDelete,
