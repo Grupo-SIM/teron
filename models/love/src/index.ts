@@ -113,9 +113,6 @@ export class TRoom extends TDoc implements Room {
   @Hidden()
     language!: RoomLanguage
 
-  @Prop(TypeBoolean(), love.string.StartWithTranscription)
-    startWithTranscription!: boolean
-
   @Prop(TypeBoolean(), love.string.StartWithRecording)
     startWithRecording!: boolean
 
@@ -211,9 +208,6 @@ export class TMeetingMinutes extends TAttachedDoc implements MeetingMinutes, Tod
 
   @Prop(Collection(attachment.class.Attachment), attachment.string.Attachments, { shortLabel: attachment.string.Files })
     attachments?: number
-
-  @Prop(PropCollection(chunter.class.ChatMessage), love.string.Transcription)
-    transcription?: number
 
   @Prop(PropCollection(chunter.class.ChatMessage), activity.string.Messages)
     messages?: number
@@ -528,7 +522,6 @@ export function createModel (builder: Builder): void {
         '',
         { key: 'status', presenter: love.component.MeetingMinutesStatusPresenter, label: love.string.Status },
         { key: 'messages', displayProps: { key: 'messages', suffix: true } },
-        { key: 'transcription', displayProps: { key: 'transcription', suffix: true } },
         'createdOn',
         'meetingEnd'
       ],
@@ -551,7 +544,6 @@ export function createModel (builder: Builder): void {
         '',
         { key: 'status', presenter: love.component.MeetingMinutesStatusPresenter, label: love.string.Status },
         { key: 'messages', displayProps: { key: 'messages', suffix: true } },
-        { key: 'transcription', displayProps: { key: 'transcription', suffix: true } },
         'createdOn',
         'meetingEnd'
       ],

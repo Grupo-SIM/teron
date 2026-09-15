@@ -62,11 +62,7 @@ async function createRooms (client: MigrationUpgradeClient): Promise<void> {
   }
   const employees = await client.findAll(contact.mixin.Employee, { active: true })
 
-  const data = createDefaultRooms(
-    employees.map((p) => p._id),
-    true,
-    true
-  )
+  const data = createDefaultRooms(employees.map((p) => p._id), true)
   for (const room of data) {
     const _class = isOffice(room) ? love.class.Office : love.class.Room
     await tx.createDoc(_class, core.space.Workspace, room, room._id)
@@ -92,7 +88,6 @@ async function createReception (client: MigrationUpgradeClient): Promise<void> {
       x: 0,
       y: 0,
       language: 'en',
-      startWithTranscription: false,
       startWithRecording: false,
       description: null
     },
@@ -126,21 +121,6 @@ export const loveOperation: MigrateOperation = {
           )
           await client.update(
             DOMAIN_LOVE,
-            { _class: love.class.Room, type: RoomType.Video, startWithTranscription: { $exists: false } },
-            { startWithTranscription: true }
-          )
-          await client.update(
-            DOMAIN_LOVE,
-            { _class: love.class.Room, startWithTranscription: { $exists: false } },
-            { startWithTranscription: false }
-          )
-          await client.update(
-            DOMAIN_LOVE,
-            { _class: love.class.Office, startWithTranscription: { $exists: false } },
-            { startWithTranscription: false }
-          )
-          await client.update(
-            DOMAIN_LOVE,
             { _class: love.class.Room, type: RoomType.Video, startWithRecording: { $exists: false } },
             { startWithRecording: true }
           )
@@ -154,6 +134,15 @@ export const loveOperation: MigrateOperation = {
             { _class: love.class.Office, startWithRecording: { $exists: false } },
             { startWithRecording: false }
           )
+        }
+      },
+      {
+        state: 'remove-call-transcription',
+        mode: 'upgrade',
+        func: async (client: MigrationClient) => {
+          await client.update(DOMAIN_LOVE, { _class: love.class.Room }, { $unset: { startWithTranscription: true } })
+          await client.update(DOMAIN_LOVE, { _class: love.class.Office }, { $unset: { startWithTranscription: true } })
+          await client.update(DOMAIN_LOVE, { _class: love.class.MeetingMinutes }, { $unset: { transcription: true } })
         }
       },
       {

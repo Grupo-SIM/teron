@@ -156,7 +156,6 @@ export interface RoleCapabilitySettings extends Configuration {
  * @public
  */
 export interface OfficeSettings extends Configuration {
-  defaultStartWithTranscription: boolean
   defaultStartWithRecording: boolean
 }
 
@@ -315,7 +314,6 @@ export default plugin(settingId, {
     MailboxLimitReached: '' as IntlString,
     OfficeSettings: '' as IntlString,
     OfficeDefaultSettings: '' as IntlString,
-    DefaultStartWithTranscription: '' as IntlString,
     DefaultStartWithRecording: '' as IntlString,
     GuestPermissionsSettings: '' as IntlString,
     GuestPermissionsApplicationPermissions: '' as IntlString,

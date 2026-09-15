@@ -222,7 +222,6 @@
     "PasswordAgingRuleDescription": "Liczba dni, po którym użytkownicy będą zobowiązani do zmiany hasła.",
     "OfficeSettings": "Ustawienia biura",
     "OfficeDefaultSettings": "Domyślne ustawienia sal konferencyjnych",
-    "DefaultStartWithTranscription": "Włącz transkrypcję w nowych salach biurowych",
     "DefaultStartWithRecording": "Włącz nagrywanie w nowych salach biurowych",
     "GuestPermissionsSettings": "Goście",
     "GuestPermissionsApplicationPermissions": "Uprawnienia aplikacji",

@@ -212,7 +212,6 @@
     "PasswordAgingRuleDescription": "Número de dias após os quais os usuários serão obrigados a alterar sua senha.",
     "OfficeSettings": "Configurações do escritório",
     "OfficeDefaultSettings": "Configurações padrão para salas de reunião",
-    "DefaultStartWithTranscription": "Habilitar transcrição em novos escritórios",
     "DefaultStartWithRecording": "Habilitar gravação em novos escritórios",
     "GuestPermissionsSettings": "Convidados",
     "GuestPermissionsApplicationPermissions": "Permissões de aplicativos",

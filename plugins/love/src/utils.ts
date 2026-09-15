@@ -20,7 +20,6 @@ export function isOffice (room: Data<Room>): room is Office {
 
 export function createDefaultRooms (
   employees: Ref<Employee>[],
-  defaultTranscription: boolean = false,
   defaultRecording: boolean = false
 ): (Data<Room | Office> & { _id: Ref<Room> })[] {
   const res: (Data<Room | Office> & { _id: Ref<Room> })[] = []
@@ -39,7 +38,6 @@ export function createDefaultRooms (
       y: index - (index % 2),
       person: employees[index] ?? null,
       language: 'en',
-      startWithTranscription: false,
       startWithRecording: false,
       description: null
     }
@@ -58,7 +56,6 @@ export function createDefaultRooms (
     x: 6,
     y: 0,
     language: 'en',
-    startWithTranscription: defaultTranscription,
     startWithRecording: defaultRecording,
     description: null
   })
@@ -75,7 +72,6 @@ export function createDefaultRooms (
     x: 6,
     y: 4,
     language: 'en',
-    startWithTranscription: defaultTranscription,
     startWithRecording: defaultRecording,
     description: null
   })
@@ -91,7 +87,6 @@ export function createDefaultRooms (
     x: 11,
     y: 4,
     language: 'en',
-    startWithTranscription: defaultTranscription,
     startWithRecording: defaultRecording,
     description: null
   })
@@ -107,7 +102,6 @@ export function createDefaultRooms (
     x: 6,
     y: 8,
     language: 'en',
-    startWithTranscription: false,
     startWithRecording: false,
     description: null
   })
@@ -123,7 +117,6 @@ export function createDefaultRooms (
     x: 11,
     y: 8,
     language: 'en',
-    startWithTranscription: false,
     startWithRecording: false,
     description: null
   })

@@ -11,7 +11,6 @@
     "OfficeSessionsBandwidth": "Besprechungsbandbreite",
     "OfficeEgressDuration": "Aufzeichnungsdauer",
     "AI": "AI",
-    "TranscriptionTime": "Transkriptionszeit",
     "TotalTokens": "Gesamte Tokens",
     "Tier": "Tarif",
     "StorageLimit": "{limit} {unit} Speicher",

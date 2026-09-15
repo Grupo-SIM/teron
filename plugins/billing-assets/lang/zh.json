@@ -11,7 +11,6 @@
     "OfficeSessionsBandwidth": "会议带宽",
     "OfficeEgressDuration": "录制时间",
     "AI": "AI",
-    "TranscriptionTime": "转录时间",
     "TotalTokens": "总令牌数",
     "Tier": "计划",
     "StorageLimit": "{limit} {unit} 存储空间",

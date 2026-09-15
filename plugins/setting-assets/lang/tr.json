@@ -221,7 +221,6 @@
     "PasswordAgingRuleDescription": "Kullanıcıların parolalarını değiştirmeleri gerekecek gün sayısı",
     "OfficeSettings": "Ofis ayarları",
     "OfficeDefaultSettings": "Toplantı odaları için varsayılan ayarlar",
-    "DefaultStartWithTranscription": "Yeni ofis odalarında transkripsiyonu etkinleştir",
     "DefaultStartWithRecording": "Yeni ofis odalarında kaydı etkinleştir",
     "GuestPermissionsSettings": "Misafirler",
     "GuestPermissionsApplicationPermissions": "Uygulama izinleri",

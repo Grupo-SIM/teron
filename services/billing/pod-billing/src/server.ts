@@ -24,8 +24,6 @@ import {
   handleGetLiveKitStats,
   handleGetDatalakeStats,
   handleGetStats,
-  handlePushAiTranscriptData,
-  handleGetAiTranscriptLastData,
   handlePushAiTokensData
 } from './billing'
 import { Config } from './config'
@@ -144,20 +142,6 @@ export async function createServer (
     wrapRequest(ctx, 'getDatalakeStats', handleGetDatalakeStats)
   )
   app.get('/api/v1/:workspace/stats', withToken, withOwner, wrapRequest(ctx, 'getStats', handleGetStats))
-
-  app.post(
-    '/api/v1/ai/transcript',
-    withToken,
-    withAdmin,
-    wrapRequest(ctx, 'pushAiTranscriptData', handlePushAiTranscriptData)
-  )
-
-  app.get(
-    '/api/v1/ai/transcript/last',
-    withToken,
-    withAdmin,
-    wrapRequest(ctx, 'getAiTranscriptLastData', handleGetAiTranscriptLastData)
-  )
 
   app.post('/api/v1/ai/tokens', withToken, withAdmin, wrapRequest(ctx, 'pushAiTokensData', handlePushAiTokensData))
 

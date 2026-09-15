@@ -11,7 +11,6 @@
     "OfficeSessionsBandwidth": "Bande passante des réunions",
     "OfficeEgressDuration": "Durée d'enregistrement",
     "AI": "IA",
-    "TranscriptionTime": "Durée de transcription",
     "TotalTokens": "Nombre total de jetons",
     "Tier": "Plan",
     "StorageLimit": "{limit} {unit} de stockage",

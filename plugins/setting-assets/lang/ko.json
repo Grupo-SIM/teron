@@ -222,7 +222,6 @@
     "PasswordAgingRuleDescription": "사용자가 비밀번호를 변경해야 하는 일수",
     "OfficeSettings": "오피스 설정",
     "OfficeDefaultSettings": "회의실 기본 설정",
-    "DefaultStartWithTranscription": "새 오피스 회의실에서 자동 기록 활성화",
     "DefaultStartWithRecording": "새 오피스 회의실에서 녹화 활성화",
     "GuestPermissionsSettings": "게스트",
     "GuestPermissionsApplicationPermissions": "애플리케이션 권한",

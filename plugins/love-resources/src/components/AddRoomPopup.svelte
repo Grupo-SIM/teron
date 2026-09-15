@@ -54,13 +54,10 @@
     const pos = getFreePosition(floorRooms, 2, 1)
     const _id = generateId<Room>()
 
-    // Get workspace settings for Video rooms
-    let defaultTranscription = false
     let defaultRecording = false
     if (val.type === RoomType.Video && val._class !== love.class.Office) {
       const officeSettings = await client.findAll<OfficeSettings>(setting.class.OfficeSettings, {})
       if (officeSettings !== undefined && officeSettings.length > 0) {
-        defaultTranscription = officeSettings[0].defaultStartWithTranscription ?? false
         defaultRecording = officeSettings[0].defaultStartWithRecording ?? false
       }
     }
@@ -74,7 +71,6 @@
       type: val.type,
       access: val.access,
       language: 'en',
-      startWithTranscription: defaultTranscription,
       startWithRecording: defaultRecording,
       description: null
     }

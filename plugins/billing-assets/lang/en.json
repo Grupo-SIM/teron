@@ -11,7 +11,6 @@
     "OfficeSessionsBandwidth": "Meetings bandwidth",
     "OfficeEgressDuration": "Recording time",
     "AI": "AI",
-    "TranscriptionTime": "Transcription time",
     "TotalTokens": "Total tokens",
     "Tier": "Tier",
     "StorageLimit": "{limit} {unit} storage",

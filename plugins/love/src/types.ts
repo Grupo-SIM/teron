@@ -19,12 +19,6 @@ export interface Floor extends Doc {
   name: string
 }
 
-export enum TranscriptionStatus {
-  Idle = 'idle',
-  InProgress = 'inProgress',
-  Completed = 'completed'
-}
-
 export type RoomLanguage =
   | 'bg'
   | 'ca'
@@ -75,7 +69,6 @@ export type RoomLanguage =
 
 export interface RoomMetadata {
   recording?: boolean
-  transcription?: TranscriptionStatus
   language?: RoomLanguage
 }
 
@@ -89,7 +82,6 @@ export interface Room extends Doc {
   x: number
   y: number
   language: RoomLanguage
-  startWithTranscription: boolean
   startWithRecording: boolean
   description: MarkupBlobRef | null
   attachments?: number
@@ -146,7 +138,6 @@ export interface MeetingMinutes extends AttachedDoc {
   status: MeetingStatus
   meetingEnd?: Timestamp
 
-  transcription?: number
   messages?: number
   attachments?: number
 }

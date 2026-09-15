@@ -11,7 +11,6 @@
     "OfficeSessionsBandwidth": "Larghezza di banda riunioni",
     "OfficeEgressDuration": "Durata registrazione",
     "AI": "AI",
-    "TranscriptionTime": "Tempo di trascrizione",
     "TotalTokens": "Totale token",
     "Tier": "Piano",
     "StorageLimit": "{limit} {unit} di archiviazione",

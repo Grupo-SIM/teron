@@ -16,8 +16,6 @@
 import {
   AiTokensData,
   AiTokensUsage,
-  AiTranscriptData,
-  AiTranscriptUsage,
   BillingDB,
   LiveKitEgressData,
   LiveKitEgressUsageData,
@@ -244,105 +242,6 @@ class PostgresDB implements BillingDB {
         VALUES ${values.join(',')}
       `
       await this.execute(query, params)
-    }
-  }
-
-  async pushAiTranscriptData (ctx: MeasureContext, data: AiTranscriptData[]): Promise<void> {
-    for (let i = 0; i < data.length; i += BATCH_SIZE) {
-      const batch = data.slice(i, i + BATCH_SIZE)
-      if (batch.length === 0) continue
-
-      const values: string[] = []
-      const params: any[] = []
-      let paramIndex = 1
-
-      for (const item of batch) {
-        const { workspace, lastRequestId, lastStartTime, durationSeconds, usd, day } = item
-        values.push(
-          `($${paramIndex++}::uuid, DATE($${paramIndex++}::timestamp), $${paramIndex++}::string, $${paramIndex++}::timestamp, $${paramIndex++}::float, $${paramIndex++}::decimal)`
-        )
-        params.push(workspace, day, lastRequestId, lastStartTime, durationSeconds, usd)
-      }
-
-      const query = `
-      INSERT INTO billing.ai_transcript_usage
-        (workspace, day, last_request_id, last_start_time, total_duration_seconds, total_usd)
-      VALUES ${values.join(',')}
-      ON CONFLICT (workspace, day)
-      DO UPDATE SET
-        total_duration_seconds = billing.ai_transcript_usage.total_duration_seconds + EXCLUDED.total_duration_seconds,
-        total_usd = billing.ai_transcript_usage.total_usd + EXCLUDED.total_usd,
-        last_request_id = CASE
-          WHEN EXCLUDED.last_start_time > billing.ai_transcript_usage.last_start_time
-          THEN EXCLUDED.last_request_id
-          ELSE billing.ai_transcript_usage.last_request_id
-        END,
-        last_start_time = GREATEST(billing.ai_transcript_usage.last_start_time, EXCLUDED.last_start_time);
-    `
-
-      await this.execute(query, params)
-    }
-  }
-
-  async getAiTranscriptStats (
-    ctx: MeasureContext,
-    workspace: WorkspaceUuid,
-    start?: Date,
-    end?: Date
-  ): Promise<AiTranscriptUsage> {
-    const baseSql = `
-    SELECT
-      SUM(total_duration_seconds) AS total_duration_seconds
-    FROM billing.ai_transcript_usage
-  `
-
-    let where = 'WHERE workspace = $1::uuid'
-    const params: any[] = [workspace]
-    let paramIndex = params.length + 1
-
-    if (start != null) {
-      const s = new Date(start)
-      s.setHours(0, 0, 0, 0)
-
-      where += ` AND day >= $${paramIndex++}::date`
-      params.push(s)
-    }
-
-    if (end != null) {
-      const e = new Date(end)
-      e.setHours(23, 59, 59, 999)
-
-      where += ` AND day <= $${paramIndex++}::date`
-      params.push(e)
-    }
-
-    const sql = [baseSql, where].join(' ')
-    const result = await this.execute(sql, params)
-
-    return {
-      totalDurationSeconds: Number(result[0]?.total_duration_seconds ?? 0)
-    }
-  }
-
-  async getAiTranscriptLastData (ctx: MeasureContext): Promise<AiTranscriptData | undefined> {
-    const sql = `
-    SELECT *
-    FROM billing.ai_transcript_usage
-    ORDER BY day DESC
-    LIMIT 1`
-
-    const result = await this.execute(sql)
-    const last = result[0]
-
-    if (last == null) return undefined
-
-    return {
-      workspace: last.workspace,
-      day: last.day,
-      lastRequestId: last.last_request_id,
-      lastStartTime: last.last_start_time,
-      durationSeconds: Number(last?.total_duration_seconds ?? 0),
-      usd: Number(last.usd)
     }
   }
 

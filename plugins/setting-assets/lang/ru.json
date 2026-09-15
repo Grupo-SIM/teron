@@ -222,7 +222,6 @@
     "PasswordAgingRuleDescription": "Количество дней, после которых пользователи должны будут изменить свой пароль.",
     "OfficeSettings": "Настройки офиса",
     "OfficeDefaultSettings": "Настройки по умолчанию для переговорных",
-    "DefaultStartWithTranscription": "Включить транскрипцию в новых комнатах",
     "DefaultStartWithRecording": "Включить запись в новых комнатах",
     "GuestPermissionsSettings": "Гости",
     "GuestPermissionsApplicationPermissions": "Права приложений",

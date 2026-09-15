@@ -42,7 +42,6 @@ export const billingPlugin = plugin(billingId, {
     OfficeEgressDuration: '' as IntlString,
     AI: '' as IntlString,
     TotalTokens: '' as IntlString,
-    TranscriptionTime: '' as IntlString,
     Tier: '' as IntlString,
     StorageLimit: '' as IntlString,
     TrafficLimit: '' as IntlString,

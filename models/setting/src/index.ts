@@ -127,7 +127,6 @@ export class TRoleCapabilitySettings extends TConfiguration implements RoleCapab
 @Model(setting.class.OfficeSettings, core.class.Configuration, DOMAIN_SETTING)
 @UX(setting.string.OfficeSettings)
 export class TOfficeSettings extends TConfiguration implements OfficeSettings {
-  defaultStartWithTranscription!: boolean
   defaultStartWithRecording!: boolean
 }
 

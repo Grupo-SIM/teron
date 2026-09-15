@@ -17,8 +17,6 @@ import { MeasureContext, type WorkspaceUuid } from '@hcengineering/core'
 import {
   AiTokensData,
   AiTokensUsage,
-  AiTranscriptData,
-  AiTranscriptUsage,
   BillingDB,
   LiveKitEgressData,
   LiveKitSessionData,
@@ -75,23 +73,6 @@ export class RetryDB implements BillingDB {
 
   async setLiveKitEgress (ctx: MeasureContext, data: LiveKitEgressData[]): Promise<void> {
     await retry(() => this.db.setLiveKitEgress(ctx, data), this.options)
-  }
-
-  async pushAiTranscriptData (ctx: MeasureContext, data: AiTranscriptData[]): Promise<void> {
-    await retry(() => this.db.pushAiTranscriptData(ctx, data), this.options)
-  }
-
-  async getAiTranscriptLastData (ctx: MeasureContext): Promise<AiTranscriptData | undefined> {
-    return await retry(() => this.db.getAiTranscriptLastData(ctx), this.options)
-  }
-
-  async getAiTranscriptStats (
-    ctx: MeasureContext,
-    workspace: WorkspaceUuid,
-    start?: Date,
-    end?: Date
-  ): Promise<AiTranscriptUsage> {
-    return await retry(() => this.db.getAiTranscriptStats(ctx, workspace, start, end), this.options)
   }
 
   async pushAiTokensData (ctx: MeasureContext, data: AiTokensData[]): Promise<void> {

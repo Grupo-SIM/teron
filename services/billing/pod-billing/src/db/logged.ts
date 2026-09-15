@@ -17,8 +17,6 @@ import { MeasureContext, type WorkspaceUuid } from '@hcengineering/core'
 import {
   AiTokensData,
   AiTokensUsage,
-  AiTranscriptData,
-  AiTranscriptUsage,
   BillingDB,
   LiveKitEgressData,
   LiveKitSessionData,
@@ -54,25 +52,6 @@ export class LoggedDB implements BillingDB {
 
   async setLiveKitEgress (ctx: MeasureContext, data: LiveKitEgressData[]): Promise<void> {
     await ctx.with('db.setLiveKitEgress', {}, () => this.db.setLiveKitEgress(this.ctx, data))
-  }
-
-  async pushAiTranscriptData (ctx: MeasureContext, data: AiTranscriptData[]): Promise<void> {
-    await ctx.with('db.pushAiTranscriptData', {}, () => this.db.pushAiTranscriptData(this.ctx, data))
-  }
-
-  async getAiTranscriptLastData (ctx: MeasureContext): Promise<AiTranscriptData | undefined> {
-    return await ctx.with('db.getAiTranscriptLastData', {}, () => this.db.getAiTranscriptLastData(this.ctx))
-  }
-
-  async getAiTranscriptStats (
-    ctx: MeasureContext,
-    workspace: WorkspaceUuid,
-    start?: Date,
-    end?: Date
-  ): Promise<AiTranscriptUsage> {
-    return await ctx.with('db.getAiTranscriptStats', {}, () =>
-      this.db.getAiTranscriptStats(this.ctx, workspace, start, end)
-    )
   }
 
   async pushAiTokensData (ctx: MeasureContext, data: AiTokensData[]): Promise<void> {

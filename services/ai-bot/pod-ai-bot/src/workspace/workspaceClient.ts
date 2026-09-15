@@ -12,12 +12,7 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 //
-import {
-  AIEventRequest,
-  ConnectMeetingRequest,
-  DisconnectMeetingRequest,
-  IdentityResponse
-} from '@hcengineering/ai-bot'
+import { AIEventRequest } from '@hcengineering/ai-bot'
 import attachment, { Attachment } from '@hcengineering/attachment'
 import chunter, { ChatMessage, ThreadMessage } from '@hcengineering/chunter'
 import contact, {
@@ -42,15 +37,12 @@ import core, {
   Ref,
   SocialId,
   Space,
-  Tx,
-  TxCUD,
   TxOperations,
   type WorkspaceUuid,
   type WorkspaceIds,
   AccountUuid,
   pickPrimarySocialId
 } from '@hcengineering/core'
-import { Room } from '@hcengineering/love'
 import { WorkspaceInfoRecord } from '@hcengineering/server-ai-bot'
 import fs from 'fs'
 import { WithId } from 'mongodb'
@@ -62,7 +54,6 @@ import config from '../config'
 import { HistoryRecord } from '../types'
 import { createChatCompletionWithTools, requestSummary } from '../utils/openai'
 import { connectPlatform } from '../utils/platform'
-import { LoveController } from './love'
 import { DbStorage } from '../storage'
 import { jsonToMarkup, markupToText } from '@hcengineering/text'
 import { markdownToMarkup } from '@hcengineering/text-markdown'
@@ -83,8 +74,6 @@ export class WorkspaceClient {
   historyMap = new Map<Ref<Doc>, WithId<HistoryRecord>[]>()
 
   summarizing = new Set<Ref<Doc>>()
-
-  love: LoveController | undefined
 
   constructor (
     readonly storage: StorageAdapter,
@@ -124,19 +113,6 @@ export class WorkspaceClient {
     await this.ensureEmployee(this.client)
     await this.checkEmployeeInfo(opClient)
 
-    if (this.aiPerson !== undefined && config.LoveEndpoint !== '') {
-      this.love = new LoveController(
-        this.wsIds.uuid,
-        this.ctx.newChild('love', {}, { span: false }),
-        this.token,
-        opClient,
-        this.aiPerson
-      )
-    }
-
-    this.client.notify = (...txes: Tx[]) => {
-      void this.txHandler(opClient, txes as TxCUD<Doc>[])
-    }
     this.ctx.info('Initialized workspace', { workspace: this.wsIds })
 
     return opClient
@@ -410,60 +386,7 @@ export class WorkspaceClient {
     this.ctx.info('Closed workspace client: ', { workspace: this.wsIds })
   }
 
-  private async txHandler (_: TxOperations, txes: TxCUD<Doc>[]): Promise<void> {
-    if (this.love !== undefined) {
-      this.love.txHandler(txes)
-    }
-  }
-
-  async loveConnect (request: ConnectMeetingRequest): Promise<void> {
-    await this.opClient
-    if (this.love === undefined) {
-      this.ctx.error('Love controller is not initialized')
-      return
-    }
-    await this.love.connect(request)
-  }
-
-  async loveDisconnect (request: DisconnectMeetingRequest): Promise<void> {
-    // Just wait initialization
-    await this.opClient
-
-    if (this.love === undefined) {
-      this.ctx.error('Love controller is not initialized')
-      return
-    }
-
-    await this.love.disconnect(request.roomId)
-  }
-
-  async processLoveTranscript (text: string, participant: Ref<Person>, room: Ref<Room>): Promise<void> {
-    // Just wait initialization
-    await this.opClient
-
-    if (this.love === undefined) {
-      this.ctx.error('Love controller is not initialized')
-      return
-    }
-
-    await this.love.processTranscript(text, participant, room)
-  }
-
-  async getLoveIdentity (): Promise<IdentityResponse | undefined> {
-    // Just wait initialization
-    await this.opClient
-
-    if (this.love === undefined) {
-      this.ctx.error('Love is not initialized')
-      return
-    }
-
-    return this.love.getIdentity()
-  }
-
   canClose (): boolean {
-    if (this.love === undefined) return true
-
-    return !this.love.hasActiveConnections()
+    return true
   }
 }

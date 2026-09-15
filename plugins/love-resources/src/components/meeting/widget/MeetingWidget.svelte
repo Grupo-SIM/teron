@@ -22,7 +22,6 @@
   import VideoTab from './VideoTab.svelte'
   import { currentMeetingMinutes, currentRoom } from '../../../stores'
   import ChatTab from './ChatTab.svelte'
-  import TranscriptionTab from './TranscriptionTab.svelte'
   import { lkSessionConnected } from '../../../liveKitClient'
   import LeaveRoomButton from '../controls/LeaveRoomButton.svelte'
   import ControlBarContainer from '../ControlBarContainer.svelte'
@@ -92,19 +91,6 @@
         <Loading />
       {:else if meetingMinutes}
         <ChatTab {meetingMinutes} {widgetState} height={contentHeight + 'px'} {width} on:close={handleClose} />
-      {/if}
-    {:else if widgetState.tab === 'transcription'}
-      {#if !isMeetingMinutesLoaded}
-        <Loading />
-      {:else if meetingMinutes}
-        <TranscriptionTab
-          {meetingMinutes}
-          {room}
-          {widgetState}
-          height={contentHeight + 'px'}
-          {width}
-          on:close={handleClose}
-        />
       {/if}
     {/if}
   </div>

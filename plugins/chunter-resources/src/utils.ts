@@ -545,7 +545,7 @@ export async function canSummarizeMessages (doc: Doc): Promise<boolean> {
 
   if (!hierarchy.isDerived(doc._class, love.class.MeetingMinutes)) return false
 
-  return ((doc as MeetingMinutes).transcription ?? 0) > 0
+  return true
 }
 
 export async function startConversationAction (docs?: Employee | Employee[]): Promise<void> {
