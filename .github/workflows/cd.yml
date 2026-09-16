@@ -313,6 +313,9 @@ jobs:
           USE_CACHE: "true"
         run: node common/scripts/install-run-rush.js package -v --only @hcengineering/prod --only @hcengineering/pod-front
 
+      - name: Bundle frontend service
+        run: node common/scripts/install-run-rush.js bundle -v --only @hcengineering/pod-front
+
       - name: Save Rush build cache
         if: always() && steps.rush-build-cache.outputs.cache-hit != 'true'
         uses: actions/cache/save@v5
