@@ -106,6 +106,8 @@ jobs:
             @hcengineering/rekoni-service
             @hcengineering/pod-stats
             @hcengineering/pod-server
+            @hcengineering/pod-telegram
+            @hcengineering/pod-telegram-bot
             @hcengineering/pod-workspace
           )
           selectors=()
@@ -130,6 +132,8 @@ jobs:
             @hcengineering/rekoni-service
             @hcengineering/pod-stats
             @hcengineering/pod-server
+            @hcengineering/pod-telegram
+            @hcengineering/pod-telegram-bot
             @hcengineering/pod-workspace
           )
           selectors=()
@@ -169,6 +173,8 @@ jobs:
             services/notification/pod-notification
             services/print/pod-print
             services/rekoni
+            services/telegram/pod-telegram
+            services/telegram-bot/pod-telegram-bot
           )
 
           for context in "${contexts[@]}"; do
