@@ -435,6 +435,8 @@
     enableUserSelect()
     document.removeEventListener('pointermove', pointerMove)
     document.removeEventListener('pointerup', pointerUp)
+    document.removeEventListener('pointercancel', pointerUp)
+    window.removeEventListener('blur', pointerUp)
   }
   function finalSeparation (): void {
     isSeparate = false
@@ -476,6 +478,8 @@
     prepareSeparation(event)
     document.addEventListener('pointermove', pointerMove)
     document.addEventListener('pointerup', pointerUp)
+    document.addEventListener('pointercancel', pointerUp)
+    window.addEventListener('blur', pointerUp)
   }
   function prepareSeparation (event: PointerEvent): void {
     if (parentElement == null) return
@@ -649,6 +653,7 @@
     }
   })
   onDestroy(() => {
+    pointerUp()
     if (mounted) {
       if (sState === SeparatorState.FLOAT) clearParent()
       else if (sState === SeparatorState.NORMAL) clearSibling()

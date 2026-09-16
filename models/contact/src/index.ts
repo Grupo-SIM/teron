@@ -218,6 +218,9 @@ export class TPerson extends TContact implements Person {
   @Prop(TypeDate(DateRangeMode.DATE, false), contact.string.Birthday)
     birthday?: Timestamp
 
+  @Prop(CollectionType(tags.class.TagReference, contact.string.Position), contact.string.Position)
+    functions?: number
+
   @Prop(CollectionType(contact.class.SocialIdentity), contact.string.SocialIds)
     socialIds?: Collection<SocialIdentity>
 
@@ -273,9 +276,6 @@ export class TEmployee extends TPerson implements Employee {
   @Prop(TypeString(), contact.string.Position)
   @Hidden()
     position?: string | null
-
-  @Prop(CollectionType(tags.class.TagReference, contact.string.Position), contact.string.Position)
-    functions?: number
 
   declare personUuid?: AccountUuid
 
@@ -588,6 +588,12 @@ export function createModel (builder: Builder): void {
         'city',
         'attachments',
         'modifiedOn',
+        {
+          key: 'functions',
+          presenter: tags.component.LabelsPresenter,
+          label: contact.string.Position,
+          props: { kind: 'list', full: false }
+        },
         {
           key: '$lookup.channels',
           label: contact.string.ContactInfo,

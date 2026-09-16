@@ -30,7 +30,7 @@
 
   function update (object: WithLookup<Doc>, value: number) {
     if (value > 0) {
-      query.query(tags.class.TagReference, { attachedTo: object._id, attachedToClass: _class, collection: key }, (result) => {
+      query.query(tags.class.TagReference, { attachedTo: object._id, collection: key }, (result) => {
         items = result.slice(ignoreFirst ? 1 : 0)
       })
     } else {

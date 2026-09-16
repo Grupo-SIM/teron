@@ -158,18 +158,16 @@
       <div class="location">
         <AttributeEditor maxWidth="20rem" _class={contact.class.Person} {object} {editable} key="city" focusIndex={3} />
       </div>
-      {#if h.hasMixin(object, contact.mixin.Employee)}
-        <div class="functions">
-          <AttributeEditor
-            maxWidth="20rem"
-            _class={contact.mixin.Employee}
-            {object}
-            {editable}
-            key="functions"
-            focusIndex={4}
-          />
-        </div>
-      {/if}
+      <div class="functions">
+        <AttributeEditor
+          maxWidth="20rem"
+          _class={contact.class.Person}
+          {object}
+          {editable}
+          key="functions"
+          focusIndex={4}
+        />
+      </div>
 
       <div class="separator" />
       <Scroller

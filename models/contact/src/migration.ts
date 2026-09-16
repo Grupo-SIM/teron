@@ -734,7 +734,7 @@ export const contactOperation: MigrateOperation = {
             {
               icon: tags.icon.Tags,
               label: contact.string.Position,
-              targetClass: contact.mixin.Employee,
+              targetClass: contact.class.Person,
               tags: [],
               default: true
             },

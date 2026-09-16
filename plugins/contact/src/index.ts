@@ -148,6 +148,7 @@ export interface Contact extends Doc, AvatarInfo {
  */
 export interface Person extends Contact, BasePerson {
   birthday?: Timestamp | null
+  functions?: number
   socialIds?: Collection<SocialIdentity>
   profile?: Ref<Card>
 }
@@ -189,7 +190,6 @@ export interface Employee extends Person {
   role?: 'USER' | 'GUEST' // Informational only
   statuses?: number
   position?: string | null
-  functions?: number
   personUuid?: AccountUuid
   timezone?: string
 }
@@ -272,7 +272,6 @@ export const contactPlugin = plugin(contactId, {
     PersonIcon: '' as AnyComponent,
     EditOrganizationPanel: '' as AnyComponent,
     CollaborationUserAvatar: '' as AnyComponent,
-    CreateGuest: '' as AnyComponent,
     SpaceMembersEditor: '' as AnyComponent,
     ContactNamePresenter: '' as AnyComponent,
     PersonFilterValuePresenter: '' as AnyComponent,
@@ -374,7 +373,6 @@ export const contactPlugin = plugin(contactId, {
     Position: '' as IntlString,
     For: '' as IntlString,
     SelectUsers: '' as IntlString,
-    AddGuest: '' as IntlString,
     Members: '' as IntlString,
     Contacts: '' as IntlString,
     Employees: '' as IntlString,
