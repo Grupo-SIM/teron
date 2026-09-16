@@ -222,14 +222,14 @@ describe('account utils', () => {
       const owner = getRolePower(AccountRole.Owner)
       const maintainer = getRolePower(AccountRole.Maintainer)
       const user = getRolePower(AccountRole.User)
-      const guest = getRolePower(AccountRole.Guest)
       const docGuest = getRolePower(AccountRole.DocGuest)
+      const readOnlyGuest = getRolePower(AccountRole.ReadOnlyGuest)
 
       // Verify hierarchy
       expect(owner).toBeGreaterThan(maintainer)
       expect(maintainer).toBeGreaterThan(user)
-      expect(user).toBeGreaterThan(guest)
-      expect(guest).toBeGreaterThan(docGuest)
+      expect(user).toBeGreaterThan(docGuest)
+      expect(docGuest).toBeGreaterThan(readOnlyGuest)
     })
   })
 

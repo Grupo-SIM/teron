@@ -1149,20 +1149,6 @@ export function createModel (builder: Builder): void {
     core.space.Model,
     {
       application: documents.app.Documents,
-      role: AccountRole.Guest,
-      permissions: [],
-      spaceClass: documents.class.OrgSpace,
-      enabled: true,
-      order: 42
-    },
-    documents.ids.ModulePermissionGroup
-  )
-
-  builder.createDoc(
-    core.class.ModulePermissionGroup,
-    core.space.Model,
-    {
-      application: documents.app.Documents,
       role: AccountRole.ReadOnlyGuest,
       permissions: [],
       spaceClass: documents.class.OrgSpace,
@@ -1212,10 +1198,6 @@ export function defineNotifications (builder: Builder): void {
     attachedTo: documents.class.DocumentRequest,
     fields: ['requested', 'createdBy'],
     provideSecurity: true
-  })
-
-  builder.mixin(documents.class.DocumentApprovalRequest, core.class.Class, core.mixin.TxAccessLevel, {
-    updateAccessLevel: AccountRole.Guest
   })
 
   builder.createDoc<ClassCollaborators<ControlledDocument>>(core.class.ClassCollaborators, core.space.Model, {

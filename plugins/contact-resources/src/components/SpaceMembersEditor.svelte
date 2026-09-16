@@ -51,6 +51,5 @@
     {kind}
     {size}
     {width}
-    allowGuests
   />
 {/if}

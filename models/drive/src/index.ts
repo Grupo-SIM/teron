@@ -847,20 +847,6 @@ export function createModel (builder: Builder): void {
     core.space.Model,
     {
       application: drive.app.Drive,
-      role: AccountRole.Guest,
-      permissions: [],
-      spaceClass: drive.class.Drive,
-      enabled: false,
-      order: 60
-    },
-    drive.ids.ModulePermissionGroup
-  )
-
-  builder.createDoc(
-    core.class.ModulePermissionGroup,
-    core.space.Model,
-    {
-      application: drive.app.Drive,
       role: AccountRole.ReadOnlyGuest,
       permissions: [],
       spaceClass: drive.class.Drive,

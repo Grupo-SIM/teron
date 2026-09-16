@@ -136,7 +136,7 @@
       items={externalApprovers}
       docQuery={{
         active: true,
-        role: 'GUEST',
+        role: 'USER',
         _id: { $nin: permittedApprovers }
       }}
       label={documents.string.ExternalApprovers}

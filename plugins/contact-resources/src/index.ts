@@ -75,7 +75,6 @@ import ContactRefPresenter from './components/ContactRefPresenter.svelte'
 import Contacts from './components/Contacts.svelte'
 import ContactsTabs from './components/ContactsTabs.svelte'
 import CreateEmployee from './components/CreateEmployee.svelte'
-import CreateGuest from './components/CreateGuest.svelte'
 import CreateOrganization from './components/CreateOrganization.svelte'
 import CreatePerson from './components/CreatePerson.svelte'
 import DeleteConfirmationPopup from './components/DeleteConfirmationPopup.svelte'
@@ -176,7 +175,6 @@ export {
   CombineAvatars,
   ContactPresenter,
   ContactRefPresenter,
-  CreateGuest,
   CreateOrganization,
   DeleteConfirmationPopup,
   EditPerson,
@@ -355,7 +353,6 @@ export default async (): Promise<Resources> => ({
     NameChangedActivityMessage
   },
   component: {
-    CreateGuest,
     ContactArrayEditor,
     PersonEditor,
     OrganizationEditor,

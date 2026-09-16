@@ -77,7 +77,7 @@ export async function leaveMeeting (): Promise<void> {
 export async function joinMeeting (room: Room): Promise<void> {
   if (room.access === RoomAccess.DND) return
 
-  const isGuest = getCurrentAccount().role === AccountRole.Guest
+  const isGuest = getCurrentAccount().role === AccountRole.DocGuest
   if (room.access === RoomAccess.Knock || isOffice(room) || isGuest) {
     sendJoinRequest(room._id)
     return

@@ -515,21 +515,6 @@ export function createModel (builder: Builder): void {
   defineApplication(builder)
 
   // Module permissions for guests/anonymous guests.
-  // Product should appear after Controlled Docs in the guest modules list and be disabled by default.
-  builder.createDoc(
-    core.class.ModulePermissionGroup,
-    core.space.Model,
-    {
-      application: products.app.Products,
-      role: AccountRole.Guest,
-      permissions: [],
-      spaceClass: products.class.Product,
-      enabled: false,
-      order: 45
-    },
-    products.ids.ModulePermissionGroup
-  )
-
   builder.createDoc(
     core.class.ModulePermissionGroup,
     core.space.Model,

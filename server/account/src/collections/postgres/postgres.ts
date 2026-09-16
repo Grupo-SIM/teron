@@ -897,7 +897,7 @@ export class PostgresAccountDB implements AccountDB {
         SELECT
           (SELECT COUNT(*) FROM ${this.client(this.getWsMembersTableName())}
             WHERE workspace_uuid = ${data.workspaceUuid}
-              AND role IN ('OWNER', 'MAINTAINER', 'USER', 'GUEST')) +
+              AND role IN ('OWNER', 'MAINTAINER', 'USER')) +
           (SELECT COUNT(*) FROM ${this.client(this.invite.getTableName())}
             WHERE workspace_uuid = ${data.workspaceUuid}
               AND email IS NOT NULL AND email <> ''
@@ -947,7 +947,7 @@ export class PostgresAccountDB implements AccountDB {
       const [row] = await tx`
         SELECT
           (SELECT COUNT(*) FROM ${this.client(this.getWsMembersTableName())}
-            WHERE workspace_uuid = ${workspaceUuid} AND role IN ('OWNER', 'MAINTAINER', 'USER', 'GUEST')) +
+            WHERE workspace_uuid = ${workspaceUuid} AND role IN ('OWNER', 'MAINTAINER', 'USER')) +
           (SELECT COUNT(*) FROM ${this.client(this.invite.getTableName())}
             WHERE workspace_uuid = ${workspaceUuid} AND email IS NOT NULL AND email <> ''
               AND (expires_on = -1 OR expires_on > ${Date.now()}) AND remaining_uses > 0) AS used
@@ -972,7 +972,7 @@ export class PostgresAccountDB implements AccountDB {
       const [row] = await tx`
         SELECT
           (SELECT COUNT(*) FROM ${this.client(this.getWsMembersTableName())}
-            WHERE workspace_uuid = ${workspaceUuid} AND role IN ('OWNER', 'MAINTAINER', 'USER', 'GUEST')) +
+            WHERE workspace_uuid = ${workspaceUuid} AND role IN ('OWNER', 'MAINTAINER', 'USER')) +
           (SELECT COUNT(*) FROM ${this.client(this.invite.getTableName())}
             WHERE workspace_uuid = ${workspaceUuid} AND email IS NOT NULL AND email <> ''
               AND (expires_on = -1 OR expires_on > ${Date.now()}) AND remaining_uses > 0) AS used

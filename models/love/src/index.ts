@@ -265,7 +265,7 @@ export function createModel (builder: Builder): void {
     core.space.Model,
     {
       application: love.app.Love,
-      role: AccountRole.Guest,
+    role: AccountRole.User,
       permissions: [],
       enabled: true,
       order: 50
@@ -362,7 +362,7 @@ export function createModel (builder: Builder): void {
       icon: love.icon.Love,
       component: love.component.Settings,
       group: 'settings-account',
-      role: AccountRole.Guest,
+      role: AccountRole.User,
       feature: 'love',
       order: 1600
     },
@@ -473,11 +473,6 @@ export function createModel (builder: Builder): void {
   builder.createDoc(activity.class.ActivityExtension, core.space.Model, {
     ofClass: love.class.MeetingMinutes,
     components: { input: { component: chunter.component.ChatMessageInput, props: { collection: 'messages' } } }
-  })
-
-  builder.mixin(love.class.ParticipantInfo, core.class.Class, core.mixin.TxAccessLevel, {
-    createAccessLevel: AccountRole.Guest,
-    updateAccessLevel: AccountRole.Guest
   })
 
   builder.mixin(love.class.MeetingMinutes, core.class.Class, activity.mixin.ActivityDoc, {})

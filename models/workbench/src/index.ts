@@ -116,12 +116,6 @@ export function createModel (builder: Builder): void {
     TWorkbenchTab
   )
 
-  builder.mixin(workbench.class.WorkbenchTab, core.class.Class, core.mixin.TxAccessLevel, {
-    createAccessLevel: AccountRole.Guest,
-    removeAccessLevel: AccountRole.Guest,
-    updateAccessLevel: AccountRole.Guest
-  })
-
   builder.mixin(workbench.class.Application, core.class.Class, view.mixin.ObjectPresenter, {
     presenter: workbench.component.ApplicationPresenter
   })

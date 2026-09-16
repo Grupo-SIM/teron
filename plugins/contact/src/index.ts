@@ -187,7 +187,7 @@ export interface Status extends AttachedDoc {
  */
 export interface Employee extends Person {
   active: boolean
-  role?: 'USER' | 'GUEST' // Informational only
+  role?: 'USER' // Informational only
   statuses?: number
   position?: string | null
   personUuid?: AccountUuid

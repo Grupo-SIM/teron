@@ -34,7 +34,6 @@
   export let includeItems: Ref<Person>[] = []
   export let excludeItems: Ref<Person>[] = []
   export let emptyLabel: IntlString | undefined = undefined
-  export let allowGuests: boolean = false
 
   let timer: any = null
   const client = getClient()
@@ -152,5 +151,4 @@
   justify={'left'}
   width={width ?? 'min-content'}
   {kind}
-  create={allowGuests ? { component: contact.component.CreateGuest, label: contact.string.AddGuest } : undefined}
 />

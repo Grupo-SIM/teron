@@ -27,7 +27,7 @@ import WorkbenchExtension from './components/WorkbenchExtension.svelte'
 export { ScreenRecorder } from './screen-recorder'
 
 async function uploadHandler ({ onFileUploaded, target }: FileUploadOptions): Promise<void> {
-  if (!hasAccountRole(getCurrentAccount(), AccountRole.Guest)) {
+  if (!hasAccountRole(getCurrentAccount(), AccountRole.DocGuest)) {
     addNotification(
       await translate(view.string.ReadOnlyWarningTitle, {}, getCurrentLanguage()),
       await translate(view.string.ReadOnlyWarningMessage, {}, getCurrentLanguage()),

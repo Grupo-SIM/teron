@@ -267,7 +267,7 @@ export class TEmployee extends TPerson implements Employee {
   @Prop(TypeString(), contact.string.Role)
   @ReadOnly()
   @Hidden()
-    role?: 'USER' | 'GUEST'
+    role?: 'USER'
 
   @Prop(CollectionType(contact.class.Status), contact.string.Status)
   @Hidden()
@@ -349,26 +349,6 @@ export function createModel (builder: Builder): void {
     TTranslation,
     TWorkspaceMemberStatus
   )
-
-  builder.mixin(contact.class.PersonSpace, core.class.Class, core.mixin.TxAccessLevel, {
-    createAccessLevel: AccountRole.Guest
-  })
-
-  builder.mixin(contact.class.WorkspaceMemberStatus, core.class.Class, core.mixin.TxAccessLevel, {
-    createAccessLevel: AccountRole.Guest,
-    updateAccessLevel: AccountRole.Guest,
-    removeAccessLevel: AccountRole.Guest
-  })
-
-  builder.mixin(contact.class.Person, core.class.Class, core.mixin.TxAccessLevel, {
-    createAccessLevel: AccountRole.Guest,
-    isIdentity: true
-  })
-
-  builder.mixin(contact.class.SocialIdentity, core.class.Class, core.mixin.TxAccessLevel, {
-    createAccessLevel: AccountRole.Guest,
-    isIdentity: true
-  })
 
   builder.mixin(contact.class.Contact, core.class.Class, activity.mixin.ActivityDoc, {})
 
@@ -472,28 +452,8 @@ export function createModel (builder: Builder): void {
               _class: contact.mixin.Employee,
               icon: contact.icon.Person,
               label: contact.string.Employee,
-              baseQuery: {
-                role: { $ne: 'GUEST' }
-              },
               createLabel: contact.string.CreateEmployee,
               createComponent: contact.component.CreateEmployee
-            }
-          },
-          {
-            id: 'guests',
-            component: workbench.component.SpecialView,
-            icon: contact.icon.Person,
-            label: contact.string.Guest,
-            accessLevel: AccountRole.DocGuest,
-            componentProps: {
-              _class: contact.mixin.Employee,
-              icon: contact.icon.Person,
-              label: contact.string.Guest,
-              baseQuery: {
-                role: 'GUEST'
-              },
-              createLabel: contact.string.Guest,
-              createComponent: contact.component.CreateGuest
             }
           },
           {
@@ -1497,7 +1457,7 @@ export function createModel (builder: Builder): void {
     icon: view.icon.Translate,
     component: contact.component.TranslationSettings,
     group: 'settings-account',
-    role: AccountRole.Guest,
+    role: AccountRole.User,
     feature: 'auto-translate',
     order: 1600
   })

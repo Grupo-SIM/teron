@@ -133,13 +133,12 @@
   let editorReady = false
 
   $: loading = !synced
-  $: canEditAsGuestCreator = account.role === AccountRole.Guest && isDocCreatedByAccount(object, account)
   $: editable =
     !readonly &&
     !contentError &&
     synced &&
     editorReady &&
-    (hasAccountRole(account, AccountRole.User) || canEditAsGuestCreator)
+    hasAccountRole(account, AccountRole.User)
 
   void provider.loaded.then(() => (synced = true))
   void provider.loaded.then(() => dispatch('loaded'))

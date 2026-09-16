@@ -485,8 +485,7 @@ export async function connect (title: string): Promise<Client | undefined> {
 
   const guestRole =
     workspaceLoginInfo.role === AccountRole.ReadOnlyGuest ||
-    workspaceLoginInfo.role === AccountRole.DocGuest ||
-    workspaceLoginInfo.role === AccountRole.Guest
+    workspaceLoginInfo.role === AccountRole.DocGuest
   if (guestRole) {
     data.visited_workspace = workspace.url
     data.visited_workspace_uuid = workspace.uuid

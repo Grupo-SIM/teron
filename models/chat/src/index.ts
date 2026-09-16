@@ -60,7 +60,4 @@ export function createModel (builder: Builder): void {
     PaletteColorIndexes.Houseplant
   )
 
-  builder.mixin(chat.masterTag.Thread, core.class.Class, core.mixin.TxAccessLevel, {
-    updateAccessLevel: AccountRole.Guest
-  })
 }

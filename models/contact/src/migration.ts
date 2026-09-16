@@ -222,7 +222,7 @@ async function assignEmployeeRoles (client: MigrationClient): Promise<void> {
           continue
         }
 
-        const role = memberInfo.role === AccountRole.Guest ? 'GUEST' : 'USER'
+        const role = 'USER'
 
         updates.push({
           filter: { _id: d._id },

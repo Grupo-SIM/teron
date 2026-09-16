@@ -146,68 +146,6 @@ export async function OnEmployeeCreate (_txes: Tx[], control: TriggerControl): P
     const txes = await createPersonSpace(account, mixinTx.objectId, control)
     result.push(...txes)
 
-    const emp = control.hierarchy.as(person, contact.mixin.Employee)
-    if (emp.role === 'GUEST') {
-      let readOnlyGuestSpaces: Space[] = []
-      const readonlyEmployees = await control.findAll(control.ctx, contact.mixin.Employee, {
-        personUuid: readOnlyGuestAccountUuid
-      })
-      if (readonlyEmployees.length !== 0) {
-        const readonlyEmployee = readonlyEmployees[0]
-        if (readonlyEmployee.active) {
-          readOnlyGuestSpaces = await control.findAll(control.ctx, core.class.Space, {
-            members: readOnlyGuestAccountUuid
-          })
-        }
-      }
-
-      const grantSpaces = await getGrantSpaces(control, control.ctx.contextData.grant)
-
-      for (const space of [...readOnlyGuestSpaces, ...grantSpaces]) {
-        if (space._class === contact.class.PersonSpace || space.members.includes(account)) continue
-
-        systemTxes.push(
-          systemTxFactory.createTxUpdateDoc(space._class, space.space, space._id, {
-            $push: {
-              members: account
-            }
-          })
-        )
-      }
-
-      const guestAutoJoinSpaces = await control.findAll(control.ctx, core.class.Space, {
-        autoJoinForRoles: AccountRole.Guest
-      })
-      for (const space of guestAutoJoinSpaces) {
-        if (space._class === contact.class.PersonSpace || space.members.includes(account)) continue
-        if (control.hierarchy.isDerived(space._class, chunter.class.DirectMessage)) continue
-
-        systemTxes.push(
-          systemTxFactory.createTxUpdateDoc(space._class, space.space, space._id, {
-            $push: {
-              members: account
-            }
-          })
-        )
-      }
-
-      const collabs = await control.findAll(control.ctx, core.class.Collaborator, {
-        collaborator: readOnlyGuestAccountUuid
-      })
-
-      for (const collab of collabs) {
-        const pushTx = systemTxFactory.createTxCreateDoc(core.class.Collaborator, collab.space, {
-          attachedTo: collab.attachedTo,
-          collaborator: account,
-          attachedToClass: collab.attachedToClass,
-          collection: 'collaborators'
-        })
-        systemTxes.push(pushTx)
-      }
-
-      continue
-    }
-
     const spaces = await control.findAll(control.ctx, core.class.Space, { autoJoin: true })
     const grantSpaces = await getGrantSpaces(control, control.ctx.contextData.grant)
 

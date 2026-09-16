@@ -74,10 +74,6 @@ export function createModel (builder: Builder): void {
   builder.createModel(TQuestion, TAssessment, TAnswer)
   builder.createModel(TQuestionMixin)
 
-  builder.mixin(questions.class.Answer, core.class.Class, core.mixin.TxAccessLevel, {
-    createAccessLevel: AccountRole.Guest
-  })
-
   defineActions(builder)
   defineSingleChoice(builder)
   defineMultipleChoice(builder)

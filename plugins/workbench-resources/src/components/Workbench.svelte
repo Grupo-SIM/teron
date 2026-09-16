@@ -784,7 +784,7 @@
   function isExcludedApp (alias: string): boolean {
     const me = getCurrentAccount()
 
-    if (me.role === AccountRole.ReadOnlyGuest || me.role === AccountRole.Guest) {
+    if (me.role === AccountRole.ReadOnlyGuest) {
       return (getMetadata(workbench.metadata.ExcludedApplicationsForAnonymous) ?? []).includes(alias)
     } else {
       return false

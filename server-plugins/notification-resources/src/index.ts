@@ -388,7 +388,7 @@ export async function pushInboxNotifications (
 
   const notificationData = {
     user: receiver.account,
-    isViewed: receiver.role === 'GUEST' && receiver.account === readOnlyGuestAccountUuid,
+    isViewed: receiver.account === readOnlyGuestAccountUuid,
     docNotifyContext: docNotifyContextId,
     archived: false,
     objectId,
@@ -568,7 +568,7 @@ async function createNotifyContext (
   }
 
   const lastViewedTimestamp =
-    receiver.role === 'GUEST' && receiver.account === readOnlyGuestAccountUuid
+    receiver.account === readOnlyGuestAccountUuid
       ? Number.MAX_VALUE
       : receiver.socialIds.some((it) => it === sender)
         ? updateTimestamp

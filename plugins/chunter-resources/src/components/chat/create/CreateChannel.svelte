@@ -16,7 +16,7 @@
   import { createEventDispatcher } from 'svelte'
   import { ModernEditbox, ButtonMenu, Label, Modal, TextArea, Toggle } from '@hcengineering/ui'
   import presentation, { getClient } from '@hcengineering/presentation'
-  import core, { AccountRole, getCurrentAccount, setWorkspaceGuestAutoJoinRoles } from '@hcengineering/core'
+  import core, { getCurrentAccount } from '@hcengineering/core'
   import contact, { getCurrentEmployee } from '@hcengineering/contact'
 
   import Lock from '../../icons/Lock.svelte'
@@ -44,16 +44,6 @@
   let topic = ''
   let canSave = true
   let autoJoin = false
-  let autoJoinForRoles: AccountRole[] = []
-
-  function normalizeAutoJoinForRoles (roles: AccountRole[]): AccountRole[] | undefined {
-    return roles.length > 0 ? [...roles] : undefined
-  }
-
-  function setGuestAutoJoin (enabled: boolean): void {
-    autoJoinForRoles = setWorkspaceGuestAutoJoinRoles(autoJoinForRoles, enabled)
-  }
-
   $: visibilityIcon = visibilityOptions.find(({ id }) => id === selectedVisibilityId)?.icon ?? visibilityOptions[0].icon
   $: visibilityLabel =
     visibilityOptions.find(({ id }) => id === selectedVisibilityId)?.label ?? visibilityOptions[0].label
@@ -74,8 +64,7 @@
       members: [myAcc],
       topic,
       owners: [myAcc],
-      autoJoin,
-      autoJoinForRoles: normalizeAutoJoinForRoles(autoJoinForRoles)
+      autoJoin
     })
 
     openChannel(channelId, chunter.class.Channel)
@@ -127,19 +116,6 @@
         <Toggle data-id="channel-auto-join-toggle" bind:on={autoJoin} />
       </div>
       <span class="text-sm content-dark-color text-left w-full"><Label label={core.string.AutoJoinDescr} /></span>
-    </div>
-    <div class="teronModal-content__settingsSet-line create-channel-join-line flex-col items-start w-full">
-      <div class="flex-row-center gap-2 w-full justify-start">
-        <span class="label"><Label label={core.string.AutoJoinGuests} /></span>
-        <Toggle
-          data-id="channel-guest-auto-join-toggle"
-          on={autoJoinForRoles.includes(AccountRole.Guest)}
-          on:change={(ev) => {
-            setGuestAutoJoin(ev.detail)
-          }}
-        />
-      </div>
-      <span class="text-sm content-dark-color text-left w-full"><Label label={core.string.AutoJoinGuestsDescr} /></span>
     </div>
   </div>
 </Modal>

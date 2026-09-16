@@ -91,7 +91,8 @@ export function getMigrations (ns: string, flavor: DBFlavor): [string, string][]
     getV31Migration(ns, flavor),
     getV32Migration(ns, flavor),
     getV33Migration(ns, flavor),
-    getV34Migration(ns, flavor)
+    getV34Migration(ns, flavor),
+    getV35Migration(ns)
   ]
 }
 
@@ -124,7 +125,7 @@ function getV1Migration (ns: string, flavor: DBFlavor): [string, string] {
     /* ======= T Y P E S ======= */
     CREATE TYPE ${ns}.social_id_type AS ENUM ('email', 'github', 'google', 'phone', 'oidc', 'huly', 'telegram');
     CREATE TYPE ${ns}.location AS ENUM ('kv', 'weur', 'eeur', 'wnam', 'enam', 'apac');
-    CREATE TYPE ${ns}.workspace_role AS ENUM ('OWNER', 'MAINTAINER', 'USER', 'GUEST', 'DOCGUEST');
+    CREATE TYPE ${ns}.workspace_role AS ENUM ('OWNER', 'MAINTAINER', 'USER', 'DOCGUEST');
 
     /* ======= HELPER FUNCTIONS FOR GENERATED COLUMNS ======= */
     -- Create an immutable function to cast the social_id_type enum to text.
@@ -1000,6 +1001,16 @@ function getV34Migration (ns: string, flavor: DBFlavor): [string, string] {
     );
     CREATE INDEX IF NOT EXISTS workspace_seat_change_workspace_created_idx
       ON ${ns}.workspace_seat_change (workspace_uuid, created_on);
+    `
+  ]
+}
+
+function getV35Migration (ns: string): [string, string] {
+  return [
+    'account_db_v35_replace_guest_roles',
+    `
+    UPDATE ${ns}.workspace_members SET role = 'USER' WHERE role::TEXT = 'GUEST';
+    UPDATE ${ns}.invite SET role = 'USER' WHERE role::TEXT = 'GUEST';
     `
   ]
 }

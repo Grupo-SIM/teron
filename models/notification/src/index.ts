@@ -387,7 +387,7 @@ export function createModel (builder: Builder): void {
       icon: notification.icon.Notifications,
       component: notification.component.NotificationSettings,
       group: 'settings-account',
-      role: AccountRole.Guest,
+      role: AccountRole.User,
       order: 1500
     },
     notification.ids.NotificationSettings
@@ -567,28 +567,6 @@ export function createModel (builder: Builder): void {
   })
   builder.mixin(notification.class.MentionInboxNotification, core.class.Class, view.mixin.ObjectPresenter, {
     presenter: notification.component.MentionInboxNotificationPresenter
-  })
-
-  builder.mixin(notification.class.BrowserNotification, core.class.Class, core.mixin.TxAccessLevel, {
-    removeAccessLevel: AccountRole.Guest
-  })
-
-  builder.mixin(notification.class.NotificationTypeSetting, core.class.Class, core.mixin.TxAccessLevel, {
-    createAccessLevel: AccountRole.Guest,
-    updateAccessLevel: AccountRole.Guest,
-    removeAccessLevel: AccountRole.Guest
-  })
-
-  builder.mixin(notification.class.NotificationProviderSetting, core.class.Class, core.mixin.TxAccessLevel, {
-    createAccessLevel: AccountRole.Guest,
-    updateAccessLevel: AccountRole.Guest,
-    removeAccessLevel: AccountRole.Guest
-  })
-
-  builder.mixin(notification.class.DocNotifyContext, core.class.Class, core.mixin.TxAccessLevel, {
-    createAccessLevel: AccountRole.Guest,
-    updateAccessLevel: AccountRole.Guest,
-    removeAccessLevel: AccountRole.Guest
   })
 
   builder.createDoc(

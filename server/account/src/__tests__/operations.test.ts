@@ -475,7 +475,7 @@ describe('account operations', () => {
       ;(mockDb.getWorkspaceRole as jest.Mock).mockResolvedValue(AccountRole.Owner)
       ;(mockDb.getWorkspaceMembers as jest.Mock).mockResolvedValue([
         { role: AccountRole.Owner },
-        { role: AccountRole.Guest },
+        { role: AccountRole.User },
         { role: AccountRole.ReadOnlyGuest }
       ])
       ;(mockDb.invite.find as jest.Mock).mockResolvedValue([
@@ -846,7 +846,7 @@ describe('account operations', () => {
     test('should throw error for insufficient role', async () => {
       ;(mockDb.account.findOne as jest.Mock).mockResolvedValue(mockAccount)
       ;(mockDb.workspace.findOne as jest.Mock).mockResolvedValue(mockWorkspace)
-      ;(mockDb.getWorkspaceRole as jest.Mock).mockResolvedValue(AccountRole.Guest)
+      ;(mockDb.getWorkspaceRole as jest.Mock).mockResolvedValue(AccountRole.DocGuest)
 
       await expect(
         createInviteLink(mockCtx, mockDb, mockBranding, mockToken, {
@@ -914,7 +914,7 @@ describe('account operations', () => {
     test('should throw error if caller has insufficient role', async () => {
       ;(mockDb.account.findOne as jest.Mock).mockResolvedValue(mockAccount)
       ;(mockDb.workspace.findOne as jest.Mock).mockResolvedValue(mockWorkspace)
-      ;(mockDb.getWorkspaceRole as jest.Mock).mockResolvedValue(AccountRole.Guest)
+      ;(mockDb.getWorkspaceRole as jest.Mock).mockResolvedValue(AccountRole.DocGuest)
 
       await expect(
         sendInvite(mockCtx, mockDb, mockBranding, mockToken, {
@@ -1340,7 +1340,7 @@ describe('account operations', () => {
           firstName: grantFirstName,
           lastName: grantLastName
         })
-        ;(mockDb.getWorkspaceRole as jest.Mock).mockResolvedValue(AccountRole.Guest)
+        ;(mockDb.getWorkspaceRole as jest.Mock).mockResolvedValue(AccountRole.User)
 
         const result = await getLoginInfoByToken(mockCtx, mockDb, mockBranding, mockToken)
 
@@ -1353,7 +1353,7 @@ describe('account operations', () => {
           workspace: grantWorkspace.uuid,
           workspaceUrl: grantWorkspace.url,
           endpoint: expect.any(String),
-          role: AccountRole.Guest
+          role: AccountRole.User
         })
       })
 
@@ -1752,7 +1752,7 @@ describe('account operations', () => {
     test('should throw error for insufficient role', async () => {
       ;(mockDb.account.findOne as jest.Mock).mockResolvedValue(mockAccount)
       ;(mockDb.workspace.findOne as jest.Mock).mockResolvedValue(mockWorkspace)
-      ;(mockDb.getWorkspaceRole as jest.Mock).mockResolvedValue(AccountRole.Guest)
+      ;(mockDb.getWorkspaceRole as jest.Mock).mockResolvedValue(AccountRole.DocGuest)
 
       await expect(
         createAccessLink(mockCtx, mockDb, mockBranding, mockToken, {

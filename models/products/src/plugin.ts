@@ -30,7 +30,6 @@ export default mergeIds(productsId, products, {
     CreateProductVersion: '' as ViewAction
   },
   ids: {
-    ModulePermissionGroup: '' as Ref<Doc>,
     ModulePermissionGroupReadOnlyGuest: '' as Ref<Doc>
   },
   component: {

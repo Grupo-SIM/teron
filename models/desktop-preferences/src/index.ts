@@ -34,12 +34,6 @@ export class TDesktopNotificationPreference extends TPreference implements Deskt
 export function createModel (builder: Builder): void {
   builder.createModel(TDesktopNotificationPreference)
 
-  builder.mixin(desktopPreferences.class.DesktopNotificationPreference, core.class.Class, core.mixin.TxAccessLevel, {
-    createAccessLevel: AccountRole.Guest,
-    updateAccessLevel: AccountRole.Guest,
-    removeAccessLevel: AccountRole.Guest
-  })
-
   builder.createDoc(
     notification.class.NotificationPreferencesGroup,
     core.space.Model,

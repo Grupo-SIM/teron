@@ -41,7 +41,6 @@
     { id: AccountRole.Maintainer, label: setting.string.Maintainer },
     { id: AccountRole.Owner, label: setting.string.Owner }
   ]
-  const guestRoles = [AccountRole.ReadOnlyGuest, AccountRole.DocGuest]
 
   let workspaceMembers: Record<string, AccountRole> = {}
   let pendingInvites: Awaited<ReturnType<typeof accountClient.getWorkspacePendingInvites>> = []
@@ -84,7 +83,7 @@
     workspaceMembers = workspaceMembers
     const employee = employees.find((item) => item.personUuid === personUuid)
     if (employee !== undefined) {
-      await client.update(employee, { role: guestRoles.includes(value) ? 'GUEST' : 'USER' })
+      await client.update(employee, { role: 'USER' })
     }
     await load()
   }

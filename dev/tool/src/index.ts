@@ -442,7 +442,7 @@ export function devTool (
     .action(async (email: string, workspace: string, role: AccountRole, cmd) => {
       console.log(`set user ${email} role for ${workspace}...`)
       await withAccountDatabase(async (db) => {
-        const rolesArray = ['DocGuest', 'GUEST', 'USER', 'MAINTAINER', 'OWNER']
+        const rolesArray = ['DocGuest', 'READONLYGUEST', 'USER', 'MAINTAINER', 'OWNER']
         if (!rolesArray.includes(role)) {
           throw new Error(`Invalid role ${role}. Valid roles are ${rolesArray.join(', ')}`)
         }

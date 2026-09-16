@@ -283,7 +283,6 @@ export async function canEditIssue (issue?: Issue | WithLookup<Issue>): Promise<
 
   const account = getCurrentAccount()
   const isGuest =
-    account.role === AccountRole.Guest ||
     account.role === AccountRole.DocGuest ||
     account.role === AccountRole.ReadOnlyGuest
 

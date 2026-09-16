@@ -210,7 +210,7 @@
           <AssigneeBox
             _class={contact.class.Person}
             excluded={excludedPersons.filter((person) => person !== room.person)}
-            docQuery={{ active: true, role: { $ne: 'GUEST' } }}
+            docQuery={{ active: true }}
             shouldShowName={false}
             showNavigate={false}
             width={'100%'}

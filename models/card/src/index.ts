@@ -1015,31 +1015,6 @@ export function createModel (builder: Builder): void {
   )
 
   builder.createDoc(
-    core.class.ClassPermission,
-    core.space.Model,
-    {
-      label: card.string.AllowCreatingCards,
-      scope: 'space',
-      targetClass: card.class.Card
-    },
-    card.ids.GuestCardClassPermission
-  )
-
-  builder.createDoc(
-    core.class.ModulePermissionGroup,
-    core.space.Model,
-    {
-      application: card.app.Card,
-      role: AccountRole.Guest,
-      permissions: [card.ids.GuestCardClassPermission],
-      spaceClass: card.class.CardSpace,
-      enabled: true,
-      order: 20
-    },
-    card.ids.ModulePermissionGroup
-  )
-
-  builder.createDoc(
     core.class.ModulePermissionGroup,
     core.space.Model,
     {

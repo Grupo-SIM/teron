@@ -424,7 +424,7 @@
   })
 
   async function updateCurrentProjectPref (currentProject: Ref<Project>): Promise<void> {
-    if (me?.role === AccountRole.ReadOnlyGuest || me?.role === AccountRole.Guest) return
+    if (me?.role === AccountRole.ReadOnlyGuest) return
     const spacePreferences = await client.findOne(tracker.class.ProjectTargetPreference, { attachedTo: currentProject })
     if (spacePreferences === undefined) {
       await client.createDoc(tracker.class.ProjectTargetPreference, currentProject, {

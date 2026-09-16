@@ -140,7 +140,7 @@
               readonly}
             docQuery={{
               active: true,
-              role: 'GUEST',
+              role: 'USER',
               _id: { $nin: permittedEmployees }
             }}
             on:update={({ detail }) => (externalUsers = detail)}

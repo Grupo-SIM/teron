@@ -188,7 +188,7 @@ export function createModel (builder: Builder): void {
       icon: setting.icon.AccountSettings,
       component: setting.component.Profile,
       group: 'settings-account',
-      role: AccountRole.Guest,
+      role: AccountRole.User,
       order: 0
     },
     setting.ids.Profile
@@ -203,7 +203,7 @@ export function createModel (builder: Builder): void {
       icon: setting.icon.Password,
       component: setting.component.Password,
       group: 'settings-account',
-      role: AccountRole.Guest,
+      role: AccountRole.User,
       order: 1000
     },
     setting.ids.Password
@@ -218,7 +218,7 @@ export function createModel (builder: Builder): void {
       icon: setting.icon.Password,
       component: setting.component.TwoFactorSettings,
       group: 'settings-account',
-      role: AccountRole.Guest,
+      role: AccountRole.User,
       order: 1200
     },
     setting.ids.Security

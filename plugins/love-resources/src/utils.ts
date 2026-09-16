@@ -316,7 +316,7 @@ export async function createMeeting (
       meetId: _id
     }
     const func = await getResource(login.function.GetInviteLink)
-    const link = await func(-1, '', -1, AccountRole.Guest, encodeURIComponent(JSON.stringify(navigateUrl)))
+    const link = await func(-1, '', -1, AccountRole.DocGuest, encodeURIComponent(JSON.stringify(navigateUrl)))
     await client.update(event, { location: link })
   }
 }
@@ -388,7 +388,7 @@ async function getRoomGuestLink (room: Room): Promise<string> {
 
     console.log('Create link')
     const accountClient = getAccountClientRaw(accountsUrl, token)
-    return await accountClient.createAccessLink(AccountRole.Guest, {
+    return await accountClient.createAccessLink(AccountRole.DocGuest, {
       navigateUrl: encodeURIComponent(JSON.stringify(navigateUrl))
     })
   }

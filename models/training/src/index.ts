@@ -900,30 +900,6 @@ function defineSettings (builder: Builder): void {
   )
 
   builder.createDoc(
-    core.class.ClassPermission,
-    core.space.Model,
-    {
-      label: training.string.AllowToTakeTraining,
-      scope: 'space',
-      targetClass: training.class.TrainingAttempt
-    },
-    training.ids.GuestTrainingAttemptClassPermission
-  )
-
-  builder.createDoc(
-    core.class.ModulePermissionGroup,
-    core.space.Model,
-    {
-      application: training.app.Training,
-      role: AccountRole.Guest,
-      permissions: [training.ids.GuestTrainingAttemptClassPermission],
-      enabled: true,
-      order: 25
-    },
-    training.ids.ModulePermissionGroup
-  )
-
-  builder.createDoc(
     core.class.ModulePermissionGroup,
     core.space.Model,
     {

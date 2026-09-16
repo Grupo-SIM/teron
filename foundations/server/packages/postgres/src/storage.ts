@@ -639,7 +639,7 @@ abstract class PostgresAdapterBase implements DbAdapter {
 
         const collabSec = getClassCollaborators(this.modelDb, this.hierarchy, _class)
         let collabRes = ''
-        if ([AccountRole.Guest, AccountRole.ReadOnlyGuest].includes(acc.role)) {
+        if (acc.role === AccountRole.ReadOnlyGuest) {
           if (collabSec?.provideSecurity === true) {
             collabRes += ` OR EXISTS (SELECT 1 FROM ${translateDomain(DOMAIN_COLLABORATOR)} collab_sec WHERE collab_sec."workspaceId" = ${vars.add(this.workspaceId, '::uuid')} AND collab_sec."attachedTo" = ${domain}._id AND collab_sec.collaborator = '${acc.uuid}')`
           }

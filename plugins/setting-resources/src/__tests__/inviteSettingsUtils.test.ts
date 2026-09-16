@@ -50,7 +50,7 @@ describe('inviteSettingsUtils', () => {
 
   describe('normalizeInviteRole', () => {
     it('maps string role names case-insensitively', () => {
-      expect(normalizeInviteRole('GUEST', AccountRole.User)).toBe(AccountRole.User)
+      expect(normalizeInviteRole('READONLYGUEST', AccountRole.User)).toBe(AccountRole.User)
       expect(normalizeInviteRole('User', AccountRole.User)).toBe(AccountRole.User)
       expect(normalizeInviteRole('MAINTAINER', AccountRole.User)).toBe(AccountRole.Maintainer)
       expect(normalizeInviteRole('owner', AccountRole.User)).toBe(AccountRole.Owner)
