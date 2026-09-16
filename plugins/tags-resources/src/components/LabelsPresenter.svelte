@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { Doc, WithLookup } from '@hcengineering/core'
+  import { Class, Doc, Ref, WithLookup } from '@hcengineering/core'
   import { createQuery } from '@hcengineering/presentation'
   import type { TagReference } from '@hcengineering/tags'
   import tags from '@hcengineering/tags'
@@ -13,6 +13,8 @@
 
   export let value: number
   export let object: WithLookup<Doc>
+  export let _class: Ref<Class<Doc>> | undefined = undefined
+  export let key: string | undefined = undefined
   export let full: boolean
   export let ckeckFilled: boolean = false
   export let kind: 'short' | 'full' | 'list' | 'link' | 'todo' | 'todo-compact' = 'short'
@@ -30,9 +32,17 @@
 
   function update (object: WithLookup<Doc>, value: number) {
     if (value > 0) {
-      query.query(tags.class.TagReference, { attachedTo: object._id, collection: key }, (result) => {
+      query.query(
+        tags.class.TagReference,
+        {
+          attachedTo: object._id,
+          ...(_class !== undefined ? { attachedToClass: _class } : {}),
+          ...(key !== undefined ? { collection: key } : {})
+        },
+        (result) => {
         items = result.slice(ignoreFirst ? 1 : 0)
-      })
+        }
+      )
     } else {
       query.unsubscribe()
       items = []
