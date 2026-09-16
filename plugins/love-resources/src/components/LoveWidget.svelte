@@ -15,12 +15,14 @@
 <script lang="ts">
   import { AccountRole, getCurrentAccount, hasAccountRole, Ref } from '@hcengineering/core'
   import love, { Floor, Room } from '@hcengineering/love'
+  import { isAdminUser } from '@hcengineering/presentation'
   import { Breadcrumbs, eventToHTMLElement, Header, IconAdd, ModernButton, Scroller, showPopup } from '@hcengineering/ui'
+  import { createEventDispatcher } from 'svelte'
   import { floors, rooms, selectedFloor } from '../stores'
   import FloorPreview from './FloorPreview.svelte'
   import EditFloorPopup from './EditFloorPopup.svelte'
 
-  let configure: boolean
+  const dispatch = createEventDispatcher()
 
   const me = getCurrentAccount()
   let floor: Floor | undefined
@@ -44,7 +46,7 @@
   }
 
   let editable: boolean = false
-  $: editable = hasAccountRole(me, AccountRole.Maintainer)
+  $: editable = isAdminUser() || hasAccountRole(me, AccountRole.Maintainer)
 </script>
 
 <Header
@@ -69,26 +71,15 @@
     <Scroller>
       {#each $floors as _floor}
         <FloorPreview
-          showRoomName
           floor={_floor}
           configurable
           removable={$floors.length > 1}
-          configure={configure && floor?._id === _floor._id}
           rooms={getRooms($rooms, _floor._id)}
           selected={floor?._id === _floor._id}
-          background={'var(--theme-panel-color)'}
-          on:configure={() => {
-            if (floor?._id === _floor._id) {
-              configure = !configure
-            } else {
-              selectedFloor.set(_floor?._id)
-              floor = _floor
-              configure = true
-            }
-          }}
           on:select={() => {
             selectedFloor.set(_floor?._id)
             floor = _floor
+            dispatch('close')
           }}
           on:remove={() => handleFloorRemoved(_floor)}
         />

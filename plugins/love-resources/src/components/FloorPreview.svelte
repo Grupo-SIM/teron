@@ -13,64 +13,35 @@
 // limitations under the License.
 -->
 <script lang="ts">
-  import { AccountRole, Ref, getCurrentAccount, hasAccountRole } from '@hcengineering/core'
-  import { IntlString } from '@hcengineering/platform'
-  import { getClient, MessageBox } from '@hcengineering/presentation'
+  import { AccountRole, getCurrentAccount, hasAccountRole } from '@hcengineering/core'
+  import { getClient, isAdminUser, MessageBox } from '@hcengineering/presentation'
   import {
-    AccordionItem,
     ButtonIcon,
+    Icon,
+    IconCheck,
     IconDelete,
     IconEdit,
     IconMoreH,
-    IconSettings,
-    Label,
     SelectPopup,
     eventToHTMLElement,
     showPopup,
     type SelectPopupValueType
   } from '@hcengineering/ui'
-  import { Floor, ParticipantInfo, Room } from '@hcengineering/love'
+  import { Floor, Room } from '@hcengineering/love'
   import { createEventDispatcher } from 'svelte'
   import plugin from '../plugin'
-  import { infos } from '../stores'
-  import { calculateFloorSize } from '../utils'
   import EditFloorPopup from './EditFloorPopup.svelte'
-  import FloorGrid from './FloorGrid.svelte'
-  import RoomPreview from './RoomPreview.svelte'
 
   export let floor: Floor
   export let configurable: boolean = false
   export let rooms: Room[] = []
   export let selected: boolean
-  export let disabled: boolean = false
-  export let isOpen: boolean = false
-  export let cropped: boolean = false
-  export let showRoomName: boolean = false
-  export let size: 'small' | 'medium' | 'large' = 'large'
-  export let background: string | undefined = undefined
-  export let kind: 'default' | 'second' | 'no-border' = 'default'
-  export let configure: boolean = false
   export let removable: boolean = true
 
   const me = getCurrentAccount()
   const dispatch = createEventDispatcher()
 
-  let floorContainer: HTMLDivElement
-  let hovered: number = -1
-
-  function getInfo (room: Ref<Room>, info: ParticipantInfo[]): ParticipantInfo[] {
-    return info.filter((p) => p.room === room)
-  }
-
-  let roomName: IntlString | undefined = undefined
-
-  function hover (e: CustomEvent<any>, n: number): void {
-    roomName = e.detail.name
-    hovered = n
-  }
-
-  $: editable = hasAccountRole(me, AccountRole.Maintainer)
-  $: rows = calculateFloorSize(rooms) - (cropped ? 1 : 0)
+  $: editable = isAdminUser() || hasAccountRole(me, AccountRole.Maintainer)
 
   const client = getClient()
 
@@ -104,47 +75,48 @@
       value.push({ id: 'delete', icon: IconDelete, label: plugin.string.DeleteFloor })
     }
     showPopup(SelectPopup, { value }, eventToHTMLElement(e), (result) => {
-      if (result === 'configure') {
-        dispatch('configure', floor)
-        pressed = false
-      } else if (result === 'rename') renameFloor()
+      pressed = false
+      if (result === 'rename') renameFloor()
       else if (result === 'delete') remove()
     })
   }
 </script>
 
-<AccordionItem
-  id={`floor-${floor._id}`}
-  title={floor.name}
-  {size}
-  {background}
-  {isOpen}
-  selectable
-  {selected}
-  {disabled}
-  {kind}
-  categoryHeader
-  contentAlign={'center'}
-  on:select
->
-  <svelte:fragment slot="actions">
-    {#if showRoomName && roomName !== undefined}
-      <span class="content-color overflow-label"><Label label={roomName} /></span>
+<div class="floor-row" class:selected>
+  <button class="floor-select" on:click={() => dispatch('select')}>
+    <span class="overflow-label">{floor.name}</span>
+    {#if selected}
+      <Icon icon={IconCheck} size={'small'} />
     {/if}
-    {#if configurable && editable}
-      <ButtonIcon icon={IconMoreH} kind={'tertiary'} size={'small'} {pressed} on:click={clickMore} />
-    {/if}
-  </svelte:fragment>
-  <FloorGrid bind:floorContainer {rows} preview on:mouseover={() => (roomName = undefined)}>
-    {#each rooms as room, i}
-      <RoomPreview
-        {room}
-        info={getInfo(room._id, $infos)}
-        preview
-        on:hover={(e) => {
-          hover(e, i)
-        }}
-      />
-    {/each}
-  </FloorGrid>
-</AccordionItem>
+  </button>
+  {#if configurable && editable}
+    <ButtonIcon icon={IconMoreH} kind={'tertiary'} size={'small'} {pressed} on:click={clickMore} />
+  {/if}
+</div>
+
+<style lang="scss">
+  .floor-row {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    margin: 0 0.5rem 0.25rem;
+    padding: 0.25rem;
+    border: 1px solid var(--global-ui-BorderColor);
+    border-radius: var(--small-BorderRadius);
+
+    &.selected {
+      background-color: var(--theme-button-pressed);
+    }
+  }
+
+  .floor-select {
+    display: flex;
+    flex: 1;
+    align-items: center;
+    justify-content: space-between;
+    min-width: 0;
+    padding: 0.5rem;
+    color: var(--theme-content-color);
+    cursor: pointer;
+  }
+</style>
