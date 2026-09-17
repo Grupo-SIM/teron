@@ -267,7 +267,7 @@ class TelegramConnection {
       if (entity.className === 'User' && entity.bot === false) {
         result.push({
           id: entity.id.toString(),
-          name: [entity.firstName, entity.lastName].filter((value) => value !== undefined).join(' ') || entity.phone ?? '',
+          name: [entity.firstName, entity.lastName].filter((value) => value !== undefined).join(' ') || (entity.phone ?? ''),
           type: 'user',
           mode: 'none'
         })
