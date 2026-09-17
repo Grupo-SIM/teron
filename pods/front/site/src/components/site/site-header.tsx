@@ -1,9 +1,10 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useEffect, useState, type MouseEvent } from "react";
 import { DocumentLocale } from "@/i18n/document-locale";
 import { Localized, defaultLocale, type Locale } from "@/i18n/site";
+import { AuthApi, loadAuthConfig } from "../auth/auth-api";
 import { Asset } from "./asset";
 
 type SiteSession =
@@ -114,7 +115,7 @@ export function SiteHeader({ locale = defaultLocale }: { locale?: Locale }) {
           style={{ alignItems: "center", gap: 18 }}
         >
           {session?.authenticated ? (
-            <WorkspaceLink href="/entrar?mode=workspaces" />
+            <WorkspaceLink locale={locale} />
           ) : session === null ? null : (
             <>
               <a
@@ -199,12 +200,11 @@ export function SiteHeader({ locale = defaultLocale }: { locale?: Locale }) {
 
           <div className="lp-menu-actions">
             {session?.authenticated ? (
-              <a
-                href="/entrar?mode=workspaces"
-                onClick={() => setMenuOpen(false)}
+              <WorkspaceLink
                 className="lp-menu-btn"
-              >
-                {"common.workspace"}</a>
+                locale={locale}
+                onNavigate={() => setMenuOpen(false)}
+              />
             ) : session === null ? null : (
               <>
                 <a
@@ -228,18 +228,60 @@ export function SiteHeader({ locale = defaultLocale }: { locale?: Locale }) {
   );
 }
 
-function WorkspaceLink({ href, locale = defaultLocale }: { href: string; locale?: Locale }) {
+function WorkspaceLink({
+  className = "lp-btn-white",
+  locale = defaultLocale,
+  onNavigate,
+}: {
+  className?: string;
+  locale?: Locale;
+  onNavigate?: () => void;
+}) {
+  const [isOpening, setIsOpening] = useState(false);
+
+  const openLastWorkspace = async (event: MouseEvent<HTMLAnchorElement>) => {
+    event.preventDefault();
+    if (isOpening) return;
+
+    setIsOpening(true);
+    try {
+      const api = new AuthApi(await loadAuthConfig(locale), locale);
+      const workspace = (await api.getWorkspaces())
+        .filter((item) => item.mode !== "archived" && !item.mode?.startsWith("archiving-"))
+        .toSorted((left, right) => (right.lastVisit ?? 0) - (left.lastVisit ?? 0))[0];
+
+      if (!workspace) throw new Error("No active workspace available");
+
+      const login = await api.selectWorkspace(workspace.url);
+      await api.setCookie(login.token);
+      onNavigate?.();
+      window.location.assign(`/workbench/${encodeURIComponent(login.workspaceUrl)}`);
+    } catch {
+      onNavigate?.();
+      window.location.assign("/entrar?mode=workspaces");
+    }
+  };
+
   return (
-    <Localized locale={locale}><a
-      href={href}
-      className="lp-btn-white"
+    <Localized locale={locale}>
+      <a
+      href="/entrar?mode=workspaces"
+      onClick={openLastWorkspace}
+      aria-busy={isOpening}
+      className={className}
       style={{
-        fontSize: 14,
-        fontWeight: 700,
-        padding: "8px 16px",
-        borderRadius: 8,
+        ...(className === "lp-btn-white"
+          ? {
+              fontSize: 14,
+              fontWeight: 700,
+              padding: "8px 16px",
+              borderRadius: 8,
+            }
+          : {}),
       }}
     >
-      {"common.workspace"}</a></Localized>
+      {"common.workspace"}
+      </a>
+    </Localized>
   );
 }
