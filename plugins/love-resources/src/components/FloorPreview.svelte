@@ -13,7 +13,7 @@
 // limitations under the License.
 -->
 <script lang="ts">
-  import { AccountRole, getCurrentAccount, hasAccountRole } from '@hcengineering/core'
+  import { AccountRole, getCurrentAccount, hasAccountRole, type Ref } from '@hcengineering/core'
   import { getClient, isAdminUser, MessageBox } from '@hcengineering/presentation'
   import {
     ButtonIcon,
@@ -27,10 +27,14 @@
     showPopup,
     type SelectPopupValueType
   } from '@hcengineering/ui'
-  import { Floor, Room } from '@hcengineering/love'
+  import { Floor, ParticipantInfo, Room } from '@hcengineering/love'
   import { createEventDispatcher } from 'svelte'
   import plugin from '../plugin'
+  import { infos } from '../stores'
+  import { calculateFloorSize } from '../utils'
   import EditFloorPopup from './EditFloorPopup.svelte'
+  import FloorGrid from './FloorGrid.svelte'
+  import RoomPreview from './RoomPreview.svelte'
 
   export let floor: Floor
   export let configurable: boolean = false
@@ -44,6 +48,12 @@
   $: editable = isAdminUser() || hasAccountRole(me, AccountRole.Maintainer)
 
   const client = getClient()
+  let floorContainer: HTMLDivElement
+  $: rows = calculateFloorSize(rooms)
+
+  function getInfo (room: Ref<Room>, info: ParticipantInfo[]): ParticipantInfo[] {
+    return info.filter((participant) => participant.room === room)
+  }
 
   function remove (): void {
     showPopup(MessageBox, {
@@ -82,31 +92,47 @@
   }
 </script>
 
-<div class="floor-row" class:selected>
-  <button class="floor-select" on:click={() => dispatch('select')}>
-    <span class="overflow-label">{floor.name}</span>
-    {#if selected}
-      <Icon icon={IconCheck} size={'small'} />
+<div class="floor-card preview" class:selected>
+  <div class="floor-row">
+    <button class="floor-select" on:click={() => dispatch('select')}>
+      <span class="overflow-label">{floor.name}</span>
+      {#if selected}
+        <Icon icon={IconCheck} size={'small'} />
+      {/if}
+    </button>
+    {#if configurable && editable}
+      <ButtonIcon icon={IconMoreH} kind={'tertiary'} size={'small'} {pressed} on:click={clickMore} />
     {/if}
+  </div>
+  <button class="floor-preview" aria-label={floor.name} on:click={() => dispatch('select')}>
+    <div class="floor-preview-content">
+      <FloorGrid bind:floorContainer {rows} preview>
+        {#each rooms as room}
+          <RoomPreview {room} info={getInfo(room._id, $infos)} preview />
+        {/each}
+      </FloorGrid>
+    </div>
   </button>
-  {#if configurable && editable}
-    <ButtonIcon icon={IconMoreH} kind={'tertiary'} size={'small'} {pressed} on:click={clickMore} />
-  {/if}
 </div>
 
 <style lang="scss">
+  .floor-card {
+    margin: 0 0.5rem 0.5rem;
+    border: 1px solid var(--global-ui-BorderColor);
+    border-radius: var(--small-BorderRadius);
+    background-color: var(--theme-button-default);
+
+    &.selected {
+      border-color: var(--theme-button-focused-border);
+      background-color: var(--theme-button-pressed);
+    }
+  }
+
   .floor-row {
     display: flex;
     align-items: center;
     gap: 0.25rem;
-    margin: 0 0.5rem 0.25rem;
     padding: 0.25rem;
-    border: 1px solid var(--global-ui-BorderColor);
-    border-radius: var(--small-BorderRadius);
-
-    &.selected {
-      background-color: var(--theme-button-pressed);
-    }
   }
 
   .floor-select {
@@ -118,5 +144,25 @@
     padding: 0.5rem;
     color: var(--theme-content-color);
     cursor: pointer;
+  }
+
+  .floor-preview {
+    display: block;
+    width: 100%;
+    padding: 0 0.5rem 0.5rem;
+    cursor: pointer;
+  }
+
+  .floor-preview-content {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+    overflow: hidden;
+    pointer-events: none;
+
+    :global(.floorGrid) {
+      min-width: 0 !important;
+      max-width: 100% !important;
+    }
   }
 </style>
