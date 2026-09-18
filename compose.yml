@@ -11,6 +11,7 @@ services:
       - STATS_URL=https://${HOST_ADDRESS}/_stats
       #      - STATS_URL=http://stats:4900
       - MAIL_URL=http://mail:8097
+      - MAIL_AUTH_TOKEN=${MAIL_AUTH_TOKEN:-}
       - MODEL_ENABLED=*
       - ACCOUNTS_URL=https://${HOST_ADDRESS}/_accounts
       - ACCOUNT_PORT=3000
@@ -403,6 +404,7 @@ services:
       - SMTP_PORT=${SMTP_PORT}
       - SMTP_USERNAME=${SMTP_USER}
       - SMTP_PASSWORD=${SMTP_PASSWORD}
+      - API_KEY=${MAIL_AUTH_TOKEN:-}
     ports:
       - 8097:8097
     networks:
