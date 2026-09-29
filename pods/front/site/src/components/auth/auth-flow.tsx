@@ -8,6 +8,7 @@ import { getDictionary, type Locale, type SiteDictionary } from "@/i18n/site";
 
 import {
   AuthApi,
+  AuthApiError,
   authErrorMessage,
   loadAuthConfig,
   type LoginInfo,
@@ -183,7 +184,10 @@ export function AuthFlow({ variant, locale }: { variant: Variant; locale: Locale
           if (authToken) setToken(authToken);
           await loadWorkspaces(authToken);
         } else if (!mode) {
-          const info = await api!.getLoginInfo();
+          const info = await api!.getLoginInfo().catch((cause: unknown) => {
+            if (cause instanceof AuthApiError && cause.code.split(":").at(-1) === "Unauthorized") return null;
+            throw cause;
+          });
           if (info && !("request" in info)) {
             const query = new URLSearchParams(params);
             query.set("mode", "workspaces");
