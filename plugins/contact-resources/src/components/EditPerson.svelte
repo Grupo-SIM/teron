@@ -170,6 +170,9 @@
         />
       </div>
 
+      <AttributeEditor maxWidth="20rem" _class={contact.class.Person} {object} {editable} key="professionalTitle" />
+      <AttributeEditor maxWidth="20rem" _class={contact.class.Person} {object} {editable} key="contactSource" />
+
       <WorkModeDays {object} {editable} />
 
       <div class="separator" />

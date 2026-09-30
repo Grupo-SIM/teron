@@ -149,6 +149,8 @@ export interface Contact extends Doc, AvatarInfo {
 export interface Person extends Contact, BasePerson {
   birthday?: Timestamp | null
   functions?: number
+  professionalTitle?: string
+  contactSource?: string
   remoteDaysPerWeek?: number | null
   onsiteDaysPerWeek?: number | null
   socialIds?: Collection<SocialIdentity>

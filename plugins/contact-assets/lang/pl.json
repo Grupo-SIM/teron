@@ -72,6 +72,8 @@
     "Inactive": "Nieaktywny",
     "Active": "Aktywny",
     "Role": "Rola",
+    "ProfessionalTitle": "Professional title",
+    "ContactSource": "Contact source",
     "RemoteDaysPerWeek": "Remote days per week",
     "OnsiteDaysPerWeek": "On-site days per week",
     "WorkDaysPerWeekInvalid": "Use 0 to 7; the total cannot exceed 7 days.",

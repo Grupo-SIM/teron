@@ -30,17 +30,21 @@ import {
   tryUpgrade,
   type MigrateOperation,
   type MigrationClient,
+  type MigrationDocumentQuery,
   type MigrationUpgradeClient,
   type ModelLogger
 } from '@hcengineering/model'
 import tags, { type TagCategory } from '@hcengineering/model-tags'
 import task, { createSequence, DOMAIN_TASK, migrateDefaultStatusesBase } from '@hcengineering/model-task'
-import { recruitId, type Applicant } from '@hcengineering/recruit'
+import { recruitId, type Applicant, type Candidate } from '@hcengineering/recruit'
 
 import { DOMAIN_CALENDAR } from '@hcengineering/model-calendar'
+import contact, { DOMAIN_CONTACT } from '@hcengineering/model-contact'
+import { type Person } from '@hcengineering/contact'
 import { DOMAIN_SPACE } from '@hcengineering/model-core'
 import recruit from './plugin'
 import { defaultApplicantStatuses } from './spaceType'
+import { candidateContactUpdate } from './candidate-contact'
 
 export const recruitOperation: MigrateOperation = {
   async preMigrate (client: MigrationClient, logger: ModelLogger, mode): Promise<void> {
@@ -80,6 +84,11 @@ export const recruitOperation: MigrateOperation = {
             { isDone: false }
           )
         }
+      },
+      {
+        state: 'preserve-candidate-contact-fields-v1',
+        mode: 'upgrade',
+        func: preserveCandidateContactFields
       }
     ])
   },
@@ -93,6 +102,28 @@ export const recruitOperation: MigrateOperation = {
         }
       }
     ])
+  }
+}
+
+async function preserveCandidateContactFields (client: MigrationClient): Promise<void> {
+  const iterator = await client.traverse<Person>(DOMAIN_CONTACT, {
+    _class: contact.class.Person,
+    [recruit.mixin.Candidate]: { $exists: true }
+  } as MigrationDocumentQuery<Person>)
+  try {
+    while (true) {
+      const people = await iterator.next(100)
+      if (people === null || people.length === 0) break
+      for (const person of people) {
+        const candidate = (person as Person & Record<string, unknown>)[recruit.mixin.Candidate] as Partial<Candidate> | undefined
+        const update = candidateContactUpdate(person, candidate)
+        if (Object.keys(update).length > 0) {
+          await client.update(DOMAIN_CONTACT, { _id: person._id }, update)
+        }
+      }
+    }
+  } finally {
+    await iterator.close()
   }
 }
 

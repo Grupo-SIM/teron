@@ -72,6 +72,8 @@
         "Inactive": "비활성",
         "Active": "활성",
         "Role": "역할",
+    "ProfessionalTitle": "Professional title",
+    "ContactSource": "Contact source",
     "RemoteDaysPerWeek": "Remote days per week",
     "OnsiteDaysPerWeek": "On-site days per week",
     "WorkDaysPerWeekInvalid": "Use 0 to 7; the total cannot exceed 7 days.",
@@ -155,6 +157,7 @@
         "WorkspaceStatusEndOfDay": "오늘 종료",
         "WorkspaceStatusPickDate": "날짜 선택"
     ,
-      "Enabled": "Enabled"
+      "Enabled": "Enabled",
+      "HideInactive": "Hide inactive"
     }
 }
