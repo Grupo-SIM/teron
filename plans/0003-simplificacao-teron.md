@@ -205,4 +205,6 @@ Etapa de sincronização executada duas vezes em MongoDB descartável local: uma
 
 Tela Modelos agora alterna entre modelos de tarefa e modelos de texto. A lista de texto consulta `MessageTemplate`, permite pesquisar, selecionar e visualizar conteúdo, inclusive após criação. Build Rush de Tracker UI e parser/preprocessamento dos dois componentes passaram; falta validar inserção do modelo no editor real com conta local.
 
+Na aba de modelos de texto, opções de visualização específicas de tarefas ficam ocultas; seleção, pesquisa e criação dos textos permanecem disponíveis.
+
 Revisão do Calendário encontrou caminho residual na visão mensal: clique em evento privado ainda abria editor, e popup do dia não marcava evento como ocupado. Visão mensal agora exibe “Ocupado” e bloqueia abertura; popup do dia aplica a mesma regra. Build Rush e parser/preprocessamento dos componentes passaram. Validar com duas contas locais.

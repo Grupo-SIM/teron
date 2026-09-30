@@ -58,7 +58,9 @@
   adaptive={'default'}
 >
   <svelte:fragment slot="header-tools">
-    <ViewletSettingButton bind:viewOptions bind:viewlet />
+    {#if templateKind === 'issue'}
+      <ViewletSettingButton bind:viewOptions bind:viewlet />
+    {/if}
   </svelte:fragment>
   <svelte:fragment slot="label_selector">
     <slot name="label_selector" />
