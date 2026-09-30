@@ -127,4 +127,6 @@ Auditoria adicional de pt-BR corrigiu rótulos de downloads ainda exibidos em in
 
 Revisão de Diretrizes corrigiu “Meus documentos” no menu e “Sin título” no estado sem nome; catálogo `pt` recebeu os mesmos nomes do aplicativo e confirmação de exclusão traduzida.
 
+Tela de exportação agora identifica Diretrizes, Projetos e Tarefas pelos nomes atuais, nos catálogos `pt` e `pt-br`.
+
 Validação parcial: parsing/preprocessamento local dos componentes Svelte alterados passou. `svelte-check` completo encontrou milhares de erros de dependências não compiladas; também revelou sintaxe inválida no handler do filtro, corrigida antes de repetir o parsing. Nenhuma migração remota executada.
