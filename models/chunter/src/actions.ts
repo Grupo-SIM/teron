@@ -18,6 +18,7 @@ import view, { actionTemplates as viewTemplates, createAction, template } from '
 import notification, { notificationActionTemplates } from '@hcengineering/model-notification'
 import activity from '@hcengineering/activity'
 import workbench from '@hcengineering/model-workbench'
+import presentation from '@hcengineering/model-presentation'
 import core from '@hcengineering/model-core'
 import contact from '@hcengineering/contact'
 
@@ -173,6 +174,24 @@ function defineMessageActions (builder: Builder): void {
 }
 
 function defineChannelActions (builder: Builder): void {
+  createAction(builder, {
+    action: view.actionImpl.ShowPanel,
+    actionProps: {
+      component: chunter.component.EditChannel,
+      element: 'content'
+    },
+    label: presentation.string.Edit,
+    icon: view.icon.Edit,
+    input: 'focus',
+    category: chunter.category.Chunter,
+    target: chunter.class.Channel,
+    visibilityTester: view.function.CanEditSpace,
+    context: {
+      mode: 'context',
+      group: 'edit'
+    }
+  })
+
   createAction(
     builder,
     {
@@ -238,10 +257,6 @@ function defineChannelActions (builder: Builder): void {
     context: {
       mode: ['browser', 'context'],
       group: 'edit'
-    },
-    action: workbench.actionImpl.Navigate,
-    actionProps: {
-      mode: 'space'
     }
   })
 

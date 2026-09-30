@@ -53,6 +53,8 @@ Busca da barra lateral de Conversa ocultada; busca continua disponível na tela 
 
 Menus simplificados: Adicionar relação, Nova tarefa relacionada, Relações, Copiar link/título/URL e configuração de projetos relacionados ocultos nos menus; Link público de Diretrizes não é mais registrado.
 
+Menu contextual de canal agora oferece Editar para usuários com permissão; ação Abrir usa navegação padrão para o painel do canal.
+
 Estimativa de tarefa agora explicita horas no rótulo e no campo de edição. Tempo restante saiu do popup de estimativa. Ação “Adicionar relatório de tempo” saiu do menu de tarefas; relatório manual ainda existe no popup enquanto cálculo automático de tempo gasto não estiver pronto.
 
 Campo Componente retirado dos formulários de criação, detalhe e modelo de tarefa; retirado de cartões, colunas, agrupamentos e filtro das listas comuns. Vínculo persistido permanece para registros antigos e rotinas de movimentação; revisar caminhos de criação contextual antes de encerrar o marco 3.
