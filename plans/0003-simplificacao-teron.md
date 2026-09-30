@@ -43,6 +43,8 @@ Marco 5 iniciado: miniaturas do drawer permitem ações sobre salas e pessoas; c
 
 Recrutamento, RH e Planejador de equipes ocultos na navegação enquanto migrações de dados são preparadas. Configurações do escritório removidas da lista de configurações. Desbloqueio de Diretrizes limitado a Owner/Maintainer na UI e na função cliente; confirmação de exclusão usa “este documento”. A autorização de desbloqueio no servidor ainda requer verificação antes do fechamento do marco 7.
 
+Aplicativos de Recursos Humanos e Planejador de equipes agora deixam de ser registrados no modelo; atalho para Planejador de equipes removido. Tipos de dados legados permanecem para compatibilidade durante a retirada gradual.
+
 Registro do aplicativo de Recrutamento, atalhos de navegação, categorias de busca e ações para criar candidaturas pelo menu de contatos removidos do modelo. Tipos legados permanecem registrados enquanto a migração de dados e a limpeza segura são concluídas.
 
 Registro de ações, painel e notificações específicas de entrevistas de Recrutamento desativado; documentos legados permanecem legíveis para a migração.

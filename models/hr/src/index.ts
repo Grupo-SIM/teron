@@ -15,7 +15,6 @@
 
 import { type Contact, type Employee } from '@hcengineering/contact'
 import {
-  AccountRole,
   DOMAIN_MODEL,
   IndexKind,
   type Arr,
@@ -26,7 +25,6 @@ import {
   type Type
 } from '@hcengineering/core'
 import {
-  hrId,
   type Department,
   type PublicHoliday,
   type Request,
@@ -55,7 +53,6 @@ import chunter from '@hcengineering/model-chunter'
 import contact, { TEmployee } from '@hcengineering/model-contact'
 import core, { TAttachedDoc, TDoc, TType } from '@hcengineering/model-core'
 import view, { classPresenter, createAction } from '@hcengineering/model-view'
-import workbench from '@hcengineering/model-workbench'
 import notification from '@hcengineering/notification'
 import { type Asset, type IntlString } from '@hcengineering/platform'
 import { PaletteColorIndexes } from '@hcengineering/ui/src/colors'
@@ -187,20 +184,6 @@ export class TPublicHoliday extends TDoc implements PublicHoliday {
 
 export function createModel (builder: Builder): void {
   builder.createModel(TDepartment, TRequest, TRequestType, TPublicHoliday, TStaff, TTzDate)
-
-  builder.createDoc(
-    workbench.class.Application,
-    core.space.Model,
-    {
-      label: hr.string.HRApplication,
-      icon: hr.icon.HR,
-      accessLevel: AccountRole.User,
-      alias: hrId,
-      hidden: true,
-      component: hr.component.Schedule
-    },
-    hr.app.HR
-  )
 
   builder.mixin(hr.class.Department, core.class.Class, view.mixin.AttributeEditor, {
     inlineEditor: hr.component.DepartmentEditor

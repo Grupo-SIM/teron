@@ -226,20 +226,6 @@ export function createModel (builder: Builder): void {
     time.ids.ModulePermissionGroupReadOnlyGuest
   )
 
-  builder.createDoc(
-    workbench.class.Application,
-    core.space.Model,
-    {
-      label: time.string.Team,
-      icon: time.icon.Team,
-      accessLevel: AccountRole.User,
-      alias: 'team',
-      hidden: true,
-      component: time.component.Team
-    },
-    time.app.Team
-  )
-
   builder.mixin(time.class.ToDo, core.class.Class, view.mixin.IgnoreActions, {
     actions: [view.action.Open, tracker.action.NewRelatedIssue, view.action.Delete]
   })
@@ -354,22 +340,6 @@ export function createModel (builder: Builder): void {
       mode: ['workbench', 'browser', 'editor', 'panel', 'popup']
     }
   })
-  createAction(builder, {
-    action: workbench.actionImpl.Navigate,
-    actionProps: {
-      mode: 'app',
-      application: 'team'
-    },
-    label: time.string.GotoTimeTeamPlaning,
-    icon: view.icon.ArrowRight,
-    input: 'none',
-    category: view.category.Navigation,
-    target: core.class.Doc,
-    context: {
-      mode: ['workbench', 'browser', 'editor', 'panel', 'popup']
-    }
-  })
-
   builder.createDoc(
     notification.class.NotificationGroup,
     core.space.Model,
