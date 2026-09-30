@@ -18,6 +18,7 @@
   import { Label, addZero, getPlatformColorForTextDef, showPopup, themeStore, tooltip } from '@hcengineering/ui'
   import { createEventDispatcher } from 'svelte'
   import calendar from '../plugin'
+  import { calendarByIdStore, isVisible } from '../utils'
   import EventsPopup from './EventsPopup.svelte'
 
   export let events: Event[]
@@ -72,10 +73,16 @@
           class="overflow-label mt-1 py-1 flex flex-between event cursor-pointer"
           style="background-color: {getPlatformColorForTextDef(e.space, $themeStore.dark).color};"
           on:click|stopPropagation|preventDefault={() => {
-            showPopup(calendar.component.EditEvent, { object: e }, 'content')
+            if (isVisible(e, $calendarByIdStore)) {
+              showPopup(calendar.component.EditEvent, { object: e }, 'content')
+            }
           }}
         >
-          {e.title}
+          {#if isVisible(e, $calendarByIdStore)}
+            {e.title}
+          {:else}
+            <Label label={calendar.string.Busy} />
+          {/if}
           {#if !e.allDay}
             <div>
               {addZero(new Date(e.date).getHours())}:{addZero(new Date(e.date).getMinutes())}
