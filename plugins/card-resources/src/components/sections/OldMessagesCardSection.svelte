@@ -28,7 +28,7 @@
     is={activity.component.Activity}
     props={{
       object: doc,
-      showCommenInput: !readonly,
+      showCommenInput: false,
       focusIndex: 1000,
       boundary: contentDiv
     }}

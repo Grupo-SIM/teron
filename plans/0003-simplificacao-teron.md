@@ -31,6 +31,8 @@ Marco 3 iniciado em paralelo: filtros Todos/Planejados/Ativos/Concluídos retira
 
 Marco 7 iniciado: botão de configuração avançada da visão retirado do componente compartilhado, preservando opções usuais de ordenação/agrupamento e seleção Lista/Quadro.
 
+Atividade permanece visível fora de Tarefas; editor de comentários fica habilitado apenas no painel da tarefa.
+
 Menus simplificados: Adicionar relação, Nova tarefa relacionada, Relações, Copiar link/título/URL e configuração de projetos relacionados ocultos nos menus; Link público de Diretrizes não é mais registrado.
 
 Concluir auditoria dos textos de interface e validar pacotes afetados antes de marcar marco 2 como concluído. Depois, continuar status e ações de Tarefas no marco 3.

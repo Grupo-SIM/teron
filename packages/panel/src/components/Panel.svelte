@@ -35,6 +35,7 @@
   export let title: string | undefined = undefined
   export let withoutActivity: boolean = false
   export let withoutInput: boolean = false
+  export let allowComments: boolean = false
   export let withoutTitle: boolean = false
   export let object: Doc
   export let panelWidth: number = 0
@@ -259,7 +260,7 @@
         {#key object._id}
           <Component
             is={activity.component.Activity}
-            props={{ object, showCommenInput: !withoutInput, shouldScroll: embedded, focusIndex: 1000 }}
+            props={{ object, showCommenInput: allowComments && !withoutInput, shouldScroll: embedded, focusIndex: 1000 }}
           />
         {/key}
       {/if}
@@ -279,7 +280,7 @@
             is={activity.component.Activity}
             props={{
               object,
-              showCommenInput: !withoutInput,
+              showCommenInput: allowComments && !withoutInput,
               shouldScroll: embedded,
               focusIndex: 1000,
               boundary: content
@@ -314,7 +315,7 @@
               bind:innerRef={activityRef}
               props={{
                 object,
-                showCommenInput: !withoutInput,
+                showCommenInput: allowComments && !withoutInput,
                 shouldScroll: embedded,
                 focusIndex: 1000,
                 boundary: content

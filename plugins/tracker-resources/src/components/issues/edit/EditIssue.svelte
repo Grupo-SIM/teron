@@ -212,6 +212,7 @@
     object={issue}
     isHeader={false}
     withoutInput={effectiveReadonly}
+    allowComments
     allowClose={!embedded}
     isAside={true}
     isSub={false}
