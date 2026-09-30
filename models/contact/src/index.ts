@@ -544,13 +544,11 @@ export function createModel (builder: Builder): void {
       config: [
         '',
         'city',
-        'attachments',
-        'modifiedOn',
         {
           key: 'functions',
           presenter: tags.component.LabelsPresenter,
           label: contact.string.Position,
-          props: { kind: 'list', full: false }
+          props: { kind: 'list', full: false, key: 'functions', queryWhenEmpty: true }
         },
         {
           key: '$lookup.channels',
@@ -580,13 +578,11 @@ export function createModel (builder: Builder): void {
       config: [
         { key: '', props: { showStatus: true } },
         'city',
-        'attachments',
-        'modifiedOn',
         {
           key: 'functions',
           presenter: tags.component.LabelsPresenter,
           label: contact.string.Position,
-          props: { kind: 'list', full: false }
+          props: { kind: 'list', full: false, key: 'functions', queryWhenEmpty: true }
         },
         {
           key: '$lookup.channels',
@@ -625,8 +621,6 @@ export function createModel (builder: Builder): void {
       config: [
         '',
         'city',
-        'attachments',
-        'modifiedOn',
         {
           key: '$lookup.channels',
           label: contact.string.ContactInfo,

@@ -22,6 +22,7 @@
   export let action: (evt: MouseEvent) => Promise<void> | void = async () => {}
   export let compression: boolean = false
   export let ignoreFirst: boolean = false
+  export let queryWhenEmpty: boolean = false
 
   const dispatch = createEventDispatcher()
 
@@ -31,7 +32,7 @@
   $: update(object, value)
 
   function update (object: WithLookup<Doc>, value: number) {
-    if (value > 0) {
+    if (value > 0 || queryWhenEmpty) {
       query.query(
         tags.class.TagReference,
         {
