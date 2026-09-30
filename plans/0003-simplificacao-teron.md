@@ -152,3 +152,5 @@ Ação Link público retirada também do registro de Contatos e de Tarefas; refe
 Ações globais de copiar link e adicionar relação, além das ações Nova tarefa relacionada, Copiar título/URL e configurar projetos relacionados, deixaram de ser registradas. IDs legados ficam para referências persistidas e listas de ignorados.
 
 Componente compartilhado de Atividade agora condiciona editor de comentários à classe Tarefa; histórico segue visível em outras entidades.
+
+Notificação de Tarefas deixou de oferecer botão de copiar URL; ação Ver tarefa permanece.

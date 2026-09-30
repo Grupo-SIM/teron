@@ -1,9 +1,8 @@
 <script lang="ts">
   import { getMetadata } from '@hcengineering/platform'
-  import presentation, { copyTextToClipboard, createQuery } from '@hcengineering/presentation'
+  import presentation, { createQuery } from '@hcengineering/presentation'
   import { Issue, IssueStatus } from '@hcengineering/tracker'
   import { Button, Notification, navigate, parseLocation, NotificationToast } from '@hcengineering/ui'
-  import view from '@hcengineering/view'
 
   import { statusStore } from '@hcengineering/view-resources'
   import tracker from '../../plugin'
@@ -46,11 +45,7 @@
     onRemove()
   }
 
-  function handleCopyUrl (): void {
-    if (issue !== undefined) {
-      void copyTextToClipboard(params?.issueUrl)
-    }
-  }
+
 </script>
 
 <NotificationToast title={notification.title} severity={notification.severity} onClose={onRemove}>
@@ -73,6 +68,5 @@
 
   <svelte:fragment slot="buttons">
     <Button label={tracker.string.ViewIssue} on:click={handleIssueOpened} />
-    <Button icon={view.icon.CopyLink} label={tracker.string.CopyIssueUrl} on:click={handleCopyUrl} />
   </svelte:fragment>
 </NotificationToast>
