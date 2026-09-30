@@ -17,11 +17,13 @@ import activity, { type DocUpdateMessage } from '@hcengineering/activity'
 import core, {
   DOMAIN_MODEL_TX,
   DOMAIN_STATUS,
+  DOMAIN_TX,
   type Ref,
   type Status,
   type TxCreateDoc,
   type TxUpdateDoc,
   TxOperations,
+  type TxCUD,
   generateId,
   toIdMap
 } from '@hcengineering/core'
@@ -79,6 +81,29 @@ async function consolidatePendingStatus (client: MigrationClient): Promise<void>
     _class: tracker.class.Project,
     defaultIssueStatus: tracker.status.Todo
   }, { defaultIssueStatus: tracker.status.Backlog })
+
+  const issueStatusTxes = await client.traverse<TxCUD<Issue>>(DOMAIN_TX, {
+    objectClass: { $in: client.hierarchy.getDescendants(tracker.class.Issue) },
+    $or: [
+      { 'attributes.status': tracker.status.Todo },
+      { 'operations.status': tracker.status.Todo }
+    ]
+  })
+  try {
+    while (true) {
+      const txes = await issueStatusTxes.next(500)
+      if (txes === null || txes.length === 0) break
+      for (const tx of txes) {
+        if (tx._class === core.class.TxCreateDoc) {
+          await client.update(DOMAIN_TX, { _id: tx._id }, { 'attributes.status': tracker.status.Backlog })
+        } else if (tx._class === core.class.TxUpdateDoc) {
+          await client.update(DOMAIN_TX, { _id: tx._id }, { 'operations.status': tracker.status.Backlog })
+        }
+      }
+    }
+  } finally {
+    await issueStatusTxes.close()
+  }
 
   const taskTypeCreates = await client.find<TxCreateDoc<TaskType>>(DOMAIN_MODEL_TX, {
     _class: core.class.TxCreateDoc,
