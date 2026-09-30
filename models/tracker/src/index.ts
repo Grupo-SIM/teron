@@ -180,7 +180,6 @@ function defineFilters (builder: Builder): void {
   //
   builder.mixin(tracker.class.Issue, core.class.Class, view.mixin.ClassFilters, {
     filters: [
-      'kind',
       'status',
       'priority',
       'space',

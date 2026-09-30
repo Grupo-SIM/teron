@@ -50,8 +50,8 @@
     SpaceSelector
   } from '@hcengineering/presentation'
   import tags, { type TagElement, TagReference } from '@hcengineering/tags'
-  import { TaskType } from '@hcengineering/task'
-  import { TaskKindSelector } from '@hcengineering/task-resources'
+  import task, { TaskType } from '@hcengineering/task'
+  import { taskTypeStore } from '@hcengineering/task-resources'
   import { EmptyMarkup, isEmptyMarkup } from '@hcengineering/text'
   import {
     Component as ComponentType,
@@ -131,6 +131,18 @@
   let object = getDefaultObjectFromDraft() ?? getDefaultObject(id)
   let isAssigneeTouched = false
   let kind: Ref<TaskType> | undefined = undefined
+
+  $: if (currentProject?.type !== undefined) {
+    const descriptors = toIdMap(client.getModel().findAllSync(task.class.TaskTypeDescriptor, {}))
+    const available = Array.from($taskTypeStore.values()).filter(
+      (type) => type.parent === currentProject.type &&
+        (descriptors.get(type.descriptor)?.allowCreate ?? false) &&
+        hierarchy.isDerived(type.targetClass, tracker.class.Issue)
+    )
+    if (available.length > 0 && !available.some((type) => type._id === kind)) {
+      kind = available[0]._id
+    }
+  }
 
   let templateId: Ref<IssueTemplate> | undefined = draft?.template?.template
   let appliedTemplateId: Ref<IssueTemplate> | undefined = draft?.template?.template
@@ -813,12 +825,6 @@
       <span class="overflow-label">
         <Label {label} />
       </span>
-      <TaskKindSelector
-        projectType={currentProject?.type}
-        bind:value={kind}
-        baseClass={tracker.class.Issue}
-        size={'small'}
-      />
       {#if relatedTo}
         <div class="lower mr-2">
           <Label label={tracker.string.RelatedTo} />

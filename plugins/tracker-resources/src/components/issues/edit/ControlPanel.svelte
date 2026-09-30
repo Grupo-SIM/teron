@@ -56,6 +56,7 @@
     'description',
     'priority',
     'status',
+    'kind',
     'number',
     'assignee',
     'component',

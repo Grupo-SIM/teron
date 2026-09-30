@@ -26,7 +26,6 @@ import tracker from './plugin'
 export const issuesOptions = (kanban: boolean): ViewOptionsModel => ({
   groupBy: [
     'status',
-    'kind',
     'assignee',
     'priority',
     'space',
@@ -34,19 +33,16 @@ export const issuesOptions = (kanban: boolean): ViewOptionsModel => ({
     'createdBy',
     'modifiedBy',
     'estimation',
-    'remainingTime',
     'reportedTime'
   ],
   orderBy: [
     ['modifiedOn', SortingOrder.Descending],
     ['status', SortingOrder.Ascending],
-    ['kind', SortingOrder.Ascending],
     ['priority', SortingOrder.Ascending],
     ['createdOn', SortingOrder.Descending],
     ['dueDate', SortingOrder.Ascending],
     ['rank', SortingOrder.Ascending],
     ['estimation', SortingOrder.Descending],
-    ['remainingTime', SortingOrder.Descending],
     ['reportedTime', SortingOrder.Descending]
   ],
   other: [
@@ -103,13 +99,6 @@ export function issueConfig (
       presenter: tracker.component.StatusEditor,
       props: { kind: 'list', size: 'small', justify: 'center' },
       displayProps: { key: key + 'status' }
-    },
-    {
-      key: 'kind',
-      label: task.string.TaskType,
-      presenter: task.component.TaskTypeListPresenter,
-      props: { kind: 'list', size: 'small', justify: 'center' },
-      displayProps: { key: key + 'kind' }
     },
     {
       key: '',
@@ -237,10 +226,9 @@ export function defineViewlets (builder: Builder): void {
   )
 
   const subIssuesOptions: ViewOptionsModel = {
-    groupBy: ['status', 'kind', 'assignee', 'priority', 'milestone', 'createdBy', 'modifiedBy'],
+    groupBy: ['status', 'assignee', 'priority', 'milestone', 'createdBy', 'modifiedBy'],
     orderBy: [
       ['rank', SortingOrder.Ascending],
-      ['kind', SortingOrder.Ascending],
       ['status', SortingOrder.Ascending],
       ['priority', SortingOrder.Ascending],
       ['modifiedOn', SortingOrder.Descending],

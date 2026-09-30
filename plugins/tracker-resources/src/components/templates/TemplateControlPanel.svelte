@@ -14,10 +14,8 @@
 -->
 <script lang="ts">
   import { generateId, Ref, WithLookup } from '@hcengineering/core'
-  import { AttributeBarEditor, createQuery, getClient, KeyedAttribute } from '@hcengineering/presentation'
+  import { AttributeBarEditor, getClient, KeyedAttribute } from '@hcengineering/presentation'
   import tags, { TagElement, TagReference } from '@hcengineering/tags'
-  import task, { Project } from '@hcengineering/task'
-  import { TaskKindSelector } from '@hcengineering/task-resources'
   import type { IssueTemplate } from '@hcengineering/tracker'
   import { Component, Label } from '@hcengineering/ui'
   import { getFiltredKeys, isCollectionAttr } from '@hcengineering/view-resources'
@@ -63,32 +61,9 @@
     }
   }
 
-  let currentProject: Project | undefined
-  const spaceQuery = createQuery()
-  spaceQuery.query(tracker.class.Project, { _id: issue.space }, (res) => {
-    currentProject = res[0]
-  })
 </script>
 
 <div class="popupPanel-body__aside-grid">
-  <span class="labelOnPanel">
-    <Label label={task.string.TaskType} />
-  </span>
-  <TaskKindSelector
-    projectType={currentProject?.type}
-    value={issue.kind}
-    baseClass={tracker.class.Issue}
-    justify={'left'}
-    width={'100%'}
-    size={'medium'}
-    kind={'link'}
-    showAlways
-    on:change={async (evt) => {
-      if (evt.detail !== undefined) {
-        await client.update(issue, { kind: evt.detail })
-      }
-    }}
-  />
   <span class="labelOnPanel">
     <Label label={tracker.string.Priority} />
   </span>
