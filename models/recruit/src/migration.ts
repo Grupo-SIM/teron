@@ -16,6 +16,7 @@
 import { getCategories } from '@anticrm/skillset'
 import core, {
   DOMAIN_MODEL_TX,
+  DOMAIN_MIGRATION,
   toIdMap,
   TxOperations,
   type Domain,
@@ -40,8 +41,9 @@ import tags, { DOMAIN_TAGS, type TagCategory } from '@hcengineering/model-tags'
 import task, { createSequence, DOMAIN_TASK, migrateDefaultStatusesBase } from '@hcengineering/model-task'
 import { recruitId, type Applicant, type Candidate } from '@hcengineering/recruit'
 
-import { DOMAIN_CALENDAR } from '@hcengineering/model-calendar'
+import { DOMAIN_CALENDAR, DOMAIN_EVENT } from '@hcengineering/model-calendar'
 import contact, { DOMAIN_CONTACT } from '@hcengineering/model-contact'
+import { DOMAIN_DOC_NOTIFY, DOMAIN_NOTIFICATION, DOMAIN_USER_NOTIFY } from '@hcengineering/model-notification'
 import { type Person } from '@hcengineering/contact'
 import { DOMAIN_SPACE } from '@hcengineering/model-core'
 import recruit from './plugin'
@@ -106,6 +108,14 @@ export const recruitOperation: MigrateOperation = {
         state: 'preserve-applicant-comments-v1',
         mode: 'upgrade',
         func: preserveApplicantComments
+      },
+      {
+        state: 'remove-recruiting-records-v1',
+        mode: 'upgrade',
+        func: async (client) => {
+          await ensureCandidateDataPreserved(client)
+          await removeRecruitingRecords(client)
+        }
       }
     ])
   },
@@ -119,6 +129,24 @@ export const recruitOperation: MigrateOperation = {
         }
       }
     ])
+  }
+}
+
+export async function ensureCandidateDataPreserved (client: MigrationClient): Promise<void> {
+  const required = [
+    'preserve-candidate-contact-fields-v1',
+    'preserve-candidate-skills-v1',
+    'preserve-applicant-files-v1',
+    'preserve-applicant-comments-v1'
+  ]
+  const completed = await client.find<Doc>(DOMAIN_MIGRATION, {
+    plugin: recruitId,
+    state: { $in: required }
+  } as MigrationDocumentQuery<Doc>)
+  const states = new Set(completed.map((doc) => (doc as Doc & { state: string }).state))
+  const missing = required.filter((state) => !states.has(state))
+  if (missing.length > 0) {
+    throw new Error(`Recruitment data preservation incomplete: ${missing.join(', ')}`)
   }
 }
 
@@ -198,6 +226,34 @@ export async function preserveApplicantComments (client: MigrationClient): Promi
     }
   } finally {
     await applicants.close()
+  }
+}
+
+export async function removeRecruitingRecords (client: MigrationClient): Promise<void> {
+  const activityDomain = 'activity' as Domain
+  const targets = [
+    { domain: DOMAIN_TASK, _class: recruit.class.ApplicantMatch },
+    { domain: 'recruit' as Domain, _class: recruit.class.Opinion },
+    { domain: DOMAIN_EVENT, _class: recruit.class.Review },
+    { domain: DOMAIN_TASK, _class: recruit.class.Applicant },
+    { domain: DOMAIN_SPACE, _class: recruit.class.Vacancy }
+  ]
+
+  for (const { domain, _class } of targets) {
+    while (true) {
+      const batch = await client.find<Doc>(domain, { _class }, { limit: 100 })
+      if (batch.length === 0) break
+      const ids = batch.map(({ _id }) => _id)
+      const attachedTo = { $in: ids }
+
+      await client.deleteMany(DOMAIN_ATTACHMENT, { attachedTo })
+      await client.deleteMany(activityDomain, { attachedTo })
+      await client.deleteMany(DOMAIN_TAGS, { attachedTo })
+      await client.deleteMany(DOMAIN_NOTIFICATION, { attachedTo })
+      await client.deleteMany(DOMAIN_USER_NOTIFY, { attachedTo })
+      await client.deleteMany(DOMAIN_DOC_NOTIFY, { objectId: { $in: ids } })
+      await client.deleteMany(domain, { _class, _id: { $in: ids } })
+    }
   }
 }
 

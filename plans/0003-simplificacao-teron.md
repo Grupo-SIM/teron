@@ -79,6 +79,10 @@ Migração idempotente adicional transfere arquivos vinculados às candidaturas 
 
 Notas em comentários das candidaturas agora também são transferidas para atividade do contato Externo, mantendo autoria e conteúdo; contador recalculado. Teste com aplicação repetida e pessoa não relacionada passou. Limpeza de registros de Recrutamento continua pendente.
 
+Migração de limpeza preparada para apagar candidaturas, correspondências, entrevistas, opiniões e vagas, com arquivos, atividades, etiquetas e notificações vinculadas a esses IDs. Contatos Externos e seus arquivos/notas transferidos permanecem. Limpeza só inicia se os quatro estados de preservação estiverem registrados; teste de proteção e execução repetida passou. Nenhuma migração foi executada em banco remoto ou compartilhado.
+
+Ações contextuais remanescentes de Recrutamento retiradas do modelo. Tipos legados ainda existem para a migração e compatibilidade de histórico; revisar sua retirada após validação em banco local descartável.
+
 Criação inicial das categorias de habilidades também aponta para Pessoa, inclusive em espaços novos. A etapa de migração de habilidades continua copiando contadores separadamente para cobrir espaços onde a etapa anterior de contatos já havia sido executada.
 
 Editor de funções/etiquetas agora permite excluir definição após confirmação. Exclusão usa participante de remoção existente para apagar referências em contatos antes do registro selecionado. Validar fluxo com funções iguais em pessoas diferentes e com duas funções na mesma pessoa.

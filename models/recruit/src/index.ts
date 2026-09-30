@@ -19,12 +19,11 @@ import { type Builder } from '@hcengineering/model'
 import chunter from '@hcengineering/model-chunter'
 import contact from '@hcengineering/model-contact'
 import core from '@hcengineering/model-core'
-import gmail from '@hcengineering/model-gmail'
 import { generateClassNotificationTypes } from '@hcengineering/model-notification'
 import tags from '@hcengineering/model-tags'
-import task, { actionTemplates } from '@hcengineering/model-task'
+import task from '@hcengineering/model-task'
 import tracker from '@hcengineering/model-tracker'
-import view, { createAction, showColorsViewOption, actionTemplates as viewTemplates } from '@hcengineering/model-view'
+import view, { showColorsViewOption } from '@hcengineering/model-view'
 import workbench from '@hcengineering/model-workbench'
 import notification from '@hcengineering/notification'
 import { type Applicant, type Vacancy } from '@hcengineering/recruit'
@@ -113,23 +112,6 @@ export function createModel (builder: Builder): void {
   builder.mixin(recruit.mixin.VacancyList, core.class.Class, setting.mixin.Editable, {
     value: false
   })
-
-  createAction(
-    builder,
-    {
-      ...actionTemplates.editStatus,
-      target: recruit.class.Vacancy,
-      query: {
-        archived: false
-      },
-      context: {
-        mode: ['context', 'browser'],
-        group: 'edit'
-      },
-      override: [task.action.EditStatuses]
-    },
-    recruit.action.EditStatuses
-  )
 
   builder.createDoc(
     view.class.Viewlet,
@@ -880,25 +862,6 @@ export function createModel (builder: Builder): void {
     recruit.category.Recruit
   )
 
-  createAction(builder, {
-    label: view.string.Open,
-    icon: view.icon.Open,
-    action: view.actionImpl.ShowPanel,
-    actionProps: {
-      component: recruit.component.EditVacancy,
-      element: 'content'
-    },
-    input: 'focus',
-    category: recruit.category.Recruit,
-    override: [view.action.Open],
-    keyBinding: ['keyE'],
-    target: recruit.class.Vacancy,
-    context: {
-      mode: ['context', 'browser'],
-      group: 'create'
-    }
-  })
-
   builder.mixin(recruit.class.Vacancy, core.class.Class, view.mixin.IgnoreActions, {
     actions: [view.action.Delete]
   })
@@ -921,72 +884,6 @@ export function createModel (builder: Builder): void {
 
   builder.mixin(recruit.mixin.VacancyList, core.class.Class, view.mixin.ClassFilters, {
     filters: []
-  })
-
-  createAction(builder, {
-    ...viewTemplates.open,
-    label: recruit.string.ShowApplications,
-    icon: recruit.icon.Application,
-    target: recruit.class.Vacancy,
-    context: {
-      mode: ['browser', 'context'],
-      group: 'create'
-    },
-    action: workbench.actionImpl.Navigate,
-    actionProps: {
-      mode: 'space'
-    }
-  })
-
-  createAction(builder, {
-    ...viewTemplates.open,
-    target: recruit.class.ApplicantMatch,
-    context: {
-      mode: ['browser', 'context'],
-      group: 'create'
-    }
-  })
-
-  createAction(builder, {
-    action: view.actionImpl.ValueSelector,
-    actionPopup: view.component.ValueSelector,
-    actionProps: {
-      attribute: 'assignee',
-      _class: contact.mixin.Employee,
-      query: {},
-      placeholder: recruit.string.AssignRecruiter
-    },
-    label: recruit.string.AssignRecruiter,
-    icon: contact.icon.Person,
-    input: 'none',
-    category: recruit.category.Recruit,
-    target: recruit.class.Applicant,
-    context: {
-      mode: ['context'],
-      application: recruit.app.Recruit,
-      group: 'edit'
-    }
-  })
-
-  createAction(builder, {
-    action: task.actionImpl.SelectStatus,
-    actionPopup: task.component.StatusSelector,
-    actionProps: {
-      _class: core.class.Status,
-      ofAttribute: recruit.attribute.State,
-      placeholder: task.string.TaskState
-    },
-    label: task.string.TaskState,
-    icon: task.icon.TaskState,
-    keyBinding: ['keyS->keyS'],
-    input: 'any',
-    category: recruit.category.Recruit,
-    target: recruit.class.Applicant,
-    context: {
-      mode: ['context'],
-      application: recruit.app.Recruit,
-      group: 'edit'
-    }
   })
 
   builder.mixin(recruit.class.Applicant, core.class.Class, view.mixin.AttributeFilter, {
@@ -1206,48 +1103,6 @@ export function createModel (builder: Builder): void {
       }
     },
     recruit.ids.ApplicantUpdatedActivityViewlet
-  )
-
-  createAction(
-    builder,
-    {
-      label: view.string.Move,
-      action: recruit.actionImpl.MoveApplicant,
-      icon: view.icon.Move,
-      input: 'any',
-      category: view.category.General,
-      target: recruit.class.Applicant,
-      context: {
-        mode: ['context', 'browser'],
-        group: 'tools'
-      },
-      override: [task.action.Move]
-    },
-    recruit.action.MoveApplicant
-  )
-
-  createAction(
-    builder,
-    {
-      action: view.actionImpl.ShowPopup,
-      actionProps: {
-        component: gmail.component.NewMessages,
-        element: 'float',
-        fillProps: {
-          attachedTo: 'value'
-        }
-      },
-      label: gmail.string.WriteEmail,
-      icon: contact.icon.Email,
-      visibilityTester: recruit.function.ApplicantHasEmail,
-      input: 'any',
-      category: recruit.category.Recruit,
-      target: recruit.class.Applicant,
-      context: {
-        mode: ['context', 'browser']
-      }
-    },
-    recruit.action.WriteEmail
   )
 
   defineSpaceType(builder)
