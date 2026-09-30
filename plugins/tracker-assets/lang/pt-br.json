@@ -22,7 +22,7 @@
     "Board": "Quadro",
     "Components": "Componentes",
     "AllComponents": "Todos",
-    "BacklogComponents": "Backlog",
+    "BacklogComponents": "Pendentes",
     "ActiveComponents": "Ativos",
     "ClosedComponents": "Fechados",
     "NewComponent": "Novo componente",
