@@ -101,7 +101,7 @@
   </Header>
 
   <div class="flex-col p-6 gap-8 max-w-2xl">
-    <div class="flex flex-between">
+    <div class="flex-col flex-gap-4 items-start">
       <Label label={setting.string.TwoFactorAuthDescription} />
       {#if tfaEnabled === undefined}
         <Spinner />

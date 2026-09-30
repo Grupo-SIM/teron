@@ -37,6 +37,8 @@ Marco 5 iniciado: miniaturas do drawer permitem ações sobre salas e pessoas; c
 
 Recrutamento, RH e Planejador de equipes ocultos na navegação enquanto migrações de dados são preparadas. Configurações do escritório removidas da lista de configurações. Desbloqueio de Diretrizes limitado a Owner/Maintainer na UI e na função cliente; confirmação de exclusão usa “este documento”. A autorização de desbloqueio no servidor ainda requer verificação antes do fechamento do marco 7.
 
+Botão 2FA posicionado abaixo da descrição. Ação Entrar removida do menu de conta de convidados; Sair permanece para contas autenticadas.
+
 Atividade permanece visível fora de Tarefas; editor de comentários fica habilitado apenas no painel da tarefa.
 
 Busca da barra lateral de Conversa ocultada; busca continua disponível na tela Pesquisar. Botão Criar funcionário removido da lista de funcionários.

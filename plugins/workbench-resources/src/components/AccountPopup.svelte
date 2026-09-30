@@ -22,7 +22,7 @@
   import contactResources from '@hcengineering/contact-resources/src/plugin'
   import core, { AccountRole, getCurrentAccount, hasAccountRole } from '@hcengineering/core'
   import rating, { type PersonRating } from '@hcengineering/rating'
-  import login, { openAuthRoute } from '@hcengineering/login'
+  import { openAuthRoute } from '@hcengineering/login'
   import presentation, {
     createQuery,
     hasResource
@@ -165,17 +165,19 @@
       })
     }
 
-    actions.push({
-      icon: setting.icon.Signout,
-      label: hasAccountRole(account, AccountRole.DocGuest) ? setting.string.Signout : login.string.LogIn,
-      action: async () => {
-        await logOut()
-        openAuthRoute()
-        Analytics.handleEvent('workbench.SignOut')
-        Analytics.logout()
-      },
-      group: 'end'
-    })
+    if (hasAccountRole(account, AccountRole.DocGuest)) {
+      actions.push({
+        icon: setting.icon.Signout,
+        label: setting.string.Signout,
+        action: async () => {
+          await logOut()
+          openAuthRoute()
+          Analytics.handleEvent('workbench.SignOut')
+          Analytics.logout()
+        },
+        group: 'end'
+      })
+    }
   }
   let menu: Menu
   $: addClass = $deviceInfo.isMobile && $deviceInfo.isPortrait ? 'self-end' : undefined
