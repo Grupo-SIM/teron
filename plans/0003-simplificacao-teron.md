@@ -77,6 +77,8 @@ Novo tipo de tarefa criado pela integração GitHub usa a mesma sequência e as 
 
 Tipo de tarefa retirado da criação, dos detalhes de modelo, da tabela, dos filtros, dos agrupamentos e da ordenação. Criação escolhe automaticamente um tipo disponível no setor, preservando compatibilidade com setores que possuem tipos personalizados. Tempo restante saiu das opções de agrupamento e ordenação.
 
+Criação de modelo de tarefa também escolhe automaticamente tipo disponível no setor e não expõe seletor; salvar exige tipo resolvido.
+
 Cabeçalho do detalhe de Tarefas sem Copiar link, Configurações e botão de mostrar todos os mixins.
 
 Controle global de gravação fica indisponível na aplicação de Tarefas; gravação em curso é cancelada ao entrar nela.

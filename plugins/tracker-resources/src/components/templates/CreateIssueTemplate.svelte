@@ -17,8 +17,8 @@
   import { Data, Doc, Ref, generateId } from '@hcengineering/core'
   import { Card, KeyedAttribute, SpaceSelector, createQuery, getClient } from '@hcengineering/presentation'
   import tags, { TagElement, TagReference } from '@hcengineering/tags'
-  import { TaskType } from '@hcengineering/task'
-  import { TaskKindSelector } from '@hcengineering/task-resources'
+  import task, { TaskType } from '@hcengineering/task'
+  import { taskTypeStore } from '@hcengineering/task-resources'
   import { StyledTextBox } from '@hcengineering/text-editor-resources'
   import { Component as ComponentType, IssuePriority, IssueTemplate, Milestone, Project } from '@hcengineering/tracker'
   import { Component, EditBox, Label } from '@hcengineering/ui'
@@ -68,7 +68,17 @@
 
   $: _space = space
 
-  $: canSave = getTitle(object.title ?? '').length > 0
+  $: canSave = getTitle(object.title ?? '').length > 0 && kind !== undefined
+
+  $: if (currentProject?.type !== undefined) {
+    const descriptors = new Map(client.getModel().findAllSync(task.class.TaskTypeDescriptor, {}).map((item) => [item._id, item]))
+    const available = Array.from($taskTypeStore.values()).filter(
+      (type) => type.parent === currentProject.type &&
+        (descriptors.get(type.descriptor)?.allowCreate ?? false) &&
+        client.getHierarchy().isDerived(type.targetClass, tracker.class.Issue)
+    )
+    if (available.length > 0 && !available.some((type) => type._id === kind)) kind = available[0]._id
+  }
 
   function getTitle (value: string) {
     return value.trim()
@@ -79,7 +89,7 @@
   }
 
   async function createIssueTemplate () {
-    if (!canSave) {
+    if (!canSave || kind === undefined) {
       return
     }
 
@@ -160,12 +170,6 @@
       <span class="overflow-label">
         <Label {label} />
       </span>
-      <TaskKindSelector
-        projectType={currentProject?.type}
-        bind:value={kind}
-        baseClass={tracker.class.Issue}
-        size={'small'}
-      />
     </div>
   </svelte:fragment>
 
