@@ -23,6 +23,14 @@
 - Desbloqueio de Diretrizes cabe a Owner e Maintainer.
 - Migrações são preparadas e testadas localmente; nenhuma execução em banco remoto.
 
+## Pendências para fechamento
+
+- Validar fluxos reais com contas locais: Calendário privado/compartilhado, troca e convite em Escritório, substituição de identidade, desbloqueio por papel e funções múltiplas em Contatos.
+- Conferir telas de Tarefas e Projetos contra todos os controles indicados nas imagens originais; verificar criação e inserção de modelos de texto sem envio automático.
+- Revisar modelos legados de Recrutamento após migração e auditar rotas, menus e strings residuais no fechamento.
+- Validar inclusão, exibição e exclusão de Função com dois valores e registros semelhantes, além de busca parcial e colunas de Contatos.
+- Executar regressão do conjunto aprovado antes de marcar marcos 2–8 como concluídos. Banco remoto continua intocado.
+
 ## Próximo passo
 
 Marco 2 em andamento. Abas internas removidas da interface; ação Abrir em nova aba usa aba real do navegador. Migração local idempotente remove preferências das abas antigas. Termos principais de setores, projetos, contatos, diretrizes, plano e arquivos atualizados em pt-BR. Nomes padrão de salas e canal Aleatório traduzidos sem alterar IDs.
