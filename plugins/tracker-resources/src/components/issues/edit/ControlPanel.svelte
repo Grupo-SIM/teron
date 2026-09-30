@@ -29,7 +29,6 @@
   } from '@hcengineering/view-resources'
 
   import tracker from '../../../plugin'
-  import ComponentEditor from '../../components/ComponentEditor.svelte'
   import MilestoneEditor from '../../milestones/MilestoneEditor.svelte'
   import AssigneeEditor from '../AssigneeEditor.svelte'
   import DueDateEditor from '../DueDateEditor.svelte'
@@ -189,13 +188,6 @@
     is={tags.component.TagsAttributeEditor}
     props={{ object: issue, label: tracker.string.AddLabel, readonly }}
   />
-
-  <div class="divider" />
-
-  <span class="labelOnPanel">
-    <Label label={tracker.string.Component} />
-  </span>
-  <ComponentEditor value={issue} space={issue.space} size={'medium'} isEditable={!readonly} />
 
   <span class="labelOnPanel">
     <Label label={tracker.string.Milestone} />

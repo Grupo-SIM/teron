@@ -30,7 +30,6 @@ export const issuesOptions = (kanban: boolean): ViewOptionsModel => ({
     'assignee',
     'priority',
     'space',
-    'component',
     'milestone',
     'createdBy',
     'modifiedBy',
@@ -82,8 +81,7 @@ export const issuesOptions = (kanban: boolean): ViewOptionsModel => ({
 export function issueConfig (
   key: string = '',
   compact: boolean = false,
-  milestone: boolean = true,
-  component: boolean = true
+  milestone: boolean = true
 ): (BuildModelKey | string)[] {
   return [
     {
@@ -159,26 +157,6 @@ export function issueConfig (
             displayProps: {
               key: key + 'milestone',
               excludeByKey: 'milestone',
-              compression: true
-            }
-          }
-        ]
-      : []),
-    ...(component
-      ? [
-          {
-            key: '',
-            label: tracker.string.Component,
-            presenter: tracker.component.ComponentEditor,
-            props: {
-              kind: 'list',
-              size: 'small',
-              shouldShowPlaceholder: false,
-              maxWidth: '30rem'
-            },
-            displayProps: {
-              key: key + 'component',
-              excludeByKey: 'component',
               compression: true
             }
           }
@@ -302,7 +280,7 @@ export function defineViewlets (builder: Builder): void {
   )
 
   const milestoneIssueOptions: ViewOptionsModel = {
-    groupBy: ['status', 'assignee', 'priority', 'component', 'createdBy', 'modifiedBy'],
+    groupBy: ['status', 'assignee', 'priority', 'createdBy', 'modifiedBy'],
     orderBy: [
       ['rank', SortingOrder.Ascending],
       ['status', SortingOrder.Ascending],
@@ -338,7 +316,7 @@ export function defineViewlets (builder: Builder): void {
           'modifiedBy'
         ]
       },
-      config: issueConfig('sub', true, false, true)
+      config: issueConfig('sub', true, false)
     },
     tracker.viewlet.MilestoneIssuesList
   )
@@ -380,7 +358,7 @@ export function defineViewlets (builder: Builder): void {
           'modifiedBy'
         ]
       },
-      config: issueConfig('sub', true, true, false)
+      config: issueConfig('sub', true, true)
     },
     tracker.viewlet.ComponentIssuesList
   )
@@ -392,7 +370,7 @@ export function defineViewlets (builder: Builder): void {
       attachTo: tracker.class.IssueTemplate,
       descriptor: view.viewlet.List,
       viewOptions: {
-        groupBy: ['assignee', 'priority', 'component', 'milestone', 'createdBy', 'modifiedBy'],
+        groupBy: ['assignee', 'priority', 'milestone', 'createdBy', 'modifiedBy'],
         orderBy: [
           ['priority', SortingOrder.Ascending],
           ['modifiedOn', SortingOrder.Descending],
@@ -423,18 +401,6 @@ export function defineViewlets (builder: Builder): void {
           props: { type: 'issue', shouldUseMargin: true }
         },
         // { key: '', presenter: tracker.component.DueDatePresenter, props: { kind: 'list' } },
-        {
-          key: '',
-          presenter: tracker.component.ComponentEditor,
-          label: tracker.string.Component,
-          props: {
-            kind: 'list',
-            size: 'small',
-            shouldShowPlaceholder: false,
-            maxWidth: '30rem'
-          },
-          displayProps: { key: 'component', compression: true }
-        },
         {
           key: '',
           label: tracker.string.Milestone,

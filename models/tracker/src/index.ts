@@ -186,12 +186,6 @@ function defineFilters (builder: Builder): void {
       'assignee',
       {
         _class: tracker.class.Issue,
-        key: 'component',
-        component: view.component.ObjectFilter,
-        showNested: false
-      },
-      {
-        _class: tracker.class.Issue,
         key: 'milestone',
         component: view.component.ObjectFilter,
         showNested: false

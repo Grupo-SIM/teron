@@ -70,7 +70,6 @@
 
   import tracker from '../../plugin'
   import { activeProjects } from '../../utils'
-  import ComponentEditor from '../components/ComponentEditor.svelte'
   import CreateIssue from '../CreateIssue.svelte'
   import AssigneeEditor from './AssigneeEditor.svelte'
   import DueDatePresenter from './DueDatePresenter.svelte'
@@ -422,16 +421,6 @@
             {#if enabledConfig(config, 'priority')}
               <PriorityEditor
                 value={issue}
-                isEditable={true}
-                kind={'link-bordered'}
-                size={'small'}
-                justify={'center'}
-              />
-            {/if}
-            {#if enabledConfig(config, 'component')}
-              <ComponentEditor
-                value={issue}
-                {space}
                 isEditable={true}
                 kind={'link-bordered'}
                 size={'small'}

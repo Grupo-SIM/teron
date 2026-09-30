@@ -87,7 +87,6 @@
   import tracker from '../plugin'
   import SetParentIssueActionPopup from './SetParentIssueActionPopup.svelte'
   import SubIssues from './SubIssues.svelte'
-  import ComponentSelector from './components/ComponentSelector.svelte'
   import AssigneeEditor from './issues/AssigneeEditor.svelte'
   import IssueNotification from './issues/IssueNotification.svelte'
   import ParentIssue from './issues/ParentIssue.svelte'
@@ -612,14 +611,6 @@
     )
   }
 
-  const handleComponentIdChanged = (componentId: Ref<ComponentType> | null | undefined): void => {
-    if (componentId === undefined) {
-      return
-    }
-
-    object.component = componentId
-  }
-
   const handleMilestoneIdChanged = (milestoneId: Ref<Milestone> | null | undefined): void => {
     if (milestoneId === undefined) {
       return
@@ -974,15 +965,6 @@
       on:delete={(evt) => {
         object.labels = object.labels.filter((it) => it.tag !== evt.detail._id)
       }}
-    />
-    <ComponentSelector
-      focusIndex={7}
-      value={object.component}
-      space={_space}
-      onChange={handleComponentIdChanged}
-      isEditable={true}
-      kind={'regular'}
-      size={'large'}
     />
     <div id="estimation-editor" class="new-line">
       <EstimationEditor focusIndex={8} kind={'regular'} size={'large'} value={object} />
