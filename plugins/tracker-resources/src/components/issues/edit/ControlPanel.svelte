@@ -38,7 +38,6 @@
   import notification from '@hcengineering/notification'
 
   export let issue: Issue
-  export let showAllMixins: boolean = false
   export let readonly = false
 
   const query = createQuery()
@@ -76,7 +75,7 @@
 
   let mixins: Mixin<Doc>[] = []
 
-  $: _mixins = getDocMixins(issue, showAllMixins)
+  $: _mixins = getDocMixins(issue, false)
 
   $: mixins = _mixins.find((p) => p._id === notification.mixin.Collaborators)
     ? _mixins

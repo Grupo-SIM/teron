@@ -23,7 +23,6 @@
     createQuery,
     getClient
   } from '@hcengineering/presentation'
-  import setting, { settingId } from '@hcengineering/setting'
   import { taskTypeStore, typeStore } from '@hcengineering/task-resources'
   import { Issue, TrackerEvents } from '@hcengineering/tracker'
   import {
@@ -32,12 +31,9 @@
     Component,
     EditBox,
     FocusHandler,
-    IconMixin,
     IconMoreH,
     Label,
-    createFocusManager,
-    getCurrentResolvedLocation,
-    navigate
+    createFocusManager
   } from '@hcengineering/ui'
   import view from '@hcengineering/view'
   import { DocNavLink, ParentsNavigator, showMenu, RelationsEditor } from '@hcengineering/view-resources'
@@ -46,12 +42,11 @@
   import { Analytics } from '@hcengineering/analytics'
 
   import { createEventDispatcher, onDestroy } from 'svelte'
-  import { generateIssueShortLink, getIssueIdByIdentifier } from '../../../issues'
+  import { getIssueIdByIdentifier } from '../../../issues'
   import { canEditIssue } from '../../../utils'
   import tracker from '../../../plugin'
   import IssueStatusActivity from '../IssueStatusActivity.svelte'
   import ControlPanel from './ControlPanel.svelte'
-  import CopyToClipboard from './CopyToClipboard.svelte'
   import SubIssueSelector from './SubIssueSelector.svelte'
   import SubIssues from './SubIssues.svelte'
 
@@ -71,7 +66,6 @@
   let title = ''
   let innerWidth: number
   let descriptionBox: AttachmentStyleBoxCollabEditor
-  let showAllMixins: boolean
 
   let effectiveReadonly = true
   $: if (issue !== undefined) {
@@ -273,36 +267,7 @@
           dataId={'btnMoreActions'}
           on:click={showContextMenu}
         />
-        <CopyToClipboard issueUrl={generateIssueShortLink(issue.identifier)} />
-        <Button
-          icon={setting.icon.Setting}
-          kind={'icon'}
-          iconProps={{ size: 'medium' }}
-          showTooltip={{ label: setting.string.ClassSetting }}
-          dataId={'btnClassSetting'}
-          on:click={(ev) => {
-            ev.stopPropagation()
-            const loc = getCurrentResolvedLocation()
-            loc.path[2] = settingId
-            loc.path[3] = 'setting'
-            loc.path[4] = 'classes'
-            loc.path.length = 5
-            loc.query = { _class }
-            loc.fragment = undefined
-            navigate(loc)
-          }}
-        />
       {/if}
-      <Button
-        icon={IconMixin}
-        iconProps={{ size: 'medium' }}
-        kind={'icon'}
-        selected={showAllMixins}
-        dataId={'btnMixin'}
-        on:click={() => {
-          showAllMixins = !showAllMixins
-        }}
-      />
     </svelte:fragment>
 
     {#if hasParentIssue}
@@ -371,7 +336,7 @@
     <svelte:fragment slot="custom-attributes">
       {#if issue !== undefined}
         <div class="space-divider" />
-        <ControlPanel {issue} {showAllMixins} readonly={effectiveReadonly} />
+        <ControlPanel {issue} readonly={effectiveReadonly} />
       {/if}
 
       <div class="popupPanel-body__aside-grid">
