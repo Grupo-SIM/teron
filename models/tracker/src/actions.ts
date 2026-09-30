@@ -375,27 +375,6 @@ export function createActions (builder: Builder, issuesId: string, componentsId:
     override: [view.action.Open]
   })
 
-  createAction(builder, {
-    action: view.actionImpl.ShowPopup,
-    actionProps: {
-      component: tracker.component.TimeSpendReportPopup,
-      fillProps: {
-        _object: 'issue'
-      }
-    },
-    label: tracker.string.TimeSpendReportAdd,
-    icon: tracker.icon.TimeReport,
-    input: 'focus',
-    keyBinding: ['keyT'],
-    category: tracker.category.Tracker,
-    target: tracker.class.Issue,
-    context: {
-      mode: ['context', 'browser'],
-      application: tracker.app.Tracker,
-      group: 'edit'
-    }
-  })
-
   createAction(
     builder,
     {

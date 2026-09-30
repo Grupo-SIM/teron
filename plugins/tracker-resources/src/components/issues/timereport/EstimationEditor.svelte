@@ -47,7 +47,7 @@
     if (kind === 'list') {
       showPopup(EstimationPopup, { value: value.estimation, format: 'number', object: value }, 'top')
     } else {
-      showPopup(EditBoxPopup, { value: value.estimation, format: 'number' }, eventToHTMLElement(event), (res) => {
+      showPopup(EditBoxPopup, { value: value.estimation, format: 'number', placeholder: tracker.string.Estimation }, eventToHTMLElement(event), (res) => {
         if (res !== undefined) {
           changeEstimation(res)
         }

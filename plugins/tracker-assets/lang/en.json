@@ -224,7 +224,7 @@
     "MoveAndDeleteMilestone": "Move issues to {newMilestone} and delete {deleteMilestone}",
     "MoveAndDeleteMilestoneConfirm": "Do you want to delete milestone and move issues to another milestone?",
 
-    "Estimation": "Estimation",
+    "Estimation": "Estimation (hours)",
     "ReportedTime": "Spent time",
     "RemainingTime": "Remaining time",
     "TimeSpendReports": "Time spent reports",

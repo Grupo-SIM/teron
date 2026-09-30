@@ -211,7 +211,7 @@
     "CreateMilestone": "Criar",
     "MoveAndDeleteMilestone": "Mover tarefas para {newMilestone} e apagar {deleteMilestone}",
     "MoveAndDeleteMilestoneConfirm": "Deseja apagar o marco e mover as tarefas para outro marco?",
-    "Estimation": "Estimativa",
+    "Estimation": "Estimativa (horas)",
     "ReportedTime": "Tempo gasto",
     "RemainingTime": "Tempo restante",
     "TimeSpendReports": "Relatórios de tempo gasto",

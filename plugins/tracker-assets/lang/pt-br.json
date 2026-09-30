@@ -211,7 +211,7 @@
     "CreateMilestone": "Criar",
     "MoveAndDeleteMilestone": "Mover tarefas para {newMilestone} e excluir {deleteMilestone}",
     "MoveAndDeleteMilestoneConfirm": "Deseja excluir o projeto e mover as tarefas para outro projeto?",
-    "Estimation": "Estimativa",
+    "Estimation": "Estimativa (horas)",
     "ReportedTime": "Tempo gasto",
     "RemainingTime": "Tempo restante",
     "TimeSpendReports": "Relatórios de tempo gasto",
