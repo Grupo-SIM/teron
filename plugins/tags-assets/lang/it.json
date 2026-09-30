@@ -13,6 +13,7 @@
     "AddTag": "Crea {word}",
     "AddLabel": "Aggiungi etichetta",
     "EditTag": "Modifica {word}",
+    "DeleteTagConfirmation": "Delete \"{title}\" and all references? This cannot be undone.",
     "TagCreateLabel": "Tag",
     "CancelLabel": "Annulla",
     "SearchCreate": "Cerca/Nome ...",

@@ -13,6 +13,7 @@
     "AddTag": "Criar {word}",
     "AddLabel": "Adicionar etiqueta",
     "EditTag": "Editar {word}",
+    "DeleteTagConfirmation": "Excluir \"{title}\" e todas as referências? Esta ação é permanente.",
     "TagCreateLabel": "Etiqueta",
     "CancelLabel": "Cancelar",
     "SearchCreate": "Pesquisar/Nome...",

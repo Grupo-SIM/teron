@@ -55,6 +55,8 @@ Tabelas Pessoa, Funcionário e Cliente agora restringem colunas às configuraç�
 
 Contatos Pessoa agora aceitam contagem opcional de dias remotos e presenciais por semana. Editor valida inteiros de 0 a 7 e soma máxima de 7; campos antigos sem contagem permanecem vazios. Validar persistência com contatos locais antes de concluir marco 6.
 
+Editor de funções/etiquetas agora permite excluir definição após confirmação. Exclusão usa participante de remoção existente para apagar referências em contatos antes do registro selecionado. Validar fluxo com funções iguais em pessoas diferentes e com duas funções na mesma pessoa.
+
 Atividade permanece visível fora de Tarefas; editor de comentários fica habilitado apenas no painel da tarefa.
 
 Busca da barra lateral de Conversa ocultada; busca continua disponível na tela Pesquisar. Botão Criar funcionário removido da lista de funcionários.

@@ -13,6 +13,7 @@
     "AddTag": "Создать {word}",
     "AddLabel": "Добавить метку",
     "EditTag": "Редактировать {word}",
+    "DeleteTagConfirmation": "Delete \"{title}\" and all references? This cannot be undone.",
     "TagCreateLabel": "Тег",
     "CancelLabel": "Отмена",
     "SearchCreate": "Название...",

@@ -13,6 +13,7 @@
     "AddTag": "{word} Oluştur",
     "AddLabel": "Etiket ekle",
     "EditTag": "{word} Düzenle",
+    "DeleteTagConfirmation": "Delete \"{title}\" and all references? This cannot be undone.",
     "TagCreateLabel": "Etiket",
     "CancelLabel": "İptal",
     "SearchCreate": "Ara/İsim ...",

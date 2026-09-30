@@ -13,6 +13,7 @@
     "AddTag": "Vytvořit {word}",
     "AddLabel": "Přidat štítek",
     "EditTag": "Upravit {word}",
+    "DeleteTagConfirmation": "Delete \"{title}\" and all references? This cannot be undone.",
     "TagCreateLabel": "Štítek",
     "CancelLabel": "Zrušit",
     "SearchCreate": "Hledat/Název ...",
