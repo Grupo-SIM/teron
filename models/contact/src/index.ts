@@ -451,9 +451,7 @@ export function createModel (builder: Builder): void {
             componentProps: {
               _class: contact.mixin.Employee,
               icon: contact.icon.Person,
-              label: contact.string.Employee,
-              createLabel: contact.string.CreateEmployee,
-              createComponent: contact.component.CreateEmployee
+              label: contact.string.Employee
             }
           },
           {

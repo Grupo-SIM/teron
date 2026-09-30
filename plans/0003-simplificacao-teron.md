@@ -33,6 +33,8 @@ Marco 7 iniciado: botão de configuração avançada da visão retirado do compo
 
 Atividade permanece visível fora de Tarefas; editor de comentários fica habilitado apenas no painel da tarefa.
 
+Busca da barra lateral de Conversa ocultada; busca continua disponível na tela Pesquisar. Botão Criar funcionário removido da lista de funcionários.
+
 Menus simplificados: Adicionar relação, Nova tarefa relacionada, Relações, Copiar link/título/URL e configuração de projetos relacionados ocultos nos menus; Link público de Diretrizes não é mais registrado.
 
 Concluir auditoria dos textos de interface e validar pacotes afetados antes de marcar marco 2 como concluído. Depois, continuar status e ações de Tarefas no marco 3.
