@@ -15,7 +15,7 @@
 <script lang="ts">
   import { Class, Doc, Ref, Space } from '@hcengineering/core'
   import { getClient } from '@hcengineering/presentation'
-  import { Button, IconFilter, eventToHTMLElement, resolvedLocationStore, showPopup } from '@hcengineering/ui'
+  import { Button, IconFilter, resolvedLocationStore, showPopup } from '@hcengineering/ui'
   import { Filter, ViewOptions } from '@hcengineering/view'
   import { filterStore, getFilterKey, selectedFilterStore, setFilters } from '../../filter'
   import view from '../../plugin'
@@ -62,8 +62,11 @@
     _class = undefined
   })
 
-  function add (e: MouseEvent): void {
-    const target = eventToHTMLElement(e)
+  let popupOpen = false
+
+  function add (target: HTMLElement): void {
+    if (popupOpen) return
+    popupOpen = true
     showPopup(
       FilterTypePopup,
       {
@@ -74,7 +77,10 @@
         onChange,
         viewOptions
       },
-      target
+      target,
+      () => {
+        popupOpen = false
+      }
     )
   }
 
@@ -94,8 +100,14 @@
     size={'medium'}
     pressed={$filterStore.length > 0}
     showTooltip={{ label: $filterStore.length === 0 ? view.string.Filter : view.string.ClearFilters }}
+    on:mousemove={(ev) => {
+      if ($filterStore.length === 0) add(ev.currentTarget as HTMLElement)
+    }}
+    on:focus={(ev) => {
+      if ($filterStore.length === 0) add(ev.currentTarget as HTMLElement)
+    }}
     on:click={(ev) => {
-      if ($filterStore.length === 0) add(ev)
+      if ($filterStore.length === 0) add(ev.currentTarget as HTMLElement)
       else setFilters([])
     }}
   />
