@@ -32,7 +32,6 @@ import setting from '@hcengineering/setting'
 import { type ViewOptionModel, type ViewOptionsModel } from '@hcengineering/view'
 
 import recruit from './plugin'
-import { createReviewModel } from './review'
 import { defineSpaceType } from './spaceType'
 import { definePermissions } from './permissions'
 import { TApplicant, TApplicantMatch, TCandidate, TOpinion, TReview, TVacancy, TVacancyList } from './types'
@@ -923,8 +922,6 @@ export function createModel (builder: Builder): void {
   builder.mixin(recruit.mixin.VacancyList, core.class.Class, view.mixin.ClassFilters, {
     filters: []
   })
-
-  createReviewModel(builder)
 
   createAction(builder, {
     ...viewTemplates.open,

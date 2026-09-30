@@ -45,6 +45,8 @@ Recrutamento, RH e Planejador de equipes ocultos na navegação enquanto migraç
 
 Registro do aplicativo de Recrutamento, atalhos de navegação, categorias de busca e ações para criar candidaturas pelo menu de contatos removidos do modelo. Tipos legados permanecem registrados enquanto a migração de dados e a limpeza segura são concluídas.
 
+Registro de ações, painel e notificações específicas de entrevistas de Recrutamento desativado; documentos legados permanecem legíveis para a migração.
+
 Middleware do servidor agora rejeita transações que limpam `lockedBy` em Diretrizes para contas abaixo de Maintainer, inclusive via `$unset`; conta de sistema permanece autorizada. Teste local das duas formas de desbloqueio passou. Validar integração com contas User e Maintainer em banco local antes de fechar marco 7.
 
 Botão 2FA posicionado abaixo da descrição. Ação Entrar removida do menu de conta de convidados; Sair permanece para contas autenticadas.
