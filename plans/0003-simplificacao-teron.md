@@ -207,4 +207,6 @@ Tela Modelos agora alterna entre modelos de tarefa e modelos de texto. A lista d
 
 Na aba de modelos de texto, opções de visualização específicas de tarefas ficam ocultas; seleção, pesquisa e criação dos textos permanecem disponíveis.
 
+Teste direto do gatilho de Tarefas confirmou que mudança para Finalizado acumula intervalo de uma hora e atualiza somente o instantâneo da subtarefa selecionada no pai. Ainda falta verificar o fluxo completo com aplicação local.
+
 Revisão do Calendário encontrou caminho residual na visão mensal: clique em evento privado ainda abria editor, e popup do dia não marcava evento como ocupado. Visão mensal agora exibe “Ocupado” e bloqueia abertura; popup do dia aplica a mesma regra. Build Rush e parser/preprocessamento dos componentes passaram. Validar com duas contas locais.
