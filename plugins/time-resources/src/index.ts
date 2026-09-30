@@ -30,7 +30,7 @@ import PriorityEditor from './components/PriorityEditor.svelte'
 import ToDoPresenter from './components/ToDoPresenter.svelte'
 import { ToDoTitleProvider } from './utils'
 
-export type ToDosMode = 'unplanned' | 'planned' | 'all' | 'tag' | 'date'
+export type ToDosMode = 'planned' | 'all' | 'tag' | 'date'
 
 export default async (): Promise<Resources> => ({
   component: {

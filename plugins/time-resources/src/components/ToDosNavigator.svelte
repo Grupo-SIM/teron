@@ -1,7 +1,6 @@
 <script lang="ts">
   import calendar from '@hcengineering/calendar'
   import { ScheduleNavSection } from '@hcengineering/calendar-resources'
-  import { getCurrentEmployee } from '@hcengineering/contact'
   import { Ref, getCurrentAccount } from '@hcengineering/core'
   import { Asset, getMetadata, getResource, IntlString } from '@hcengineering/platform'
   import { createQuery } from '@hcengineering/presentation'
@@ -32,7 +31,6 @@
   export let currentDate: Date
 
   const currentAccount = getCurrentAccount()
-  const currentUser = getCurrentEmployee()
 
   interface IMode {
     label: IntlString
@@ -41,11 +39,6 @@
   }
 
   const modes: IMode[] = [
-    {
-      label: time.string.Unplanned,
-      value: 'unplanned',
-      icon: time.icon.Inbox
-    },
     {
       label: time.string.Planned,
       value: 'planned',
@@ -89,26 +82,6 @@
 
   $: tags = allTags.filter((p) => myTags.has(p._id))
 
-  const unplannedQuery = createQuery()
-
-  unplannedQuery.query(
-    time.class.ToDo,
-    {
-      user: currentUser,
-      doneOn: null,
-      workslots: 0
-    },
-    (res) => {
-      counters.unplanned = res.total
-    },
-    {
-      total: true,
-      limit: 1
-    }
-  )
-
-  const counters: Record<string, number> = {}
-  const today: Date = new Date()
 
   let pressed: boolean = false
 
@@ -152,12 +125,10 @@
 
     <Scroller shrink>
       {#each modes as _mode}
-        {@const counter = counters[_mode.value] ?? 0}
         <NavItem
           icon={_mode.icon}
           label={_mode.label}
           selected={mode === _mode.value}
-          count={counter > 0 ? counter : null}
           on:click={() => {
             mode = _mode.value
             tag = undefined

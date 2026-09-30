@@ -50,7 +50,6 @@
   const user = getCurrentEmployee()
 
   const doneQuery = createQuery()
-  const inboxQuery = createQuery()
   const activeQuery = createQuery()
   const tagsQuery = createQuery()
   const projectsQuery = createQuery()
@@ -88,17 +87,7 @@
   function update (mode: ToDosMode, currentDate: Date, ids: Ref<ToDo>[]): void {
     let activeQ: DocumentQuery<ToDo> | undefined = undefined
     let doneQ: DocumentQuery<ToDo> | undefined = undefined
-    let inboxQ: DocumentQuery<ToDo> | undefined = undefined
-    if (mode === 'unplanned') {
-      activeQ = undefined
-      doneQ = undefined
-      inboxQ = {
-        user,
-        doneOn: null,
-        workslots: 0
-      }
-    } else if (mode === 'planned') {
-      inboxQ = undefined
+    if (mode === 'planned') {
       doneQ = {
         doneOn: { $gte: currentDate.setHours(0, 0, 0, 0), $lte: currentDate.setHours(23, 59, 59, 999) },
         user
@@ -109,11 +98,6 @@
         workslots: { $gt: 0 }
       }
     } else if (mode === 'all' || mode === 'date') {
-      inboxQ = {
-        doneOn: null,
-        workslots: 0,
-        user
-      }
       doneQ = {
         doneOn: { $ne: null },
         user
@@ -124,12 +108,6 @@
         workslots: { $gt: 0 }
       }
     } else if (mode === 'tag') {
-      inboxQ = {
-        doneOn: null,
-        workslots: 0,
-        user,
-        _id: { $in: ids }
-      }
       doneQ = {
         doneOn: { $ne: null },
         user,
@@ -160,23 +138,6 @@
       rawActive = []
     }
 
-    if (inboxQ !== undefined) {
-      inboxQuery.query(
-        time.class.ToDo,
-        inboxQ,
-        (res) => {
-          inbox = res
-        },
-        {
-          limit: 200,
-          sort: { rank: SortingOrder.Ascending }
-        }
-      )
-    } else {
-      inboxQuery.unsubscribe()
-      inbox = []
-    }
-
     if (doneQ !== undefined) {
       doneQuery.query(
         time.class.ToDo,
@@ -194,14 +155,13 @@
 
   $: update(mode, currentDate, ids)
 
-  let inbox: WithLookup<ToDo>[] = []
   let done: WithLookup<ToDo>[] = []
   let rawActive: WithLookup<ToDo>[] = []
   let todoValue: string = ''
 
   $: active = filterActive(mode, rawActive, currentDate)
 
-  $: groups = group(inbox, done, active, todoValue)
+  $: groups = group(done, active, todoValue)
 
   function filterActive (mode: ToDosMode, raw: WithLookup<ToDo>[], currentDate: Date): WithLookup<ToDo>[] {
     if (mode === 'planned') {
@@ -233,7 +193,6 @@
   }
 
   function group (
-    unplanned: WithLookup<ToDo>[],
     done: WithLookup<ToDo>[],
     active: WithLookup<ToDo>[],
     filterValue: string
@@ -244,44 +203,15 @@
 
     const groups = new Map<IntlString, WithLookup<ToDo>[]>([
       [time.string.Scheduled, []],
-      [time.string.Unplanned, unplanned.filter(filterOp)],
-      [time.string.ToDos, []],
       [time.string.Done, done.filter(filterOp)]
     ])
-    const now = Date.now()
-    const todos: {
-      nearest: WorkSlot | undefined
-      todo: WithLookup<ToDo>
-    }[] = []
-    const scheduled: {
-      nearest: WorkSlot | undefined
-      todo: WithLookup<ToDo>
-    }[] = []
-    for (const todo of active.filter(filterOp)) {
+    const scheduled = active.filter(filterOp)
+    for (const todo of scheduled) {
       if (todo.$lookup?.workslots !== undefined) {
         todo.$lookup.workslots = getWorkslots(todo).sort((a, b) => a.date - b.date)
       }
-      const nearest = getNearest(getWorkslots(todo))
-      if (nearest === undefined || nearest.dueDate < now) {
-        todos.push({
-          nearest,
-          todo
-        })
-      } else {
-        scheduled.push({
-          nearest,
-          todo
-        })
-      }
     }
-    groups.set(
-      time.string.ToDos,
-      todos.map((p) => p.todo)
-    )
-    groups.set(
-      time.string.Scheduled,
-      scheduled.map((p) => p.todo)
-    )
+    groups.set(time.string.Scheduled, scheduled)
     if (trimFilter.length > 0) {
       for (const [k, v] of groups) {
         if (v.length === 0) {
@@ -296,9 +226,8 @@
   }
   $: filteredGroups = groups.filter(
     (gr) =>
-      (mode === 'unplanned' && gr[0] === time.string.Unplanned) ||
-      (mode === 'planned' && (gr[0] === time.string.ToDos || gr[0] === time.string.Scheduled)) ||
-      (mode !== 'unplanned' && mode !== 'planned')
+      (mode === 'planned' && gr[0] === time.string.Scheduled) ||
+      (mode !== 'planned')
   )
 </script>
 
@@ -320,9 +249,7 @@
             ? time.string.All
             : mode === 'planned'
               ? time.string.Planned
-              : mode === 'unplanned'
-                ? time.string.Unplanned
-                : view.string.Labels}
+              : view.string.Labels}
         />
       {/if}
     </div>
@@ -334,7 +261,7 @@
         todos={group[1]}
         title={group[0]}
         showTitle
-        showDuration={group[0] !== time.string.Unplanned}
+        showDuration
         {mode}
         {projects}
       />

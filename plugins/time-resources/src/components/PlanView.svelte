@@ -71,7 +71,8 @@
 
   defineSeparators('time', timeSeparators)
 
-  let mode: ToDosMode = (localStorage.getItem('todos_last_mode') as ToDosMode) ?? 'unplanned'
+  const savedMode = localStorage.getItem('todos_last_mode')
+  let mode: ToDosMode = savedMode === 'all' || savedMode === 'tag' || savedMode === 'date' ? savedMode : 'planned'
   let tag: Ref<TagElement> | undefined = (localStorage.getItem('todos_last_tag') as Ref<TagElement>) ?? undefined
 
   dispatch('change', true)
