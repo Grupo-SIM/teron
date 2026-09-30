@@ -188,3 +188,5 @@ Carregadores de recursos de interface e servidor de Recrutamento retirados de pr
 Build Rush de produção, pipeline de servidor e ferramenta local passou após retirada dos carregadores de Recrutamento. Modelo agregado em memória contém 21 aplicativos ativos; nenhum de Recrutamento, RH ou Planejador de equipes. O app `time:app:Me` permanece como Calendário.
 
 Recursos remanescentes do Planejador de equipes e apresentador de candidaturas retirados do pacote Calendário; mixin de candidatura no modelo de tempo também removido. Componentes legados podem permanecer no código sem registro até limpeza de arquivos.
+
+Build Rush dos pacotes de modelo e recursos de Calendário passou após retirada dos apresentadores de candidatura e Planejador de equipes.
