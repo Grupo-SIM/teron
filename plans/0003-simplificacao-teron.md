@@ -154,3 +154,5 @@ Ações globais de copiar link e adicionar relação, além das ações Nova tar
 Componente compartilhado de Atividade agora condiciona editor de comentários à classe Tarefa; histórico segue visível em outras entidades.
 
 Notificação de Tarefas deixou de oferecer botão de copiar URL; ação Ver tarefa permanece.
+
+Catálogos portugueses `pt` alinhados a `pt-br`: substantivos Anexo/Anexos agora exibem Arquivo/Arquivos também em painéis de cartões, integração e arquivos salvos.
