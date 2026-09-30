@@ -54,7 +54,6 @@
     Dock,
     getCurrentLocation,
     getLocation,
-    IconSettings,
     isSameSegments,
     Label,
     Location,
@@ -103,7 +102,6 @@
   import { buildNavModel, isAllowedToRole, logOut, workspacesStore } from '../utils'
   import AccountPopup from './AccountPopup.svelte'
   import AppItem from './AppItem.svelte'
-  import AppSwitcher from './AppSwitcher.svelte'
   import Applications from './Applications.svelte'
   import Logo from './Logo.svelte'
   import NavFooter from './NavFooter.svelte'
@@ -799,13 +797,6 @@
         class:vertical-mobile={$deviceInfo.navigator.direction === 'vertical'}
         class:mini={appsMini}
       >
-        <AppItem
-          icon={IconSettings}
-          label={setting.string.Customize}
-          dataId="workbench-app-customize"
-          size={appsMini ? 'small' : 'large'}
-          on:click={() => showPopup(AppSwitcher, { apps }, popupPosition)}
-        />
         <div
           class="flex-center"
           class:mt-3={$deviceInfo.navigator.direction === 'vertical'}

@@ -190,3 +190,5 @@ Build Rush de produção, pipeline de servidor e ferramenta local passou após r
 Recursos remanescentes do Planejador de equipes e apresentador de candidaturas retirados do pacote Calendário; mixin de candidatura no modelo de tempo também removido. Componentes legados podem permanecer no código sem registro até limpeza de arquivos.
 
 Build Rush dos pacotes de modelo e recursos de Calendário passou após retirada dos apresentadores de candidatura e Planejador de equipes.
+
+Atalho global “Customizar aplicativos” removido da barra lateral, encerrando acesso ao seletor avançado de visibilidade.
