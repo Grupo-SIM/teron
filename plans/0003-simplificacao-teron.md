@@ -164,3 +164,5 @@ Fábrica genérica de Funcionário desregistrada: nenhum menu de criação ofere
 Rótulos residuais “Explorador de canais/mensagens” também passaram a “Pesquisar canais/mensagens” em `pt` e `pt-br`; entrada principal exibe “Pesquisar”.
 
 Catálogo `pt` alinhado aos nomes aprovados de Setores, Projetos, Externos, Clientes, Calendário e Plano; `pt-br` já usava esses nomes.
+
+FAQ do site público também usa Arquivos no lugar de Anexos; artefatos gerados de build permanecem derivados e serão atualizados pelo próximo build local.

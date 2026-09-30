@@ -315,7 +315,7 @@
       },
       "migration": {
         "question": "Consigo migrar dados das ferramentas que já uso?",
-        "answer": "Sim. É possível importar projetos, tarefas, documentos e histórico das ferramentas mais comuns do mercado, mantendo responsáveis, prazos e anexos."
+        "answer": "Sim. É possível importar projetos, tarefas, documentos e histórico das ferramentas mais comuns do mercado, mantendo responsáveis, prazos e arquivos."
       },
       "billing": {
         "question": "Como funciona a cobrança?",
