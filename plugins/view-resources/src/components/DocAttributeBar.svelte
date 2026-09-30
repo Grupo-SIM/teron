@@ -48,7 +48,7 @@
 />
 {#each mixins as mixin}
   {@const to = !hierarchy.hasMixin(mixin, setting.mixin.UserMixin) ? object._class : mixin.extends}
-  {#if (!hierarchy.hasMixin(mixin, setting.mixin.Editable) || hierarchy.as(mixin, setting.mixin.Editable).value) && (!isContact || mixin._id !== 'lead:mixin:Customer')}
+  {#if (!hierarchy.hasMixin(mixin, setting.mixin.Editable) || hierarchy.as(mixin, setting.mixin.Editable).value) && (!isContact || mixin._id !== 'lead:mixin:Customer') && (!isPerson || mixin._id !== 'recruit:mixin:Candidate')}
     {#key mixin._id}
       <ClassAttributeBar
         _class={mixin._id}
@@ -57,7 +57,7 @@
         {to}
         {readonly}
         allowedCollections={_allowedCollections}
-        showHeader={showHeader && (!isPerson || mixin._id !== 'recruit:mixin:Candidate')}
+        {showHeader}
         on:update
       />
     {/key}
