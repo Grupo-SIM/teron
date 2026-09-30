@@ -9,6 +9,7 @@ import { getMetadata } from '@hcengineering/platform'
 import { workbenchId } from '@hcengineering/workbench'
 import serverCore, { TriggerControl } from '@hcengineering/server-core'
 import slugify from 'slugify'
+export { DocumentLockMiddleware } from './DocumentLockMiddleware'
 
 function getDocumentId (doc: Document): string {
   const slug = slugify(doc.title, { lower: true })

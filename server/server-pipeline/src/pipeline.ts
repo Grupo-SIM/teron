@@ -72,6 +72,7 @@ import { createStorageDataAdapter } from './blobStorage'
 import { CommunicationMiddleware, type CommunicationApiFactory } from './communication'
 
 import { RatingMiddleware } from '@hcengineering/server-rating'
+import { DocumentLockMiddleware } from '@hcengineering/server-document-resources'
 
 /**
  * @public
@@ -161,6 +162,7 @@ export function createServerPipeline (
       VersioningMiddleware.create,
       IdentifierMiddleware.create, // After ApplyTx to ensure that it pass
       RatingMiddleware.create, // Rating editing restrictions
+      DocumentLockMiddleware.create,
       TxMiddleware.create, // Store tx into transaction domain
       ...(opt.disableTriggers === true ? [] : [TriggersMiddleware.create]),
       ...(opt.fulltextUrl !== undefined
