@@ -49,6 +49,7 @@ import { AnyComponent, ComponentExtensionId, Location, ResolvedLocation } from '
 import { Action, ActionCategory, IconProps } from '@hcengineering/view'
 
 export * from './analytics'
+export * from './time-tracking'
 
 /**
  * @public
@@ -208,6 +209,8 @@ export interface Issue extends Task {
 
   // ReportedTime time, auto updated using trigger.
   reportedTime: number
+  trackedTimeMs?: number
+  trackingStartedOn?: Timestamp | null
   // Collection of reportedTime entries, for proper time estimations per person.
   reports: CollectionSize<TimeSpendReport>
 

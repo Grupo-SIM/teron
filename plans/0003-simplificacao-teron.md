@@ -63,7 +63,9 @@ Menus simplificados: Adicionar relação, Nova tarefa relacionada, Relações, C
 
 Menu contextual de canal agora oferece Editar para usuários com permissão; ação Abrir usa navegação padrão para o painel do canal.
 
-Estimativa de tarefa agora explicita horas no rótulo e no campo de edição. Tempo restante saiu do popup de estimativa. Ação “Adicionar relatório de tempo” saiu do menu de tarefas; relatório manual ainda existe no popup enquanto cálculo automático de tempo gasto não estiver pronto.
+Estimativa de tarefa agora explicita horas no rótulo e no campo de edição. Tempo restante saiu do popup de estimativa. Ação “Adicionar relatório de tempo” saiu do menu de tarefas.
+
+Tempo gasto agora acompanha intervalos de Pendente, Em andamento e Revisão: criação inicia contagem; cada troca de status acumula horas; reabertura inicia novo intervalo; Finalizado e Ajustes pausam. Valor ativo atualiza no editor a cada minuto. Entrada manual saiu do popup de estimativa, do editor de tempo e das listas de relatórios; relatórios antigos deixam de alterar o total. Migração idempotente preparada para reconstruir intervalos pelo histórico de status, preservar dados de relatórios antigos e sincronizar totais de subtarefas nos pais. Testes unitários de transições e reabertura passaram; falta validar migração e gatilho com banco local antes de concluir marco 3.
 
 Campo Componente retirado dos formulários de criação, detalhe e modelo de tarefa; retirado de cartões, colunas, agrupamentos e filtro das listas comuns. Vínculo persistido permanece para registros antigos e rotinas de movimentação; revisar caminhos de criação contextual antes de encerrar o marco 3.
 

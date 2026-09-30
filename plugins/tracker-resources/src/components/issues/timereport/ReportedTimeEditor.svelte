@@ -15,12 +15,10 @@
 -->
 <script lang="ts">
   import type { IntlString } from '@hcengineering/platform'
-  import { Issue, Project } from '@hcengineering/tracker'
-  import { ActionIcon, IconAdd, Label, eventToHTMLElement, floorFractionDigits, showPopup } from '@hcengineering/ui'
-  import { activeProjects } from '../../../utils'
-  import ReportsPopup from './ReportsPopup.svelte'
+  import { Issue, Project, issueTimeHours } from '@hcengineering/tracker'
+  import { Label, floorFractionDigits } from '@hcengineering/ui'
+  import { onMount } from 'svelte'
   import TimePresenter from './TimePresenter.svelte'
-  import TimeSpendReportPopup from './TimeSpendReportPopup.svelte'
 
   // export let label: IntlString
   export let placeholder: IntlString
@@ -31,32 +29,14 @@
   export let currentProject: Project | undefined
   export let readonly: boolean = false
 
-  $: if (currentProject === undefined) {
-    currentProject = $activeProjects.get(object.space)
-  }
-
-  $: defaultTimeReportDay = currentProject?.defaultTimeReportDay
-
-  function addTimeReport (event: MouseEvent): void {
-    if (readonly) return
-    showPopup(
-      TimeSpendReportPopup,
-      {
-        issue: object,
-        issueId: object._id,
-        defaultTimeReportDay,
-        issueClass: object._class,
-        space: object.space,
-        assignee: object.assignee,
-        currentProject
-      },
-      eventToHTMLElement(event)
-    )
-  }
-  function showReports (event: MouseEvent): void {
-    if (readonly) return
-    showPopup(ReportsPopup, { issue: object }, eventToHTMLElement(event))
-  }
+  let now = Date.now()
+  onMount(() => {
+    const timer = setInterval(() => (now = Date.now()), 60000)
+    return () => clearInterval(timer)
+  })
+  $: trackedHours = object.trackedTimeMs !== undefined
+    ? issueTimeHours({ trackedTimeMs: object.trackedTimeMs, trackingStartedOn: object.trackingStartedOn ?? null }, now)
+    : value
   $: childTime = floorFractionDigits(
     (object.childInfo ?? []).map((it) => it.reportedTime).reduce((a, b) => a + b, 0),
     3
@@ -64,17 +44,13 @@
 </script>
 
 {#if kind === 'link'}
-  <!-- svelte-ignore a11y-click-events-have-key-events -->
-  <!-- svelte-ignore a11y-no-static-element-interactions -->
   <div
     id="ReportedTimeEditor"
-    class="link-container antiButton link {size} flex-grow flex-between"
-    class:readonly
-    on:click={showReports}
+    class="link-container {size} flex-grow flex-between"
   >
-    {#if value !== undefined}
+    {#if trackedHours !== undefined}
       <span class="flex-row-center">
-        <TimePresenter {value} />
+        <TimePresenter value={trackedHours} />
         {#if childTime !== 0}
           / <TimePresenter value={childTime} />
         {/if}
@@ -82,15 +58,10 @@
     {:else}
       <span class="content-dark-color"><Label label={placeholder} /></span>
     {/if}
-    {#if !readonly}
-      <div class="add-action">
-        <ActionIcon icon={IconAdd} size={'small'} action={addTimeReport} />
-      </div>
-    {/if}
   </div>
-{:else if value !== undefined}
+{:else if trackedHours !== undefined}
   <span class="flex-row-center">
-    <TimePresenter {value} />
+    <TimePresenter value={trackedHours} />
     {#if childTime !== 0}
       / <TimePresenter value={childTime} />
     {/if}
@@ -103,19 +74,5 @@
   .link-container {
     padding: 0px 0.75rem;
     border-radius: 0.375rem;
-
-    &:not(.readonly) {
-      cursor: pointer;
-
-      .add-action {
-        visibility: hidden;
-      }
-
-      &:hover {
-        .add-action {
-          visibility: visible;
-        }
-      }
-    }
   }
 </style>

@@ -24,6 +24,7 @@ import core, {
   type TxUpdateDoc,
   TxOperations,
   type TxCUD,
+  SortingOrder,
   generateId,
   toIdMap
 } from '@hcengineering/core'
@@ -46,6 +47,9 @@ import tracker, {
   type IssueStatus,
   type Project,
   TimeReportDayType,
+  isTimedIssueStatus,
+  transitionIssueTime,
+  type IssueTimeState,
   trackerId
 } from '@hcengineering/tracker'
 
@@ -170,6 +174,73 @@ async function consolidatePendingStatus (client: MigrationClient): Promise<void>
         'operations.$push.statuses': { ...status, _id: tracker.status.Backlog }
       })
     }
+  }
+}
+
+async function backfillIssueTime (client: MigrationClient): Promise<void> {
+  const classes = client.hierarchy.getDescendants(tracker.class.Issue)
+  const issues = await client.traverse<Issue>(DOMAIN_TASK, {
+    _class: { $in: classes },
+    trackedTimeMs: { $exists: false }
+  })
+
+  try {
+    while (true) {
+      const batch = await issues.next(100)
+      if (batch === null || batch.length === 0) break
+      for (const issue of batch) {
+        const statusTxes = await client.find<TxCUD<Issue>>(DOMAIN_TX, {
+          objectId: issue._id,
+          objectClass: { $in: classes },
+          $or: [
+            { 'attributes.status': { $exists: true } },
+            { 'operations.status': { $exists: true } }
+          ]
+        }, { sort: { modifiedOn: SortingOrder.Ascending } })
+
+        let state: IssueTimeState = { trackedTimeMs: 0, trackingStartedOn: null }
+        let previousStatus: Ref<Status> | undefined
+        for (const tx of statusTxes) {
+          const nextStatus = tx._class === core.class.TxCreateDoc
+            ? (tx as TxCreateDoc<Issue>).attributes.status
+            : tx._class === core.class.TxUpdateDoc
+              ? (tx as TxUpdateDoc<Issue>).operations.status
+              : undefined
+          if (nextStatus === undefined) continue
+          if (previousStatus === undefined) {
+            state.trackingStartedOn = isTimedIssueStatus(nextStatus) ? tx.modifiedOn : null
+          } else {
+            state = transitionIssueTime(state, previousStatus, nextStatus, tx.modifiedOn)
+          }
+          previousStatus = nextStatus
+        }
+
+        if (previousStatus === undefined) {
+          state.trackingStartedOn = isTimedIssueStatus(issue.status) ? issue.createdOn : null
+        } else if (previousStatus !== issue.status) {
+          state = transitionIssueTime(state, previousStatus, issue.status, issue.modifiedOn)
+        }
+
+        const reportedTime = state.trackedTimeMs / 3600000
+        await client.update(DOMAIN_TASK, { _id: issue._id, trackedTimeMs: { $exists: false } }, {
+          ...state,
+          reportedTime,
+          remainingTime: Math.max(0, issue.estimation - reportedTime)
+        })
+        for (const parent of issue.parents ?? []) {
+          const [parentIssue] = await client.find<Issue>(DOMAIN_TASK, { _id: parent.parentId })
+          if (parentIssue === undefined) continue
+          const childInfo = parentIssue.childInfo?.map((child) =>
+            child.childId === issue._id ? { ...child, reportedTime } : child
+          )
+          if (childInfo !== undefined && childInfo.some((child) => child.childId === issue._id)) {
+            await client.update(DOMAIN_TASK, { _id: parentIssue._id }, { childInfo })
+          }
+        }
+      }
+    }
+  } finally {
+    await issues.close()
   }
 }
 
@@ -514,6 +585,10 @@ export const trackerOperation: MigrateOperation = {
       {
         state: 'consolidate-pending-status',
         func: consolidatePendingStatus
+      },
+      {
+        state: 'backfill-automatic-issue-time',
+        func: backfillIssueTime
       }
     ])
   },

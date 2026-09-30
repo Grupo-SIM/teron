@@ -246,6 +246,9 @@ export class TIssue extends TTask implements Issue {
   @Prop(TypeReportedTime(), tracker.string.ReportedTime)
     reportedTime!: number
 
+  trackedTimeMs?: number
+  trackingStartedOn?: Timestamp | null
+
   @Prop(TypeRemainingTime(), tracker.string.RemainingTime)
   @ReadOnly()
     remainingTime!: number

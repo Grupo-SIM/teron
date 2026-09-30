@@ -15,45 +15,19 @@
 <script lang="ts">
   import contact from '@hcengineering/contact'
   import { UserBox } from '@hcengineering/contact-resources'
-  import { Ref, Space, WithLookup } from '@hcengineering/core'
-  import { Project, TimeReportDayType, TimeSpendReport } from '@hcengineering/tracker'
+  import { WithLookup } from '@hcengineering/core'
+  import { TimeSpendReport } from '@hcengineering/tracker'
   import {
     DatePresenter,
     ListView,
     deviceOptionsStore as deviceInfo,
-    eventToHTMLElement,
-    showPopup
   } from '@hcengineering/ui'
-  import { FixedColumn, ListSelectionProvider, showMenu } from '@hcengineering/view-resources'
+  import { FixedColumn } from '@hcengineering/view-resources'
   import tracker from '../../../plugin'
-  import { activeProjects } from '../../../utils'
   import TimePresenter from './TimePresenter.svelte'
-  import TimeSpendReportPopup from './TimeSpendReportPopup.svelte'
 
   export let reports: WithLookup<TimeSpendReport>[]
 
-  const listProvider = new ListSelectionProvider(() => {})
-
-  const toProjectId = (ref: Ref<Space>) => ref as Ref<Project>
-
-  function editSpendReport (
-    event: MouseEvent,
-    value: TimeSpendReport,
-    defaultTimeReportDay: TimeReportDayType | undefined
-  ): void {
-    showPopup(
-      TimeSpendReportPopup,
-      {
-        issueId: value.attachedTo,
-        issueClass: value.attachedToClass,
-        space: value.space,
-        value,
-        assignee: value.employee,
-        defaultTimeReportDay
-      },
-      $deviceInfo.isMobile ? 'top' : eventToHTMLElement(event)
-    )
-  }
   $: twoRows = $deviceInfo.twoRows
 </script>
 
@@ -62,21 +36,8 @@
 <ListView count={reports.length} addClass={'step-tb-2-accent'}>
   <svelte:fragment slot="item" let:item>
     {@const report = reports[item]}
-    {@const currentProject = $activeProjects.get(toProjectId(report.space))}
     <div
       class="{twoRows ? 'flex-col' : 'flex-between'} p-text-2 clear-mins"
-      on:contextmenu={(ev) => {
-        showMenu(ev, { object: report })
-      }}
-      on:mouseenter={() => {
-        listProvider.updateFocus(report)
-      }}
-      on:focus={() => {
-        listProvider.updateFocus(report)
-      }}
-      on:click={(evt) => {
-        editSpendReport(evt, report, currentProject?.defaultTimeReportDay)
-      }}
     >
       <div class="flex-row-center clear-mins gap-2 flex-grow mr-4" class:p-text={twoRows}>
         <FixedColumn key={'timespend_issue'} justify={'left'} addClass={'fs-bold'}>
