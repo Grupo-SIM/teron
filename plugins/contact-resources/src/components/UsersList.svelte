@@ -50,7 +50,7 @@
     {
       ...(searchMode !== 'disabled' && search !== ''
         ? searchMode === 'fulltext'
-          ? { $search: search }
+          ? { [searchField]: { $like: '%' + search.trim() + '%' } }
           : { [searchField]: { $like: '%' + search + '%' } }
         : {}),
       ...{ _id: { $nin: skipCurrentAccount ? [...skipAccounts, me] : [...skipAccounts] } },

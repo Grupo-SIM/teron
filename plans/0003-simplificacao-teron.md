@@ -43,6 +43,8 @@ Notificações agora exibe apenas os grupos de preferências Geral e Som e apar�
 
 Tabelas padrão de contatos enxugadas para nome, localização, função (quando pessoa) e informações de contato. Apresentação de funções consulta coleção correta mesmo quando contador está desatualizado, permitindo mostrar múltiplas funções.
 
+Buscas das listas Contatos, Funcionários e Usuários usam correspondência parcial e sem distinção entre maiúsculas e minúsculas por meio do operador `$like`, já suportado pelos adaptadores locais.
+
 Atividade permanece visível fora de Tarefas; editor de comentários fica habilitado apenas no painel da tarefa.
 
 Busca da barra lateral de Conversa ocultada; busca continua disponível na tela Pesquisar. Botão Criar funcionário removido da lista de funcionários.
