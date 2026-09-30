@@ -180,3 +180,5 @@ Exemplo de identificador na criação de Setor agora usa SET nos catálogos `pt`
 Modelo de Recrutamento reduzido às classes legadas necessárias à migração; apresentação, filtros, notificações e ações deixam de registrar. Modelo servidor de Recrutamento removido do agregado. Criação inicial mantém apenas categorias de habilidades de Externos, sem sequências de candidaturas e vagas.
 
 Build Rush de `@hcengineering/model-all` passou após retirada das contribuições de Recrutamento. Testes de migração/candidato passaram (6/6). Inspeção do modelo agregado em memória encontrou 49 transações legadas de esquema, nenhum aplicativo de Recrutamento e nenhum gatilho servidor de Recrutamento.
+
+Botão compartilhado `ViewletsSettingButton` também deixou de expor configuração avançada nas listas embutidas de tarefas, cartões, relações, processos e reuniões; ordenação/agrupamento seguem pelo botão de opções.
