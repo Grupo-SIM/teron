@@ -99,7 +99,7 @@ Menu contextual de canal agora oferece Editar para usuários com permissão; aç
 
 Estimativa de tarefa agora explicita horas no rótulo e no campo de edição. Tempo restante saiu do popup de estimativa. Ação “Adicionar relatório de tempo” saiu do menu de tarefas.
 
-Tempo gasto agora acompanha intervalos de Pendente, Em andamento e Revisão: criação inicia contagem; cada troca de status acumula horas; reabertura inicia novo intervalo; Finalizado e Ajustes pausam. Valor ativo atualiza no editor a cada minuto. Entrada manual saiu do popup de estimativa, do editor de tempo e das listas de relatórios; relatórios antigos deixam de alterar o total. Migração idempotente preparada para reconstruir intervalos pelo histórico de status, preservar dados de relatórios antigos e sincronizar totais de subtarefas nos pais. Testes unitários de transições e reabertura passaram; falta validar migração e gatilho com banco local antes de concluir marco 3.
+Tempo gasto agora acompanha intervalos de Pendente, Em andamento e Revisão: criação inicia contagem; cada troca de status acumula horas; reabertura inicia novo intervalo; Finalizado e Ajustes pausam. Valor ativo atualiza no editor a cada minuto. Entrada manual saiu do popup de estimativa, do editor de tempo e das listas de relatórios; relatórios antigos deixam de alterar o total. Migração idempotente preparada para reconstruir intervalos pelo histórico de status, preservar dados de relatórios antigos e sincronizar totais de subtarefas nos pais. Testes unitários de transições e reabertura passaram; migração de status e tempo validada duas vezes em MongoDB local descartável, com reabertura e registro alheio preservado; falta validar gatilho em fluxo real antes de concluir marco 3.
 
 Tempo ativo agora aparece também no quadro, no resumo de estimativas, na estatística de projetos e na lista de relatórios, com atualização a cada minuto. Totais de subtarefas ainda dependem do último valor persistido de cada filha; validar apresentação com hierarquias ativas em banco local.
 
@@ -113,7 +113,7 @@ Criação de tarefas e modelos agora grava Componente vazio mesmo quando chamada
 
 Tela Modelos de Tarefas agora oferece ações separadas para criar modelo de tarefa e modelo de texto. O modelo de texto usa `MessageTemplate` e fica disponível no seletor existente dos editores de comentários. Conferir criação e inserção com dados locais antes de encerrar o marco 3.
 
-Status padrão de tarefa definidos como Pendente cinza, Em andamento azul, Revisão laranja, Finalizado verde e Ajustes vermelho. Migração idempotente preparada para consolidar referências do antigo Todo em Pendente nas tarefas, padrões de setor e definições de tipos; documento legado permanece disponível para histórico. Testar migração com dados locais e conferir projetos personalizados antes de encerrar o marco 3.
+Status padrão de tarefa definidos como Pendente cinza, Em andamento azul, Revisão laranja, Finalizado verde e Ajustes vermelho. Migração idempotente preparada para consolidar referências do antigo Todo em Pendente nas tarefas, padrões de setor e definições de tipos; documento legado permanece disponível para histórico. Migração de status validada duas vezes em MongoDB local descartável; conferir projetos personalizados antes de encerrar o marco 3.
 
 Rótulos residuais de Backlog na navegação e no gerenciamento de status de Tarefas passam a Pendente/Pendentes nos catálogos `pt` e `pt-br`; o filtro de componentes legado permanece sem navegação.
 
@@ -144,3 +144,5 @@ Revisão de Diretrizes corrigiu “Meus documentos” no menu e “Sin título�
 Tela de exportação agora identifica Diretrizes, Projetos e Tarefas pelos nomes atuais, nos catálogos `pt` e `pt-br`.
 
 Validação parcial: parsing/preprocessamento local dos componentes Svelte alterados passou. `svelte-check` completo encontrou milhares de erros de dependências não compiladas; também revelou sintaxe inválida no handler do filtro, corrigida antes de repetir o parsing. Nenhuma migração remota executada.
+
+Migrações de status e tempo de Tarefas executadas duas vezes em MongoDB local descartável. Fixture com reabertura acumulou quatro horas; status padrão e histórico antigo remapeados; tarefa de outra classe permaneceu intacta. Contêiner descartável removido após teste.
