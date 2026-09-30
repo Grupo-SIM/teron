@@ -103,6 +103,8 @@ Tela Modelos de Tarefas agora oferece ações separadas para criar modelo de tar
 
 Status padrão de tarefa definidos como Pendente cinza, Em andamento azul, Revisão laranja, Finalizado verde e Ajustes vermelho. Migração idempotente preparada para consolidar referências do antigo Todo em Pendente nas tarefas, padrões de setor e definições de tipos; documento legado permanece disponível para histórico. Testar migração com dados locais e conferir projetos personalizados antes de encerrar o marco 3.
 
+Rótulos residuais de Backlog na navegação e no gerenciamento de status de Tarefas passam a Pendente/Pendentes nos catálogos `pt` e `pt-br`; o filtro de componentes legado permanece sem navegação.
+
 Migração de status agora remapeia também transações de criação e atualização de tarefas que referenciam Todo, mantendo histórico coerente com Pendente. Testar com banco local e execução repetida.
 
 Novo tipo de tarefa criado pela integração GitHub usa a mesma sequência e as mesmas cores dos status aprovados.
