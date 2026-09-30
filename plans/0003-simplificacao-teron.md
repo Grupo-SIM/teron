@@ -194,3 +194,5 @@ Build Rush dos pacotes de modelo e recursos de Calendário passou após retirada
 Atalho global “Customizar aplicativos” removido da barra lateral, encerrando acesso ao seletor avançado de visibilidade.
 
 Botões de mostrar todos os mixins retirados dos painéis de Cliente, Produto e Versão de Produto; atributos correntes seguem pelo painel comum.
+
+Botão de configuração avançada retirado também dos formulários de criação e edição de visões em cartões. Opções comuns de visão continuam acessíveis quando disponíveis; o atalho `btn-viewSetting` deixa de ser renderizado.

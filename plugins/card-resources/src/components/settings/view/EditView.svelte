@@ -19,10 +19,8 @@
   import { Button, IconDelete, Label, Modal, ModernEditbox, showPopup } from '@hcengineering/ui'
   import view, { Viewlet } from '@hcengineering/view'
 
-  import { AttributeConfig, Config } from '@hcengineering/view-resources'
   import card from '../../../plugin'
   import DescriptorBox from './DescriptorBox.svelte'
-  import { updateViewletConfig } from './utils'
   import ViewSettingButton from './ViewSettingButton.svelte'
 
   export let viewlet: Viewlet
@@ -55,9 +53,6 @@
       }
     })
   }
-  function onSave (items: (Config | AttributeConfig)[]): void {
-    updateViewletConfig(viewlet, items)
-  }
 </script>
 
 <Modal
@@ -83,18 +78,15 @@
         <DescriptorBox label={card.string.SelectViewType} bind:value={type} />
       </div>
     </div>
-    <div class="teronModal-content__settingsSet-line">
-      <span class="label">
-        <Label label={setting.string.Settings} />
-      </span>
-      <div class="pl-2">
-        <ViewSettingButton
-          {viewlet}
-          on:save={(event) => {
-            onSave(event.detail ?? [])
-          }}
-        />
+    {#if viewlet.viewOptions !== undefined}
+      <div class="teronModal-content__settingsSet-line">
+        <span class="label">
+          <Label label={setting.string.Settings} />
+        </span>
+        <div class="pl-2">
+          <ViewSettingButton {viewlet} />
+        </div>
       </div>
-    </div>
+    {/if}
   </div>
 </Modal>
