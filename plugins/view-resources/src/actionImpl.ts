@@ -19,7 +19,6 @@ import {
   copyTextToClipboardOldBrowser,
   getClient,
   getMarkup,
-  hasResource,
   updateAttribute
 } from '@hcengineering/presentation'
 import { markupToJSON } from '@hcengineering/text'
@@ -49,7 +48,6 @@ import {
   selectionStore
 } from './selection'
 import { deleteObjects, getObjectId, getObjectLinkFragment, restrictionStore } from './utils'
-import workbenchPlugin from '@hcengineering/workbench'
 import converter from '@hcengineering/converter'
 import { viewletContextStore } from './viewletContextStore'
 
@@ -404,18 +402,20 @@ async function OpenInNewTab (
   | undefined
 ): Promise<void> {
   evt.preventDefault()
+  const newTab = window.open('', '_blank')
+  if (newTab === null) return
+  newTab.opener = null
   const d = Array.isArray(doc) ? doc[0] : doc
   const client = getClient()
   const hierarchy = client.getHierarchy()
   const panelComponent = hierarchy.classHierarchyMixin(d._class, view.mixin.ObjectPanel)
   const component = props?.component ?? panelComponent?.component ?? view.component.EditDoc
-  const loc = await getObjectLinkFragment(hierarchy, d, {}, component)
-  if (hasResource(workbenchPlugin.function.OpenInNewTab) === true) {
-    const res = await getResource(workbenchPlugin.function.OpenInNewTab)
-    await res(loc)
-  } else {
-    const url = locationToUrl(loc)
-    window.open(url, '_blank')
+  try {
+    const loc = await getObjectLinkFragment(hierarchy, d, {}, component)
+    newTab.location.replace(locationToUrl(loc))
+  } catch (error) {
+    newTab.close()
+    throw error
   }
 }
 

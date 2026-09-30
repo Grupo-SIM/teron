@@ -83,6 +83,11 @@ export const workbenchOperation: MigrateOperation = {
         state: 'tabs-social-ids-to-global-accounts',
         mode: 'upgrade',
         func: migrateSocialIdsToGlobalAccounts
+      },
+      {
+        state: 'remove-internal-tabs-v1',
+        mode: 'upgrade',
+        func: removeTabs
       }
     ])
   },
