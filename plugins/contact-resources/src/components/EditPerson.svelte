@@ -90,6 +90,7 @@
       'channels',
       'city',
       'functions',
+      'skills',
       'professionalTitle',
       'contactSource',
       'remoteDaysPerWeek',
@@ -181,6 +182,8 @@
           focusIndex={4}
         />
       </div>
+
+      <AttributeEditor maxWidth="20rem" _class={contact.class.Person} {object} {editable} key="skills" />
 
       <AttributeEditor maxWidth="20rem" _class={contact.class.Person} {object} {editable} key="professionalTitle" />
       <AttributeEditor maxWidth="20rem" _class={contact.class.Person} {object} {editable} key="contactSource" />

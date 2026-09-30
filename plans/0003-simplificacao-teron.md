@@ -63,6 +63,8 @@ Migração de Recrutamento iniciada preservando cargo profissional e origem do c
 
 Painel de Externos agora agrupa atributos de Candidato sem cabeçalho separado e oculta a seção Cliente. Campos do candidato continuam acessíveis durante a migração; bloqueio da seção sem cabeçalho foi removido para permitir editar atributos vazios. Conferir renderização de pessoa com os dois mixins em dados locais.
 
+Habilidades dos candidatos agora têm atributo no contato Externo. Migração copia contador sem sobrescrever valor existente e troca `attachedToClass` das referências de habilidade para Pessoa; categorias e elementos também passam a apontar Pessoa. Nenhum registro de habilidade é removido. Validar contadores e filtros de etiquetas com dados locais antes da limpeza do mixin legado.
+
 Editor de funções/etiquetas agora permite excluir definição após confirmação. Exclusão usa participante de remoção existente para apagar referências em contatos antes do registro selecionado. Validar fluxo com funções iguais em pessoas diferentes e com duas funções na mesma pessoa.
 
 Atividade permanece visível fora de Tarefas; editor de comentários fica habilitado apenas no painel da tarefa.

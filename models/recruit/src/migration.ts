@@ -34,7 +34,7 @@ import {
   type MigrationUpgradeClient,
   type ModelLogger
 } from '@hcengineering/model'
-import tags, { type TagCategory } from '@hcengineering/model-tags'
+import tags, { DOMAIN_TAGS, type TagCategory } from '@hcengineering/model-tags'
 import task, { createSequence, DOMAIN_TASK, migrateDefaultStatusesBase } from '@hcengineering/model-task'
 import { recruitId, type Applicant, type Candidate } from '@hcengineering/recruit'
 
@@ -89,6 +89,11 @@ export const recruitOperation: MigrateOperation = {
         state: 'preserve-candidate-contact-fields-v1',
         mode: 'upgrade',
         func: preserveCandidateContactFields
+      },
+      {
+        state: 'preserve-candidate-skills-v1',
+        mode: 'upgrade',
+        func: preserveCandidateSkills
       }
     ])
   },
@@ -125,6 +130,47 @@ async function preserveCandidateContactFields (client: MigrationClient): Promise
   } finally {
     await iterator.close()
   }
+}
+
+async function preserveCandidateSkills (client: MigrationClient): Promise<void> {
+  const iterator = await client.traverse<Person>(DOMAIN_CONTACT, {
+    _class: contact.class.Person,
+    [recruit.mixin.Candidate]: { $exists: true }
+  } as MigrationDocumentQuery<Person>)
+  try {
+    while (true) {
+      const people = await iterator.next(100)
+      if (people === null || people.length === 0) break
+      for (const person of people) {
+        const candidate = (person as Person & Record<string, unknown>)[recruit.mixin.Candidate] as Partial<Candidate> | undefined
+        if (person.skills === undefined && candidate?.skills !== undefined) {
+          await client.update(DOMAIN_CONTACT, { _id: person._id }, { skills: candidate.skills })
+        }
+      }
+    }
+  } finally {
+    await iterator.close()
+  }
+
+  await client.update(DOMAIN_TAGS, {
+    _class: tags.class.TagReference,
+    attachedToClass: recruit.mixin.Candidate,
+    collection: 'skills'
+  }, {
+    attachedToClass: contact.class.Person
+  })
+  await client.update(DOMAIN_TAGS, {
+    _class: tags.class.TagElement,
+    targetClass: recruit.mixin.Candidate
+  }, {
+    targetClass: contact.class.Person
+  })
+  await client.update(DOMAIN_TAGS, {
+    _class: tags.class.TagCategory,
+    targetClass: recruit.mixin.Candidate
+  }, {
+    targetClass: contact.class.Person
+  })
 }
 
 async function migrateIdentifiers (client: MigrationClient): Promise<void> {

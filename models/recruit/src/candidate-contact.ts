@@ -5,6 +5,7 @@ export function candidateContactUpdate (person: Person, candidate: Partial<Candi
   if (candidate === undefined) return {}
   return {
     ...(candidate.title && !person.professionalTitle ? { professionalTitle: candidate.title } : {}),
-    ...(candidate.source && !person.contactSource ? { contactSource: candidate.source } : {})
+    ...(candidate.source && !person.contactSource ? { contactSource: candidate.source } : {}),
+    ...(candidate.skills !== undefined && person.skills === undefined ? { skills: candidate.skills } : {})
   }
 }

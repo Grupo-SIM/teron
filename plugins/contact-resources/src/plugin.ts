@@ -70,6 +70,7 @@ export default mergeIds(contactId, contact, {
     Role: '' as IntlString,
     ProfessionalTitle: '' as IntlString,
     ContactSource: '' as IntlString,
+    Skills: '' as IntlString,
     RemoteDaysPerWeek: '' as IntlString,
     OnsiteDaysPerWeek: '' as IntlString,
     WorkDaysPerWeekInvalid: '' as IntlString,
