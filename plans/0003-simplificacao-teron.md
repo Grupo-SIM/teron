@@ -25,4 +25,6 @@
 
 ## Próximo passo
 
-Implementar marco 2: nomes, traduções e abas do navegador.
+Marco 2 em andamento. Abas internas removidas da interface; ação Abrir em nova aba usa aba real do navegador. Migração local idempotente remove preferências das abas antigas. Termos principais de setores, projetos, contatos, diretrizes, plano e arquivos atualizados em pt-BR. Nomes padrão de salas e canal Aleatório traduzidos sem alterar IDs.
+
+Concluir auditoria dos textos de interface e validar pacotes afetados antes de marcar marco 2 como concluído. Depois, iniciar status e ações de Tarefas no marco 3.

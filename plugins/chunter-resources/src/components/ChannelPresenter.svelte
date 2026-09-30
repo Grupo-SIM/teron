@@ -13,7 +13,7 @@
 // limitations under the License.
 -->
 <script lang="ts">
-  import { Channel, chunterId } from '@hcengineering/chunter'
+  import chunter, { Channel, chunterId } from '@hcengineering/chunter'
   import { getClient } from '@hcengineering/presentation'
   import { Icon, tooltip } from '@hcengineering/ui'
   import { NavLink } from '@hcengineering/view-resources'
@@ -28,6 +28,7 @@
   const client = getClient()
 
   $: icon = client.getHierarchy().getClass(value._class).icon
+  $: displayName = value._id === chunter.space.Random && value.name === 'random' ? 'Aleatório' : value.name
 </script>
 
 {#if value}
@@ -41,10 +42,10 @@
             {/if}
           </div>
         {/if}
-        <span class="label">{value.name}</span>
+        <span class="label">{displayName}</span>
       </div>
     </NavLink>
   {:else}
-    <span class="overflow-label" use:tooltip={{ label: getEmbeddedLabel(value.name) }}>{value.name}</span>
+    <span class="overflow-label" use:tooltip={{ label: getEmbeddedLabel(displayName) }}>{displayName}</span>
   {/if}
 {/if}

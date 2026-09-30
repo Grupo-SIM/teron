@@ -114,7 +114,7 @@
     "CreateDocumentCategory": "Criar uma categoria",
     "DocumentCategoryAlreadyExists": "A categoria \"{title}\" já existe. ",
     "DocumentCategoryCodeAlreadyExists": "O código \"{code}\" já está em uso. ",
-    "AttachmentsMax": "Máximo de anexos permitidos",
+    "AttachmentsMax": "Máximo de arquivos permitidos",
     "Resolve": "Resolver",
     "Unresolve": "Reabrir",
     "Pending": "Pendente",

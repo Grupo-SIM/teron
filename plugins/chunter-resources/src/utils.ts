@@ -193,7 +193,7 @@ export async function ChannelTitleProvider (client: Client, id: Ref<Channel>, do
     return ''
   }
 
-  return channel.name
+  return channel._id === chunter.space.Random && channel.name === 'random' ? 'Aleatório' : channel.name
 }
 
 export enum SearchType {

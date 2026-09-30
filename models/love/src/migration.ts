@@ -47,7 +47,7 @@ async function createDefaultFloor (tx: TxOperations): Promise<void> {
       love.class.Floor,
       core.space.Workspace,
       {
-        name: 'Main'
+        name: 'Principal'
       },
       love.ids.MainFloor
     )
@@ -79,7 +79,7 @@ async function createReception (client: MigrationUpgradeClient): Promise<void> {
     love.class.Room,
     core.space.Workspace,
     {
-      name: 'Reception',
+      name: 'Recepção',
       type: RoomType.Reception,
       access: RoomAccess.Open,
       floor: '' as Ref<Floor>,
@@ -168,6 +168,24 @@ export const loveOperation: MigrateOperation = {
         func: async (client) => {
           await client.reindex(DOMAIN_MEETING_MINUTES, [love.class.MeetingMinutes])
         }
+      },
+      {
+        state: 'translate-default-rooms-v1',
+        mode: 'upgrade',
+        func: async (client) => {
+          const names = new Map([
+            ['All hands', 'Reunião geral'],
+            ['Meeting Room 1', 'Sala de reunião 1'],
+            ['Meeting Room 2', 'Sala de reunião 2'],
+            ['Voice Room 1', 'Sala de áudio 1'],
+            ['Voice Room 2', 'Sala de áudio 2'],
+            ['Reception', 'Recepção']
+          ])
+          for (const [name, translated] of names) {
+            await client.update(DOMAIN_LOVE, { _class: love.class.Room, name }, { name: translated })
+          }
+          await client.update(DOMAIN_LOVE, { _class: love.class.Floor, name: 'Main' }, { name: 'Principal' })
+        }
       }
     ])
   },
@@ -198,8 +216,8 @@ export const loveOperation: MigrateOperation = {
             client,
             love.space.Drive,
             {
-              name: 'Records',
-              description: 'Office records',
+              name: 'Gravações',
+              description: 'Gravações do escritório',
               type: drive.spaceType.DefaultDrive,
               autoJoin: true
             },

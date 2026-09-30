@@ -47,7 +47,7 @@ export function createDefaultRooms (
 
   res.push({
     _id: allHands,
-    name: 'All hands',
+    name: 'Reunião geral',
     type: RoomType.Video,
     access: RoomAccess.Open,
     floor: love.ids.MainFloor,
@@ -63,7 +63,7 @@ export function createDefaultRooms (
   const meetingRoom1 = generateId<Room>()
   res.push({
     _id: meetingRoom1,
-    name: 'Meeting Room 1',
+    name: 'Sala de reunião 1',
     type: RoomType.Video,
     access: RoomAccess.Open,
     floor: love.ids.MainFloor,
@@ -78,7 +78,7 @@ export function createDefaultRooms (
   const meetingRoom2 = generateId<Room>()
   res.push({
     _id: meetingRoom2,
-    name: 'Meeting Room 2',
+    name: 'Sala de reunião 2',
     type: RoomType.Video,
     access: RoomAccess.Open,
     floor: love.ids.MainFloor,
@@ -93,7 +93,7 @@ export function createDefaultRooms (
   const voiceRoom1 = generateId<Room>()
   res.push({
     _id: voiceRoom1,
-    name: 'Voice Room 1',
+    name: 'Sala de áudio 1',
     type: RoomType.Audio,
     access: RoomAccess.Open,
     floor: love.ids.MainFloor,
@@ -108,7 +108,7 @@ export function createDefaultRooms (
   const voiceRoom2 = generateId<Room>()
   res.push({
     _id: voiceRoom2,
-    name: 'Voice Room 2',
+    name: 'Sala de áudio 2',
     type: RoomType.Audio,
     access: RoomAccess.Open,
     floor: love.ids.MainFloor,
