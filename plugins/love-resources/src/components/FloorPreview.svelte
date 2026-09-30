@@ -41,6 +41,7 @@
   export let rooms: Room[] = []
   export let selected: boolean
   export let removable: boolean = true
+  let expanded = selected && rooms.length > 0
 
   const me = getCurrentAccount()
   const dispatch = createEventDispatcher()
@@ -104,14 +105,23 @@
       <ButtonIcon icon={IconMoreH} kind={'tertiary'} size={'small'} {pressed} on:click={clickMore} />
     {/if}
   </div>
-  <button class="floor-preview" aria-label={floor.name} on:click={() => dispatch('select')}>
-    <div class="floor-preview-content">
-      <FloorGrid bind:floorContainer {rows} preview>
-        {#each rooms as room}
-          <RoomPreview {room} info={getInfo(room._id, $infos)} preview />
-        {/each}
-      </FloorGrid>
-    </div>
+  <button
+    class="floor-preview-toggle"
+    aria-label={floor.name}
+    aria-expanded={expanded}
+    on:click={() => (expanded = !expanded)}
+  >
+    {#if expanded}
+      <div class="floor-preview-content">
+        <FloorGrid bind:floorContainer {rows} preview>
+          {#each rooms as room}
+            <RoomPreview {room} info={getInfo(room._id, $infos)} />
+          {/each}
+        </FloorGrid>
+      </div>
+    {:else}
+      <span>+</span>
+    {/if}
   </button>
 </div>
 
@@ -125,6 +135,11 @@
     &.selected {
       border-color: var(--theme-button-focused-border);
       background-color: var(--theme-button-pressed);
+    }
+
+    &:not(:has(.floor-preview-content)) {
+      width: 10rem;
+      min-height: 9rem;
     }
   }
 
@@ -146,11 +161,16 @@
     cursor: pointer;
   }
 
-  .floor-preview {
+  .floor-preview-toggle {
     display: block;
     width: 100%;
+    min-height: 5rem;
     padding: 0 0.5rem 0.5rem;
     cursor: pointer;
+    text-align: center;
+    color: var(--theme-content-color);
+    background: transparent;
+    border: 0;
   }
 
   .floor-preview-content {
@@ -158,7 +178,6 @@
     justify-content: center;
     width: 100%;
     overflow: hidden;
-    pointer-events: none;
 
     :global(.floorGrid) {
       min-width: 0 !important;

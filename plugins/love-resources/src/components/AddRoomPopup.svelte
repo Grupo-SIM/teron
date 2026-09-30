@@ -13,7 +13,7 @@
 
   const dispatch = createEventDispatcher()
 
-  type TypeIds = 'meetingRoom' | 'teamRoom' | 'office'
+  type TypeIds = 'meetingRoom' | 'office'
 
   interface Item extends DropdownIntlItem {
     id: TypeIds
@@ -27,13 +27,6 @@
       id: 'meetingRoom',
       label: love.string.MeetingRoom,
       type: RoomType.Video,
-      _class: love.class.Room,
-      access: RoomAccess.Open
-    },
-    {
-      id: 'teamRoom',
-      label: love.string.TeamRoom,
-      type: RoomType.Audio,
       _class: love.class.Room,
       access: RoomAccess.Open
     },
