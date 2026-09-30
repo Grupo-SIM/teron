@@ -57,6 +57,8 @@ Campo Componente retirado dos formulários de criação, detalhe e modelo de tar
 
 Status padrão de tarefa definidos como Pendente cinza, Em andamento azul, Revisão laranja, Finalizado verde e Ajustes vermelho. Migração idempotente preparada para consolidar referências do antigo Todo em Pendente nas tarefas, padrões de setor e definições de tipos; documento legado permanece disponível para histórico. Testar migração com dados locais e conferir projetos personalizados antes de encerrar o marco 3.
 
+Novo tipo de tarefa criado pela integração GitHub usa a mesma sequência e as mesmas cores dos status aprovados.
+
 Concluir auditoria dos textos de interface e validar pacotes afetados antes de marcar marco 2 como concluído. Depois, continuar status e ações de Tarefas no marco 3.
 
 Validação parcial: parsing/preprocessamento local dos componentes Svelte alterados passou. `svelte-check` completo encontrou milhares de erros de dependências não compiladas; também revelou sintaxe inválida no handler do filtro, corrigida antes de repetir o parsing. Nenhuma migração remota executada.
