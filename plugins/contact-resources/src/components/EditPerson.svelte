@@ -27,6 +27,7 @@
   import ChannelsDropdown from './ChannelsDropdown.svelte'
   import ChannelsEditor from './ChannelsEditor.svelte'
   import EditableAvatar from './EditableAvatar.svelte'
+  import WorkModeDays from './WorkModeDays.svelte'
 
   export let object: Person
   export let readonly: boolean = false
@@ -168,6 +169,8 @@
           focusIndex={4}
         />
       </div>
+
+      <WorkModeDays {object} {editable} />
 
       <div class="separator" />
       <Scroller

@@ -221,6 +221,12 @@ export class TPerson extends TContact implements Person {
   @Prop(CollectionType(tags.class.TagReference, contact.string.Position), contact.string.Position)
     functions?: number
 
+  @Prop(TypeNumber(), contact.string.RemoteDaysPerWeek)
+    remoteDaysPerWeek?: number | null
+
+  @Prop(TypeNumber(), contact.string.OnsiteDaysPerWeek)
+    onsiteDaysPerWeek?: number | null
+
   @Prop(CollectionType(contact.class.SocialIdentity), contact.string.SocialIds)
     socialIds?: Collection<SocialIdentity>
 
