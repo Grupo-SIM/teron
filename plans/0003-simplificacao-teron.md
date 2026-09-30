@@ -95,6 +95,8 @@ Menu de comandos `/` agora entrega texto já traduzido ao popup e reserva largur
 
 Campo Componente retirado dos formulários de criação, detalhe e modelo de tarefa; retirado de cartões, colunas, agrupamentos e filtro das listas comuns. Vínculo persistido permanece para registros antigos e rotinas de movimentação; revisar caminhos de criação contextual antes de encerrar o marco 3.
 
+Página de Componentes dentro de cada setor, seu atalho de teclado e ação contextual de atribuir componente retirados. Classe legada permanece para leitura de dados antigos.
+
 Criação de tarefas e modelos agora grava Componente vazio mesmo quando chamada a partir de contexto antigo; criação contextual ainda preserva projeto e demais dados. Campo Componente retirado também do formulário residual de modelo.
 
 Tela Modelos de Tarefas agora oferece ações separadas para criar modelo de tarefa e modelo de texto. O modelo de texto usa `MessageTemplate` e fica disponível no seletor existente dos editores de comentários. Conferir criação e inserção com dados locais antes de encerrar o marco 3.
