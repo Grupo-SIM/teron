@@ -61,7 +61,7 @@
     return nonEmpty === undefined
   }
 
-  $: collapsed = getCollapsed(_class, nonEmpty)
+  $: collapsed = showHeader && getCollapsed(_class, nonEmpty)
 </script>
 
 {#if showHeader && (keys.length > 0 || isMainClass)}

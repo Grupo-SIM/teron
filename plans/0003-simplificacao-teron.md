@@ -61,6 +61,8 @@ Contatos Pessoa agora aceitam contagem opcional de dias remotos e presenciais po
 
 Migração de Recrutamento iniciada preservando cargo profissional e origem do candidato nos campos próprios de contato Externo. Editor de contatos exibe os campos; migração não sobrescreve edição existente e mantém dados de Recrutamento até a etapa de limpeza. Teste unitário da cópia e da repetição passou. Ainda faltam habilidades, anexos, referências e remoção segura das candidaturas/vagas.
 
+Painel de Externos agora agrupa atributos de Candidato sem cabeçalho separado e oculta a seção Cliente. Campos do candidato continuam acessíveis durante a migração; bloqueio da seção sem cabeçalho foi removido para permitir editar atributos vazios. Conferir renderização de pessoa com os dois mixins em dados locais.
+
 Editor de funções/etiquetas agora permite excluir definição após confirmação. Exclusão usa participante de remoção existente para apagar referências em contatos antes do registro selecionado. Validar fluxo com funções iguais em pessoas diferentes e com duas funções na mesma pessoa.
 
 Atividade permanece visível fora de Tarefas; editor de comentários fica habilitado apenas no painel da tarefa.

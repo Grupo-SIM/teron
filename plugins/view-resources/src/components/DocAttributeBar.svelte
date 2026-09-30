@@ -13,6 +13,7 @@
 // limitations under the License.
 -->
 <script lang="ts">
+  import contact from '@hcengineering/contact'
   import { Doc, Mixin } from '@hcengineering/core'
   import { getClient } from '@hcengineering/presentation'
   import setting from '@hcengineering/setting'
@@ -30,6 +31,8 @@
   const hierarchy = client.getHierarchy()
 
   $: _allowedCollections = allowedCollections.filter((key) => key !== 'collaborators')
+  $: isContact = hierarchy.isDerived(object._class, contact.class.Contact)
+  $: isPerson = hierarchy.isDerived(object._class, contact.class.Person)
 </script>
 
 <ClassAttributeBar
@@ -45,7 +48,7 @@
 />
 {#each mixins as mixin}
   {@const to = !hierarchy.hasMixin(mixin, setting.mixin.UserMixin) ? object._class : mixin.extends}
-  {#if !hierarchy.hasMixin(mixin, setting.mixin.Editable) || hierarchy.as(mixin, setting.mixin.Editable).value}
+  {#if (!hierarchy.hasMixin(mixin, setting.mixin.Editable) || hierarchy.as(mixin, setting.mixin.Editable).value) && (!isContact || mixin._id !== 'lead:mixin:Customer')}
     {#key mixin._id}
       <ClassAttributeBar
         _class={mixin._id}
@@ -54,7 +57,7 @@
         {to}
         {readonly}
         allowedCollections={_allowedCollections}
-        {showHeader}
+        showHeader={showHeader && (!isPerson || mixin._id !== 'recruit:mixin:Candidate')}
         on:update
       />
     {/key}
