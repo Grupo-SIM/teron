@@ -174,3 +174,5 @@ Rótulos residuais “Explorador de canais/mensagens” também passaram a “Pe
 Catálogo `pt` alinhado aos nomes aprovados de Setores, Projetos, Externos, Clientes, Calendário e Plano; `pt-br` já usava esses nomes.
 
 FAQ do site público também usa Arquivos no lugar de Anexos; artefatos gerados de build permanecem derivados e serão atualizados pelo próximo build local.
+
+Exemplo de identificador na criação de Setor agora usa SET nos catálogos `pt`/`pt-br`; identificadores existentes não são alterados.
