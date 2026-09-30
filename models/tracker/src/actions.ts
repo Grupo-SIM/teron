@@ -300,30 +300,7 @@ export function createActions (builder: Builder, issuesId: string, myIssuesId: s
     tracker.action.UnsetParent
   )
 
-  createAction(
-    builder,
-    {
-      action: view.actionImpl.ShowPopup,
-      actionProps: {
-        component: tracker.component.CreateIssue,
-        element: 'top',
-        fillProps: {
-          _object: 'relatedTo',
-          space: 'space'
-        }
-      },
-      label: tracker.string.NewRelatedIssue,
-      icon: tracker.icon.NewIssue,
-      input: 'focus',
-      category: tracker.category.Tracker,
-      target: core.class.Doc,
-      context: {
-        mode: [],
-        group: 'associate'
-      }
-    },
-    tracker.action.NewRelatedIssue
-  )
+
 
   createAction(builder, {
     action: view.actionImpl.ShowPopup,
@@ -549,49 +526,8 @@ export function createActions (builder: Builder, issuesId: string, myIssuesId: s
     },
     tracker.action.CopyIssueId
   )
-  createAction(
-    builder,
-    {
-      action: view.actionImpl.CopyTextToClipboard,
-      actionProps: {
-        textProvider: tracker.function.GetIssueTitle
-      },
-      label: tracker.string.CopyIssueTitle,
-      icon: tracker.icon.CopyBranch,
-      input: 'focus',
-      category: tracker.category.Tracker,
-      target: tracker.class.Issue,
-      visibilityTester: view.function.IsClipboardAvailable,
-      context: {
-        mode: [],
-        application: tracker.app.Tracker,
-        group: 'copy'
-      }
-    },
-    tracker.action.CopyIssueTitle
-  )
-  createAction(
-    builder,
-    {
-      action: view.actionImpl.CopyTextToClipboard,
-      actionProps: {
-        textProvider: tracker.function.GetIssueLink
-      },
-      label: tracker.string.CopyIssueUrl,
-      icon: view.icon.CopyLink,
-      input: 'focus',
-      category: tracker.category.Tracker,
-      target: tracker.class.Issue,
-      visibilityTester: view.function.IsClipboardAvailable,
-      context: {
-        mode: [],
-        application: tracker.app.Tracker,
-        group: 'copy'
-      },
-      override: [view.action.CopyLink]
-    },
-    tracker.action.CopyIssueLink
-  )
+
+
   createAction(
     builder,
     {
@@ -696,31 +632,5 @@ export function createActions (builder: Builder, issuesId: string, myIssuesId: s
     tracker.action.CopyAsMarkdownTable
   )
 
-  createAction(
-    builder,
-    {
-      action: view.actionImpl.ShowPopup,
-      actionProps: {
-        component: tracker.component.EditRelatedTargetsPopup,
-        element: 'top',
-        fillProps: {
-          _objects: 'value'
-        }
-      },
-      label: tracker.string.MapRelatedIssues,
-      icon: tracker.icon.Relations,
-      input: 'none',
-      category: tracker.category.Tracker,
-      target: core.class.Space,
-      query: {
-        _class: { $ne: tracker.class.Project }
-      },
-      context: {
-        mode: [],
-        application: tracker.app.Tracker,
-        group: 'associate'
-      }
-    },
-    tracker.action.EditRelatedTargets
-  )
+
 }

@@ -809,23 +809,7 @@ export function createModel (builder: Builder): void {
     view.action.Delete
   )
 
-  createAction(
-    builder,
-    {
-      action: view.actionImpl.CopyTextToClipboard,
-      actionProps: {
-        textProvider: view.function.GetLink
-      },
-      label: view.string.CopyLink,
-      icon: view.icon.CopyLink,
-      category: view.category.General,
-      input: 'any',
-      target: core.class.Doc,
-      context: { mode: [] },
-      visibilityTester: view.function.CanCopyLink
-    },
-    view.action.CopyLink
-  )
+
 
   createAction(
     builder,
@@ -898,28 +882,7 @@ export function createModel (builder: Builder): void {
     view.action.Join
   )
 
-  createAction(
-    builder,
-    {
-      action: view.actionImpl.ShowPopup as ViewAction<Record<string, any>>,
-      actionProps: {
-        component: view.component.AddRelationPopup,
-        fillProps: {
-          _objects: 'value'
-        }
-      },
-      label: core.string.AddRelation,
-      input: 'any',
-      icon: view.icon.CopyLink,
-      category: view.category.Editor,
-      target: core.class.Doc,
-      context: {
-        mode: [],
-        group: 'associate'
-      }
-    },
-    view.action.AddRelation
-  )
+
 
   createAction(
     builder,

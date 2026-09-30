@@ -148,3 +148,5 @@ Validação parcial: parsing/preprocessamento local dos componentes Svelte alter
 Migrações de status e tempo de Tarefas executadas duas vezes em MongoDB local descartável. Fixture com reabertura acumulou quatro horas; status padrão e histórico antigo remapeados; tarefa de outra classe permaneceu intacta. Contêiner descartável removido após teste.
 
 Ação Link público retirada também do registro de Contatos e de Tarefas; referências de tipo ficam para documentos antigos.
+
+Ações globais de copiar link e adicionar relação, além das ações Nova tarefa relacionada, Copiar título/URL e configurar projetos relacionados, deixaram de ser registradas. IDs legados ficam para referências persistidas e listas de ignorados.
