@@ -68,17 +68,19 @@ export { default } from './plugin'
 export const classicIssueTaskStatuses: TaskStatusFactory[] = [
   {
     category: task.statusCategory.UnStarted,
-    statuses: [['Backlog', PaletteColorIndexes.Cloud, pluginState.status.Backlog]]
+    statuses: [['Pendente', PaletteColorIndexes.Cloud, pluginState.status.Backlog]]
   },
-  { category: task.statusCategory.ToDo, statuses: [['Todo', PaletteColorIndexes.Porpoise, pluginState.status.Todo]] },
   {
     category: task.statusCategory.Active,
-    statuses: [['In Progress', PaletteColorIndexes.Cerulean, pluginState.status.InProgress]]
+    statuses: [
+      ['Em andamento', PaletteColorIndexes.Cerulean, pluginState.status.InProgress],
+      ['Revisão', PaletteColorIndexes.Orange, pluginState.status.UnderReview]
+    ]
   },
-  { category: task.statusCategory.Won, statuses: [['Done', PaletteColorIndexes.Grass, pluginState.status.Done]] },
+  { category: task.statusCategory.Won, statuses: [['Finalizado', PaletteColorIndexes.Grass, pluginState.status.Done]] },
   {
     category: task.statusCategory.Lost,
-    statuses: [['Canceled', PaletteColorIndexes.Coin, pluginState.status.Canceled]]
+    statuses: [['Ajustes', PaletteColorIndexes.Firework, pluginState.status.Canceled]]
   }
 ]
 
@@ -790,6 +792,14 @@ function defineSpaceType (builder: Builder): void {
       )
     }
   }
+
+  // Keep the old status available to historical activity until references have been migrated.
+  builder.createDoc(tracker.class.IssueStatus, core.space.Model, {
+    ofAttribute: tracker.attribute.IssueStatus,
+    name: 'Pendente',
+    color: PaletteColorIndexes.Cloud,
+    category: task.statusCategory.UnStarted
+  }, pluginState.status.Todo)
 
   // Create default task type
   builder.createModel(TIssueTypeData)
