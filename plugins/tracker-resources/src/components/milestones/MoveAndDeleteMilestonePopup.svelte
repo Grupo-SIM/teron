@@ -43,6 +43,7 @@
 >
   <MilestonePopup
     _class={tracker.class.Milestone}
+    milestoneQuery={{ space: milestones[0]?.space }}
     ignoreMilestones={milestones}
     allowDeselect
     closeAfterSelect={false}

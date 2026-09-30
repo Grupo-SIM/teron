@@ -331,11 +331,11 @@ async function moveAndDeleteMilestones (
     },
     action: async () => {
       for (const oldMilestone of oldMilestones) {
-        void moveIssuesToAnotherMilestone(client, oldMilestone, newMilestone).then((success) => {
-          if (success) {
-            void deleteObject(client, oldMilestone)
-          }
-        })
+        if (newMilestone?._id === oldMilestone._id || (newMilestone !== undefined && newMilestone.space !== oldMilestone.space)) {
+          continue
+        }
+        const success = await moveIssuesToAnotherMilestone(client, oldMilestone, newMilestone)
+        if (success) await deleteObject(client, oldMilestone)
       }
     }
   })
@@ -346,7 +346,8 @@ async function deleteMilestone (milestones: Milestone | Milestone[]): Promise<vo
   const milestoneArray = Array.isArray(milestones) ? milestones : [milestones]
   // Check if available to move issues to another milestone
   const firstSearchedMilestone = await client.findOne(tracker.class.Milestone, {
-    _id: { $nin: milestoneArray.map((p) => p._id) }
+    _id: { $nin: milestoneArray.map((p) => p._id) },
+    space: milestoneArray[0]?.space
   })
   if (firstSearchedMilestone !== undefined) {
     showPopup(

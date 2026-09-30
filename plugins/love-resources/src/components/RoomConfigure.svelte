@@ -16,8 +16,8 @@
   import contact, { Contact, Person } from '@hcengineering/contact'
   import { AssigneeBox } from '@hcengineering/contact-resources'
   import { Ref } from '@hcengineering/core'
-  import { getClient } from '@hcengineering/presentation'
-  import { ActionIcon, EditBox, Icon, IconDelete, resizeObserver, tooltip } from '@hcengineering/ui'
+  import { getClient, MessageBox } from '@hcengineering/presentation'
+  import { ActionIcon, EditBox, Icon, IconDelete, resizeObserver, showPopup, tooltip } from '@hcengineering/ui'
   import { Room, RoomAccess, RoomType, isOffice } from '@hcengineering/love'
   import { createEventDispatcher, onMount } from 'svelte'
   import { cubicOut } from 'svelte/easing'
@@ -40,6 +40,7 @@
   const SHADOW_OFFSET = 3
   const SHADOW_BLUR = 2
   const SHADOW_SPREAD = -1
+  let assigneeVersion = 0
 
   async function updateName (): Promise<void> {
     await client.update(room, { name: room.name })
@@ -49,6 +50,16 @@
     if (isOffice(room)) {
       const value = e.detail
       const prevValue = room.person
+      if (value === prevValue) return
+      if ($infos.some((info) => info.room === room._id || info.person === prevValue)) {
+        assigneeVersion += 1
+        showPopup(MessageBox, {
+          label: love.string.ChangeOfficeAssignee,
+          message: love.string.OfficeCannotBeDeleted,
+          canSubmit: false
+        })
+        return
+      }
       await client.update(room, { person: value })
       if (prevValue != null) {
         const currentInfo = $infos.find((p) => p.room === room._id && p.person === prevValue)
@@ -207,6 +218,7 @@
         }}
       >
         {#if isOffice(room) && rX === 0 && rY === 0}
+          {#key assigneeVersion}
           <AssigneeBox
             _class={contact.class.Person}
             excluded={excludedPersons.filter((person) => person !== room.person)}
@@ -217,9 +229,10 @@
             height={'100%'}
             label={contact.string.Person}
             value={room.person}
-            avatarSize={'full'}
+            avatarSize={'card'}
             on:change={changePerson}
           />
+          {/key}
         {/if}
       </div>
     {/each}

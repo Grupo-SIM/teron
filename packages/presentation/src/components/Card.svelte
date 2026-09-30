@@ -81,15 +81,26 @@
         return
       }
       okProcessing = true
-      const r = okAction()
-      if (r instanceof Promise) {
-        r.then(() => {
+      try {
+        const result = okAction()
+        if (result instanceof Promise) {
+          void result.then(
+            () => {
+              okProcessing = false
+              dispatch('close')
+            },
+            (error) => {
+              okProcessing = false
+              console.error(error)
+            }
+          )
+        } else {
           okProcessing = false
           dispatch('close')
-        })
-      } else {
+        }
+      } catch (error) {
         okProcessing = false
-        dispatch('close')
+        throw error
       }
     }
   }

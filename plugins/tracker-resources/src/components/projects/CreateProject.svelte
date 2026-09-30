@@ -137,7 +137,7 @@
   }
 
   async function updateProject (): Promise<void> {
-    if (!project || typeType?.targetClass === undefined) {
+    if (!project) {
       return
     }
 
@@ -193,11 +193,14 @@
 
     if (Object.keys(update).length > 0) {
       isSaving = true
-      await client.update(project, update)
-      isSaving = false
+      try {
+        await client.update(project, update)
+      } finally {
+        isSaving = false
+      }
     }
 
-    if (rolesAssignment && !deepEqual(rolesAssignment, getRolesAssignment())) {
+    if (typeType?.targetClass !== undefined && rolesAssignment && !deepEqual(rolesAssignment, getRolesAssignment())) {
       await client.updateMixin(
         project._id,
         tracker.class.Project,
@@ -241,24 +244,26 @@
         .notMatch(tracker.class.Project, { identifier: projectData.identifier.toUpperCase() })
 
       isSaving = true
-      await ops.createDoc(tracker.class.Project, core.space.Space, { ...projectData, type: typeId }, projectId)
-      const succeeded = await ops.commit()
-      Analytics.handleEvent(TrackerEvents.ProjectCreated, {
-        ok: succeeded.result,
-        id: projectData.identifier
-      })
-      if (succeeded.result) {
-        // Add space type's mixin with roles assignments
-        await client.createMixin(
-          projectId,
-          tracker.class.Project,
-          core.space.Space,
-          typeType.targetClass,
-          rolesAssignment ?? {}
-        )
+      try {
+        await ops.createDoc(tracker.class.Project, core.space.Space, { ...projectData, type: typeId }, projectId)
+        const succeeded = await ops.commit()
+        Analytics.handleEvent(TrackerEvents.ProjectCreated, {
+          ok: succeeded.result,
+          id: projectData.identifier
+        })
+        if (succeeded.result) {
+          // Add space type's mixin with roles assignments
+          await client.createMixin(
+            projectId,
+            tracker.class.Project,
+            core.space.Space,
+            typeType.targetClass,
+            rolesAssignment ?? {}
+          )
 
-        close(projectId)
-      } else {
+          close(projectId)
+        }
+      } finally {
         isSaving = false
       }
     }
