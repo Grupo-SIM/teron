@@ -17,7 +17,7 @@
   import contact, { getCurrentEmployee, SocialIdentityProvider, SocialIdentityRef } from '@hcengineering/contact'
   import { EditBox, Label, Button, CodeForm, TimeLeft, Status as StatusControl } from '@hcengineering/ui'
   import { OtpInfo } from '@hcengineering/account-client'
-  import { buildSocialIdString, getCurrentAccount, setCurrentAccount, SocialId, Timestamp } from '@hcengineering/core'
+  import { buildSocialIdString, getCurrentAccount, pickPrimarySocialId, setCurrentAccount, SocialId, SocialIdType, Timestamp } from '@hcengineering/core'
   import { OK, PlatformError, Severity, Status, unknownError } from '@hcengineering/platform'
   import { getClient } from '@hcengineering/presentation'
 
@@ -94,7 +94,7 @@
       const newSocialIdLoginInfo = await accountClient.validateOtp(email, code, undefined, 'verify')
       const currPerson = getCurrentEmployee()
       const currAcc = getCurrentAccount()
-      const socialIds = await accountClient.getSocialIds()
+      let socialIds = await accountClient.getSocialIds()
 
       const newSocialId = socialIds.find((it) => it._id === newSocialIdLoginInfo.socialId)
       if (newSocialId == null) {
@@ -134,10 +134,25 @@
         )
       }
 
+      for (const previous of currAcc.fullSocialIds.filter(
+        (socialId) => socialId.type === SocialIdType.EMAIL && socialId._id !== newSocialId._id && socialId.isDeleted !== true
+      )) {
+        const released = await accountClient.releaseSocialId(undefined, previous.type, previous.value, true)
+        const oldIdentity = await client.findOne(contact.class.SocialIdentity, { _id: released._id as SocialIdentityRef })
+        if (oldIdentity !== undefined) {
+          await client.updateDoc(contact.class.SocialIdentity, contact.space.Contacts, oldIdentity._id, {
+            key: released.key,
+            value: released.value,
+            isDeleted: released.isDeleted
+          })
+        }
+      }
+      socialIds = await accountClient.getSocialIds()
       setCurrentAccount({
         ...currAcc,
         fullSocialIds: socialIds,
-        socialIds: socialIds.map((si) => si._id)
+        socialIds: socialIds.map((si) => si._id),
+        primarySocialId: pickPrimarySocialId(socialIds)._id
       })
       if (onAdded != null) {
         console.log('Callback onAdded')

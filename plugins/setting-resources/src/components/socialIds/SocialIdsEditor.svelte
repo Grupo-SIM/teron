@@ -14,10 +14,9 @@
 -->
 <script lang="ts">
   import contact from '@hcengineering/contact'
-  import { getCurrentAccount, loginSocialTypes, notEmpty, SocialIdType } from '@hcengineering/core'
+  import { getCurrentAccount, loginSocialTypes, SocialIdType } from '@hcengineering/core'
   import { getClient, hasResource } from '@hcengineering/presentation'
-  import { Action, Button, createFocusManager, FocusHandler, Label, Menu, Scroller, showPopup } from '@hcengineering/ui'
-  import view from '@hcengineering/view'
+  import { Button, createFocusManager, FocusHandler, Label, Scroller, showPopup } from '@hcengineering/ui'
 
   import type { PersonRating } from '@hcengineering/rating'
   import ratingPlugin from '@hcengineering/rating'
@@ -38,23 +37,11 @@
 
   $: socialIds = account.fullSocialIds.filter((si) => socialIdProviders.has(si.type) && si.isDeleted !== true)
 
-  const addActions: Action[] = Array.from(socialIdProviders.values())
-    .map((pr) => {
-      const { creator } = pr
-      if (creator == null) return null
-
-      return {
-        icon: pr.icon ?? contact.icon.Profile,
-        label: pr.label,
-        action: async () => {
-          showPopup(creator, { provider: pr, onAdded: handleAccountUpdated })
-        }
-      }
-    })
-    .filter(notEmpty)
+  const emailProvider = socialIdProviders.get(SocialIdType.EMAIL)
 
   function handleAdd (ev: MouseEvent): void {
-    showPopup(Menu, { actions: addActions }, ev.target as HTMLElement)
+    if (emailProvider?.creator === undefined) return
+    showPopup(emailProvider.creator, { provider: emailProvider, onAdded: handleAccountUpdated }, ev.target as HTMLElement)
   }
 
   $: onlyHuly = socialIds.filter((it) => it.type === SocialIdType.HULY).length === 1
@@ -73,7 +60,9 @@
 <div class="flex-col flex-gap-2">
   <div class="title flex-between">
     <Label label={setting.string.ManageIdentities} />
-    <Button icon={view.icon.Add} kind="icon" size="small" on:click={handleAdd} />
+    {#if emailProvider?.creator !== undefined}
+      <Button icon={emailProvider.icon ?? contact.icon.Profile} label={emailProvider.label} kind="link-bordered" size="small" on:click={handleAdd} />
+    {/if}
   </div>
 
   <div class="items">

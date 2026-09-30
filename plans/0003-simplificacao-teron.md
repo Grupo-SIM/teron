@@ -41,6 +41,8 @@ Recrutamento, RH e Planejador de equipes ocultos na navegação enquanto migraç
 
 Botão 2FA posicionado abaixo da descrição. Ação Entrar removida do menu de conta de convidados; Sair permanece para contas autenticadas.
 
+Gerenciamento de identidades agora abre diretamente o formulário de E-mail. Após validar o código do novo endereço, identidades de e-mail antigas são liberadas e marcadas como removidas no espaço de trabalho. Conferir o fluxo completo com conta de teste local antes de fechar o marco 7.
+
 Notificações agora exibe apenas os grupos de preferências Geral e Som e aparência; subtelas por categoria não são renderizadas mesmo por URL antiga.
 
 Tabelas padrão de contatos enxugadas para nome, localização, função (quando pessoa) e informações de contato. Apresentação de funções consulta coleção correta mesmo quando contador está desatualizado, permitindo mostrar múltiplas funções.
