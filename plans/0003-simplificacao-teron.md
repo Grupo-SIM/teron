@@ -182,3 +182,5 @@ Modelo de Recrutamento reduzido às classes legadas necessárias à migração; 
 Build Rush de `@hcengineering/model-all` passou após retirada das contribuições de Recrutamento. Testes de migração/candidato passaram (6/6). Inspeção do modelo agregado em memória encontrou 49 transações legadas de esquema, nenhum aplicativo de Recrutamento e nenhum gatilho servidor de Recrutamento.
 
 Botão compartilhado `ViewletsSettingButton` também deixou de expor configuração avançada nas listas embutidas de tarefas, cartões, relações, processos e reuniões; ordenação/agrupamento seguem pelo botão de opções.
+
+Carregadores de recursos de interface e servidor de Recrutamento retirados de produção, pipeline e ferramenta local; catálogo de strings/ícones permanece para categorias legadas de habilidades dos Externos.
