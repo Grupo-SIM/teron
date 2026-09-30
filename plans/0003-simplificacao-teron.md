@@ -97,4 +97,6 @@ Atributo visível Colaboradores retirado do editor genérico, do painel de Taref
 
 Concluir auditoria dos textos de interface e validar pacotes afetados antes de marcar marco 2 como concluído. Depois, continuar status e ações de Tarefas no marco 3.
 
+Auditoria adicional de pt-BR corrigiu rótulos de downloads ainda exibidos em inglês ou com terminologia inconsistente. Comparação de chaves entre inglês e pt-BR encontrou somente nomes próprios, exemplos de URL e valores técnicos iguais; revisar textos gerados fora dos catálogos no fechamento.
+
 Validação parcial: parsing/preprocessamento local dos componentes Svelte alterados passou. `svelte-check` completo encontrou milhares de erros de dependências não compiladas; também revelou sintaxe inválida no handler do filtro, corrigida antes de repetir o parsing. Nenhuma migração remota executada.
