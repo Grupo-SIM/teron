@@ -62,7 +62,7 @@ import { type KeyFilter, type ViewletDescriptor } from '@hcengineering/view'
 import { CategoryQuery, ListSelectionProvider, statusStore, type SelectDirection } from '@hcengineering/view-resources'
 import { derived, get, writable } from 'svelte/store'
 import tracker from './plugin'
-import { defaultMilestoneStatuses, defaultPriorities } from './types'
+import { defaultPriorities } from './types'
 
 export const activeProjects = derived(taskActiveProjects, (projects) => {
   const client = getClient()
@@ -74,40 +74,11 @@ export * from './types'
 
 export type ComponentsFilterMode = 'all' | 'backlog' | 'active' | 'closed'
 
-export type MilestoneViewMode = 'all' | 'planned' | 'active' | 'closed'
-
-export const getIncludedMilestoneStatuses = (mode: MilestoneViewMode): MilestoneStatus[] => {
-  switch (mode) {
-    case 'all': {
-      return defaultMilestoneStatuses
-    }
-    case 'active': {
-      return [MilestoneStatus.InProgress]
-    }
-    case 'planned': {
-      return [MilestoneStatus.Planned]
-    }
-    case 'closed': {
-      return [MilestoneStatus.Completed, MilestoneStatus.Canceled]
-    }
-    default: {
-      return []
-    }
-  }
-}
-
 export const componentsTitleMap: Record<ComponentsFilterMode, IntlString> = Object.freeze({
   all: tracker.string.AllComponents,
   backlog: tracker.string.BacklogComponents,
   active: tracker.string.ActiveComponents,
   closed: tracker.string.ClosedComponents
-})
-
-export const milestoneTitleMap: Record<MilestoneViewMode, IntlString> = Object.freeze({
-  all: tracker.string.AllMilestones,
-  planned: tracker.string.PlannedMilestones,
-  active: tracker.string.ActiveMilestones,
-  closed: tracker.string.ClosedMilestones
 })
 
 /**

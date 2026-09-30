@@ -17,13 +17,11 @@
   import { IntlString } from '@hcengineering/platform'
   import { Project } from '@hcengineering/tracker'
   import tracker from '../../plugin'
-  import { MilestoneViewMode } from '../../utils'
   import MilestoneBrowser from './MilestoneBrowser.svelte'
 
   export let currentSpace: Ref<Project>
   export let label: IntlString = tracker.string.Milestones
   export let search: string = ''
-  export let mode: MilestoneViewMode = 'all'
 </script>
 
-<MilestoneBrowser {label} query={{ space: currentSpace }} {search} {mode} />
+<MilestoneBrowser {label} query={{ space: currentSpace }} {search} />
