@@ -18,7 +18,8 @@
   import Icon from '../Icon.svelte'
   import Label from '../Label.svelte'
   import IconClose from '../icons/Close.svelte'
-  import { daysInMonth, fromCurrentToTz, getUserTimezone } from './internal/DateUtils'
+  import { deviceOptionsStore as deviceInfo } from '../..'
+  import { daysInMonth, fromCurrentToTz, fromTzToCurrent, getUserTimezone } from './internal/DateUtils'
 
   export let currentDate: Date | null
   export let withTime: boolean = false
@@ -40,6 +41,32 @@
   let startTyping: boolean = false
 
   const dispatch = createEventDispatcher()
+
+  $: nativeValue = currentDate == null ? '' : formatNativeDate(timeZone ? fromCurrentToTz(currentDate, timeZone) : currentDate)
+
+  function formatNativeDate (date: Date): string {
+    const day = `${date.getFullYear()}-${String(date.getMonth() + 1).padStart(2, '0')}-${String(date.getDate()).padStart(2, '0')}`
+    return withTime ? `${day}T${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}` : day
+  }
+
+  function nativeDateChanged (event: Event): void {
+    const value = (event.currentTarget as HTMLInputElement).value
+    if (!value) return
+
+    const [date, time] = value.split('T')
+    const [year, month, day] = date.split('-').map(Number)
+    const [hour, minute] = time?.split(':').map(Number) ?? []
+    const previous = currentDate ?? new Date()
+    const selected = new Date(year, month - 1, day, hour ?? previous.getHours(), minute ?? previous.getMinutes())
+    currentDate = timeZone ? fromTzToCurrent(selected, timeZone) : selected
+    dateToEdits(currentDate)
+    dispatch('save')
+  }
+
+  function openNativePicker (event: MouseEvent): void {
+    const input = event.currentTarget as HTMLInputElement
+    if (typeof input.showPicker === 'function') input.showPicker()
+  }
 
   const setValue = (val: number, date: Date | null, id: TEdits): Date => {
     if (date == null) date = new Date()
@@ -198,14 +225,23 @@
   }
 
   $: dateToEdits(currentDate)
-  $: if (selected && edits[getIndex(selected)].el) edits[getIndex(selected)].el?.focus()
+  $: if (!$deviceInfo.isMobile && selected && edits[getIndex(selected)].el) edits[getIndex(selected)].el?.focus()
 
   afterUpdate(() => {
-    if (selected) edits[getIndex(selected)].el?.focus()
+    if (!$deviceInfo.isMobile && selected) edits[getIndex(selected)].el?.focus()
   })
 </script>
 
 <div class="datetime-input {kind}">
+  {#if $deviceInfo.isMobile}
+    <input
+      class="native-date-input"
+      type={withTime ? 'datetime-local' : 'date'}
+      value={nativeValue}
+      on:click={openNativePicker}
+      on:change={nativeDateChanged}
+    />
+  {:else}
   <div class="flex-row-center">
     <!-- svelte-ignore a11y-no-noninteractive-tabindex -->
     <!-- svelte-ignore a11y-no-static-element-interactions -->
@@ -304,6 +340,7 @@
       </span>
     {/if}
   </div>
+  {/if}
   {#if currentDate}
     <!-- svelte-ignore a11y-click-events-have-key-events -->
     <!-- svelte-ignore a11y-no-noninteractive-tabindex -->
@@ -334,6 +371,26 @@
     height: 3rem;
     font-family: inherit;
     color: var(--theme-content-color);
+
+    .native-date-input {
+      position: relative;
+      width: 100%;
+      min-width: 0;
+      color: inherit;
+      background: transparent;
+      border: 0;
+      font: inherit;
+      cursor: pointer;
+
+      &::-webkit-calendar-picker-indicator {
+        position: absolute;
+        inset: 0;
+        width: 100%;
+        height: 100%;
+        opacity: 0;
+        cursor: pointer;
+      }
+    }
 
     &:hover {
       border-color: var(--theme-button-default);
