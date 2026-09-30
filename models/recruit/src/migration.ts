@@ -273,7 +273,7 @@ async function createDefaults (client: MigrationUpgradeClient, tx: TxOperations)
     {
       icon: recruit.icon.Skills,
       label: 'Other',
-      targetClass: recruit.mixin.Candidate,
+      targetClass: contact.class.Person,
       tags: [],
       default: true
     },
@@ -284,7 +284,7 @@ async function createDefaults (client: MigrationUpgradeClient, tx: TxOperations)
   const cats = getCategories().filter((it, idx, arr) => arr.findIndex((qt) => qt.id === it.id) === idx)
 
   const existingCategories = toIdMap(
-    await client.findAll<Doc>(tags.class.TagCategory, { targetClass: recruit.mixin.Candidate })
+    await client.findAll<Doc>(tags.class.TagCategory, { targetClass: contact.class.Person })
   )
   for (const c of cats) {
     await createOrUpdate(
@@ -294,7 +294,7 @@ async function createDefaults (client: MigrationUpgradeClient, tx: TxOperations)
       {
         icon: recruit.icon.Skills,
         label: c.label,
-        targetClass: recruit.mixin.Candidate,
+        targetClass: contact.class.Person,
         tags: c.skills,
         default: false
       },
