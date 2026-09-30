@@ -54,7 +54,6 @@ import tracker from '@hcengineering/model-tracker'
 import view, { createAction } from '@hcengineering/model-view'
 import workbench from '@hcengineering/model-workbench'
 import notification, { type NotificationGroup } from '@hcengineering/notification'
-import recruit from '@hcengineering/recruit'
 import tags from '@hcengineering/tags'
 import {
   timeId,
@@ -174,10 +173,6 @@ export function createModel (builder: Builder): void {
 
   builder.mixin(lead.class.Lead, core.class.Class, time.mixin.ItemPresenter, {
     presenter: time.component.LeadPresenter
-  })
-
-  builder.mixin(recruit.class.Applicant, core.class.Class, time.mixin.ItemPresenter, {
-    presenter: time.component.ApplicantPresenter
   })
 
   builder.mixin(board.class.Card, core.class.Class, time.mixin.ItemPresenter, {
