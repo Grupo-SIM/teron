@@ -44,3 +44,10 @@ export function currentReportedTime (
   if (issue.trackedTimeMs === undefined) return issue.reportedTime
   return issueTimeHours({ trackedTimeMs: issue.trackedTimeMs, trackingStartedOn: issue.trackingStartedOn ?? null }, at)
 }
+
+export function currentChildReportedTime (
+  children: Array<{ reportedTime: number, trackedTimeMs?: number, trackingStartedOn?: number | null }> | undefined,
+  at: number
+): number {
+  return (children ?? []).reduce((total, child) => total + currentReportedTime(child, at), 0)
+}

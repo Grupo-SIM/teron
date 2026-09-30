@@ -14,7 +14,7 @@
 -->
 <script lang="ts">
   import task from '@hcengineering/task'
-  import { Issue, currentReportedTime } from '@hcengineering/tracker'
+  import { Issue, currentChildReportedTime, currentReportedTime } from '@hcengineering/tracker'
   import { floorFractionDigits, Label } from '@hcengineering/ui'
   import { FixedColumn, statusStore } from '@hcengineering/view-resources'
   import tracker from '../../plugin'
@@ -47,7 +47,7 @@
         let retEst = it.estimation
         if (it.childInfo?.length > 0) {
           const cEstimation = it.childInfo.map((ct) => ct.estimation).reduce((a, b) => a + b, 0)
-          const cReported = it.childInfo.map((ct) => ct.reportedTime).reduce((a, b) => a + b, 0)
+          const cReported = currentChildReportedTime(it.childInfo, now)
           if (cEstimation !== 0) {
             retEst = cEstimation
             if (cat === task.statusCategory.Won || cat === task.statusCategory.Lost) {
@@ -74,7 +74,7 @@
     (noParents ?? [{ reportedTime: 0, childInfo: [] } as unknown as Issue])
       .map((it) => {
         if (it.childInfo?.length > 0) {
-          const cReported = it.childInfo.map((ct) => ct.reportedTime).reduce((a, b) => a + b, 0)
+          const cReported = currentChildReportedTime(it.childInfo, now)
           if (cReported !== 0) {
             return cReported + currentReportedTime(it, now)
           }

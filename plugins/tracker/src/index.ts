@@ -333,6 +333,8 @@ export interface IssueChildInfo {
   childId: Ref<Issue>
   estimation: number
   reportedTime: number
+  trackedTimeMs?: number
+  trackingStartedOn?: Timestamp | null
 }
 
 /**

@@ -231,7 +231,7 @@ async function backfillIssueTime (client: MigrationClient): Promise<void> {
           const [parentIssue] = await client.find<Issue>(DOMAIN_TASK, { _id: parent.parentId })
           if (parentIssue === undefined) continue
           const childInfo = parentIssue.childInfo?.map((child) =>
-            child.childId === issue._id ? { ...child, reportedTime } : child
+            child.childId === issue._id ? { ...child, reportedTime, ...state } : child
           )
           if (childInfo !== undefined && childInfo.some((child) => child.childId === issue._id)) {
             await client.update(DOMAIN_TASK, { _id: parentIssue._id }, { childInfo })
@@ -241,6 +241,38 @@ async function backfillIssueTime (client: MigrationClient): Promise<void> {
     }
   } finally {
     await issues.close()
+  }
+}
+
+export async function syncChildTimeSnapshots (client: MigrationClient): Promise<void> {
+  const parents = await client.traverse<Issue>(DOMAIN_TASK, { 'childInfo.0': { $exists: true } })
+  try {
+    while (true) {
+      const batch = await parents.next(100)
+      if (batch === null || batch.length === 0) break
+      for (const parent of batch) {
+        const ids = parent.childInfo?.map((child) => child.childId) ?? []
+        if (ids.length === 0) continue
+        const children = await client.find<Issue>(DOMAIN_TASK, { _id: { $in: ids } })
+        const byId = new Map(children.map((child) => [child._id, child]))
+        const childInfo = parent.childInfo.map((entry) => {
+          const child = byId.get(entry.childId)
+          return child === undefined
+            ? entry
+            : {
+                ...entry,
+                reportedTime: child.reportedTime,
+                trackedTimeMs: child.trackedTimeMs,
+                trackingStartedOn: child.trackingStartedOn
+              }
+        })
+        if (JSON.stringify(childInfo) !== JSON.stringify(parent.childInfo)) {
+          await client.update(DOMAIN_TASK, { _id: parent._id }, { childInfo })
+        }
+      }
+    }
+  } finally {
+    await parents.close()
   }
 }
 
@@ -589,6 +621,10 @@ export const trackerOperation: MigrateOperation = {
       {
         state: 'backfill-automatic-issue-time',
         func: backfillIssueTime
+      },
+      {
+        state: 'sync-child-time-snapshots',
+        func: syncChildTimeSnapshots
       }
     ])
   },

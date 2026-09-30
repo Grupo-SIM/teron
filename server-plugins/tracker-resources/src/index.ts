@@ -213,7 +213,11 @@ export async function OnIssueUpdate (txes: Tx[], control: TriggerControl): Promi
       const createTx = actualTx as TxCreateDoc<Issue>
       if (control.hierarchy.isDerived(createTx.objectClass, tracker.class.Issue)) {
         const issue = TxProcessor.createDoc2Doc(createTx)
-        updateIssueParentEstimations(issue, result, control, [], issue.parents)
+        updateIssueParentEstimations({
+          ...issue,
+          trackedTimeMs: 0,
+          trackingStartedOn: isTimedIssueStatus(issue.status) ? createTx.modifiedOn : null
+        }, result, control, [], issue.parents)
         result.push(control.txFactory.createTxUpdateDoc(issue._class, issue.space, issue._id, {
           trackedTimeMs: 0,
           trackingStartedOn: isTimedIssueStatus(issue.status) ? createTx.modifiedOn : null,
@@ -291,6 +295,7 @@ async function doIssueUpdate (updateTx: TxUpdateDoc<Issue>, control: TriggerCont
         ...next,
         reportedTime
       }, false, issue.modifiedOn))
+      updateIssueParentEstimations({ ...issue, ...next, reportedTime }, res, control, issue.parents, issue.parents)
     }
   }
 
@@ -380,6 +385,8 @@ function updateIssueParentEstimations (
     space: Ref<Space>
     estimation: number
     reportedTime: number
+    trackedTimeMs?: number
+    trackingStartedOn?: number | null
   },
   res: Tx[],
   control: TriggerControl,
@@ -402,7 +409,9 @@ function updateIssueParentEstimations (
           childInfo: {
             childId: issue._id,
             estimation: issue.estimation,
-            reportedTime: issue.reportedTime
+            reportedTime: issue.reportedTime,
+            trackedTimeMs: issue.trackedTimeMs,
+            trackingStartedOn: issue.trackingStartedOn
           }
         }
       })

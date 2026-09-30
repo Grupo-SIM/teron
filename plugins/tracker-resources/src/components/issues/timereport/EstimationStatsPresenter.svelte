@@ -15,7 +15,7 @@
 <script lang="ts">
   import { AttachedData } from '@hcengineering/core'
 
-  import { Issue, currentReportedTime } from '@hcengineering/tracker'
+  import { Issue, currentChildReportedTime, currentReportedTime } from '@hcengineering/tracker'
   import { floorFractionDigits } from '@hcengineering/ui'
   import { onMount } from 'svelte'
   import EstimationProgressCircle from './EstimationProgressCircle.svelte'
@@ -35,7 +35,7 @@
   $: ownReportedTime = currentReportedTime(value, now)
 
   $: childReportTime = floorFractionDigits(
-    ownReportedTime + (value.childInfo ?? []).map((it) => it.reportedTime).reduce((a, b) => a + b, 0),
+    ownReportedTime + currentChildReportedTime(value.childInfo, now),
     3
   )
   $: childEstimationTime = (value.childInfo ?? []).map((it) => it.estimation).reduce((a, b) => a + b, 0)

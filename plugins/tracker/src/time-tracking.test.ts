@@ -1,4 +1,4 @@
-import tracker, { currentReportedTime, issueTimeHours, transitionIssueTime } from './index'
+import tracker, { currentChildReportedTime, currentReportedTime, issueTimeHours, transitionIssueTime } from './index'
 
 describe('automatic issue time', () => {
   it('counts pending, active and review intervals, including reopened work', () => {
@@ -29,5 +29,13 @@ describe('automatic issue time', () => {
   it('shows current elapsed hours and preserves legacy values', () => {
     expect(currentReportedTime({ reportedTime: 1, trackedTimeMs: 3600000, trackingStartedOn: 3600000 }, 7200000)).toBe(2)
     expect(currentReportedTime({ reportedTime: 3 }, 7200000)).toBe(3)
+  })
+
+  it('includes active child intervals in parent totals', () => {
+    expect(currentChildReportedTime([
+      { reportedTime: 1, trackedTimeMs: 3600000, trackingStartedOn: 3600000 },
+      { reportedTime: 2, trackedTimeMs: 7200000, trackingStartedOn: null },
+      { reportedTime: 3 }
+    ], 7200000)).toBe(7)
   })
 })

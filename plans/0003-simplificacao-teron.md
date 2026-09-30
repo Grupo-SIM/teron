@@ -196,3 +196,7 @@ Atalho global “Customizar aplicativos” removido da barra lateral, encerrando
 Botões de mostrar todos os mixins retirados dos painéis de Cliente, Produto e Versão de Produto; atributos correntes seguem pelo painel comum.
 
 Botão de configuração avançada retirado também dos formulários de criação e edição de visões em cartões. Opções comuns de visão continuam acessíveis quando disponíveis; o atalho `btn-viewSetting` deixa de ser renderizado.
+
+Tempo ativo de subtarefas agora entra no total exibido do pai em quadro, estatística de projeto e editores de tempo. Atualizações de status sincronizam instantâneo e início da contagem no resumo do pai; migração local preparada para completar resumos antigos. Build Rush de Tracker (modelo, servidor e UI) passou; cinco testes de cálculo passaram. Falta executar nova etapa de migração em banco local descartável e conferir hierarquia ativa na aplicação.
+
+Teste da etapa de sincronização de resumos confirmou atualização do filho certo, preservação do filho ausente e repetição sem nova escrita.
