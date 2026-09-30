@@ -3,7 +3,7 @@ import attachment, { DOMAIN_ATTACHMENT } from '@hcengineering/model-attachment'
 import contact, { DOMAIN_CONTACT } from '@hcengineering/model-contact'
 import { DOMAIN_TASK } from '@hcengineering/model-task'
 import recruit from './plugin'
-import { preserveApplicantFiles } from './migration'
+import { preserveApplicantComments, preserveApplicantFiles } from './migration'
 
 describe('preserveApplicantFiles', () => {
   it('moves applicant files to the selected person without touching another person and can run twice', async () => {
@@ -47,5 +47,45 @@ describe('preserveApplicantFiles', () => {
     expect(files[1]).toMatchObject({ attachedTo: unrelated._id, attachedToClass: contact.class.Person })
     expect(person.attachments).toBe(1)
     expect(unrelated.attachments).toBe(1)
+  })
+
+  it('keeps applicant comments as read-only contact activity on repeated migration', async () => {
+    const applicant = { _id: 'application-2', _class: recruit.class.Applicant, attachedTo: 'person-3' }
+    const person = { _id: 'person-3', _class: contact.class.Person, space: 'contacts', comments: 0 }
+    const comments = [
+      { _id: 'note-1', attachedTo: applicant._id, attachedToClass: recruit.class.Applicant, collection: 'comments', space: 'applications' },
+      { _id: 'note-2', attachedTo: 'person-4', attachedToClass: contact.class.Person, collection: 'comments', space: 'contacts' }
+    ]
+    const client = {
+      traverse: async () => {
+        let delivered = false
+        return {
+          next: async () => {
+            if (delivered) return null
+            delivered = true
+            return [applicant]
+          },
+          close: async () => {}
+        }
+      },
+      find: async (domain: string, query: { _id?: string, attachedTo?: string }) => {
+        if (domain === DOMAIN_CONTACT) return query._id === person._id ? [person] : []
+        if (domain === 'activity') return comments.filter((comment) => comment.attachedTo === query.attachedTo)
+        return []
+      },
+      update: async (domain: string, query: { _id?: string, attachedTo?: string }, changes: Record<string, unknown>) => {
+        if (domain === DOMAIN_CONTACT && query._id === person._id) Object.assign(person, changes)
+        if (domain === 'activity') {
+          comments.filter((comment) => comment.attachedTo === query.attachedTo).forEach((comment) => Object.assign(comment, changes))
+        }
+      }
+    } as unknown as MigrationClient
+
+    await preserveApplicantComments(client)
+    await preserveApplicantComments(client)
+
+    expect(comments[0]).toMatchObject({ attachedTo: person._id, attachedToClass: contact.class.Person, space: person.space })
+    expect(comments[1]).toMatchObject({ attachedTo: 'person-4', attachedToClass: contact.class.Person })
+    expect(person.comments).toBe(1)
   })
 })

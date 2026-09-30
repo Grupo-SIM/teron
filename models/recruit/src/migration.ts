@@ -18,6 +18,7 @@ import core, {
   DOMAIN_MODEL_TX,
   toIdMap,
   TxOperations,
+  type Domain,
   type Doc,
   type Ref,
   type Space,
@@ -100,6 +101,11 @@ export const recruitOperation: MigrateOperation = {
         state: 'preserve-applicant-files-v1',
         mode: 'upgrade',
         func: preserveApplicantFiles
+      },
+      {
+        state: 'preserve-applicant-comments-v1',
+        mode: 'upgrade',
+        func: preserveApplicantComments
       }
     ])
   },
@@ -148,6 +154,45 @@ export async function preserveApplicantFiles (client: MigrationClient): Promise<
         })
         if (candidate.attachments !== files.length) {
           await client.update(DOMAIN_CONTACT, { _id: candidate._id }, { attachments: files.length })
+        }
+      }
+    }
+  } finally {
+    await applicants.close()
+  }
+}
+
+export async function preserveApplicantComments (client: MigrationClient): Promise<void> {
+  const activityDomain = 'activity' as Domain
+  const applicants = await client.traverse<Applicant>(DOMAIN_TASK, { _class: recruit.class.Applicant })
+  try {
+    while (true) {
+      const batch = await applicants.next(100)
+      if (batch === null || batch.length === 0) break
+      for (const applicant of batch) {
+        const [candidate] = await client.find<Person>(DOMAIN_CONTACT, {
+          _id: applicant.attachedTo,
+          _class: contact.class.Person
+        } as MigrationDocumentQuery<Person>)
+        if (candidate === undefined) continue
+
+        await client.update(activityDomain, {
+          attachedTo: applicant._id,
+          attachedToClass: recruit.class.Applicant,
+          collection: 'comments'
+        }, {
+          attachedTo: candidate._id,
+          attachedToClass: contact.class.Person,
+          space: candidate.space
+        })
+
+        const comments = await client.find(activityDomain, {
+          attachedTo: candidate._id,
+          attachedToClass: contact.class.Person,
+          collection: 'comments'
+        })
+        if (candidate.comments !== comments.length) {
+          await client.update(DOMAIN_CONTACT, { _id: candidate._id }, { comments: comments.length })
         }
       }
     }
