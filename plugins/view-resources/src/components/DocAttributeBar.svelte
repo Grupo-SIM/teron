@@ -18,7 +18,6 @@
   import setting from '@hcengineering/setting'
 
   import ClassAttributeBar from './ClassAttributeBar.svelte'
-  import notification from '@hcengineering/notification'
 
   export let object: Doc
   export let mixins: Array<Mixin<Doc>> = []
@@ -30,10 +29,7 @@
   const client = getClient()
   const hierarchy = client.getHierarchy()
 
-  $: _allowedCollections = [...allowedCollections, 'collaborators']
-  $: _mixins = mixins.find((p) => p._id === notification.mixin.Collaborators)
-    ? mixins
-    : [...mixins, hierarchy.getClass(notification.mixin.Collaborators)]
+  $: _allowedCollections = allowedCollections.filter((key) => key !== 'collaborators')
 </script>
 
 <ClassAttributeBar
@@ -47,7 +43,7 @@
   isMainClass
   on:update
 />
-{#each _mixins as mixin}
+{#each mixins as mixin}
   {@const to = !hierarchy.hasMixin(mixin, setting.mixin.UserMixin) ? object._class : mixin.extends}
   {#if !hierarchy.hasMixin(mixin, setting.mixin.Editable) || hierarchy.as(mixin, setting.mixin.Editable).value}
     {#key mixin._id}

@@ -122,7 +122,7 @@
   </div>
 </div>
 <ExpandCollapse isExpanded={!isCollapsed}>
-  <CardAttributes object={value} _class={value._class} readonly={_readonly} {ignoreKeys} {fourRows} showCollaborators />
+  <CardAttributes object={value} _class={value._class} readonly={_readonly} {ignoreKeys} {fourRows} />
   <MarkupProperties doc={value} readonly={_readonly} tag={undefined} />
 </ExpandCollapse>
 

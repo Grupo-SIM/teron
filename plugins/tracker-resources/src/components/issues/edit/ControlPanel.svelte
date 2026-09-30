@@ -35,7 +35,6 @@
   import PriorityEditor from '../PriorityEditor.svelte'
   import RelationEditor from '../RelationEditor.svelte'
   import StatusEditor from '../StatusEditor.svelte'
-  import notification from '@hcengineering/notification'
 
   export let issue: Issue
   export let readonly = false
@@ -77,11 +76,7 @@
 
   $: _mixins = getDocMixins(issue, false)
 
-  $: mixins = _mixins.find((p) => p._id === notification.mixin.Collaborators)
-    ? _mixins
-    : [..._mixins, hierarchy.getClass(notification.mixin.Collaborators)]
-
-  const allowedCollections = ['collaborators']
+  $: mixins = _mixins
 
   function getMixinKeys (mixin: Ref<Mixin<Doc>>): KeyedAttribute[] {
     const mixinClass = hierarchy.getClass(mixin)
@@ -91,7 +86,7 @@
       [],
       hierarchy.isMixin(mixinClass.extends as Ref<Class<Doc>>) ? mixinClass.extends : issue._class
     )
-    return filtredKeys.filter((key) => !isCollectionAttr(hierarchy, key) || allowedCollections.includes(key.key))
+    return filtredKeys.filter((key) => !isCollectionAttr(hierarchy, key))
   }
 
   $: updateKeys(issue._class, ignoreKeys)

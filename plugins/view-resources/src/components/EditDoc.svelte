@@ -28,7 +28,7 @@
     hasResource,
     reduceCalls
   } from '@hcengineering/presentation'
-  import { AnyComponent, Button, Component, IconMixin, IconMoreH } from '@hcengineering/ui'
+  import { AnyComponent, Button, Component, IconMoreH } from '@hcengineering/ui'
   import view, { AttributeCategory } from '@hcengineering/view'
   import { createEventDispatcher, onDestroy } from 'svelte'
 
@@ -109,18 +109,17 @@
   let fieldEditors: Array<{ key: KeyedAttribute, editor: AnyComponent, category: AttributeCategory }> = []
 
   let mixins: Array<Mixin<Doc>> = []
-  let showAllMixins = false
 
   const dispatch = createEventDispatcher()
 
   let ignoreKeys: string[] = []
   let activityOptions = { enabled: true, showInput: true }
-  let allowedCollections: string[] = ['collaborators']
+  let allowedCollections: string[] = []
   let collectionArrays: string[] = []
   let inplaceAttributes: string[] = []
   let ignoreMixins: Set<Ref<Mixin<Doc>>> = new Set<Ref<Mixin<Doc>>>()
 
-  $: mixins = getDocMixins(object, showAllMixins, ignoreMixins, realObjectClass)
+  $: mixins = getDocMixins(object, false, ignoreMixins, realObjectClass)
   let attr: Promise<any> | undefined
   async function updateKeys (): Promise<void> {
     if (attr instanceof Promise) {
@@ -219,10 +218,10 @@
     ignoreKeys = ev.detail.ignoreKeys
     activityOptions = ev.detail.activityOptions ?? activityOptions
     ignoreMixins = new Set(ev.detail.ignoreMixins)
-    allowedCollections = [...(ev.detail.allowedCollections ?? []), 'collaborators']
+    allowedCollections = (ev.detail.allowedCollections ?? []).filter((key: string) => key !== 'collaborators')
     collectionArrays = ev.detail.collectionArrays ?? []
     title = ev.detail.title
-    mixins = getDocMixins(object, showAllMixins, ignoreMixins, realObjectClass)
+    mixins = getDocMixins(object, false, ignoreMixins, realObjectClass)
     void updateKeys()
   }
 
@@ -284,16 +283,6 @@
           }}
         />
       {/if}
-      <Button
-        icon={IconMixin}
-        iconProps={{ size: 'medium' }}
-        kind={'icon'}
-        selected={showAllMixins}
-        dataId={'btnMixin'}
-        on:click={() => {
-          showAllMixins = !showAllMixins
-        }}
-      />
     </svelte:fragment>
 
     <svelte:fragment slot="attributes" let:direction={dir}>
