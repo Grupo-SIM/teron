@@ -158,3 +158,5 @@ Notificação de Tarefas deixou de oferecer botão de copiar URL; ação Ver tar
 Catálogos portugueses `pt` alinhados a `pt-br`: substantivos Anexo/Anexos agora exibem Arquivo/Arquivos também em painéis de cartões, integração e arquivos salvos.
 
 Build Rush dos modelos View, Task, Contact e Tracker passou após retirada das ações; componentes Svelte de Atividade e notificação de Tarefas passaram pelo preprocessamento e parser.
+
+Fábrica genérica de Funcionário desregistrada: nenhum menu de criação oferece Criar funcionário; convite continua responsável pela inclusão.
