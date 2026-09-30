@@ -411,6 +411,23 @@ function defineDocument (builder: Builder): void {
     actions: [view.action.Open, view.action.OpenInNewTab, tracker.action.NewRelatedIssue]
   })
 
+  createAction(
+    builder,
+    {
+      action: view.actionImpl.Delete,
+      actionProps: { confirmation: document.string.DeleteDocumentConfirm },
+      label: view.string.Delete,
+      icon: view.icon.Delete,
+      category: view.category.General,
+      input: 'any',
+      target: document.class.Document,
+      context: { mode: ['context', 'browser'], group: 'remove' },
+      visibilityTester: view.function.CanDeleteObject,
+      override: [view.action.Delete]
+    },
+    document.action.DeleteDocument
+  )
+
   builder.createDoc(
     notification.class.NotificationGroup,
     core.space.Model,

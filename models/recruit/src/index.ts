@@ -133,7 +133,7 @@ export function createModel (builder: Builder): void {
       icon: recruit.icon.RecruitApplication,
       locationResolver: recruit.resolver.Location,
       alias: recruitId,
-      hidden: false,
+      hidden: true,
       navigatorModel: {
         spaces: [],
         specials: [

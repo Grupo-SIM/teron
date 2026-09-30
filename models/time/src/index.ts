@@ -234,7 +234,7 @@ export function createModel (builder: Builder): void {
       icon: time.icon.Team,
       accessLevel: AccountRole.User,
       alias: 'team',
-      hidden: false,
+      hidden: true,
       component: time.component.Team
     },
     time.app.Team

@@ -17,7 +17,16 @@
 <script lang="ts">
   import { Analytics } from '@hcengineering/analytics'
   import attachment, { Attachment } from '@hcengineering/attachment'
-  import core, { Doc, Ref, WithLookup, generateId, type Blob } from '@hcengineering/core'
+  import core, {
+    AccountRole,
+    Doc,
+    Ref,
+    WithLookup,
+    generateId,
+    getCurrentAccount,
+    hasAccountRole,
+    type Blob
+  } from '@hcengineering/core'
   import { Document, DocumentEvents, Teamspace } from '@hcengineering/document'
   import notification from '@hcengineering/notification'
   import { Panel } from '@hcengineering/panel'
@@ -285,7 +294,7 @@
       {/if}
       <ParentsNavigator element={doc} />
       <DocumentPresenter value={doc} breadcrumb noUnderline />
-      {#if locked}
+      {#if locked && hasAccountRole(getCurrentAccount(), AccountRole.Maintainer)}
         <div class="ml-2">
           <Button
             icon={document.icon.Lock}

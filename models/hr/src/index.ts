@@ -196,7 +196,7 @@ export function createModel (builder: Builder): void {
       icon: hr.icon.HR,
       accessLevel: AccountRole.User,
       alias: hrId,
-      hidden: false,
+      hidden: true,
       component: hr.component.Schedule
     },
     hr.app.HR

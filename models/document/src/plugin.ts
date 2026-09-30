@@ -46,6 +46,7 @@ export default mergeIds(documentId, document, {
     UnlockContent: '' as ViewAction
   },
   action: {
+    DeleteDocument: '' as Ref<Action<Doc, any>>,
     PublicLink: '' as Ref<Action<Doc, any>>,
     LockContent: '' as Ref<Action<Doc, any>>,
     UnlockContent: '' as Ref<Action<Doc, any>>

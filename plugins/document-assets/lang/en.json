@@ -1,6 +1,7 @@
 {
   "string": {
     "Document": "Document",
+    "DeleteDocumentConfirm": "Delete {count, plural, =1 {this document} other {these # documents}}?",
     "ParentDocument": "Parent document",
     "ChildDocument": "Child document",
     "CreateDocument": "Create document",

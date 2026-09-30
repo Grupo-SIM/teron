@@ -14,8 +14,10 @@
 //
 
 import {
+  AccountRole,
   generateId,
   getCurrentAccount,
+  hasAccountRole,
   type Class,
   type Client,
   type DocumentQuery,
@@ -124,6 +126,7 @@ export async function lockContent (doc: Document | Document[]): Promise<void> {
 }
 
 export async function unlockContent (doc: Document | Document[]): Promise<void> {
+  if (!hasAccountRole(getCurrentAccount(), AccountRole.Maintainer)) return
   const client = getClient()
 
   const arr = Array.isArray(doc) ? doc : [doc]
@@ -138,6 +141,7 @@ export async function canLockDocument (doc: Document | Document[]): Promise<bool
 }
 
 export async function canUnlockDocument (doc: Document | Document[]): Promise<boolean> {
+  if (!hasAccountRole(getCurrentAccount(), AccountRole.Maintainer)) return false
   const arr = Array.isArray(doc) ? doc : [doc]
   return arr.some((p) => p.lockedBy != null)
 }

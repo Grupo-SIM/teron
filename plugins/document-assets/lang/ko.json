@@ -1,6 +1,7 @@
 {
     "string": {
         "Document": "문서",
+    "DeleteDocumentConfirm": "Delete {count, plural, =1 {this document} other {these # documents}}?",
         "ParentDocument": "상위 문서",
         "ChildDocument": "하위 문서",
         "CreateDocument": "문서 만들기",

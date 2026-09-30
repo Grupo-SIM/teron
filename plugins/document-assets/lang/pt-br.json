@@ -1,6 +1,7 @@
 {
   "string": {
     "Document": "Documento",
+    "DeleteDocumentConfirm": "Deseja apagar {count, plural, =1 {este documento} other {estes # documentos}}?",
     "ParentDocument": "Documento superior",
     "ChildDocument": "Documento inferior",
     "CreateDocument": "Criar um documento",

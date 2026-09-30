@@ -37,6 +37,7 @@ export default mergeIds(documentId, document, {
     Name: '' as IntlString,
     Cancel: '' as IntlString,
     Document: '' as IntlString,
+    DeleteDocumentConfirm: '' as IntlString,
     SearchDocument: '' as IntlString,
     Version: '' as IntlString,
     Snapshot: '' as IntlString,
