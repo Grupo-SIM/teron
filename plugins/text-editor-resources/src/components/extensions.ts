@@ -14,9 +14,12 @@
 //
 
 import textEditor from '../plugin'
+import { translate } from '@hcengineering/platform'
+import { themeStore } from '@hcengineering/theme'
 import { IconScribble } from '@hcengineering/ui'
 import view from '@hcengineering/view'
 import { type Editor, type Range } from '@tiptap/core'
+import { get } from 'svelte/store'
 
 import { type InlineCommandsOptions } from './extension/inlineCommands'
 import type { SuggestionKeyDownProps, SuggestionProps } from './extension/suggestion'
@@ -116,8 +119,8 @@ export function inlineCommandsConfig (
 ): Partial<InlineCommandsOptions> {
   return {
     suggestion: {
-      items: () => {
-        return [
+      items: async () => {
+        const commands = [
           { id: 'image', label: textEditor.string.Image, icon: view.icon.Image },
           { id: 'table', label: textEditor.string.Table, icon: view.icon.Table2 },
           { id: 'code-block', label: textEditor.string.CodeBlock, icon: view.icon.CodeBlock },
@@ -126,6 +129,11 @@ export function inlineCommandsConfig (
           { id: 'drawing-board', label: textEditor.string.DrawingBoard, icon: IconScribble as any },
           { id: 'mermaid', label: textEditor.string.MermaidDiargram, icon: view.icon.Model }
         ].filter(({ id }) => !excludedCommands.includes(id as InlineCommandId))
+
+        return await Promise.all(commands.map(async ({ label, ...command }) => ({
+          ...command,
+          text: await translate(label, {}, get(themeStore).language)
+        })))
       },
       command: ({ editor, range, props }: { editor: Editor, range: Range, props: any }) => {
         editor.commands.deleteRange(range)
