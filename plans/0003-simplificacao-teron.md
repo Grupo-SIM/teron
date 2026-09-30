@@ -45,6 +45,8 @@ Recrutamento, RH e Planejador de equipes ocultos na navegação enquanto migraç
 
 Aplicativos de Recursos Humanos e Planejador de equipes agora deixam de ser registrados no modelo; atalho para Planejador de equipes removido. Tipos de dados legados permanecem para compatibilidade durante a retirada gradual.
 
+Ações contextuais específicas de RH também deixam de ser registradas, inclusive associação de departamento em contatos. Dados e notificações legados continuam preservados até definição de migração segura.
+
 Registro do aplicativo de Recrutamento, atalhos de navegação, categorias de busca e ações para criar candidaturas pelo menu de contatos removidos do modelo. Tipos legados permanecem registrados enquanto a migração de dados e a limpeza segura são concluídas.
 
 Registro de ações, painel e notificações específicas de entrevistas de Recrutamento desativado; documentos legados permanecem legíveis para a migração.

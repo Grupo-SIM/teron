@@ -52,7 +52,7 @@ import calendar from '@hcengineering/model-calendar'
 import chunter from '@hcengineering/model-chunter'
 import contact, { TEmployee } from '@hcengineering/model-contact'
 import core, { TAttachedDoc, TDoc, TType } from '@hcengineering/model-core'
-import view, { classPresenter, createAction } from '@hcengineering/model-view'
+import view, { classPresenter } from '@hcengineering/model-view'
 import notification from '@hcengineering/notification'
 import { type Asset, type IntlString } from '@hcengineering/platform'
 import { PaletteColorIndexes } from '@hcengineering/ui/src/colors'
@@ -291,95 +291,6 @@ export function createModel (builder: Builder): void {
     hr.ids.Remote
   )
 
-  createAction(
-    builder,
-    {
-      action: view.actionImpl.ShowPanel,
-      actionProps: { element: 'content' },
-      label: view.string.Open,
-      icon: view.icon.Open,
-      keyBinding: ['e'],
-      input: 'any',
-      category: hr.category.HR,
-      target: hr.class.Department,
-      context: { mode: 'context', application: hr.app.HR, group: 'create' }
-    },
-    hr.action.EditDepartment
-  )
-
-  createAction(
-    builder,
-    {
-      action: view.actionImpl.ShowPopup,
-      actionProps: {
-        component: hr.component.CreateDepartment,
-        element: 'top',
-        fillProps: {
-          _id: 'parent'
-        }
-      },
-      label: hr.string.CreateDepartment,
-      icon: hr.icon.Department,
-      input: 'focus',
-      category: hr.category.HR,
-      target: hr.class.Department,
-      context: { mode: 'context', application: hr.app.HR, group: 'create' }
-    },
-    hr.action.CreateDepartment
-  )
-
-  createAction(
-    builder,
-    {
-      action: view.actionImpl.Delete,
-      label: view.string.Delete,
-      icon: view.icon.Delete,
-      input: 'any',
-      category: hr.category.HR,
-      keyBinding: ['Meta + Backspace'],
-      query: {
-        'members.length': 0,
-        _id: { $nin: [hr.ids.Head] }
-      },
-      target: hr.class.Department,
-      context: { mode: ['context', 'browser'], group: 'tools' },
-      override: [view.action.Delete]
-    },
-    hr.action.ArchiveDepartment
-  )
-
-  createAction(
-    builder,
-    {
-      action: view.actionImpl.ShowPanel,
-      actionProps: { element: 'content' },
-      label: view.string.Open,
-      icon: view.icon.Open,
-      keyBinding: ['e'],
-      input: 'any',
-      category: hr.category.HR,
-      target: hr.class.Request,
-      context: { mode: 'context', application: hr.app.HR, group: 'create' },
-      override: [view.action.Open]
-    },
-    hr.action.EditRequest
-  )
-
-  createAction(
-    builder,
-    {
-      action: hr.actionImpl.EditRequestType,
-      actionProps: {},
-      label: hr.string.EditRequestType,
-      icon: view.icon.Edit,
-      input: 'any',
-      category: hr.category.HR,
-      target: hr.class.Request,
-      context: { mode: 'context', application: hr.app.HR, group: 'edit' }
-    },
-    hr.action.EditRequestType
-  )
-
   builder.createDoc(
     view.class.Viewlet,
     core.space.Model,
@@ -423,29 +334,6 @@ export function createModel (builder: Builder): void {
     },
     hr.viewlet.StaffStats
   )
-
-  createAction(builder, {
-    action: view.actionImpl.ValueSelector,
-    actionPopup: view.component.ValueSelector,
-    actionProps: {
-      attribute: 'department',
-      _class: hr.class.Department,
-      query: {},
-      searchField: 'name',
-      placeholder: hr.string.Department,
-      castRequest: hr.mixin.Staff
-    },
-    label: hr.string.Department,
-    icon: hr.icon.Department,
-    input: 'none',
-    category: hr.category.HR,
-    target: hr.mixin.Staff,
-    context: {
-      mode: ['context'],
-      application: hr.app.HR,
-      group: 'associate'
-    }
-  })
 
   builder.mixin(hr.class.Request, core.class.Class, view.mixin.ObjectPresenter, {
     presenter: hr.component.RequestPresenter
