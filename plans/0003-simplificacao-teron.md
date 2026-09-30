@@ -202,3 +202,5 @@ Tempo ativo de subtarefas agora entra no total exibido do pai em quadro, estatí
 Teste da etapa de sincronização de resumos confirmou atualização do filho certo, preservação do filho ausente e repetição sem nova escrita.
 
 Etapa de sincronização executada duas vezes em MongoDB descartável local: uma escrita no pai, filho não encontrado e registro alheio preservados. Contêiner de teste removido.
+
+Tela Modelos agora alterna entre modelos de tarefa e modelos de texto. A lista de texto consulta `MessageTemplate`, permite pesquisar, selecionar e visualizar conteúdo, inclusive após criação. Build Rush de Tracker UI e parser/preprocessamento dos dois componentes passaram; falta validar inserção do modelo no editor real com conta local.

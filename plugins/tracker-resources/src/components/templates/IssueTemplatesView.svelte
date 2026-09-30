@@ -9,6 +9,7 @@
   import CreateIssueTemplate from './CreateIssueTemplate.svelte'
   import CreateTextTemplate from './CreateTextTemplate.svelte'
   import IssueTemplatesContent from './IssueTemplatesContent.svelte'
+  import TextTemplatesView from './TextTemplatesView.svelte'
 
   export let space: Ref<Space> | undefined = undefined
   export let query: DocumentQuery<IssueTemplate> = {}
@@ -20,6 +21,7 @@
   let viewOptions: ViewOptions | undefined
 
   let search = ''
+  let templateKind: 'issue' | 'text' = 'issue'
   let searchQuery: DocumentQuery<IssueTemplate> = { ...query }
   function updateSearchQuery (search: string): void {
     searchQuery = search === '' ? { ...query } : { ...query, $search: search }
@@ -35,10 +37,12 @@
   }
 
   const showCreateDialog = async () => {
+    templateKind = 'issue'
     showPopup(CreateIssueTemplate, { targetElement: null, space }, 'top')
   }
 
   const showCreateTextDialog = (): void => {
+    templateKind = 'text'
     showPopup(CreateTextTemplate, {}, 'top')
   }
 </script>
@@ -60,11 +64,14 @@
     <slot name="label_selector" />
   </svelte:fragment>
   <svelte:fragment slot="actions">
+    <Button label={tracker.string.IssueTemplate} kind={templateKind === 'issue' ? 'primary' : 'secondary'} on:click={() => (templateKind = 'issue')} />
+    <Button label={tracker.string.TextTemplate} kind={templateKind === 'text' ? 'primary' : 'secondary'} on:click={() => (templateKind = 'text')} />
     <Button icon={IconAdd} label={tracker.string.IssueTemplate} kind={'primary'} on:click={showCreateDialog} />
     <Button icon={IconAdd} label={tracker.string.TextTemplate} on:click={showCreateTextDialog} />
   </svelte:fragment>
 </SpaceHeader>
 <slot name="afterHeader" />
+{#if templateKind === 'issue'}
 <FilterBar
   _class={tracker.class.IssueTemplate}
   {space}
@@ -74,4 +81,7 @@
 />
 {#if viewlet && viewOptions}
   <IssueTemplatesContent {viewOptions} {viewlet} {space} query={resultQuery} />
+{/if}
+{:else}
+  <TextTemplatesView {search} />
 {/if}
