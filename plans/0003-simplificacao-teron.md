@@ -81,6 +81,8 @@ Notas em comentários das candidaturas agora também são transferidas para ativ
 
 Migração de limpeza preparada para apagar candidaturas, correspondências, entrevistas, opiniões e vagas, com arquivos, atividades, etiquetas e notificações vinculadas a esses IDs. Contatos Externos e seus arquivos/notas transferidos permanecem. Limpeza só inicia se os quatro estados de preservação estiverem registrados; teste de proteção e execução repetida passou. Nenhuma migração foi executada em banco remoto ou compartilhado.
 
+Migração completa de Recrutamento executada duas vezes em MongoDB descartável iniciado só para esta validação, com dados de candidato, candidatura, vaga, arquivo, nota, etiquetas e registros não relacionados. Contato e conteúdo transferido permaneceram; candidaturas e vagas saíram; registros não relacionados ficaram intactos. Contêiner local removido após teste.
+
 Ações contextuais remanescentes de Recrutamento retiradas do modelo. Tipos legados ainda existem para a migração e compatibilidade de histórico; revisar sua retirada após validação em banco local descartável.
 
 Criação inicial das categorias de habilidades também aponta para Pessoa, inclusive em espaços novos. A etapa de migração de habilidades continua copiando contadores separadamente para cobrir espaços onde a etapa anterior de contatos já havia sido executada.
