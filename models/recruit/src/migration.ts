@@ -38,7 +38,7 @@ import {
 } from '@hcengineering/model'
 import attachment, { DOMAIN_ATTACHMENT } from '@hcengineering/model-attachment'
 import tags, { DOMAIN_TAGS, type TagCategory } from '@hcengineering/model-tags'
-import task, { createSequence, DOMAIN_TASK, migrateDefaultStatusesBase } from '@hcengineering/model-task'
+import task, { DOMAIN_TASK, migrateDefaultStatusesBase } from '@hcengineering/model-task'
 import { recruitId, type Applicant, type Candidate } from '@hcengineering/recruit'
 
 import { DOMAIN_CALENDAR, DOMAIN_EVENT } from '@hcengineering/model-calendar'
@@ -125,7 +125,7 @@ export const recruitOperation: MigrateOperation = {
         state: 'create-defaults-v2',
         func: async (client) => {
           const tx = new TxOperations(client, core.account.System)
-          await createDefaults(client, tx)
+          await createContactSkillCategories(client, tx)
         }
       }
     ])
@@ -412,7 +412,7 @@ async function migrateDefaultTypeMixins (client: MigrationClient): Promise<void>
   )
 }
 
-async function createDefaults (client: MigrationUpgradeClient, tx: TxOperations): Promise<void> {
+async function createContactSkillCategories (client: MigrationUpgradeClient, tx: TxOperations): Promise<void> {
   await createOrUpdate(
     tx,
     tags.class.TagCategory,
@@ -451,8 +451,4 @@ async function createDefaults (client: MigrationUpgradeClient, tx: TxOperations)
   }
   await ops.commit()
 
-  await createSequence(tx, recruit.class.Review)
-  await createSequence(tx, recruit.class.Opinion)
-  await createSequence(tx, recruit.class.Applicant)
-  await createSequence(tx, recruit.class.Vacancy)
 }

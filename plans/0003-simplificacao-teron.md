@@ -176,3 +176,5 @@ Catálogo `pt` alinhado aos nomes aprovados de Setores, Projetos, Externos, Clie
 FAQ do site público também usa Arquivos no lugar de Anexos; artefatos gerados de build permanecem derivados e serão atualizados pelo próximo build local.
 
 Exemplo de identificador na criação de Setor agora usa SET nos catálogos `pt`/`pt-br`; identificadores existentes não são alterados.
+
+Modelo de Recrutamento reduzido às classes legadas necessárias à migração; apresentação, filtros, notificações e ações deixam de registrar. Modelo servidor de Recrutamento removido do agregado. Criação inicial mantém apenas categorias de habilidades de Externos, sem sequências de candidaturas e vagas.
