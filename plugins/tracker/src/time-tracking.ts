@@ -36,3 +36,11 @@ export function transitionIssueTime (
 export function issueTimeHours (state: IssueTimeState, at: number): number {
   return (state.trackedTimeMs + (state.trackingStartedOn !== null ? Math.max(0, at - state.trackingStartedOn) : 0)) / 3600000
 }
+
+export function currentReportedTime (
+  issue: { reportedTime: number, trackedTimeMs?: number, trackingStartedOn?: number | null },
+  at: number
+): number {
+  if (issue.trackedTimeMs === undefined) return issue.reportedTime
+  return issueTimeHours({ trackedTimeMs: issue.trackedTimeMs, trackingStartedOn: issue.trackingStartedOn ?? null }, at)
+}

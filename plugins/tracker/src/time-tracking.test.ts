@@ -1,4 +1,4 @@
-import tracker, { issueTimeHours, transitionIssueTime } from './index'
+import tracker, { currentReportedTime, issueTimeHours, transitionIssueTime } from './index'
 
 describe('automatic issue time', () => {
   it('counts pending, active and review intervals, including reopened work', () => {
@@ -24,5 +24,10 @@ describe('automatic issue time', () => {
       trackedTimeMs: 3600000,
       trackingStartedOn: null
     })
+  })
+
+  it('shows current elapsed hours and preserves legacy values', () => {
+    expect(currentReportedTime({ reportedTime: 1, trackedTimeMs: 3600000, trackingStartedOn: 3600000 }, 7200000)).toBe(2)
+    expect(currentReportedTime({ reportedTime: 3 }, 7200000)).toBe(3)
   })
 })

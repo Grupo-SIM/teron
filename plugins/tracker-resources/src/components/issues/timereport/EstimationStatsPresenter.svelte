@@ -15,8 +15,9 @@
 <script lang="ts">
   import { AttachedData } from '@hcengineering/core'
 
-  import { Issue } from '@hcengineering/tracker'
+  import { Issue, currentReportedTime } from '@hcengineering/tracker'
   import { floorFractionDigits } from '@hcengineering/ui'
+  import { onMount } from 'svelte'
   import EstimationProgressCircle from './EstimationProgressCircle.svelte'
   import TimePresenter from './TimePresenter.svelte'
 
@@ -24,10 +25,17 @@
   export let estimation: number | undefined = undefined
   export let kind: 'normal' | 'list' = 'normal'
 
+  let now = Date.now()
+  onMount(() => {
+    const timer = setInterval(() => (now = Date.now()), 60000)
+    return () => clearInterval(timer)
+  })
+
   $: _estimation = estimation ?? value.estimation
+  $: ownReportedTime = currentReportedTime(value, now)
 
   $: childReportTime = floorFractionDigits(
-    value.reportedTime + (value.childInfo ?? []).map((it) => it.reportedTime).reduce((a, b) => a + b, 0),
+    ownReportedTime + (value.childInfo ?? []).map((it) => it.reportedTime).reduce((a, b) => a + b, 0),
     3
   )
   $: childEstimationTime = (value.childInfo ?? []).map((it) => it.estimation).reduce((a, b) => a + b, 0)
@@ -38,16 +46,16 @@
 <div class="estimation-container" on:click>
   <div class="icon">
     <EstimationProgressCircle
-      value={Math.max(value.reportedTime, childReportTime)}
+      value={Math.max(ownReportedTime, childReportTime)}
       max={childEstimationTime || _estimation}
     />
   </div>
   <span class="overflow-label label flex-row-center flex-nowrap {kind}">
-    {#if value.reportedTime > 0 || childReportTime > 0}
+    {#if ownReportedTime > 0 || childReportTime > 0}
       {#if childReportTime}
         {@const rchildReportTime = childReportTime}
-        {@const reportDiff = floorFractionDigits(rchildReportTime - value.reportedTime, 3)}
-        {#if reportDiff !== 0 && value.reportedTime !== 0}
+        {@const reportDiff = floorFractionDigits(rchildReportTime - ownReportedTime, 3)}
+        {#if reportDiff !== 0 && ownReportedTime !== 0}
           <div
             class="flex flex-nowrap"
             class:mr-1={kind !== 'list'}
@@ -57,16 +65,16 @@
           </div>
           {#if kind !== 'list'}
             <div class="romColor">
-              (<TimePresenter value={value.reportedTime} />)
+              (<TimePresenter value={ownReportedTime} />)
             </div>
           {/if}
-        {:else if value.reportedTime === 0}
+        {:else if ownReportedTime === 0}
           <TimePresenter value={childReportTime} />
         {:else}
-          <TimePresenter value={value.reportedTime} />
+          <TimePresenter value={ownReportedTime} />
         {/if}
       {:else}
-        <TimePresenter value={value.reportedTime} />
+        <TimePresenter value={ownReportedTime} />
       {/if}
       <span>/</span>
     {/if}

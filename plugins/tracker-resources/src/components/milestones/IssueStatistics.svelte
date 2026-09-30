@@ -14,15 +14,22 @@
 -->
 <script lang="ts">
   import task from '@hcengineering/task'
-  import { Issue } from '@hcengineering/tracker'
+  import { Issue, currentReportedTime } from '@hcengineering/tracker'
   import { floorFractionDigits, Label } from '@hcengineering/ui'
   import { FixedColumn, statusStore } from '@hcengineering/view-resources'
   import tracker from '../../plugin'
   import EstimationProgressCircle from '../issues/timereport/EstimationProgressCircle.svelte'
   import TimePresenter from '../issues/timereport/TimePresenter.svelte'
+  import { onMount } from 'svelte'
   export let docs: Issue[] | undefined = undefined
   export let capacity: number | undefined = undefined
   export let category: string | undefined = undefined
+
+  let now = Date.now()
+  onMount(() => {
+    const timer = setInterval(() => (now = Date.now()), 60000)
+    return () => clearInterval(timer)
+  })
 
   $: ids = new Set(docs?.map((it) => it._id) ?? [])
 
@@ -51,8 +58,8 @@
           }
         } else {
           if (cat === task.statusCategory.Won || cat === task.statusCategory.Lost) {
-            if (it.reportedTime < it.estimation) {
-              return it.reportedTime
+            if (currentReportedTime(it, now) < it.estimation) {
+              return currentReportedTime(it, now)
             }
           }
         }
@@ -69,10 +76,10 @@
         if (it.childInfo?.length > 0) {
           const cReported = it.childInfo.map((ct) => ct.reportedTime).reduce((a, b) => a + b, 0)
           if (cReported !== 0) {
-            return cReported + it.reportedTime
+            return cReported + currentReportedTime(it, now)
           }
         }
-        return it.reportedTime
+        return currentReportedTime(it, now)
       })
       .reduce((it, cur) => {
         return it + cur

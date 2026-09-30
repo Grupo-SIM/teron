@@ -15,7 +15,7 @@
 -->
 <script lang="ts">
   import type { IntlString } from '@hcengineering/platform'
-  import { Issue, Project, issueTimeHours } from '@hcengineering/tracker'
+  import { Issue, Project, currentReportedTime } from '@hcengineering/tracker'
   import { Label, floorFractionDigits } from '@hcengineering/ui'
   import { onMount } from 'svelte'
   import TimePresenter from './TimePresenter.svelte'
@@ -34,9 +34,7 @@
     const timer = setInterval(() => (now = Date.now()), 60000)
     return () => clearInterval(timer)
   })
-  $: trackedHours = object.trackedTimeMs !== undefined
-    ? issueTimeHours({ trackedTimeMs: object.trackedTimeMs, trackingStartedOn: object.trackingStartedOn ?? null }, now)
-    : value
+  $: trackedHours = currentReportedTime({ ...object, reportedTime: value }, now)
   $: childTime = floorFractionDigits(
     (object.childInfo ?? []).map((it) => it.reportedTime).reduce((a, b) => a + b, 0),
     3

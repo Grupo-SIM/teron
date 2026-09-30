@@ -15,11 +15,12 @@
 <script lang="ts">
   import { DocumentQuery, SortingOrder } from '@hcengineering/core'
   import { createQuery } from '@hcengineering/presentation'
-  import { Issue, TimeSpendReport } from '@hcengineering/tracker'
+  import { Issue, TimeSpendReport, currentReportedTime } from '@hcengineering/tracker'
   import { Expandable, Label, Spinner, floorFractionDigits } from '@hcengineering/ui'
   import tracker from '../../../plugin'
   import TimePresenter from './TimePresenter.svelte'
   import TimeSpendReportsList from './TimeSpendReportsList.svelte'
+  import { onMount } from 'svelte'
 
   export let issue: Issue
   export let query: DocumentQuery<TimeSpendReport>
@@ -27,6 +28,11 @@
   const subIssuesQuery = createQuery()
 
   let reports: TimeSpendReport[] | undefined
+  let now = Date.now()
+  onMount(() => {
+    const timer = setInterval(() => (now = Date.now()), 60000)
+    return () => clearInterval(timer)
+  })
 
   $: subIssuesQuery.query(
     tracker.class.TimeSpendReport,
@@ -43,7 +49,7 @@
   )
 
   $: total = (reports ?? []).reduce((a, b) => a + floorFractionDigits(b.value, 3), 0)
-  $: reportedTime = floorFractionDigits(issue.reportedTime, 3)
+  $: reportedTime = floorFractionDigits(currentReportedTime(issue, now), 3)
 </script>
 
 {#if reports}

@@ -33,7 +33,7 @@
   import tags from '@hcengineering/tags'
   import { DocWithRank, getStates } from '@hcengineering/task'
   import { getTaskKanbanResultQuery, typeStore, updateTaskKanbanCategories } from '@hcengineering/task-resources'
-  import { Issue, IssuesGrouping, IssuesOrdering, Project } from '@hcengineering/tracker'
+  import { Issue, IssuesGrouping, IssuesOrdering, Project, currentReportedTime } from '@hcengineering/tracker'
   import {
     Button,
     ColorDefinition,
@@ -137,7 +137,11 @@
 
   onMount(() => {
     ;(document.activeElement as HTMLElement)?.blur()
+    const timer = setInterval(() => (now = Date.now()), 60000)
+    return () => clearInterval(timer)
   })
+
+  let now = Date.now()
 
   // Category information only
   let tasks: DocWithRank[] = []
@@ -385,7 +389,7 @@
       {@const issue = toIssue(object)}
       {@const issueId = object._id}
       {@const reports =
-        issue.reportedTime + (issue.childInfo ?? []).map((it) => it.reportedTime).reduce((a, b) => a + b, 0)}
+        currentReportedTime(issue, now) + (issue.childInfo ?? []).map((it) => it.reportedTime).reduce((a, b) => a + b, 0)}
       {@const estimations = (issue.childInfo ?? []).map((it) => it.estimation).reduce((a, b) => a + b, 0)}
       {#key issueId}
         <div
