@@ -160,3 +160,5 @@ Catálogos portugueses `pt` alinhados a `pt-br`: substantivos Anexo/Anexos agora
 Build Rush dos modelos View, Task, Contact e Tracker passou após retirada das ações; componentes Svelte de Atividade e notificação de Tarefas passaram pelo preprocessamento e parser.
 
 Fábrica genérica de Funcionário desregistrada: nenhum menu de criação oferece Criar funcionário; convite continua responsável pela inclusão.
+
+Rótulos residuais “Explorador de canais/mensagens” também passaram a “Pesquisar canais/mensagens” em `pt` e `pt-br`; entrada principal exibe “Pesquisar”.
