@@ -46,7 +46,6 @@ import {
 import attachment from '@hcengineering/model-attachment'
 import chunter from '@hcengineering/model-chunter'
 import core, { TDoc, TTypedSpace } from '@hcengineering/model-core'
-import { createPublicLinkAction } from '@hcengineering/model-guest'
 import { generateClassNotificationTypes } from '@hcengineering/model-notification'
 import presentation from '@hcengineering/model-presentation'
 import tracker from '@hcengineering/model-tracker'
@@ -265,8 +264,6 @@ function defineTeamspace (builder: Builder): void {
     },
     document.action.CreateDocument
   )
-
-  createPublicLinkAction(builder, document.class.Document, document.action.PublicLink)
 }
 
 function defineDocument (builder: Builder): void {

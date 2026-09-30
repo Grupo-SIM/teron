@@ -821,7 +821,7 @@ export function createModel (builder: Builder): void {
       category: view.category.General,
       input: 'any',
       target: core.class.Doc,
-      context: { mode: ['context', 'browser'] },
+      context: { mode: [] },
       visibilityTester: view.function.CanCopyLink
     },
     view.action.CopyLink
@@ -914,7 +914,7 @@ export function createModel (builder: Builder): void {
       category: view.category.Editor,
       target: core.class.Doc,
       context: {
-        mode: ['context', 'browser'],
+        mode: [],
         group: 'associate'
       }
     },

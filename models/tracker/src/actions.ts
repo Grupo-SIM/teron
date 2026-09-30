@@ -319,7 +319,7 @@ export function createActions (builder: Builder, issuesId: string, componentsId:
       category: tracker.category.Tracker,
       target: core.class.Doc,
       context: {
-        mode: ['context', 'browser', 'editor'],
+        mode: [],
         group: 'associate'
       }
     },
@@ -609,7 +609,7 @@ export function createActions (builder: Builder, issuesId: string, componentsId:
       target: tracker.class.Issue,
       visibilityTester: view.function.IsClipboardAvailable,
       context: {
-        mode: ['context', 'browser'],
+        mode: [],
         application: tracker.app.Tracker,
         group: 'copy'
       }
@@ -630,7 +630,7 @@ export function createActions (builder: Builder, issuesId: string, componentsId:
       target: tracker.class.Issue,
       visibilityTester: view.function.IsClipboardAvailable,
       context: {
-        mode: ['context', 'browser'],
+        mode: [],
         application: tracker.app.Tracker,
         group: 'copy'
       },
@@ -670,7 +670,7 @@ export function createActions (builder: Builder, issuesId: string, componentsId:
       category: tracker.category.Tracker,
       target: tracker.class.Issue,
       context: {
-        mode: ['context', 'browser'],
+        mode: [],
         application: tracker.app.Tracker,
         group: 'associate'
       }
@@ -762,7 +762,7 @@ export function createActions (builder: Builder, issuesId: string, componentsId:
         _class: { $ne: tracker.class.Project }
       },
       context: {
-        mode: ['context'],
+        mode: [],
         application: tracker.app.Tracker,
         group: 'associate'
       }
