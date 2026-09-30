@@ -117,4 +117,6 @@ Concluir auditoria dos textos de interface e validar pacotes afetados antes de m
 
 Auditoria adicional de pt-BR corrigiu rótulos de downloads ainda exibidos em inglês ou com terminologia inconsistente. Comparação de chaves entre inglês e pt-BR encontrou somente nomes próprios, exemplos de URL e valores técnicos iguais; revisar textos gerados fora dos catálogos no fechamento.
 
+Revisão de Diretrizes corrigiu “Meus documentos” no menu e “Sin título” no estado sem nome; catálogo `pt` recebeu os mesmos nomes do aplicativo e confirmação de exclusão traduzida.
+
 Validação parcial: parsing/preprocessamento local dos componentes Svelte alterados passou. `svelte-check` completo encontrou milhares de erros de dependências não compiladas; também revelou sintaxe inválida no handler do filtro, corrigida antes de repetir o parsing. Nenhuma migração remota executada.
