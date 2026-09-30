@@ -23,9 +23,8 @@
   import { Component as ComponentType, IssuePriority, IssueTemplate, Milestone, Project } from '@hcengineering/tracker'
   import { Component, EditBox, Label } from '@hcengineering/ui'
   import { createEventDispatcher } from 'svelte'
-  import { activeComponent, activeMilestone } from '../../issues'
+  import { activeMilestone } from '../../issues'
   import tracker from '../../plugin'
-  import ComponentSelector from '../components/ComponentSelector.svelte'
   import AssigneeEditor from '../issues/AssigneeEditor.svelte'
   import PriorityEditor from '../issues/PriorityEditor.svelte'
   import MilestoneSelector from '../milestones/MilestoneSelector.svelte'
@@ -36,7 +35,7 @@
   export let space: Ref<Project>
   export let priority: IssuePriority = IssuePriority.NoPriority
   export let assignee: Ref<Person> | null = null
-  export let component: Ref<ComponentType> | null = $activeComponent ?? null
+  export let component: Ref<ComponentType> | null = null
   export let milestone: Ref<Milestone> | null = $activeMilestone ?? null
   export let relatedTo: Doc | undefined
 
@@ -48,7 +47,7 @@
     title: '',
     description: '',
     assignee,
-    component,
+    component: null,
     milestone,
     priority,
     estimation: 0,
@@ -88,7 +87,7 @@
       title: getTitle(object.title),
       description: object.description,
       assignee: object.assignee,
-      component: object.component,
+      component: null,
       milestone: object.milestone,
       priority: object.priority,
       estimation: object.estimation,
@@ -102,14 +101,6 @@
 
     await client.createDoc(tracker.class.IssueTemplate, _space, value, objectId)
     objectId = generateId()
-  }
-
-  const handleComponentIdChanged = (componentId: Ref<ComponentType> | null | undefined) => {
-    if (componentId === undefined) {
-      return
-    }
-
-    object = { ...object, component: componentId }
   }
 
   const handleMilestoneIdChanged = (milestoneId: Ref<Milestone> | null | undefined) => {
@@ -193,7 +184,7 @@
   />
   <SubIssueTemplates
     bind:children={object.children}
-    component={object.component}
+    component={null}
     milestone={object.milestone}
     project={_space}
     maxHeight="limited"
@@ -233,14 +224,6 @@
       }}
     />
     <EstimationEditor kind={'regular'} size={'large'} value={object} />
-    <ComponentSelector
-      {space}
-      value={object.component}
-      onChange={handleComponentIdChanged}
-      isEditable={true}
-      kind={'regular'}
-      size={'large'}
-    />
     <MilestoneSelector
       {space}
       value={object.milestone}

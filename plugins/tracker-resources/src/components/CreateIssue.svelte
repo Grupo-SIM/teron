@@ -83,7 +83,7 @@
   import { ObjectBox } from '@hcengineering/view-resources'
   import { createEventDispatcher, onDestroy } from 'svelte'
 
-  import { activeComponent, activeMilestone, generateIssueShortLink, updateIssueRelation } from '../issues'
+  import { activeMilestone, generateIssueShortLink, updateIssueRelation } from '../issues'
   import tracker from '../plugin'
   import SetParentIssueActionPopup from './SetParentIssueActionPopup.svelte'
   import SubIssues from './SubIssues.svelte'
@@ -182,7 +182,6 @@
       ...(status != null ? { status } : {}),
       ...(priority != null ? { priority } : {}),
       ...(assignee != null ? { assignee } : {}),
-      ...(component != null ? { component } : {}),
       ...(milestone != null ? { milestone } : {}),
       ...(_parentIssue !== undefined ? { parentIssue: _parentIssue._id } : {})
     }
@@ -196,7 +195,7 @@
       kind: '' as Ref<TaskType>,
       priority: priority ?? IssuePriority.NoPriority,
       space: _space as Ref<Project>,
-      component: component ?? $activeComponent ?? null,
+      component: null,
       dueDate: null,
       attachments: 0,
       estimation: 0,
@@ -212,7 +211,6 @@
         ...base,
         status: originalIssue.status,
         priority: originalIssue.priority,
-        component: originalIssue.component,
         dueDate: originalIssue.dueDate,
         assignee: originalIssue.assignee,
         estimation: originalIssue.estimation,
@@ -255,7 +253,6 @@
     status: status ?? currentProject?.defaultIssueStatus,
     parentIssue: parentIssue?._id,
     description: EmptyMarkup,
-    component: component ?? $activeComponent ?? null,
     milestone: milestone ?? $activeMilestone ?? null,
     priority: priority ?? IssuePriority.NoPriority,
     space: _space
@@ -491,7 +488,7 @@
         title: getTitle(object.title),
         description: null,
         assignee: object.assignee,
-        component: object.component,
+        component: null,
         milestone: object.milestone,
         number,
         status: object.status,
@@ -758,7 +755,6 @@
     status: object.status,
     priority: object.priority,
     assignee: object.assignee,
-    component: object.component,
     milestone: object.milestone,
     relatedTo,
     parentIssue,
@@ -898,7 +894,7 @@
       projectId={_space}
       project={currentProject}
       milestone={object.milestone}
-      component={object.component}
+      component={null}
       bind:subIssues={object.subIssues}
     />
   {/if}
