@@ -14,28 +14,25 @@
 //
 
 import activity from '@hcengineering/activity'
-import { AccountRole, type ClassCollaborators, SortingOrder, type Lookup, type Ref } from '@hcengineering/core'
+import { type ClassCollaborators, SortingOrder, type Lookup, type Ref } from '@hcengineering/core'
 import { type Builder } from '@hcengineering/model'
-import calendar from '@hcengineering/model-calendar'
 import chunter from '@hcengineering/model-chunter'
 import contact from '@hcengineering/model-contact'
 import core from '@hcengineering/model-core'
 import gmail from '@hcengineering/model-gmail'
 import { generateClassNotificationTypes } from '@hcengineering/model-notification'
-import presentation from '@hcengineering/model-presentation'
 import tags from '@hcengineering/model-tags'
 import task, { actionTemplates } from '@hcengineering/model-task'
 import tracker from '@hcengineering/model-tracker'
 import view, { createAction, showColorsViewOption, actionTemplates as viewTemplates } from '@hcengineering/model-view'
-import workbench, { createNavigateAction, type Application } from '@hcengineering/model-workbench'
+import workbench from '@hcengineering/model-workbench'
 import notification from '@hcengineering/notification'
-import { type IntlString } from '@hcengineering/platform'
-import { recruitId, type Applicant, RecruitEvents, type Vacancy } from '@hcengineering/recruit'
+import { type Applicant, type Vacancy } from '@hcengineering/recruit'
 import setting from '@hcengineering/setting'
-import { type KeyBinding, type ViewOptionModel, type ViewOptionsModel } from '@hcengineering/view'
+import { type ViewOptionModel, type ViewOptionsModel } from '@hcengineering/view'
 
 import recruit from './plugin'
-import { createReviewModel, reviewTableConfig, reviewTableOptions } from './review'
+import { createReviewModel } from './review'
 import { defineSpaceType } from './spaceType'
 import { definePermissions } from './permissions'
 import { TApplicant, TApplicantMatch, TCandidate, TOpinion, TReview, TVacancy, TVacancyList } from './types'
@@ -117,130 +114,6 @@ export function createModel (builder: Builder): void {
   builder.mixin(recruit.mixin.VacancyList, core.class.Class, setting.mixin.Editable, {
     value: false
   })
-
-  const vacanciesId = 'vacancies'
-  const talentsId = 'talents'
-  const skillsId = 'skills'
-  const candidatesId = 'candidates'
-  const myApplicationsId = 'my-applications'
-  const organizationsId = 'organizations'
-
-  builder.createDoc(
-    workbench.class.Application,
-    core.space.Model,
-    {
-      label: recruit.string.RecruitApplication,
-      icon: recruit.icon.RecruitApplication,
-      locationResolver: recruit.resolver.Location,
-      alias: recruitId,
-      hidden: true,
-      navigatorModel: {
-        spaces: [],
-        specials: [
-          {
-            id: vacanciesId,
-            component: recruit.component.Vacancies,
-            icon: recruit.icon.Vacancy,
-            label: recruit.string.Vacancies,
-            createItemLabel: recruit.string.VacancyCreateLabel,
-            position: 'vacancy',
-            componentProps: {
-              archived: false
-            }
-          },
-          {
-            id: organizationsId,
-            component: recruit.component.Organizations,
-            icon: contact.icon.Company,
-            label: recruit.string.Organizations,
-            position: 'vacancy'
-          },
-          {
-            id: candidatesId,
-            component: task.component.TypesView,
-            icon: recruit.icon.Application,
-            label: recruit.string.Applications,
-            componentProps: {
-              _class: recruit.class.Applicant,
-              label: recruit.string.Applications,
-              createLabel: recruit.string.ApplicationCreateLabel,
-              createComponent: recruit.component.CreateApplication,
-              descriptor: recruit.descriptors.VacancyType,
-              descriptors: [
-                view.viewlet.Table,
-                view.viewlet.List,
-                task.viewlet.Kanban,
-                recruit.viewlet.ApplicantDashboard
-              ]
-            },
-            position: 'vacancy'
-          },
-          {
-            id: talentsId,
-            component: workbench.component.SpecialView,
-            icon: recruit.icon.Talents,
-            label: recruit.string.Talents,
-            accessLevel: AccountRole.User,
-            componentProps: {
-              _class: recruit.mixin.Candidate,
-              icon: contact.icon.Person,
-              label: recruit.string.Talents,
-              createEvent: RecruitEvents.PlusTalentButtonClicked,
-              createLabel: recruit.string.TalentCreateLabel,
-              createComponent: recruit.component.CreateCandidate,
-              createComponentProps: { shouldSaveDraft: false }
-            },
-            position: 'vacancy'
-          },
-          {
-            id: skillsId,
-            component: recruit.component.SkillsView,
-            accessLevel: AccountRole.User,
-            icon: recruit.icon.Skills,
-            label: recruit.string.SkillsLabel,
-            createItemLabel: recruit.string.SkillCreateLabel,
-            position: 'bottom'
-          },
-          {
-            id: myApplicationsId,
-            label: recruit.string.MyApplications,
-            icon: recruit.icon.AssignedToMe,
-            component: task.component.AssignedTasks,
-            position: 'event',
-            componentProps: {
-              labelTasks: recruit.string.Applications,
-              icon: recruit.icon.AssignedToMe,
-              _class: recruit.class.Applicant,
-              config: [
-                ['assigned', view.string.Assigned, {}],
-                ['created', view.string.Created, {}],
-                ['subscribed', view.string.Subscribed, {}]
-              ],
-              descriptors: [view.viewlet.List, view.viewlet.Table, task.viewlet.Kanban]
-            }
-          },
-          {
-            id: 'reviews',
-            component: calendar.component.Events,
-            componentProps: {
-              viewLabel: recruit.string.Reviews,
-              viewIcon: recruit.icon.Review,
-              _class: recruit.class.Review,
-              options: reviewTableOptions,
-              config: reviewTableConfig,
-              createLabel: recruit.string.ReviewCreateLabel,
-              createComponent: recruit.component.CreateReview
-            },
-            icon: recruit.icon.Reviews,
-            label: recruit.string.Reviews,
-            position: 'event'
-          }
-        ]
-      },
-      navHeaderComponent: recruit.component.NewCandidateHeader
-    },
-    recruit.app.Recruit
-  )
 
   createAction(
     builder,
@@ -1009,122 +882,6 @@ export function createModel (builder: Builder): void {
   )
 
   createAction(builder, {
-    action: view.actionImpl.ShowPopup,
-    actionProps: {
-      component: recruit.component.CreateApplication,
-      element: 'top',
-      props: {
-        preserveCandidate: true
-      },
-      fillProps: {
-        _id: 'candidate'
-      }
-    },
-    label: recruit.string.CreateAnApplication,
-    icon: recruit.icon.Create,
-    input: 'focus',
-    category: recruit.category.Recruit,
-    target: contact.class.Person,
-    context: {
-      mode: ['context', 'browser'],
-      group: 'associate'
-    },
-    override: [recruit.action.CreateGlobalApplication]
-  })
-  createAction(
-    builder,
-    {
-      action: view.actionImpl.ShowPopup,
-      actionProps: {
-        component: recruit.component.CreateCandidate,
-        element: 'top'
-      },
-      label: recruit.string.CreateTalent,
-      icon: recruit.icon.Create,
-      keyBinding: ['keyC'],
-      input: 'none',
-      category: recruit.category.Recruit,
-      target: core.class.Doc,
-      context: {
-        mode: ['workbench', 'browser'],
-        application: recruit.app.Recruit,
-        group: 'create'
-      }
-    },
-    recruit.action.CreateTalent
-  )
-
-  createAction(builder, {
-    action: view.actionImpl.ShowPopup,
-    actionProps: {
-      component: recruit.component.CreateVacancy,
-      element: 'top'
-    },
-    label: recruit.string.CreateVacancy,
-    icon: recruit.icon.Create,
-    input: 'none',
-    category: recruit.category.Recruit,
-    target: core.class.Doc,
-    context: {
-      mode: ['workbench', 'browser'],
-      application: recruit.app.Recruit,
-      group: 'create'
-    }
-  })
-
-  createAction(
-    builder,
-    {
-      action: view.actionImpl.ShowPopup,
-      actionProps: {
-        component: recruit.component.CreateApplication,
-        element: 'top'
-      },
-      label: recruit.string.CreateApplication,
-      icon: recruit.icon.Create,
-      input: 'none',
-      category: recruit.category.Recruit,
-      target: core.class.Doc,
-      context: {
-        mode: ['workbench', 'browser'],
-        application: recruit.app.Recruit,
-        group: 'create'
-      }
-    },
-    recruit.action.CreateGlobalApplication
-  )
-
-  builder.createDoc(
-    presentation.class.ObjectSearchCategory,
-    core.space.Model,
-    {
-      icon: recruit.icon.Application,
-      label: recruit.string.SearchApplication,
-      title: recruit.string.Applications,
-      query: recruit.completion.ApplicationQuery,
-      context: ['search', 'mention', 'spotlight'],
-      classToSearch: recruit.class.Applicant,
-      priority: 500
-    },
-    recruit.completion.ApplicationCategory
-  )
-
-  builder.createDoc(
-    presentation.class.ObjectSearchCategory,
-    core.space.Model,
-    {
-      icon: recruit.icon.Vacancy,
-      label: recruit.string.SearchVacancy,
-      title: recruit.string.Vacancies,
-      query: recruit.completion.VacancyQuery,
-      context: ['search', 'mention', 'spotlight'],
-      classToSearch: recruit.class.Vacancy,
-      priority: 550
-    },
-    recruit.completion.VacancyCategory
-  )
-
-  createAction(builder, {
     label: view.string.Open,
     icon: view.icon.Open,
     action: view.actionImpl.ShowPanel,
@@ -1193,37 +950,6 @@ export function createModel (builder: Builder): void {
     }
   })
 
-  function createGotoSpecialAction (builder: Builder, id: string, key: KeyBinding, label: IntlString): void {
-    createNavigateAction(builder, key, label, recruit.app.Recruit as Ref<Application>, {
-      application: recruitId,
-      mode: 'special',
-      special: id
-    })
-  }
-
-  createGotoSpecialAction(builder, talentsId, 'keyG->keyE', recruit.string.GotoTalents)
-  createGotoSpecialAction(builder, vacanciesId, 'keyG->keyV', recruit.string.GotoVacancies)
-  createGotoSpecialAction(builder, skillsId, 'keyG->keyS', recruit.string.GotoSkills)
-  createGotoSpecialAction(builder, myApplicationsId, 'keyG->keyM', recruit.string.GotoMyApplications)
-  createGotoSpecialAction(builder, candidatesId, 'keyG->keyA', recruit.string.GotoApplicants)
-
-  createAction(builder, {
-    action: workbench.actionImpl.Navigate,
-    actionProps: {
-      mode: 'app',
-      application: recruitId,
-      special: talentsId
-    },
-    label: recruit.string.GotoRecruitApplication,
-    icon: view.icon.ArrowRight,
-    input: 'none',
-    category: view.category.Navigation,
-    target: core.class.Doc,
-    context: {
-      mode: ['workbench', 'browser', 'editor', 'panel', 'popup']
-    }
-  })
-
   createAction(builder, {
     action: view.actionImpl.ValueSelector,
     actionPopup: view.component.ValueSelector,
@@ -1265,69 +991,6 @@ export function createModel (builder: Builder): void {
       group: 'edit'
     }
   })
-
-  createAction(
-    builder,
-    {
-      action: view.actionImpl.CopyTextToClipboard,
-      actionProps: {
-        textProvider: recruit.function.IdProvider
-      },
-      label: recruit.string.CopyId,
-      icon: view.icon.CopyId,
-      input: 'none',
-      category: recruit.category.Recruit,
-      target: recruit.class.Applicant,
-      context: {
-        mode: ['context', 'browser'],
-        application: recruit.app.Recruit,
-        group: 'copy'
-      }
-    },
-    recruit.action.CopyApplicationId
-  )
-  createAction(
-    builder,
-    {
-      action: view.actionImpl.CopyTextToClipboard,
-      actionProps: {
-        textProvider: recruit.function.GetObjectLink
-      },
-      label: recruit.string.CopyLink,
-      icon: view.icon.CopyLink,
-      input: 'none',
-      category: recruit.category.Recruit,
-      target: recruit.class.Applicant,
-      context: {
-        mode: ['context', 'browser'],
-        application: recruit.app.Recruit,
-        group: 'copy'
-      },
-      override: [view.action.CopyLink]
-    },
-    recruit.action.CopyApplicationLink
-  )
-  createAction(
-    builder,
-    {
-      action: view.actionImpl.CopyTextToClipboard,
-      actionProps: {
-        textProvider: recruit.function.GetObjectLink
-      },
-      label: recruit.string.CopyLink,
-      icon: view.icon.CopyLink,
-      input: 'none',
-      category: recruit.category.Recruit,
-      target: recruit.class.Vacancy,
-      context: {
-        mode: ['context', 'browser'],
-        application: recruit.app.Recruit,
-        group: 'copy'
-      },
-      override: [view.action.CopyLink]
-    },
-    recruit.action.CopyCandidateLink
-  )
 
   builder.mixin(recruit.class.Applicant, core.class.Class, view.mixin.AttributeFilter, {
     component: recruit.component.ApplicantFilter
@@ -1564,27 +1227,6 @@ export function createModel (builder: Builder): void {
       override: [task.action.Move]
     },
     recruit.action.MoveApplicant
-  )
-
-  createAction(
-    builder,
-    {
-      action: view.actionImpl.CopyTextToClipboard,
-      actionProps: {
-        textProvider: recruit.function.GetTalentId
-      },
-      label: recruit.string.GetTalentIds,
-      icon: view.icon.CopyId,
-      input: 'any',
-      category: recruit.category.Recruit,
-      target: recruit.mixin.Candidate,
-      context: {
-        mode: ['context', 'browser'],
-        application: recruit.app.Recruit,
-        group: 'copy'
-      }
-    },
-    recruit.action.GetTalentIds
   )
 
   createAction(

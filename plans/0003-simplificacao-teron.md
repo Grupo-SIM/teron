@@ -43,6 +43,8 @@ Marco 5 iniciado: miniaturas do drawer permitem ações sobre salas e pessoas; c
 
 Recrutamento, RH e Planejador de equipes ocultos na navegação enquanto migrações de dados são preparadas. Configurações do escritório removidas da lista de configurações. Desbloqueio de Diretrizes limitado a Owner/Maintainer na UI e na função cliente; confirmação de exclusão usa “este documento”. A autorização de desbloqueio no servidor ainda requer verificação antes do fechamento do marco 7.
 
+Registro do aplicativo de Recrutamento, atalhos de navegação, categorias de busca e ações para criar candidaturas pelo menu de contatos removidos do modelo. Tipos legados permanecem registrados enquanto a migração de dados e a limpeza segura são concluídas.
+
 Middleware do servidor agora rejeita transações que limpam `lockedBy` em Diretrizes para contas abaixo de Maintainer, inclusive via `$unset`; conta de sistema permanece autorizada. Teste local das duas formas de desbloqueio passou. Validar integração com contas User e Maintainer em banco local antes de fechar marco 7.
 
 Botão 2FA posicionado abaixo da descrição. Ação Entrar removida do menu de conta de convidados; Sair permanece para contas autenticadas.
