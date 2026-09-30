@@ -75,6 +75,8 @@ Após preservar cargo, origem e habilidades no contato Externo, painel de atribu
 
 Habilidades dos candidatos agora têm atributo no contato Externo. Migração copia contador sem sobrescrever valor existente e troca `attachedToClass` das referências de habilidade para Pessoa; categorias e elementos também passam a apontar Pessoa. Nenhum registro de habilidade é removido. Validar contadores e filtros de etiquetas com dados locais antes da limpeza do mixin legado.
 
+Migração idempotente adicional transfere arquivos vinculados às candidaturas para o contato Externo selecionado e recalcula seu contador. Arquivos de outras pessoas permanecem intactos; teste com aplicação repetida passou. A limpeza de candidaturas e vagas ainda depende da preservação das notas e relações relevantes.
+
 Criação inicial das categorias de habilidades também aponta para Pessoa, inclusive em espaços novos. A etapa de migração de habilidades continua copiando contadores separadamente para cobrir espaços onde a etapa anterior de contatos já havia sido executada.
 
 Editor de funções/etiquetas agora permite excluir definição após confirmação. Exclusão usa participante de remoção existente para apagar referências em contatos antes do registro selecionado. Validar fluxo com funções iguais em pessoas diferentes e com duas funções na mesma pessoa.

@@ -34,6 +34,7 @@ import {
   type MigrationUpgradeClient,
   type ModelLogger
 } from '@hcengineering/model'
+import attachment, { DOMAIN_ATTACHMENT } from '@hcengineering/model-attachment'
 import tags, { DOMAIN_TAGS, type TagCategory } from '@hcengineering/model-tags'
 import task, { createSequence, DOMAIN_TASK, migrateDefaultStatusesBase } from '@hcengineering/model-task'
 import { recruitId, type Applicant, type Candidate } from '@hcengineering/recruit'
@@ -94,6 +95,11 @@ export const recruitOperation: MigrateOperation = {
         state: 'preserve-candidate-skills-v1',
         mode: 'upgrade',
         func: preserveCandidateSkills
+      },
+      {
+        state: 'preserve-applicant-files-v1',
+        mode: 'upgrade',
+        func: preserveApplicantFiles
       }
     ])
   },
@@ -107,6 +113,46 @@ export const recruitOperation: MigrateOperation = {
         }
       }
     ])
+  }
+}
+
+export async function preserveApplicantFiles (client: MigrationClient): Promise<void> {
+  const applicants = await client.traverse<Applicant>(DOMAIN_TASK, { _class: recruit.class.Applicant })
+  try {
+    while (true) {
+      const batch = await applicants.next(100)
+      if (batch === null || batch.length === 0) break
+      for (const applicant of batch) {
+        const [candidate] = await client.find<Person>(DOMAIN_CONTACT, {
+          _id: applicant.attachedTo,
+          _class: contact.class.Person
+        } as MigrationDocumentQuery<Person>)
+        if (candidate === undefined) continue
+
+        await client.update(DOMAIN_ATTACHMENT, {
+          _class: attachment.class.Attachment,
+          attachedTo: applicant._id,
+          attachedToClass: recruit.class.Applicant
+        }, {
+          attachedTo: candidate._id,
+          attachedToClass: contact.class.Person,
+          collection: 'attachments',
+          space: candidate.space
+        })
+
+        const files = await client.find(DOMAIN_ATTACHMENT, {
+          _class: attachment.class.Attachment,
+          attachedTo: candidate._id,
+          attachedToClass: contact.class.Person,
+          collection: 'attachments'
+        })
+        if (candidate.attachments !== files.length) {
+          await client.update(DOMAIN_CONTACT, { _id: candidate._id }, { attachments: files.length })
+        }
+      }
+    }
+  } finally {
+    await applicants.close()
   }
 }
 
