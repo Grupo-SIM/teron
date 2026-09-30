@@ -693,7 +693,7 @@
                             <Button
                               icon={IconStop}
                               size={'small'}
-                              showTooltip={{ label: login.string.Archive }}
+                              label={login.string.Archive}
                               kind={'ghost'}
                               on:click={() => {
                                 showPopup(MessageBox, {
@@ -713,7 +713,7 @@
                               icon={IconStart}
                               size={'small'}
                               kind={'ghost'}
-                              showTooltip={{ label: login.string.Unarchive }}
+                              label={login.string.Unarchive}
                               on:click={() => {
                                 showPopup(MessageBox, {
                                   label: login.string.UnarchiveWorkspace,
@@ -731,7 +731,7 @@
                               icon={IconArrowRight}
                               size={'small'}
                               kind={'positive'}
-                              showTooltip={{ label: login.string.Migrate }}
+                              label={login.string.Migrate}
                               on:click={() => {
                                 showPopup(MessageBox, {
                                   label: login.string.MigrateWorkspace,
@@ -750,7 +750,7 @@
                               icon={IconStop}
                               size={'small'}
                               kind={'dangerous'}
-                              showTooltip={{ label: login.string.Delete }}
+                              label={login.string.Delete}
                               on:click={() => {
                                 showPopup(MessageBox, {
                                   label: login.string.DeleteWorkspace,
@@ -836,7 +836,7 @@
                       icon={IconStop}
                       size={'small'}
                       kind={'dangerous'}
-                      showTooltip={{ label: login.string.Delete }}
+                      label={login.string.Delete}
                       on:click={() => {
                         showPopup(MessageBox, {
                           label: login.string.DeleteAccount,
