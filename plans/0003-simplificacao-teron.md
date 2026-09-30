@@ -31,6 +31,8 @@ Marco 3 iniciado em paralelo: filtros Todos/Planejados/Ativos/Concluídos retira
 
 Marco 7 iniciado: botão de configuração avançada da visão retirado do componente compartilhado, preservando opções usuais de ordenação/agrupamento e seleção Lista/Quadro.
 
+Configuração avançada de classe também saiu do cabeçalho compartilhado dos atributos. Blocos continuam expansíveis e atributos editáveis conforme permissão. Rever demais atalhos para telas de customização na regressão final.
+
 Marco 4 iniciado: Todo o dia, Fuso horário e Repetir agora usam controles independentes; Ocupado/Livre removido da escolha; agenda privada de outra pessoa mostra somente bloco ocupado com horário, sem ações de contexto. Calendário principal lista agendas acessíveis e permite escolher uma. Seletor de agenda na criação de evento ocultado mantendo agenda padrão.
 
 Criação de evento agora usa privacidade fixa e oculta o seletor de visibilidade: horário alheio continua ocupado sem revelar detalhes. Edição de eventos existentes mantém o estado atual. Validar com duas contas locais antes de concluir o marco 4.
