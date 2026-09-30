@@ -83,7 +83,19 @@
     }
   )
 
-  const sendOpen = () => dispatch('open', { ignoreKeys: ['comments', 'name', 'channels', 'city'] })
+  const sendOpen = () => dispatch('open', {
+    ignoreKeys: [
+      'comments',
+      'name',
+      'channels',
+      'city',
+      'functions',
+      'professionalTitle',
+      'contactSource',
+      'remoteDaysPerWeek',
+      'onsiteDaysPerWeek'
+    ]
+  })
   onMount(sendOpen)
 
   async function onAvatarDone (): Promise<void> {
