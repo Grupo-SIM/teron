@@ -351,11 +351,6 @@ function defineApplication (
               space: undefined,
               icon: tracker.icon.Issues,
               title: tracker.string.AllIssues,
-              config: [
-                ['all', tracker.string.All, {}],
-                ['active', tracker.string.Active, {}],
-                ['backlog', tracker.string.Backlog, {}]
-              ],
               allProjectsTypes: true
             }
           },
@@ -400,12 +395,7 @@ function defineApplication (
                 component: tracker.component.Issues,
                 componentProps: {
                   icon: tracker.icon.Issues,
-                  title: tracker.string.Issues,
-                  config: [
-                    ['all', tracker.string.All, {}],
-                    ['active', tracker.string.Active, {}],
-                    ['backlog', tracker.string.Backlog, {}]
-                  ]
+                  title: tracker.string.Issues
                 }
               },
               {
