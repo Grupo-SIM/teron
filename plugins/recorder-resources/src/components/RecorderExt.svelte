@@ -14,7 +14,7 @@
 -->
 <script lang="ts">
   import { getMetadata } from '@hcengineering/platform'
-  import { Icon, tooltip } from '@hcengineering/ui'
+  import { Icon, resolvedLocationStore, tooltip } from '@hcengineering/ui'
   import { onDestroy } from 'svelte'
 
   import IconRec from './icons/Rec.svelte'
@@ -28,8 +28,13 @@
 
   $: state = $recorderState.state
   $: elapsedTime = $recorderState.elapsedTime
+  $: inTasks = $resolvedLocationStore.path[2] === 'tracker'
+  $: if (inTasks && state !== 'idle') {
+    void cancelRecording()
+  }
 
   function handleRecClick (): void {
+    if (inTasks) return
     void record({})
   }
 
@@ -38,7 +43,7 @@
   })
 </script>
 
-{#if endpoint !== ''}
+{#if endpoint !== '' && !inTasks}
   {#if state !== 'stopped' && state !== 'idle' && state !== 'ready'}
     <button
       class="antiButton ghost jf-center bs-none no-focus statusButton negative"
