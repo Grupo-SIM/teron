@@ -146,3 +146,5 @@ Tela de exportação agora identifica Diretrizes, Projetos e Tarefas pelos nomes
 Validação parcial: parsing/preprocessamento local dos componentes Svelte alterados passou. `svelte-check` completo encontrou milhares de erros de dependências não compiladas; também revelou sintaxe inválida no handler do filtro, corrigida antes de repetir o parsing. Nenhuma migração remota executada.
 
 Migrações de status e tempo de Tarefas executadas duas vezes em MongoDB local descartável. Fixture com reabertura acumulou quatro horas; status padrão e histórico antigo remapeados; tarefa de outra classe permaneceu intacta. Contêiner descartável removido após teste.
+
+Ação Link público retirada também do registro de Contatos e de Tarefas; referências de tipo ficam para documentos antigos.

@@ -81,7 +81,6 @@ import {
 import attachment from '@hcengineering/model-attachment'
 import chunter from '@hcengineering/model-chunter'
 import core, { TAttachedDoc, TDoc, TSpace } from '@hcengineering/model-core'
-import { createPublicLinkAction } from '@hcengineering/model-guest'
 import { generateClassNotificationTypes } from '@hcengineering/model-notification'
 import presentation from '@hcengineering/model-presentation'
 import view, { createAction, createAttributePresenter, type Viewlet } from '@hcengineering/model-view'
@@ -1407,7 +1406,6 @@ export function createModel (builder: Builder): void {
     ['comments', 'attachments']
   )
 
-  createPublicLinkAction(builder, contact.class.Contact, contact.action.PublicLink)
 
   builder.createDoc(core.class.DomainIndexConfiguration, core.space.Model, {
     domain: DOMAIN_CHANNEL,

@@ -53,7 +53,6 @@ import core, {
   TSpaceTypeDescriptor,
   TTypedSpace
 } from '@hcengineering/model-core'
-import { createPublicLinkAction } from '@hcengineering/model-guest'
 import view, {
   classPresenter,
   createAction,
@@ -522,7 +521,6 @@ export function createModel (builder: Builder): void {
     }
   })
 
-  createPublicLinkAction(builder, task.class.Task, task.action.PublicLink)
 
   builder.createDoc(core.class.DomainIndexConfiguration, core.space.Model, {
     domain: DOMAIN_TASK,
