@@ -184,3 +184,5 @@ Build Rush de `@hcengineering/model-all` passou após retirada das contribuiçõ
 Botão compartilhado `ViewletsSettingButton` também deixou de expor configuração avançada nas listas embutidas de tarefas, cartões, relações, processos e reuniões; ordenação/agrupamento seguem pelo botão de opções.
 
 Carregadores de recursos de interface e servidor de Recrutamento retirados de produção, pipeline e ferramenta local; catálogo de strings/ícones permanece para categorias legadas de habilidades dos Externos.
+
+Build Rush de produção, pipeline de servidor e ferramenta local passou após retirada dos carregadores de Recrutamento. Modelo agregado em memória contém 21 aplicativos ativos; nenhum de Recrutamento, RH ou Planejador de equipes. O app `time:app:Me` permanece como Calendário.
