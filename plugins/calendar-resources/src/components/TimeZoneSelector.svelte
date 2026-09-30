@@ -60,7 +60,7 @@
 <Button
   {disabled}
   label={calendar.string.TimeZone}
-  kind={'ghost'}
+  kind={'secondary'}
   padding={'0 .5rem'}
   justify={'left'}
   {flex}

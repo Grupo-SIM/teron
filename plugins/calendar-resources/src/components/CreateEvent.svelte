@@ -256,7 +256,7 @@
       />
     </div>
     <div class="block rightCropPadding">
-      <CalendarSelector bind:value={_calendar} focusIndex={10101} />
+      <CalendarSelector bind:value={_calendar} focusIndex={10101} showSelector={false} />
       <div class="flex-row-center flex-gap-1">
         <Icon icon={calendar.icon.Hidden} size={'small'} />
         <VisibilityEditor bind:value={visibility} kind="inline" size="medium" focusIndex={10102} withoutIcon />

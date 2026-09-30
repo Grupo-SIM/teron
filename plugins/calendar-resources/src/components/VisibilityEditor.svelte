@@ -44,18 +44,15 @@
       icon: calendar.icon.Public
     },
     {
-      id: 'freeBusy',
-      label: calendar.string.FreeBusy,
-      icon: calendar.icon.Private
-    },
-    {
       id: 'private',
       label: calendar.string.Private,
       icon: calendar.icon.Hidden
     }
   ]
 
-  $: selected = value !== undefined ? items.find((item) => item.id === value) : undefined
+  $: selected = value !== undefined
+    ? items.find((item) => item.id === (value === 'freeBusy' ? 'private' : value))
+    : undefined
 
   function change (val: Visibility): void {
     if (value !== val) {
