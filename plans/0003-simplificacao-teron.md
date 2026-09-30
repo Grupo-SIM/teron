@@ -150,3 +150,5 @@ Migrações de status e tempo de Tarefas executadas duas vezes em MongoDB local 
 Ação Link público retirada também do registro de Contatos e de Tarefas; referências de tipo ficam para documentos antigos.
 
 Ações globais de copiar link e adicionar relação, além das ações Nova tarefa relacionada, Copiar título/URL e configurar projetos relacionados, deixaram de ser registradas. IDs legados ficam para referências persistidas e listas de ignorados.
+
+Componente compartilhado de Atividade agora condiciona editor de comentários à classe Tarefa; histórico segue visível em outras entidades.
