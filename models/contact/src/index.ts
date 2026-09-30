@@ -558,6 +558,7 @@ export function createModel (builder: Builder): void {
       ],
       configOptions: {
         hiddenKeys: ['name'],
+        strict: true,
         sortable: true
       },
       baseQuery: {
@@ -592,6 +593,7 @@ export function createModel (builder: Builder): void {
       ],
       configOptions: {
         hiddenKeys: ['name'],
+        strict: true,
         sortable: true
       },
       viewOptions: {
@@ -629,6 +631,7 @@ export function createModel (builder: Builder): void {
       ],
       configOptions: {
         hiddenKeys: ['name'],
+        strict: true,
         sortable: true
       }
     },

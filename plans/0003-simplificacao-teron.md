@@ -49,6 +49,8 @@ Tabelas padrão de contatos enxugadas para nome, localização, função (quando
 
 Buscas das listas Contatos, Funcionários e Usuários usam correspondência parcial e sem distinção entre maiúsculas e minúsculas por meio do operador `$like`, já suportado pelos adaptadores locais.
 
+Tabelas Pessoa, Funcionário e Cliente agora restringem colunas às configurações aprovadas por `strict`, impedindo colunas extras geradas por atributos desativados.
+
 Atividade permanece visível fora de Tarefas; editor de comentários fica habilitado apenas no painel da tarefa.
 
 Busca da barra lateral de Conversa ocultada; busca continua disponível na tela Pesquisar. Botão Criar funcionário removido da lista de funcionários.
