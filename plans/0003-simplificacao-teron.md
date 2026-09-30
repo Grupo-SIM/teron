@@ -105,6 +105,8 @@ Status padrão de tarefa definidos como Pendente cinza, Em andamento azul, Revis
 
 Rótulos residuais de Backlog na navegação e no gerenciamento de status de Tarefas passam a Pendente/Pendentes nos catálogos `pt` e `pt-br`; o filtro de componentes legado permanece sem navegação.
 
+Categoria base de status também exibe Pendente nos catálogos de Tarefas; seu ID interno não muda.
+
 Migração de status agora remapeia também transações de criação e atualização de tarefas que referenciam Todo, mantendo histórico coerente com Pendente. Testar com banco local e execução repetida.
 
 Novo tipo de tarefa criado pela integração GitHub usa a mesma sequência e as mesmas cores dos status aprovados.
