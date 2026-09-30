@@ -233,6 +233,7 @@
     "AddedAsBlocked": "Marqué comme bloqué",
     "AddedAsBlocking": "Marqué comme bloquant",
     "IssueTemplate": "Modèle",
+    "TextTemplate": "Text template",
     "IssueTemplates": "Modèles",
     "NewProcess": "Nouveau modèle",
     "SaveProcess": "Enregistrer le modèle",

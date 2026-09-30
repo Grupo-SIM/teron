@@ -248,6 +248,7 @@
     "AddedAsBlocking": "Oznaczono jako blokujące",
 
     "IssueTemplate": "Szablon",
+    "TextTemplate": "Text template",
     "IssueTemplates": "Szablony",
     "NewProcess": "Nowy szablon",
     "SaveProcess": "Zapisz szablon",

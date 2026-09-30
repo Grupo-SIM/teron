@@ -233,6 +233,7 @@
     "AddedAsBlocked": "Marcado como bloqueado",
     "AddedAsBlocking": "Marcado como bloqueante",
     "IssueTemplate": "Plantilla",
+    "TextTemplate": "Text template",
     "IssueTemplates": "Plantillas",
     "NewProcess": "Nueva plantilla",
     "SaveProcess": "Guardar plantilla",

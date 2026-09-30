@@ -159,6 +159,7 @@ export default mergeIds(trackerId, tracker, {
     ModificationDate: '' as IntlString,
     SubIssue: '' as IntlString,
     IssueTemplate: '' as IntlString,
+    TextTemplate: '' as IntlString,
     Document: '' as IntlString,
     DocumentIcon: '' as IntlString,
     DocumentColor: '' as IntlString,

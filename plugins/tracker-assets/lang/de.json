@@ -248,6 +248,7 @@
     "AddedAsBlocking": "Als blockierend markiert",
 
     "IssueTemplate": "Vorlage",
+    "TextTemplate": "Text template",
     "IssueTemplates": "Vorlagen",
     "NewProcess": "Neue Vorlage",
     "SaveProcess": "Vorlage speichern",

@@ -7,6 +7,7 @@
   import { FilterBar, SpaceHeader, ViewletSettingButton } from '@hcengineering/view-resources'
   import tracker from '../../plugin'
   import CreateIssueTemplate from './CreateIssueTemplate.svelte'
+  import CreateTextTemplate from './CreateTextTemplate.svelte'
   import IssueTemplatesContent from './IssueTemplatesContent.svelte'
 
   export let space: Ref<Space> | undefined = undefined
@@ -36,6 +37,10 @@
   const showCreateDialog = async () => {
     showPopup(CreateIssueTemplate, { targetElement: null, space }, 'top')
   }
+
+  const showCreateTextDialog = (): void => {
+    showPopup(CreateTextTemplate, {}, 'top')
+  }
 </script>
 
 <SpaceHeader
@@ -56,6 +61,7 @@
   </svelte:fragment>
   <svelte:fragment slot="actions">
     <Button icon={IconAdd} label={tracker.string.IssueTemplate} kind={'primary'} on:click={showCreateDialog} />
+    <Button icon={IconAdd} label={tracker.string.TextTemplate} on:click={showCreateTextDialog} />
   </svelte:fragment>
 </SpaceHeader>
 <slot name="afterHeader" />

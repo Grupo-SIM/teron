@@ -233,6 +233,7 @@
         "AddedAsBlocked": "차단됨으로 표시됨",
         "AddedAsBlocking": "차단 중으로 표시됨",
         "IssueTemplate": "템플릿",
+    "TextTemplate": "Text template",
         "IssueTemplates": "템플릿",
         "NewProcess": "새 템플릿",
         "SaveProcess": "템플릿 저장",

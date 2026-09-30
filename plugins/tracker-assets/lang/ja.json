@@ -233,6 +233,7 @@
     "AddedAsBlocked": "ブロックされているとしてマーク",
     "AddedAsBlocking": "ブロックしているとしてマーク",
     "IssueTemplate": "テンプレート",
+    "TextTemplate": "Text template",
     "IssueTemplates": "テンプレート",
     "NewProcess": "新しいテンプレート",
     "SaveProcess": "テンプレートを保存",

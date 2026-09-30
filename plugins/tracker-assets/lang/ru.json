@@ -248,6 +248,7 @@
     "AddedAsBlocking": "Отмечено как блокирующее",
 
     "IssueTemplate": "Шаблон",
+    "TextTemplate": "Text template",
     "IssueTemplates": "Шаблоны",
     "NewProcess": "Новый шаблон",
     "SaveProcess": "Сохранить шаблон",

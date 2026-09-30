@@ -248,6 +248,7 @@
     "AddedAsBlocking": "Marked as blocking",
 
     "IssueTemplate": "Template",
+    "TextTemplate": "Text template",
     "IssueTemplates": "Templates",
     "NewProcess": "New template",
     "SaveProcess": "Save template",
