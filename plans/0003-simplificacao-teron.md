@@ -192,3 +192,5 @@ Recursos remanescentes do Planejador de equipes e apresentador de candidaturas r
 Build Rush dos pacotes de modelo e recursos de Calendário passou após retirada dos apresentadores de candidatura e Planejador de equipes.
 
 Atalho global “Customizar aplicativos” removido da barra lateral, encerrando acesso ao seletor avançado de visibilidade.
+
+Botões de mostrar todos os mixins retirados dos painéis de Cliente, Produto e Versão de Produto; atributos correntes seguem pelo painel comum.
