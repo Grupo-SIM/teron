@@ -162,3 +162,5 @@ Build Rush dos modelos View, Task, Contact e Tracker passou após retirada das a
 Fábrica genérica de Funcionário desregistrada: nenhum menu de criação oferece Criar funcionário; convite continua responsável pela inclusão.
 
 Rótulos residuais “Explorador de canais/mensagens” também passaram a “Pesquisar canais/mensagens” em `pt` e `pt-br`; entrada principal exibe “Pesquisar”.
+
+Catálogo `pt` alinhado aos nomes aprovados de Setores, Projetos, Externos, Clientes, Calendário e Plano; `pt-br` já usava esses nomes.
