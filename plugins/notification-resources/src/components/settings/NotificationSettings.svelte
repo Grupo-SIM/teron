@@ -13,86 +13,27 @@
 // limitations under the License.
 -->
 <script lang="ts">
-  import { onDestroy } from 'svelte'
-  import { Ref } from '@hcengineering/core'
-  import type {
-    NotificationType,
-    NotificationGroup,
-    NotificationPreferencesGroup,
-    NotificationTypeSetting
-  } from '@hcengineering/notification'
+  import type { NotificationPreferencesGroup } from '@hcengineering/notification'
   import { getResource } from '@hcengineering/platform'
   import { getClient } from '@hcengineering/presentation'
   import {
     Breadcrumb,
     defineSeparators,
-    getCurrentResolvedLocation,
     Header,
-    Loading,
-    Location,
-    navigate,
     NavItem,
-    resolvedLocationStore,
     Scroller,
     Separator,
     twoPanelsSeparators
   } from '@hcengineering/ui'
 
   import notification from '../../plugin'
-  import NotificationGroupSetting from './NotificationGroupSetting.svelte'
-  import { providersSettings, typesSettings } from '../../utils'
 
-  const client = getClient()
-  const groups: NotificationGroup[] = client.getModel().findAllSync(notification.class.NotificationGroup, {})
-  const preferencesGroups: NotificationPreferencesGroup[] = client
+  const preferencesGroups: NotificationPreferencesGroup[] = getClient()
     .getModel()
     .findAllSync(notification.class.NotificationPreferencesGroup, {})
 
-  let settings = new Map<Ref<NotificationType>, NotificationTypeSetting[]>()
+  let currentPreferenceGroup: NotificationPreferencesGroup | undefined = preferencesGroups[0]
 
-  let isProviderSettingLoading = true
-  let isTypeSettingLoading = true
-
-  $: loading = isProviderSettingLoading || isTypeSettingLoading
-
-  const unsubscribeTypeSetting = typesSettings.subscribe((res) => {
-    settings = new Map()
-    for (const value of res) {
-      const arr = settings.get(value.type) ?? []
-      arr.push(value)
-      settings.set(value.type, arr)
-    }
-    settings = settings
-    isTypeSettingLoading = false
-  })
-
-  const unsubscribeProviderSetting = providersSettings.subscribe(() => {
-    isProviderSettingLoading = false
-  })
-
-  let group: Ref<NotificationGroup> | undefined = undefined
-  let currentPreferenceGroup: NotificationPreferencesGroup | undefined = undefined
-
-  $: if (!group && !currentPreferenceGroup) {
-    if (preferencesGroups.length > 0) {
-      currentPreferenceGroup = preferencesGroups[0]
-    } else if (groups.length > 0) {
-      group = groups[0]._id
-    }
-  }
-
-  const unsubscribeLocation = resolvedLocationStore.subscribe((loc) => {
-    void (async (loc: Location): Promise<void> => {
-      group = loc.path[4] as Ref<NotificationGroup>
-      currentPreferenceGroup = undefined
-    })(loc)
-  })
-
-  onDestroy(() => {
-    unsubscribeLocation()
-    unsubscribeTypeSetting()
-    unsubscribeProviderSetting()
-  })
   defineSeparators('notificationSettings', twoPanelsSeparators)
 </script>
 
@@ -113,51 +54,19 @@
             icon={preferenceGroup.icon}
             label={preferenceGroup.label}
             selected={preferenceGroup === currentPreferenceGroup}
-            on:click={() => {
-              currentPreferenceGroup = preferenceGroup
-              group = undefined
-              const loc = getCurrentResolvedLocation()
-              loc.path.length = 4
-              navigate(loc)
-            }}
+            on:click={() => (currentPreferenceGroup = preferenceGroup)}
           />
         {/each}
-        {#if preferencesGroups.length > 0 && groups.length > 0}
-          <div class="antiNav-divider line" />
-        {/if}
-        {#each groups as gr}
-          <NavItem
-            icon={gr.icon}
-            label={gr.label}
-            selected={gr._id === group}
-            on:click={() => {
-              group = gr._id
-              currentPreferenceGroup = undefined
-              const loc = getCurrentResolvedLocation()
-              loc.path[4] = group
-              loc.path.length = 5
-              navigate(loc)
-            }}
-          />
-        {/each}
-        <div class="antiNav-space" />
       </Scroller>
     </div>
     <Separator name="notificationSettings" index={0} color={'var(--theme-divider-color)'} />
     <div class="teronComponent-content__column content">
       <Scroller align={'center'} padding={'var(--spacing-3)'} bottomPadding={'var(--spacing-3)'}>
         <div class="teronComponent-content">
-          {#if loading}
-            <Loading />
-          {:else}
-            {#if group}
-              <NotificationGroupSetting {group} {settings} />
-            {/if}
-            {#if currentPreferenceGroup}
-              {#await getResource(currentPreferenceGroup.presenter) then presenter}
-                <svelte:component this={presenter} />
-              {/await}
-            {/if}
+          {#if currentPreferenceGroup}
+            {#await getResource(currentPreferenceGroup.presenter) then presenter}
+              <svelte:component this={presenter} />
+            {/await}
           {/if}
         </div>
       </Scroller>
