@@ -33,6 +33,8 @@
 
 ## Próximo passo
 
+Mensagem de acesso somente leitura também usa Setores, encerrando os rótulos genéricos residuais de `Project` encontrados nos catálogos portugueses. Projetos ainda designa `Milestone` e módulos separados de SGQ/testes.
+
 Editor de Função e Habilidades consultava todas as referências de etiquetas da pessoa sem distinguir coleção; lista e exclusão podiam atingir atributo diferente. Consulta agora restringe `collection` ao atributo atual. Editores genéricos de etiquetas individuais e em lote também limitam busca e exclusão a `labels`; callback ignora referência removida enquanto popup está aberto. Validar dois valores e registros semelhantes em conta local.
 
 Auditoria da nomenclatura `Project` encontrou rótulos legados ainda visíveis no tipo de setor, criação de espaço de trabalho e agrupamento do Calendário. Catálogos `pt` e `pt-br` agora exibem Setor nesses contextos; Projetos de SGQ e testes mantêm sua terminologia própria.
