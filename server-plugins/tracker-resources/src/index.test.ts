@@ -10,7 +10,8 @@ describe('OnIssueUpdate', () => {
       _id: 'selected' as Ref<Issue>,
       _class: tracker.class.Issue,
       space: core.space.Model,
-      status: tracker.status.Backlog,
+      // Synchronous triggers run after the incoming transaction is persisted.
+      status: tracker.status.Done,
       createdOn: 1000,
       modifiedOn: 1000,
       trackedTimeMs: 0,

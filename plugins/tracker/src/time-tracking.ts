@@ -21,9 +21,19 @@ export function transitionIssueTime (
 ): IssueTimeState {
   if (previousStatus === nextStatus) return state
 
+  return settleIssueTime(state, nextStatus, at)
+}
+
+/** Settle an interval after persistence has already replaced the status. */
+export function settleIssueTime (
+  state: IssueTimeState,
+  nextStatus: Ref<Status>,
+  at: number
+): IssueTimeState {
+
   const trackedTimeMs =
     state.trackedTimeMs +
-    (isTimedIssueStatus(previousStatus) && state.trackingStartedOn !== null
+    (state.trackingStartedOn !== null
       ? Math.max(0, at - state.trackingStartedOn)
       : 0)
 

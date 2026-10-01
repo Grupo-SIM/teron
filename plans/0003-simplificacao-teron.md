@@ -33,6 +33,12 @@
 
 ## Próximo passo
 
+Fechamento retomado com autorização explícita para baixar imagens Docker e subir stack de teste local. Compose antigo falhou em imagens inexistentes; variante isolada usa bundles do checkout atual, PostgreSQL, Redpanda e MinIO próprios, portas em localhost e integrações externas desativadas. Duas contas descartáveis entraram no mesmo workspace por convite, como Owner e User.
+
+Regressão real encontrou erro não coberto pelo teste antigo de tempo: gatilhos consultam a tarefa depois de persistir o status, portanto comparar o status armazenado com o recebido impedia finalizar o intervalo. Gatilho agora calcula a transição pelo `trackingStartedOn` persistido. Teste do gatilho reproduz o documento pós-transação; seis testes de cálculo e um de gatilho passaram. Build dos recursos de Tracker passou. No PostgreSQL local, Finalizado acumulou uma hora, pausou contador, atualizou o resumo do pai e Revisão reabriu sem perder o acumulado.
+
+Sete grupos de regressão de backend passaram com duas contas: funções múltiplas e coleções isoladas; busca parcial sem distinguir maiúsculas; dias opcionais; agendas/eventos; desbloqueio rejeitado para User por `null` e `$unset`, permitido para Owner e Maintainer; troca do titular de escritório; exclusão da função selecionada removendo suas referências em duas pessoas sem afetar função semelhante, habilidades ou etiquetas. Conferência visual, modelos de texto e substituição de identidade continuam em execução antes de fechar marcos 2–8.
+
 Mensagem de acesso somente leitura também usa Setores, encerrando os rótulos genéricos residuais de `Project` encontrados nos catálogos portugueses. Projetos ainda designa `Milestone` e módulos separados de SGQ/testes.
 
 Editor de Função e Habilidades consultava todas as referências de etiquetas da pessoa sem distinguir coleção; lista e exclusão podiam atingir atributo diferente. Consulta agora restringe `collection` ao atributo atual. Editores genéricos de etiquetas individuais e em lote também limitam busca e exclusão a `labels`; callback ignora referência removida enquanto popup está aberto. Validar dois valores e registros semelhantes em conta local.

@@ -1,6 +1,15 @@
-import tracker, { currentChildReportedTime, currentReportedTime, issueTimeHours, transitionIssueTime } from './index'
+import tracker, { currentChildReportedTime, currentReportedTime, issueTimeHours, settleIssueTime, transitionIssueTime } from './index'
 
 describe('automatic issue time', () => {
+  it('settles persisted status changes and restarts a paused interval without recounting it', () => {
+    const paused = settleIssueTime({ trackedTimeMs: 0, trackingStartedOn: 1000 }, tracker.status.Done, 3601000)
+    expect(paused).toEqual({ trackedTimeMs: 3600000, trackingStartedOn: null })
+    expect(settleIssueTime(paused, tracker.status.Done, 7201000)).toEqual(paused)
+    expect(settleIssueTime(paused, tracker.status.UnderReview, 7201000)).toEqual({
+      trackedTimeMs: 3600000,
+      trackingStartedOn: 7201000
+    })
+  })
   it('counts pending, active and review intervals, including reopened work', () => {
     let state = { trackedTimeMs: 0, trackingStartedOn: 0 as number | null }
     state = transitionIssueTime(state, tracker.status.Backlog, tracker.status.InProgress, 3600000)

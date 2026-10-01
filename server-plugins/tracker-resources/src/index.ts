@@ -40,7 +40,7 @@ import tracker, {
   IssueParentInfo,
   isTimedIssueStatus,
   issueTimeHours,
-  transitionIssueTime,
+  settleIssueTime,
   trackerId,
   type Project
 } from '@hcengineering/tracker'
@@ -280,23 +280,22 @@ async function doIssueUpdate (updateTx: TxUpdateDoc<Issue>, control: TriggerCont
 
   if (updateTx.operations.status !== undefined) {
     const issue = await getCurrentIssue()
-    if (issue.status !== updateTx.operations.status) {
-      const next = transitionIssueTime(
-        {
-          trackedTimeMs: issue.trackedTimeMs ?? 0,
-          trackingStartedOn: issue.trackingStartedOn ?? (isTimedIssueStatus(issue.status) ? issue.createdOn : null)
-        },
-        issue.status,
-        updateTx.operations.status,
-        updateTx.modifiedOn
-      )
-      const reportedTime = issueTimeHours(next, updateTx.modifiedOn)
-      res.push(control.txFactory.createTxUpdateDoc(issue._class, issue.space, issue._id, {
-        ...next,
-        reportedTime
-      }, false, issue.modifiedOn))
-      updateIssueParentEstimations({ ...issue, ...next, reportedTime }, res, control, issue.parents, issue.parents)
-    }
+    // Trigger queries see the document after the incoming status update.
+    // The stored interval, rather than issue.status, records whether time was running.
+    const next = settleIssueTime(
+      {
+        trackedTimeMs: issue.trackedTimeMs ?? 0,
+        trackingStartedOn: issue.trackingStartedOn ?? null
+      },
+      updateTx.operations.status,
+      updateTx.modifiedOn
+    )
+    const reportedTime = issueTimeHours(next, updateTx.modifiedOn)
+    res.push(control.txFactory.createTxUpdateDoc(issue._class, issue.space, issue._id, {
+      ...next,
+      reportedTime
+    }, false, issue.modifiedOn))
+    updateIssueParentEstimations({ ...issue, ...next, reportedTime }, res, control, issue.parents, issue.parents)
   }
 
   if (Object.prototype.hasOwnProperty.call(updateTx.operations, 'attachedTo')) {
