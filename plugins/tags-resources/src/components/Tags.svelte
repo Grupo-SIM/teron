@@ -31,7 +31,7 @@
 
   $: query.query(
     tags.class.TagReference,
-    { attachedTo: object._id, attachedToClass: _class },
+    { attachedTo: object._id, attachedToClass: _class, collection: key.key },
     (result) => {
       items = result
     },

@@ -36,7 +36,7 @@
   const query = createQuery()
   const client = getClient()
 
-  $: query.query(tags.class.TagReference, { attachedTo: object._id }, (result) => {
+  $: query.query(tags.class.TagReference, { attachedTo: object._id, collection: 'labels' }, (result) => {
     items = result
   })
 

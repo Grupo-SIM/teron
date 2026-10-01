@@ -33,6 +33,8 @@
 
 ## Próximo passo
 
+Editor de Função e Habilidades consultava todas as referências de etiquetas da pessoa sem distinguir coleção; lista e exclusão podiam atingir atributo diferente. Consulta agora restringe `collection` ao atributo atual. Editores genéricos de etiquetas individuais e em lote também limitam busca e exclusão a `labels`; callback ignora referência removida enquanto popup está aberto. Validar dois valores e registros semelhantes em conta local.
+
 Auditoria da nomenclatura `Project` encontrou rótulos legados ainda visíveis no tipo de setor, criação de espaço de trabalho e agrupamento do Calendário. Catálogos `pt` e `pt-br` agora exibem Setor nesses contextos; Projetos de SGQ e testes mantêm sua terminologia própria.
 
 Regra de visibilidade do Calendário isolada e coberta por quatro testes: proprietário sem `createdBy`, evento privado/livre para outra conta, agenda ausente ou privada e evento explicitamente público.
