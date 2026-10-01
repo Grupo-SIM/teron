@@ -105,6 +105,7 @@ bundle/*
 bundle.js.map
 tests/profiles
 **/bundle/model.json
+**/bundle/simplification.cjs
 .wrangler
 dump
 **/logs/**

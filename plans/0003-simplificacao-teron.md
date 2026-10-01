@@ -33,6 +33,10 @@
 
 ## Próximo passo
 
+Encerramento desta etapa: stack descartável, preparação dos bundles e runner de regressão foram versionados em `dev/docker-compose.regression.yaml`, `dev/regression/` e `dev/tool/tests/simplification.ts`. Runner prepara workspace/Owner/User locais, repete sete grupos de regressão e deixa fixtures para conferência visual. Compose validado; scripts de preparação passaram pela verificação de sintaxe. Build web completo passou antes da correção adicional do Calendário principal, que teve build de pacotes e parser próprios aprovados. Nenhum push, deploy, migração ou seed remoto foi executado.
+
+Plano permanece aberto: privacidade visual em todas as visões, seleção de agenda na tela principal, criação/inserção de modelos de texto sem publicação, drawer/convites de escritório, substituição de e-mail por OTP e auditoria final de menus/formulários ainda exigem regressão real no navegador. Os marcos 2–8 continuam desmarcados para não apresentar essa validação como concluída.
+
 Calendário principal também foi corrigido: consulta agendas acessíveis, oferece seleção individual e mantém tratamento de privacidade existente. Seletor compartilhado com a visão genérica evita implementações divergentes. Build até `@hcengineering/time-resources` passou; os três componentes Svelte alterados passaram pelo preprocessamento/parser. Regressão visual da seleção com duas contas permanece pendente.
 
 Fechamento retomado com autorização explícita para baixar imagens Docker e subir stack de teste local. Compose antigo falhou em imagens inexistentes; variante isolada usa bundles do checkout atual, PostgreSQL, Redpanda e MinIO próprios, portas em localhost e integrações externas desativadas. Duas contas descartáveis entraram no mesmo workspace por convite, como Owner e User.

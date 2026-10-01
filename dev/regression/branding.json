@@ -1,0 +1,9 @@
+{
+  "localhost:30180": {
+    "title": "Teron",
+    "defaultLanguage": "pt-br",
+    "languages": "pt-br,pt,en",
+    "front": "http://localhost:30180",
+    "accounts": "http://localhost:30130"
+  }
+}
