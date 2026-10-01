@@ -33,6 +33,8 @@
 
 ## Próximo passo
 
+Visão do Calendário de equipe agora impede menu contextual de evento privado alheio, acompanhando o bloqueio do editor e do menu da visão comum. Exibição de horário ocupado permanece; testar com duas contas locais.
+
 Auditoria adicional do marco 2: rótulos plurais de documentos em Cartões e Conversa agora exibem Diretrizes nos catálogos `pt` e `pt-br`. Documentos controlados do SGQ permanecem com nome próprio; nomes genéricos de arquivos e documentos continuam descritivos.
 
 Marco 2 em andamento. Abas internas removidas da interface; ação Abrir em nova aba usa aba real do navegador. Migração local idempotente remove preferências das abas antigas. Termos principais de setores, projetos, contatos, diretrizes, plano e arquivos atualizados em pt-BR. Nomes padrão de salas e canal Aleatório traduzidos sem alterar IDs.

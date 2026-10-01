@@ -50,7 +50,7 @@
   $: visible = isVisible(event, $calendarByIdStore)
 
   function onContext (e: MouseEvent): void {
-    showMenu(e, { object: event })
+    if (visible) showMenu(e, { object: event })
   }
 </script>
 
