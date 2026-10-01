@@ -19,6 +19,7 @@ import { type Resources } from '@hcengineering/platform'
 import { getClient } from '@hcengineering/presentation'
 import { closePopup, showPopup } from '@hcengineering/ui'
 import CalendarView from './components/CalendarView.svelte'
+import CalendarFilter from './components/CalendarFilter.svelte'
 import CreateEvent from './components/CreateEvent.svelte'
 import DateTimePresenter from './components/DateTimePresenter.svelte'
 import DocReminder from './components/DocReminder.svelte'
@@ -55,6 +56,7 @@ import { disconnect, disconnectAll } from './api'
 export {
   EventElement,
   CalendarView,
+  CalendarFilter,
   DayCalendar,
   EventParticipants,
   EventTimeEditor,

@@ -33,6 +33,8 @@
 
 ## Próximo passo
 
+Calendário principal também foi corrigido: consulta agendas acessíveis, oferece seleção individual e mantém tratamento de privacidade existente. Seletor compartilhado com a visão genérica evita implementações divergentes. Build até `@hcengineering/time-resources` passou; os três componentes Svelte alterados passaram pelo preprocessamento/parser. Regressão visual da seleção com duas contas permanece pendente.
+
 Fechamento retomado com autorização explícita para baixar imagens Docker e subir stack de teste local. Compose antigo falhou em imagens inexistentes; variante isolada usa bundles do checkout atual, PostgreSQL, Redpanda e MinIO próprios, portas em localhost e integrações externas desativadas. Duas contas descartáveis entraram no mesmo workspace por convite, como Owner e User.
 
 Regressão real encontrou erro não coberto pelo teste antigo de tempo: gatilhos consultam a tarefa depois de persistir o status, portanto comparar o status armazenado com o recebido impedia finalizar o intervalo. Gatilho agora calcula a transição pelo `trackingStartedOn` persistido. Teste do gatilho reproduz o documento pós-transação; seis testes de cálculo e um de gatilho passaram. Build dos recursos de Tracker passou. No PostgreSQL local, Finalizado acumulou uma hora, pausou contador, atualizou o resumo do pai e Revisão reabriu sem perder o acumulado.
