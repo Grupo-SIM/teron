@@ -83,7 +83,6 @@ export default mergeIds(workbenchId, workbench, {
   },
   component: {
     SpacePanel: '' as AnyComponent,
-    Workbench: '' as AnyComponent,
-    WorkbenchTabs: '' as AnyComponent
+    Workbench: '' as AnyComponent
   }
 })
