@@ -12,4 +12,17 @@
 - Aumento entra em vigor após pagamento aprovado do valor proporcional ao tempo restante do ciclo.
 - Redução não gera crédito. Fica agendada para renovação e não pode ficar abaixo da ocupação atual.
 - Remover membro ou cancelar convite libera vaga, mas não reduz assinatura automaticamente.
-- Vaga livre continua disponível para novo convite até Owner reduzir quantidade em Billing.
+- Vaga livre continua disponível para novo convite até Owner reduzir quantidade em Plano.
+
+## Setores, projetos e tarefas
+
+- A entidade `Project` aparece para pessoas usuárias como Setor; `Milestone` aparece como Projeto. IDs e URLs legados permanecem.
+- Tarefas seguem Pendente, Em andamento, Revisão, Finalizado e Ajustes. Pendente, Em andamento e Revisão acumulam tempo corrido; Finalizado e Ajustes pausam a contagem. Reabrir tarefa inicia novo intervalo.
+- Projetos seguem Pendente, Em andamento, Concluído e Cancelado.
+- Modelos de texto inserem conteúdo no editor de comentário de tarefa sem publicar automaticamente.
+
+## Calendário, contatos e diretrizes
+
+- Evento privado ocupa horário para outras pessoas sem mostrar título, descrição, local ou participantes.
+- Contatos Externos podem ter dias remotos e presenciais opcionais por semana, cada contagem entre 0 e 7 e soma máxima de 7. Booleanos legados não inferem contagem.
+- Somente Owner e Maintainer podem desbloquear Diretrizes.

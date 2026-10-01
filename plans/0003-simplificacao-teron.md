@@ -205,6 +205,8 @@ Etapa de sincronização executada duas vezes em MongoDB descartável local: uma
 
 Sistema antigo de abas internas retirado também do runtime e do modelo: componentes, estados e ações de criar/fixar/fechar abas deixaram de ser registrados. `OpenInNewTab` mantém aba real do navegador. No desktop, Ctrl+W fecha a janela em vez de acionar a aba interna. Classe legada `WorkbenchTab` permanece só para migração. Build Rush até Desktop passou.
 
+Regras duráveis de nomenclatura, status, tempo, privacidade, dias de trabalho e desbloqueio registradas em `docs/business-rules.md`; histórico de execução permanece neste plano.
+
 Tela Modelos agora alterna entre modelos de tarefa e modelos de texto. A lista de texto consulta `MessageTemplate`, permite pesquisar, selecionar e visualizar conteúdo, inclusive após criação. Build Rush de Tracker UI e parser/preprocessamento dos dois componentes passaram; falta validar inserção do modelo no editor real com conta local.
 
 Na aba de modelos de texto, opções de visualização específicas de tarefas ficam ocultas; seleção, pesquisa e criação dos textos permanecem disponíveis.
