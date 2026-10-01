@@ -33,6 +33,12 @@
 
 ## Próximo passo
 
+Regra de visibilidade do Calendário isolada e coberta por quatro testes: proprietário sem `createdBy`, evento privado/livre para outra conta, agenda ausente ou privada e evento explicitamente público.
+
+Eventos próprios antigos sem `createdBy` agora mostram detalhes ao titular, alinhando `isVisible` ao tratamento de eventos próprios no filtro do Calendário; permissão de edição continua independente. Regressão em conta local pendente.
+
+Privacidade do Calendário também passa a ocultar detalhes enquanto a agenda do evento ainda não foi carregada ou não está acessível. Eventos explicitamente públicos e eventos próprios seguem visíveis. Validar com duas contas locais.
+
 Visão do Calendário de equipe agora impede menu contextual de evento privado alheio, acompanhando o bloqueio do editor e do menu da visão comum. Exibição de horário ocupado permanece; testar com duas contas locais.
 
 Auditoria adicional do marco 2: rótulos plurais de documentos em Cartões e Conversa agora exibem Diretrizes nos catálogos `pt` e `pt-br`. Documentos controlados do SGQ permanecem com nome próprio; nomes genéricos de arquivos e documentos continuam descritivos.

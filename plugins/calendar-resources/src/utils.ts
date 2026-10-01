@@ -26,6 +26,7 @@ import login from '@hcengineering/login'
 import { getClient as getAccountClientRaw, type AccountClient } from '@hcengineering/account-client'
 import { EmptyMarkup } from '@hcengineering/text'
 import CalDavAccess from './components/CalDavAccess.svelte'
+import { canViewEventDetails } from './event-visibility'
 
 export function saveUTC (date: Timestamp): Timestamp {
   const utcdate = new Date(date)
@@ -64,18 +65,7 @@ export function isReadOnly (value: Event): boolean {
 }
 
 export function isVisible (value: Event, calendars: IdMap<Calendar>): boolean {
-  if (value.createdBy !== undefined && getCurrentAccount().socialIds.includes(value.user)) return true
-  if (value.visibility === 'freeBusy' || value.visibility === 'private') {
-    return false
-  } else if (value.visibility === 'public') {
-    return true
-  }
-  const calendar = calendars.get(value.calendar)
-  if (calendar == null) {
-    return true
-  } else {
-    return calendar.visibility === 'public'
-  }
+  return canViewEventDetails(value, calendars, getCurrentAccount().socialIds)
 }
 
 export const calendarByIdStore = writable<IdMap<Calendar>>(new Map())
