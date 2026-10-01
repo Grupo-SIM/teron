@@ -79,7 +79,7 @@
     "MessageNotificationBody": "{senderName}: {message}",
     "AddCommentPlaceholder": "Adicionar comentário...",
     "Reacted": "Reagiu",
-    "Docs": "Documentos",
+    "Docs": "Diretrizes",
     "NewestFirst": "Mais recentes primeiro",
     "ReplyToThread": "Responder à conversa",
     "SentMessage": "Mensagem enviada",
