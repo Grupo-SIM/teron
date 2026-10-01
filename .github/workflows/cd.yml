@@ -12,7 +12,7 @@ concurrency:
 
 env:
   DOCKER_BACKEND_CONTEXT_IMAGE: docker.io/jbmidia/teron_workspace:backend-build-context
-  DOCKER_FRONT_BUILD_CACHE_IMAGE: docker.io/jbmidia/teron_workspace:front-build-cache
+  DOCKER_FRONT_BUILD_CACHE_IMAGE: docker.io/jbmidia/teron_workspace:front-build-cache-v2
   DOCKER_FRONT_CONTEXT_IMAGE: docker.io/jbmidia/teron_workspace:front-build-context
   INIT_SCRIPTS_BRANCH: main
 
@@ -294,9 +294,10 @@ jobs:
           fi
 
           cache_container=$(docker create "$DOCKER_FRONT_BUILD_CACHE_IMAGE")
-          trap 'docker rm -f "$cache_container"' EXIT
-          docker cp "$cache_container:/cache/common/temp/build-cache" common/temp/build-cache
-          docker cp "$cache_container:/cache/dev/prod/.build_dev" dev/prod/.build_dev
+          cache_archive=$(mktemp)
+          trap 'rm -f "$cache_archive"; docker rm -f "$cache_container"; docker image rm "$DOCKER_FRONT_BUILD_CACHE_IMAGE"' EXIT
+          docker cp "$cache_container:/cache.tar.gz" "$cache_archive"
+          tar -xzf "$cache_archive"
 
       - name: Set model version
         run: node common/scripts/install-run-rush.js model-version
@@ -327,15 +328,17 @@ jobs:
 
       - name: Push persistent frontend build cache
         run: |
-          mkdir -p .ci/front-build-cache/common/temp .ci/front-build-cache/dev/prod
-          cp -a common/temp/build-cache .ci/front-build-cache/common/temp/
-          cp -a dev/prod/.build_dev .ci/front-build-cache/dev/prod/
+          mkdir -p .ci/front-build-cache
+          trap 'rm -rf .ci/front-build-cache' EXIT
+          tar -czf .ci/front-build-cache/cache.tar.gz common/temp/build-cache dev/prod/.build_dev
 
           docker build --tag "$DOCKER_FRONT_BUILD_CACHE_IMAGE" --file - .ci/front-build-cache <<'DOCKERFILE'
-          FROM alpine:3.21
-          COPY . /cache
+          FROM scratch
+          COPY cache.tar.gz /cache.tar.gz
+          CMD ["/unused"]
           DOCKERFILE
           docker push "$DOCKER_FRONT_BUILD_CACHE_IMAGE"
+          docker image rm "$DOCKER_FRONT_BUILD_CACHE_IMAGE"
 
       - name: Stage frontend Docker context files
         run: |
