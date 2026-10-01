@@ -2,7 +2,7 @@
   "string": {
     "OnboardingChannelDescription": "User: {user}; Workspace: {workspace}",
     "Error": "Error: ",
-    "InProject": " in project ",
+    "InProject": " no setor ",
     "NavigateToSpecial": "{app}: open {special}",
     "OpenSpecial": "open {special} ",
     "Set": "Set ",

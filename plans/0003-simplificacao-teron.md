@@ -33,6 +33,8 @@
 
 ## Próximo passo
 
+Auditoria da nomenclatura `Project` encontrou rótulos legados ainda visíveis no tipo de setor, criação de espaço de trabalho e agrupamento do Calendário. Catálogos `pt` e `pt-br` agora exibem Setor nesses contextos; Projetos de SGQ e testes mantêm sua terminologia própria.
+
 Regra de visibilidade do Calendário isolada e coberta por quatro testes: proprietário sem `createdBy`, evento privado/livre para outra conta, agenda ausente ou privada e evento explicitamente público.
 
 Eventos próprios antigos sem `createdBy` agora mostram detalhes ao titular, alinhando `isVisible` ao tratamento de eventos próprios no filtro do Calendário; permissão de edição continua independente. Regressão em conta local pendente.
