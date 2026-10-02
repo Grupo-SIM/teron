@@ -13,7 +13,8 @@
 // limitations under the License.
 //
 
-import textEditor from '../plugin'
+import textEditor from '@hcengineering/text-editor'
+import textEditorResources from '../plugin'
 import { translate } from '@hcengineering/platform'
 import { themeStore } from '@hcengineering/theme'
 import { IconScribble } from '@hcengineering/ui'
@@ -29,70 +30,70 @@ import { SvelteRenderer } from './node-view'
 export const mInsertTable = [
   {
     id: '2x2',
-    label: textEditor.string.Table2x2,
+    label: textEditorResources.string.Table2x2,
     rows: 2,
     cols: 2,
     header: false
   },
   {
     id: '3x3',
-    label: textEditor.string.Table3x3,
+    label: textEditorResources.string.Table3x3,
     rows: 3,
     cols: 3,
     header: false
   },
   {
     id: '2x1',
-    label: textEditor.string.Table2x1,
+    label: textEditorResources.string.Table2x1,
     rows: 2,
     cols: 1,
     header: false
   },
   {
     id: '5x5',
-    label: textEditor.string.Table5x5,
+    label: textEditorResources.string.Table5x5,
     rows: 5,
     cols: 5,
     header: false
   },
   {
     id: '1x2',
-    label: textEditor.string.Table1x2,
+    label: textEditorResources.string.Table1x2,
     rows: 1,
     cols: 2,
     header: false
   },
   {
     id: 'headed-2x2',
-    label: textEditor.string.HeadedTable2x2,
+    label: textEditorResources.string.HeadedTable2x2,
     rows: 2,
     cols: 2,
     header: true
   },
   {
     id: 'headed-3x3',
-    label: textEditor.string.HeadedTable3x3,
+    label: textEditorResources.string.HeadedTable3x3,
     rows: 3,
     cols: 3,
     header: true
   },
   {
     id: 'headed-2x1',
-    label: textEditor.string.HeadedTable2x1,
+    label: textEditorResources.string.HeadedTable2x1,
     rows: 2,
     cols: 1,
     header: true
   },
   {
     id: 'headed-5x5',
-    label: textEditor.string.HeadedTable5x5,
+    label: textEditorResources.string.HeadedTable5x5,
     rows: 5,
     cols: 5,
     header: true
   },
   {
     id: 'headed-1x2',
-    label: textEditor.string.HeadedTable1x2,
+    label: textEditorResources.string.HeadedTable1x2,
     rows: 1,
     cols: 2,
     header: true
