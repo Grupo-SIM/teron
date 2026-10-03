@@ -1,5 +1,6 @@
 {
   "string": {
+    "LegacyReadOnlyMembers": "Contas legadas somente leitura aguardam conversão para User: {count}. Conversão exige vagas disponíveis.",
     "Setting": "Configuração",
     "Spaces": "Espaços",
     "Integrations": "Integrações",

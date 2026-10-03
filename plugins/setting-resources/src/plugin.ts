@@ -34,6 +34,7 @@ export default mergeIds(settingId, setting, {
     GuestPermissionsSettings: '' as AnyComponent
   },
   string: {
+    LegacyReadOnlyMembers: '' as IntlString,
     IntegrationDisabled: '' as IntlString,
     IntegrationDisabledSetting: '' as IntlString,
     IntegrationDisabledDescr: '' as IntlString,

@@ -1,5 +1,6 @@
 {
   "string": {
+    "LegacyReadOnlyMembers": "Legacy read-only members await conversion to User: {count}. Available seats are required.",
     "Setting": "Настройки",
     "Spaces": "Пространства",
     "Integrations": "Интеграции",

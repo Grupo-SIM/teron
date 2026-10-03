@@ -36,7 +36,6 @@
   const accountClient = getAccountClient()
 
   const items: DropdownIntlItem[] = [
-    { id: AccountRole.ReadOnlyGuest, label: setting.string.ReadonlyGuest },
     { id: AccountRole.User, label: setting.string.User },
     { id: AccountRole.Maintainer, label: setting.string.Maintainer },
     { id: AccountRole.Owner, label: setting.string.Owner }
@@ -131,6 +130,7 @@
     return items.filter((item) => item.id === role || hasAccountRole(account, item.id as AccountRole))
   }
 
+  $: legacyMembers = Object.values(workspaceMembers).filter((role) => role === AccountRole.ReadOnlyGuest).length
   $: ownersCount = Object.values(workspaceMembers).filter((role) => role === AccountRole.Owner).length
   $: usedSeats = (entitlement?.memberSeats ?? 0) + (entitlement?.pendingInviteSeats ?? 0)
   $: availableSeats = entitlement?.availableSeats
@@ -171,6 +171,9 @@
             {/if}
           {/if}
 
+          {#if currentAccount.role === AccountRole.Owner && legacyMembers > 0}
+            <div class="seat-alert"><Label label={setting.string.LegacyReadOnlyMembers} params={{ count: legacyMembers }} /></div>
+          {/if}
           <div class="section-title"><Label label={setting.string.ActiveMembers} /></div>
           {#each employees as employee (employee._id)}
             {@const personUuid = employee.personUuid ?? undefined}

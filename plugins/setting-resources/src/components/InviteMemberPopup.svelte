@@ -15,7 +15,6 @@
   const accountClient = getAccountClient()
   const dispatch = createEventDispatcher()
   const roles: DropdownIntlItem[] = [
-    { id: AccountRole.ReadOnlyGuest, label: setting.string.ReadonlyGuest },
     { id: AccountRole.User, label: setting.string.User },
     { id: AccountRole.Maintainer, label: setting.string.Maintainer }
   ]
