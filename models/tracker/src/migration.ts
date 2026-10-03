@@ -648,8 +648,9 @@ export const trackerOperation: MigrateOperation = {
               if (batch === null || batch.length === 0) break
               for (const item of batch) {
                 await client.update(DOMAIN_TRACKER, { _id: item._id }, {
-                  assignees: getTaskAssignees(item), children: item.children.map(normalize), $unset: { assignee: true }
+                  assignees: getTaskAssignees(item), children: (item.children ?? []).map(normalize)
                 })
+                await client.update(DOMAIN_TRACKER, { _id: item._id }, { $unset: { assignee: true } })
               }
             }
           } finally {

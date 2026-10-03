@@ -529,7 +529,8 @@ export const taskOperation: MigrateOperation = {
                 const batch = await tasks.next(500)
                 if (batch === null || batch.length === 0) break
                 for (const item of batch) {
-                  await client.update(domain, { _id: item._id }, { assignees: getTaskAssignees(item), $unset: { assignee: true } })
+                  await client.update(domain, { _id: item._id }, { assignees: getTaskAssignees(item) })
+                  await client.update(domain, { _id: item._id }, { $unset: { assignee: true } })
                 }
               }
             } finally {

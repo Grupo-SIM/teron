@@ -60,10 +60,20 @@ async function main (): Promise<void> {
     }
     const docId: any = 'regression-grant-document'
     if (await owner.findOne(document.class.Document, { _id: docId }) === undefined) await owner.createDoc(document.class.Document, spaceId, { title: 'Documento herdado', content: null, parent: document.ids.NoParent, rank: '0|hzzzzz:' }, docId)
+    const collaborativeName = [state.ws.workspace, document.class.Document, docId, 'content'].join('|')
+    async function collaborativeRpc (token: string, method: string, payload: any): Promise<Response> {
+      return await fetch(`http://localhost:30178/rpc/${encodeURIComponent(collaborativeName)}`, {
+        method: 'POST', headers: { Authorization: `Bearer ${token}`, 'Content-Type': 'application/json' },
+        body: JSON.stringify({ method, payload }), signal: AbortSignal.timeout(30000)
+      })
+    }
     assert.ok(await user.findOne(document.class.Document, { _id: docId }))
+    assert.equal((await collaborativeRpc(state.userWs.token, 'getContent', {})).status, 200)
+    assert.equal((await collaborativeRpc(state.userWs.token, 'updateContent', { content: { content: '<p>Leitor não escreve</p>' } })).status, 500)
     await assert.rejects(user.updateDoc(document.class.Document, spaceId, docId, { title: 'Leitor não edita' }))
     await owner.updateDoc(document.class.Teamspace, core.space.Space, spaceId, { guidelineEditors: [state.user.account] })
     await user.updateDoc(document.class.Document, spaceId, docId, { title: 'Editor edita' })
+    assert.equal((await collaborativeRpc(state.userWs.token, 'updateContent', { content: { content: '<p>Editor autorizado</p>' } })).status, 200)
     await assert.rejects(user.removeDoc(document.class.Document, spaceId, docId))
     await assert.rejects(user.updateDoc(document.class.Teamspace, core.space.Space, spaceId, { guidelineEditors: [] }))
     await owner.updateDoc(document.class.Teamspace, core.space.Space, spaceId, { guidelineReaders: [], guidelineEditors: [], guidelineEditorSectors: [sector._id] })
@@ -72,12 +82,15 @@ async function main (): Promise<void> {
       await user.updateDoc(document.class.Document, spaceId, docId, { title: 'Editor por setor' })
       await owner.updateDoc(tracker.class.Project, core.space.Space, sector._id, { members: [state.owner.account] })
       assert.equal(await user.findOne(document.class.Document, { _id: docId }), undefined)
+      assert.equal((await collaborativeRpc(state.userWs.token, 'getContent', {})).status, 500)
+      assert.equal((await collaborativeRpc(state.userWs.token, 'updateContent', { content: { content: '<p>Revogado</p>' } })).status, 500)
       await assert.rejects(user.updateDoc(document.class.Document, spaceId, docId, { title: 'Acesso revogado' }))
     } finally {
       await owner.updateDoc(tracker.class.Project, core.space.Space, sector._id, { members: originalMembers })
       await owner.updateDoc(document.class.Teamspace, core.space.Space, spaceId, { guidelineReaders: [state.user.account], guidelineEditorSectors: [] })
     }
     passed.push('inherited individual/sector grants, editor precedence, deletion denial and sector exit revocation')
+    passed.push('collaborative RPC reader/editor enforcement and revocation')
 
     const issueId: any = 'regression-parent-issue'
     const issue = await owner.findOne(tracker.class.Issue, { _id: issueId })
