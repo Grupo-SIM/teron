@@ -62,7 +62,17 @@
     <AttributesBar {object} _class={object._class} keys={['status']} showHeader={false} readonly={statusReadonly} />
   </div>
 {:else}
-  <DocAttributeBar {object} {ignoreKeys} {mixins} {allowedCollections} readonly={readonly || !administrator} on:update />
+  <DocAttributeBar
+    {object}
+    ignoreKeys={administrator ? ignoreKeys : [...ignoreKeys, 'status']}
+    {mixins}
+    {allowedCollections}
+    readonly={readonly || !administrator}
+    on:update
+  />
+  {#if !administrator && !ignoreKeys.includes('status')}
+    <AttributesBar {object} _class={object._class} keys={['status']} readonly={statusReadonly} />
+  {/if}
 {/if}
 
 <style lang="scss">

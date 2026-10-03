@@ -221,7 +221,7 @@ async function main (): Promise<void> {
     const issueId: any = 'regression-parent-issue'
     const issue = await owner.findOne(tracker.class.Issue, { _id: issueId })
     assert.ok(issue)
-    await owner.updateDoc(tracker.class.Issue, issue.space, issueId, { assignees: [ownerIdentity.attachedTo, userIdentity.attachedTo, userIdentity.attachedTo] })
+    await owner.updateDoc(tracker.class.Issue, issue.space, issueId, { status: tracker.status.InProgress, assignees: [ownerIdentity.attachedTo, userIdentity.attachedTo, userIdentity.attachedTo] })
     const assigned: any = await owner.findOne(tracker.class.Issue, { _id: issueId })
     assert.deepEqual(assigned.assignees, [ownerIdentity.attachedTo, userIdentity.attachedTo])
     assert.equal(Object.hasOwn(assigned, 'assignee'), false)
@@ -243,7 +243,12 @@ async function main (): Promise<void> {
     assert.ok(collaborators.some((row) => row.collaborator === state.user.account))
     assert.equal(collaborators.filter((row) => row.collaborator === state.user.account).length, 1)
     assert.equal(collaborators.filter((row) => row.collaborator === state.owner.account).length, 1)
-    const todos: any[] = await owner.findAll('time:class:ToDo' as any, { attachedTo: issueId, doneOn: null } as any)
+    let todos: any[] = []
+    for (let attempt = 0; attempt < 100; attempt++) {
+      todos = await owner.findAll('time:class:ToDo' as any, { attachedTo: issueId, doneOn: null } as any)
+      if (todos.length === 2) break
+      await new Promise((resolve) => setTimeout(resolve, 100))
+    }
     assert.deepEqual(todos.map((todo) => todo.user).sort(), [ownerIdentity.attachedTo, userIdentity.attachedTo].sort())
     passed.push('batch atomic authorization, protected contacts and deduplicated notification collaborators/personal agendas')
     passed.push('multiple/zero assignees, deduplication, canonical writes and assigned-only status changes')
