@@ -30,7 +30,7 @@
   import { Document, DocumentEvents, Teamspace } from '@hcengineering/document'
   import notification from '@hcengineering/notification'
   import { Panel } from '@hcengineering/panel'
-  import { getResource, setPlatformStatus, unknownError } from '@hcengineering/platform'
+  import { getResource, setPlatformStatus, translate, unknownError } from '@hcengineering/platform'
   import {
     ComponentExtensions,
     IconWithEmoji,
@@ -45,6 +45,10 @@
 
   import {
     Button,
+    IconDelete,
+    addNotification,
+    NotificationSeverity,
+    NotificationToast,
     ButtonItem,
     Component,
     FocusHandler,
@@ -176,6 +180,12 @@
     if (nameTrimmed.length > 0 && nameTrimmed !== doc.title) {
       await client.update(doc, { title: nameTrimmed })
     }
+  }
+
+  async function removeIcon (): Promise<void> {
+    if (doc === undefined || effectiveReadonly) return
+    await client.update(doc, { $unset: { icon: true, color: true } })
+    addNotification(await translate(document.string.CustomIconRemoved, {}, $themeStore.language), '', NotificationToast, undefined, NotificationSeverity.Info)
   }
 
   async function chooseIcon (): Promise<void> {
@@ -369,6 +379,9 @@
             showTooltip={{ label: document.string.Icon, direction: 'bottom' }}
             on:click={chooseIcon}
           />
+          {#if !effectiveReadonly && (doc.icon !== undefined || doc.color !== undefined)}
+            <Button icon={IconDelete} kind="secondary" size="small" showTooltip={{ label: document.string.RemoveCustomIcon }} on:click={removeIcon} />
+          {/if}
         </div>
 
         <DocumentTitle

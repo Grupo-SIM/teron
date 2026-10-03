@@ -33,6 +33,8 @@ export default mergeIds(documentId, document, {
     ParseDocumentId: '' as Resource<(id: string) => Promise<Ref<Document> | undefined>>
   },
   string: {
+    RemoveCustomIcon: '' as IntlString,
+    CustomIconRemoved: '' as IntlString,
     DocumentNamePlaceholder: '' as IntlString,
     Name: '' as IntlString,
     Cancel: '' as IntlString,

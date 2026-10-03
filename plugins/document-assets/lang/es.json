@@ -1,5 +1,7 @@
 {
   "string": {
+    "RemoveCustomIcon": "Remove custom icon",
+    "CustomIconRemoved": "Default icon restored",
     "Document": "Documento",
     "DeleteDocumentConfirm": "Delete {count, plural, =1 {this document} other {these # documents}}?",
     "ParentDocument": "Documento superior",
