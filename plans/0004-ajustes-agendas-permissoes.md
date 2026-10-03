@@ -77,3 +77,5 @@ Contatos: navegação e títulos usam chaves plurais existentes (Funcionários, 
 Navegador ampliado: eventos de dia inteiro e atravessando meia-noite passaram, incluindo recorte 00:00–01:00; token de fundo de troca de andar passou em CSS claro/escuro. Captura com foto detectou wrappers internos ainda limitando avatar: correção expande apresentador/link/contêiner, mantendo máscara e cover. Teste mede largura/altura da imagem contra célula inteira, evitando falso positivo por contêiner interno pequeno. Verificação final dessa correção em andamento.
 
 Foto validada no navegador: largura e altura iguais à célula inteira, cover e máscara preservados; nova captura confirma preenchimento do squircle. Build web com correção passou nas duas configurações.
+
+Reabertura com status/responsáveis combinados reproduziu quatro itens pessoais ativos para duas pessoas no backend anterior. Gatilho agora reconcilia uma vez pelo caminho de status; mesmo teste passou com exatamente dois itens, junto aos sete grupos específicos completos. Bundle servidor atualizado passou; runner encerrou normalmente.

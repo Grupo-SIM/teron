@@ -733,7 +733,7 @@ async function updateIssueHandler (tx: TxUpdateDoc<Issue>, control: TriggerContr
   if (project === undefined) return []
   const type = (await control.modelDb.findAll(task.class.ProjectType, { _id: project.type }))[0]
   if (!type?.classic) return []
-  if (['assignee', 'assignees'].some((key) => Object.prototype.hasOwnProperty.call(tx.operations, key) || ['$push', '$pull', '$unset'].some((op) => Object.prototype.hasOwnProperty.call((tx.operations as any)[op] ?? {}, key)))) {
+  if (tx.operations.status === undefined && ['assignee', 'assignees'].some((key) => Object.prototype.hasOwnProperty.call(tx.operations, key) || ['$push', '$pull', '$unset'].some((op) => Object.prototype.hasOwnProperty.call((tx.operations as any)[op] ?? {}, key)))) {
     res.push(...(await changeIssueAssigneeHandler(control, tx.objectId)))
   }
   const newStatus = tx.operations.status
