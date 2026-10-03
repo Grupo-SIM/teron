@@ -24,3 +24,5 @@ docker compose -f dev/docker-compose.regression.yaml down --volumes
 ```
 
 Após encerrar, apagar também os dois arquivos temporários de estado/resultados mencionados acima.
+
+Busca global literal (plano 0004): `node dev/regression/elastic.mjs` usa Elasticsearch 7.14.2 e imagem base já instalados, em rede interna descartável. Não baixa imagens. Valida início/meio/fim, caixa/acentos, símbolos literais, espaço autorizado, paginação e reconstrução repetida do campo `literalSearch` sem alterar conteúdo original. Contêineres, volumes, rede e bundle temporário são removidos ao terminar. Reconstrução explícita usa `ElasticAdapter.rebuildLiteralSearch()`; não é executada automaticamente na inicialização ou em serviços externos.

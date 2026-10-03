@@ -14,6 +14,7 @@
 // limitations under the License.
 //
 
+import { literalSearchQuery, literalSearchValues } from './literal-search'
 import { Analytics } from '@hcengineering/analytics'
 import {
   Class,
@@ -44,6 +45,7 @@ function getIndexVersion (): string {
 
 const mappings = {
   properties: {
+    literalSearch: { type: 'wildcard' },
     fulltextSummary: {
       type: 'text',
       analyzer: 'rebuilt_english'
@@ -102,7 +104,7 @@ const mappings = {
   }
 }
 
-class ElasticAdapter implements FullTextAdapter {
+export class ElasticAdapter implements FullTextAdapter {
   private readonly getFulltextDocId: (workspaceId: WorkspaceUuid, doc: Ref<Doc>) => Ref<Doc>
   private readonly getDocId: (workspaceId: WorkspaceUuid, fulltext: Ref<Doc>) => Ref<Doc>
   private readonly indexName: string
@@ -122,7 +124,9 @@ class ElasticAdapter implements FullTextAdapter {
     try {
       const existingVersions = await ctx.withSync('get-indexes', {}, () =>
         this.client.indices.get({
-          index: [`${this.indexBaseName}_*`]
+          index: [`${this.indexBaseName}_*`],
+          allow_no_indices: true,
+          ignore_unavailable: true
         })
       )
       const allIndexes = Object.keys(existingVersions.body)
@@ -136,6 +140,7 @@ class ElasticAdapter implements FullTextAdapter {
           })
         )
         for (const [propName, propType] of Object.entries(mappings.properties)) {
+          if (propName === 'literalSearch' && mapping.body[indexName]?.mappings.properties?.[propName] === undefined) continue
           if (mapping.body[indexName]?.mappings.properties?.[propName]?.type !== propType.type) {
             shouldDropExistingIndex = true
             break
@@ -198,6 +203,35 @@ class ElasticAdapter implements FullTextAdapter {
     return true
   }
 
+  /** Add normalized content to existing records without deleting indexes or changing original fields. */
+  async rebuildLiteralSearch (): Promise<number> {
+    let count = 0
+    let scrollId: string | undefined
+    try {
+      let response = await this.client.search({
+        index: this.indexName, scroll: '2m', size: 500,
+        body: { query: { bool: { must_not: [{ exists: { field: 'literalSearch' } }] } } }
+      })
+      while (true) {
+        scrollId = response.body._scroll_id
+        const hits = response.body.hits.hits
+        if (hits.length === 0) break
+        const body = hits.flatMap((hit: any) => [
+          { update: { _index: this.indexName, _id: hit._id } },
+          { doc: { literalSearch: literalSearchValues(hit._source) } }
+        ])
+        const updated = await this.client.bulk({ refresh: true, body })
+        if (updated.body.errors === true) throw new Error('Failed to rebuild normalized search records.')
+        count += hits.length
+        if (scrollId === undefined) break
+        response = await this.client.scroll({ scroll_id: scrollId, scroll: '2m' })
+      }
+      return count
+    } finally {
+      if (scrollId !== undefined) await this.client.clearScroll({ scroll_id: scrollId })
+    }
+  }
+
   async close (): Promise<void> {
     await this.client.close()
   }
@@ -215,19 +249,7 @@ class ElasticAdapter implements FullTextAdapter {
             query: {
               bool: {
                 must: [
-                  {
-                    simple_query_string: {
-                      query: query.query,
-                      analyze_wildcard: true,
-                      flags: 'OR|PREFIX|PHRASE|FUZZY|NOT|ESCAPE',
-                      default_operator: 'and',
-                      fields: [
-                        'searchTitle^50', // boost
-                        'searchShortTitle^50',
-                        '*' // Search in all other fields without a boost
-                      ]
-                    }
-                  },
+                  literalSearchQuery(query.query),
                   {
                     term: {
                       workspaceId
@@ -317,14 +339,7 @@ class ElasticAdapter implements FullTextAdapter {
     const request: any = {
       bool: {
         must: [
-          {
-            simple_query_string: {
-              query: query.$search,
-              analyze_wildcard: true,
-              flags: 'OR|PREFIX|PHRASE|FUZZY|NOT|ESCAPE',
-              default_operator: 'and'
-            }
-          },
+          literalSearchQuery(query.$search),
           {
             term: {
               workspaceId
@@ -350,7 +365,7 @@ class ElasticAdapter implements FullTextAdapter {
         const field = Object.hasOwn(mappings.properties, q) ? q : `${q}.keyword`
         if (typeof v === 'object') {
           if (v.$in !== undefined) {
-            request.bool.should.push({
+            request.bool.filter.push({
               terms: {
                 [field]: v.$in,
                 boost: 100.0
@@ -358,7 +373,7 @@ class ElasticAdapter implements FullTextAdapter {
             })
           }
         } else {
-          request.bool.should.push({
+          request.bool.filter.push({
             term: {
               [field]: {
                 value: v,
@@ -414,7 +429,8 @@ class ElasticAdapter implements FullTextAdapter {
   async index (ctx: MeasureContext, workspaceId: WorkspaceUuid, doc: IndexedDoc): Promise<TxResult> {
     const wsDoc = {
       workspaceId,
-      ...doc
+      ...doc,
+      literalSearch: literalSearchValues(doc)
     }
     const fulltextId = this.getFulltextDocId(workspaceId, doc.id)
     if (doc.data === undefined) {
@@ -432,6 +448,7 @@ class ElasticAdapter implements FullTextAdapter {
         pipeline: 'attachment',
         body: wsDoc
       })
+      await this.update(ctx, workspaceId, doc.id, {})
     }
     return {}
   }
@@ -442,6 +459,8 @@ class ElasticAdapter implements FullTextAdapter {
     id: Ref<Doc>,
     update: Record<string, any>
   ): Promise<TxResult> {
+    const current = await this.client.get({ index: this.indexName, id: this.getFulltextDocId(workspaceId, id) })
+    update = { ...update, literalSearch: literalSearchValues({ ...(current.body._source as Record<string, unknown>), ...update }) }
     await this.client.update({
       index: this.indexName,
       id: this.getFulltextDocId(workspaceId, id),
@@ -459,7 +478,7 @@ class ElasticAdapter implements FullTextAdapter {
       const part = parts.splice(0, 500)
 
       const operations = part.flatMap((doc) => {
-        const wsDoc = { workspaceId, ...doc }
+        const wsDoc = { workspaceId, ...doc, literalSearch: literalSearchValues(doc) }
         return [
           { index: { _index: this.indexName, _id: this.getFulltextDocId(workspaceId, doc.id) } },
           { ...wsDoc, type: '_doc' }
