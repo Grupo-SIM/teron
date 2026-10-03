@@ -1955,6 +1955,9 @@ importers:
       '@hcengineering/document':
         specifier: workspace:^0.7.426
         version: link:../../plugins/document
+      '@hcengineering/drive':
+        specifier: workspace:^0.7.426
+        version: link:../../plugins/drive
       '@hcengineering/elastic':
         specifier: workspace:^0.7.426
         version: link:../../foundations/server/packages/elastic
