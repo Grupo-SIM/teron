@@ -21,3 +21,7 @@ Arquitetura Svelte/Rush existente. Migrações idempotentes preparadas e executa
 ## Progresso
 
 Execução iniciada: checkout limpo; plano 0003 e regras comerciais lidos. Checkout não possui hook `pre-commit` instalado nem configuração Lefthook; commits normais serão usados sem bypass. Verificação funcional local será registrada por etapa.
+
+Calendário: painel de tarefas substituído por eventos, modos migrados para `mine`/`team`, seleção compartilhada entre lista e grade. Colaboradores consultados no workspace inteiro; suas identidades determinam agendas sem restringir por setor. Agenda selecionada é descartada quando sai do conjunto permitido. Eventos recorrentes e eventos que cruzam meia-noite usam expansão existente; intervalo do dia exclui eventos terminados no início ou iniciados no fim. Painel protege detalhes/ações de eventos privados. Traduções adicionadas nos 14 catálogos. Três testes de seleção/preferência/intervalo e parser de cinco componentes passaram. Build e regressão com duas contas ainda pendentes; marco permanece aberto.
+
+Build Rush até `@hcengineering/time-resources` passou. Testes adicionais cobrem eventos de dia inteiro, sobreposição, ordenação, fronteiras exclusivas e privacidade (sete casos). Expansão oferece opção sem recorte para editar evento com datas originais; lista recorta apenas horário mostrado. Conferência visual continua pendente.

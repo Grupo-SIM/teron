@@ -1,106 +1,59 @@
-<!--
-// Copyright © 2024 Hardcore Engineering Inc.
-//
-// Licensed under the Eclipse Public License, Version 2.0 (the "License");
-// you may not use this file except in compliance with the License. You may
-// obtain a copy of the License at https://www.eclipse.org/legal/epl-2.0
-//
-// Unless required by applicable law or agreed to in writing, software
-// distributed under the License is distributed on an "AS IS" BASIS,
-// WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-//
-// See the License for the specific language governing permissions and
-// limitations under the License.
--->
-
 <script lang="ts">
-  import { createEventDispatcher, afterUpdate, onDestroy } from 'svelte'
-  import calendar, { AccessLevel, Calendar, generateEventId, getPrimaryCalendar } from '@hcengineering/calendar'
-  import { getCurrentEmployee } from '@hcengineering/contact'
+  import { afterUpdate, onDestroy, createEventDispatcher } from 'svelte'
+  import { CalendarFilter, visibleCalendarStore } from '@hcengineering/calendar-resources'
+  import contact, { Person, SocialIdentity } from '@hcengineering/contact'
+  import { AssigneeBox } from '@hcengineering/contact-resources'
   import { Ref, getCurrentAccount } from '@hcengineering/core'
-  import { getClient } from '@hcengineering/presentation'
-  import { TagElement } from '@hcengineering/tags'
+  import { createQuery } from '@hcengineering/presentation'
   import { Separator, defineSeparators, deviceOptionsStore as deviceInfo } from '@hcengineering/ui'
-  import { ToDosMode } from '..'
+  import { AgendaMode, migrateAgendaMode, selectAgendaCalendars } from '../agenda'
+  import { timeSeparators } from '../utils'
+  import DayAgenda from './DayAgenda.svelte'
   import PlanningCalendar from './PlanningCalendar.svelte'
   import ToDosNavigator from './ToDosNavigator.svelte'
-  import ToDos from './ToDos.svelte'
-  import { findPrimaryCalendar, timeSeparators } from '../utils'
-  import { dragging } from '../dragging'
-  import time from '../plugin'
-  import { Analytics } from '@hcengineering/analytics'
-  import { TimeEvents } from '@hcengineering/time'
 
   const dispatch = createEventDispatcher()
-
-  const defaultDuration = 30 * 60 * 1000
+  const account = getCurrentAccount()
+  const peopleQuery = createQuery()
+  let person: Ref<Person> | null | undefined
+  let identities: SocialIdentity[] = []
   let mainPanel: HTMLElement
-  let replacedPanel: HTMLElement
+  let replacedPanel: HTMLElement | undefined
+  let currentDate = new Date()
+  let mode: AgendaMode = migrateAgendaMode(localStorage.getItem('todos_last_mode'))
+  let selectedCalendar = 'all'
+  localStorage.setItem('todos_last_mode', mode)
+  localStorage.removeItem('todos_last_tag')
 
-  let currentDate: Date = new Date()
-
-  $: dragItem = $dragging.item
+  $: peopleQuery.query(contact.class.SocialIdentity, { attachedTo: person ?? { $in: [] } }, (result) => {
+    identities = result
+  })
+  $: calendars = selectAgendaCalendars($visibleCalendarStore, mode, account.socialIds,
+    person == null ? undefined : identities.filter((identity) => identity.attachedTo === person).map((identity) => identity._id))
+  $: if (selectedCalendar !== 'all' && !calendars.some((item) => item._id === selectedCalendar)) selectedCalendar = 'all'
+  $: calendarIds = calendars.filter((item) => selectedCalendar === 'all' || item._id === selectedCalendar).map((item) => item._id)
   $: visibleCalendar = $deviceInfo.docWidth > 800
 
-  const client = getClient()
-
-  async function drop (e: CustomEvent<any>) {
-    if (dragItem === null) return
-    const doc = dragItem
-    const date = e.detail.date.getTime()
-    const currentAccount = getCurrentAccount()
-    const _calendar = await findPrimaryCalendar()
-    const dueDate = date + defaultDuration
-    await client.addCollection(time.class.WorkSlot, calendar.space.Calendar, doc._id, doc._class, 'workslots', {
-      calendar: _calendar,
-      eventId: generateEventId(),
-      date,
-      dueDate,
-      description: doc.description,
-      participants: [getCurrentEmployee()],
-      title: doc.title,
-      allDay: false,
-      blockTime: true,
-      access: AccessLevel.Owner,
-      visibility: doc.visibility === 'public' ? 'public' : 'freeBusy',
-      reminders: [],
-      user: currentAccount.primarySocialId
-    })
-    Analytics.handleEvent(TimeEvents.ToDoScheduled, { id: doc._id })
-  }
-
   defineSeparators('time', timeSeparators)
-
-  const savedMode = localStorage.getItem('todos_last_mode')
-  let mode: ToDosMode = savedMode === 'all' || savedMode === 'tag' || savedMode === 'date' ? savedMode : 'planned'
-  let tag: Ref<TagElement> | undefined = (localStorage.getItem('todos_last_tag') as Ref<TagElement>) ?? undefined
-
   dispatch('change', true)
-  afterUpdate(() => {
-    $deviceInfo.replacedPanel = replacedPanel ?? mainPanel
-  })
-  onDestroy(() => ($deviceInfo.replacedPanel = undefined))
+  afterUpdate(() => { $deviceInfo.replacedPanel = replacedPanel ?? mainPanel })
+  onDestroy(() => { $deviceInfo.replacedPanel = undefined })
 </script>
 
 {#if $deviceInfo.navigator.visible}
-  <ToDosNavigator bind:mode bind:tag bind:currentDate />
-  <Separator name={'time'} float={$deviceInfo.navigator.float} index={0} color={'var(--theme-divider-color)'} />
+  <ToDosNavigator bind:mode bind:currentDate />
+  <Separator name="time" float={$deviceInfo.navigator.float} index={0} color="var(--theme-divider-color)" />
 {/if}
-<div
-  class="flex-col w-full clear-mins mobile-wrapper"
-  class:left-divider={!$deviceInfo.navigator.visible}
-  class:right-divider={!visibleCalendar}
-  bind:this={mainPanel}
->
-  <ToDos {mode} {tag} bind:currentDate />
+<div class="flex-col w-full clear-mins mobile-wrapper" bind:this={mainPanel}>
+  <div class="flex-row-center gap-2 p-2">
+    {#if mode === 'team'}
+      <AssigneeBox label={contact.string.Employee} bind:value={person} kind="secondary" />
+    {/if}
+    <CalendarFilter {calendars} bind:selectedCalendar />
+  </div>
+  <DayAgenda bind:currentDate {calendarIds} />
 </div>
 {#if visibleCalendar}
-  <Separator name={'time'} index={1} color={'transparent'} separatorSize={0} short />
-  <PlanningCalendar
-    {dragItem}
-    bind:element={replacedPanel}
-    bind:currentDate
-    displayedDaysCount={5}
-    on:dragDrop={drop}
-  />
+  <Separator name="time" index={1} color="transparent" separatorSize={0} short />
+  <PlanningCalendar bind:element={replacedPanel} bind:currentDate displayedDaysCount={5} {calendarIds} />
 {/if}

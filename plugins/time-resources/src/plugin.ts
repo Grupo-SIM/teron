@@ -23,6 +23,8 @@ export default mergeIds(timeId, time, {
     Other: '' as Ref<TagCategory>
   },
   string: {
+    MyCalendars: '' as IntlString,
+    TeamCalendars: '' as IntlString,
     Today: '' as IntlString,
     TodayColon: '' as IntlString,
     ToDoColon: '' as IntlString,

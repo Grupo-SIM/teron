@@ -26,3 +26,6 @@
 - Evento privado ocupa horário para outras pessoas sem mostrar título, descrição, local ou participantes.
 - Contatos Externos podem ter dias remotos e presenciais opcionais por semana, cada contagem entre 0 e 7 e soma máxima de 7. Booleanos legados não inferem contagem.
 - Somente Owner e Maintainer podem desbloquear Diretrizes.
+
+- Calendário exibe compromissos do dia selecionado; Minhas Agendas restringe agendas ao titular, Agendas da Equipe permite selecionar funcionário do workspace e sua agenda, sem conceder acesso a documentos.
+- Mudança de dia usa intervalo entre meia-noite local e a seguinte; compromissos que atravessam o limite aparecem no dia correspondente. Eventos privados alheios não oferecem edição.

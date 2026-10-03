@@ -24,6 +24,8 @@
   import time from '../plugin'
   import IconSun from './icons/Sun.svelte'
 
+  export let calendarIds: Ref<Calendar>[] | undefined = undefined
+
   export let dragItem: ToDo | null = null
   export let currentDate: Date = new Date()
   export let displayedDaysCount = 1
@@ -37,7 +39,9 @@
   }
 
   function getTo (date: Date, days: number = 3): Timestamp {
-    return new Date(date).setDate(date.getDate() + days)
+    const end = new Date(date)
+    end.setHours(0, 0, 0, 0)
+    return end.setDate(end.getDate() + days)
   }
 
   let dayCalendar: DayCalendar
@@ -54,9 +58,9 @@
 
   let calendars: Calendar[] = []
   let selectedCalendar = 'all'
-  $: displayedCalendars = selectedCalendar === 'all'
+  $: displayedCalendars = calendarIds ?? (selectedCalendar === 'all'
     ? [personalCalendar, ...calendars.map((item) => item._id)]
-    : [selectedCalendar as Ref<Calendar>]
+    : [selectedCalendar as Ref<Calendar>])
   let todayDate = new Date()
 
   calendarsQ.query(calendar.class.Calendar, { hidden: false }, (res) => {
@@ -192,7 +196,7 @@
       <Label label={time.string.Schedule} />: <Label label={getTitle(currentDate, $ticker)} />
     </div>
     <svelte:fragment slot="actions">
-      <CalendarFilter {calendars} bind:selectedCalendar />
+      {#if calendarIds === undefined}<CalendarFilter {calendars} bind:selectedCalendar />{/if}
       <ButtonIcon
         icon={IconChevronLeft}
         kind={'secondary'}
