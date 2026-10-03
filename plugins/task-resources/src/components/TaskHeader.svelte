@@ -14,10 +14,10 @@
 // limitations under the License.
 -->
 <script lang="ts">
-  import contact from '@hcengineering/contact'
-  import core, { Class, Doc, Mixin, Ref, RefTo } from '@hcengineering/core'
+  import { AccountRole, getCurrentAccount, hasAccountRole, Doc, Mixin } from '@hcengineering/core'
   import { AttributesBar, getClient, KeyedAttribute } from '@hcengineering/presentation'
-  import { UserBox } from '@hcengineering/contact-resources'
+  import { EmployeeArrayEditor } from '@hcengineering/contact-resources'
+  import { getTaskAssignees } from '@hcengineering/task'
   import { Task } from '@hcengineering/task'
   import task from '../plugin'
   import { DocAttributeBar } from '@hcengineering/view-resources'
@@ -33,30 +33,12 @@
   const client = getClient()
   const hierarchy = client.getHierarchy()
 
-  function change () {
-    client.updateCollection(
-      object._class,
-      object.space,
-      object._id,
-      object.attachedTo,
-      object.attachedToClass,
-      object.collection,
-      { assignee: object.assignee }
-    )
+  async function change (assignees: Task['assignees']): Promise<void> {
+    if (readonly || !hasAccountRole(getCurrentAccount(), AccountRole.Maintainer)) return
+    await client.update(object, { assignees: getTaskAssignees({ assignees }) })
   }
-
-  $: assigneeTitle = hierarchy.getAttribute(object._class, 'assignee').label
-
-  function getAssigneeClass (object: Task): Ref<Class<Doc>> {
-    const attribute = hierarchy.getAttribute(object._class, 'assignee')
-    const attrClass = attribute.type._class
-    if (attrClass === core.class.RefTo) {
-      return (attribute.type as RefTo<Doc>).to
-    }
-    return contact.mixin.Employee
-  }
-
-  const taskKeys = ['status', 'assignee']
+  $: assigneeTitle = hierarchy.getAttribute(object._class, 'assignees').label
+  const taskKeys = ['status', 'assignee', 'assignees']
 
   $: filtredKeys = keys.filter((p) => !taskKeys.includes(p.key)) // todo
 </script>
@@ -64,15 +46,11 @@
 {#if !vertical}
   <div class="task-attr-header">
     <div class="flex-center">
-      <UserBox
-        _class={getAssigneeClass(object)}
+      <EmployeeArrayEditor
         label={assigneeTitle}
-        placeholder={assigneeTitle}
-        bind:value={object.assignee}
-        on:change={change}
-        allowDeselect
-        {readonly}
-        titleDeselect={task.string.TaskUnAssign}
+        value={getTaskAssignees(object)}
+        onChange={change}
+        readonly={readonly || !hasAccountRole(getCurrentAccount(), AccountRole.Maintainer)}
       />
       <div class="column">
         <AttributesBar {object} _class={object._class} keys={filtredKeys} {readonly} />

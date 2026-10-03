@@ -49,7 +49,7 @@
   const dispatch = createEventDispatcher()
   const me = getCurrentEmployee()
   const account = getCurrentAccount()
-  const assigned = { assignee: me }
+  const assigned = { $or: [{ assignees: me }, { assignees: { $exists: false }, assignee: me }] }
   $: created = { createdBy: { $in: account.socialIds } }
   let subscribed = { _id: { $in: [] as Ref<Task>[] } }
   let mode: string | undefined = undefined

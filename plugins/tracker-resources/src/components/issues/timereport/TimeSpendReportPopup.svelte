@@ -20,6 +20,7 @@
   import { UserBox } from '@hcengineering/contact-resources'
   import { Issue, TimeReportDayType, TimeSpendReport, TrackerEvents } from '@hcengineering/tracker'
   import { Button, DatePresenter, EditBox, Label } from '@hcengineering/ui'
+  import { getTaskAssignees } from '@hcengineering/task'
   import tracker from '../../../plugin'
   import { getTimeReportDate, getTimeReportDayType } from '../../../utils'
   import TitlePresenter from '../TitlePresenter.svelte'
@@ -30,7 +31,7 @@
   export let issueId: Ref<Issue> | undefined = issue?._id
   export let issueClass: Ref<Class<Issue>> = issue?._class ?? tracker.class.Issue
   export let space: Ref<Space> | undefined = issue?.space
-  export let assignee: Ref<Employee> | null | undefined = issue?.assignee as Ref<Employee>
+  export let assignee: Ref<Employee> | null | undefined = issue == null ? undefined : getTaskAssignees(issue)[0] as Ref<Employee>
 
   export let value: TimeSpendReport | undefined
   export let placeholder: IntlString = tracker.string.TimeSpendReportValue

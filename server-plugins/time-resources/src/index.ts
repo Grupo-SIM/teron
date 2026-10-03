@@ -47,6 +47,7 @@ import {
   getSenderInfo
 } from '@hcengineering/server-notification-resources'
 import serverTime, { OnToDo, ToDoFactory } from '@hcengineering/server-time'
+import { assigneeTodoChanges } from './assignee-todos'
 import task, { makeRank } from '@hcengineering/task'
 import { jsonToMarkup, nodeDoc, nodeParagraph, nodeText } from '@hcengineering/text-core'
 import time, { ProjectToDo, ToDo, ToDoPriority, TodoAutomationHelper, WorkSlot } from '@hcengineering/time'
@@ -586,20 +587,12 @@ export async function IssueToDoDone (
 }
 
 async function createIssueHandler (issue: Issue, control: TriggerControl): Promise<Tx[]> {
-  if (issue.assignee != null) {
-    const project = (await control.findAll(control.ctx, task.class.Project, { _id: issue.space }))[0]
-    if (project === undefined) return []
-    const type = (await control.modelDb.findAll(task.class.ProjectType, { _id: project.type }))[0]
-    if (!type?.classic) return []
-    const status = (await control.modelDb.findAll(core.class.Status, { _id: issue.status }))[0]
-    if (status === undefined) return []
-    if (status.category === task.statusCategory.Active || status.category === task.statusCategory.ToDo) {
-      const tx = await getCreateToDoTx(issue, issue.assignee, control)
-      if (tx !== undefined) {
-        await control.apply(control.ctx, [tx])
-      }
-    }
-  }
+  const project = (await control.findAll(control.ctx, task.class.Project, { _id: issue.space }))[0]
+  if (project === undefined) return []
+  const type = (await control.modelDb.findAll(task.class.ProjectType, { _id: project.type }))[0]
+  if (!type?.classic) return []
+  const txes = await changeIssueAssigneeHandler(control, issue._id)
+  if (txes.length > 0) await control.apply(control.ctx, txes)
   return []
 }
 
@@ -655,33 +648,20 @@ async function getCreateToDoTx (issue: Issue, user: Ref<Person>, control: Trigge
   return outerTx
 }
 
-async function changeIssueAssigneeHandler (
-  control: TriggerControl,
-  newAssignee: Ref<Person>,
-  issueId: Ref<Issue>
-): Promise<Tx[]> {
+async function changeIssueAssigneeHandler (control: TriggerControl, issueId: Ref<Issue>): Promise<Tx[]> {
   const issue = (await control.findAll(control.ctx, tracker.class.Issue, { _id: issueId }))[0]
-  if (issue !== undefined) {
-    const status = (await control.modelDb.findAll(core.class.Status, { _id: issue.status }))[0]
-    if (status === undefined) return []
-    if (status.category === task.statusCategory.Active || status.category === task.statusCategory.ToDo) {
-      const res: Tx[] = []
-      const todos = await control.findAll(control.ctx, time.class.ToDo, {
-        attachedTo: issue._id
-      })
-      const now = Date.now()
-      for (const todo of todos) {
-        if (todo.doneOn != null) continue
-        res.push(control.txFactory.createTxUpdateDoc(todo._class, todo.space, todo._id, { doneOn: now }))
-      }
-      const tx = await getCreateToDoTx(issue, newAssignee, control)
-      if (tx !== undefined) {
-        res.push(tx)
-      }
-      return res
-    }
+  if (issue === undefined) return []
+  const status = (await control.modelDb.findAll(core.class.Status, { _id: issue.status }))[0]
+  if (status === undefined || ![task.statusCategory.Active, task.statusCategory.ToDo].includes(status.category)) return []
+  const todos = await control.findAll(control.ctx, time.class.ToDo, { attachedTo: issue._id })
+  const changes = assigneeTodoChanges(issue, todos)
+  const now = Date.now()
+  const result: Tx[] = changes.complete.map((todo) => control.txFactory.createTxUpdateDoc(todo._class, todo.space, todo._id, { doneOn: now }))
+  for (const person of changes.create) {
+    const tx = await getCreateToDoTx(issue, person, control)
+    if (tx !== undefined) result.push(tx)
   }
-  return []
+  return result
 }
 
 async function changeIssueStatusHandler (
@@ -692,19 +672,8 @@ async function changeIssueStatusHandler (
   const status = (await control.modelDb.findAll(core.class.Status, { _id: newStatus }))[0]
   if (status === undefined) return []
   if (status.category === task.statusCategory.Active || status.category === task.statusCategory.ToDo) {
-    const issue = (await control.findAll(control.ctx, tracker.class.Issue, { _id: issueId }))[0]
-    if (issue?.assignee != null) {
-      const todos = await control.findAll(control.ctx, time.class.ToDo, {
-        attachedTo: issue._id,
-        user: issue.assignee as Ref<Employee>
-      })
-      if (todos.length === 0) {
-        const tx = await getCreateToDoTx(issue, issue.assignee, control)
-        if (tx !== undefined) {
-          await control.apply(control.ctx, [tx])
-        }
-      }
-    }
+    const txes = await changeIssueAssigneeHandler(control, issueId)
+    if (txes.length > 0) await control.apply(control.ctx, txes)
   } else if (status.category === task.statusCategory.Won || status.category === task.statusCategory.Lost) {
     const issue = (await control.findAll(control.ctx, tracker.class.Issue, { _id: issueId }))[0]
     if (issue !== undefined) {
@@ -764,9 +733,8 @@ async function updateIssueHandler (tx: TxUpdateDoc<Issue>, control: TriggerContr
   if (project === undefined) return []
   const type = (await control.modelDb.findAll(task.class.ProjectType, { _id: project.type }))[0]
   if (!type?.classic) return []
-  const newAssignee = tx.operations.assignee
-  if (newAssignee != null) {
-    res.push(...(await changeIssueAssigneeHandler(control, newAssignee, tx.objectId)))
+  if (['assignee', 'assignees'].some((key) => Object.prototype.hasOwnProperty.call(tx.operations, key) || ['$push', '$pull', '$unset'].some((op) => Object.prototype.hasOwnProperty.call((tx.operations as any)[op] ?? {}, key)))) {
+    res.push(...(await changeIssueAssigneeHandler(control, tx.objectId)))
   }
   const newStatus = tx.operations.status
   if (newStatus !== undefined) {
