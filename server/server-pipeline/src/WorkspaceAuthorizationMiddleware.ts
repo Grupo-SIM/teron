@@ -10,7 +10,8 @@ import document, { guidelineAccessFor, type Teamspace } from '@hcengineering/doc
 import love from '@hcengineering/love'
 import notification from '@hcengineering/notification'
 import preference from '@hcengineering/preference'
-import task from '@hcengineering/task'
+import task, { getTaskAssignees, type Task } from '@hcengineering/task'
+import time, { type ToDo } from '@hcengineering/time'
 import { BaseMiddleware, type Middleware, type PipelineContext, type TxMiddlewareResult } from '@hcengineering/server-core'
 import { changedFields, clientTransactions, isWorkspaceAdministrator, memberTaskUpdateAllowed } from './workspace-policy'
 
@@ -44,17 +45,32 @@ export class WorkspaceAuthorizationMiddleware extends BaseMiddleware {
         if (created) pending.set(tx.objectId, data)
         continue
       }
-      if (created && tx.attachedTo !== undefined && tx.attachedToClass !== undefined) {
-        const parent = pending.get(tx.attachedTo) ?? (await reader.findAll(ctx, tx.attachedToClass, { _id: tx.attachedTo }))[0]
-        if (parent === undefined || parent.space !== tx.objectSpace) throw new Error('Cannot attach content to an inaccessible parent.')
+      if (created && hierarchy.isDerived(data._class, core.class.AttachedDoc)) {
+        const attached = data as Doc & { attachedTo: Ref<Doc>, attachedToClass: any }
+        const standaloneEvent = hierarchy.isDerived(data._class, calendar.class.Event) && attached.attachedTo === calendar.ids.NoAttached
+        const standaloneTodo = data._class === time.class.ToDo && attached.attachedToClass === time.class.ToDo
+        if (!standaloneEvent && !standaloneTodo) {
+          const parent = pending.get(attached.attachedTo) ?? (await reader.findAll(ctx, attached.attachedToClass, { _id: attached.attachedTo }))[0]
+          if (parent === undefined) throw new Error('Cannot attach content to an inaccessible parent.')
+          // Workslots and personal agenda entries live in their own system spaces.
+          if (parent.space !== tx.objectSpace && !hierarchy.isDerived(data._class, calendar.class.Event) && !hierarchy.isDerived(data._class, time.class.ToDo)) throw new Error('Cannot attach content across spaces.')
+        }
       }
       const fields = updated ? changedFields((tx as TxUpdateDoc<Doc>).operations) : []
       if (updated && fields.some((field) => ['*', '_id', '_class', 'space', 'createdBy', 'createdOn', 'modifiedBy', 'modifiedOn'].includes(field))) throw new Error('Cannot change document identity or move content.')
       let allowed = false
       if (hierarchy.isDerived(tx.objectClass, task.class.Task)) {
         allowed = memberTaskUpdateAllowed(tx, data, personIds)
+      } else if (hierarchy.isDerived(tx.objectClass, time.class.ToDo)) {
+        allowed = personIds.includes((data as ToDo).user) && (created || (updated && fields.every((field) => ['title', 'description', 'doneOn', 'priority', 'visibility', 'rank'].includes(field))) || tx._class === core.class.TxRemoveDoc)
+        const todo = data as ToDo
+        if (allowed && hierarchy.isDerived(todo.attachedToClass, task.class.Task) && (created || fields.includes('doneOn'))) {
+          const parent = pending.get(todo.attachedTo) ?? (await reader.findAll(ctx, todo.attachedToClass, { _id: todo.attachedTo }))[0]
+          allowed = parent !== undefined && getTaskAssignees(parent as Task).some((person) => personIds.includes(person))
+        }
       } else if (hierarchy.isDerived(tx.objectClass, calendar.class.Event)) {
-        allowed = account.socialIds.includes((data as Event).user) && (created || (updated && fields.every((field) => [
+        const eventCalendar = (await reader.findAll(ctx, calendar.class.Calendar, { _id: (data as Event).calendar }))[0]
+        allowed = (created ? eventCalendar !== undefined && account.socialIds.includes(eventCalendar.user) : true) && account.socialIds.includes((data as Event).user) && (created || (updated && fields.every((field) => [
           'title', 'description', 'date', 'dueDate', 'allDay', 'timeZone', 'visibility', 'participants',
           'externalParticipants', 'location', 'reminders', 'rules', 'rdate', 'exdate', 'isCancelled'
         ].includes(field))) || tx._class === core.class.TxRemoveDoc)

@@ -13,8 +13,8 @@
 // limitations under the License.
 //
 
-import { type ReccuringInstance } from '@hcengineering/calendar'
-import { type Doc, type TxOperations } from '@hcengineering/core'
+import { type Event, type ReccuringInstance } from '@hcengineering/calendar'
+import { getCurrentAccount, type Doc, type TxOperations } from '@hcengineering/core'
 import { type Resources } from '@hcengineering/platform'
 import { getClient } from '@hcengineering/presentation'
 import { closePopup, showPopup } from '@hcengineering/ui'
@@ -132,7 +132,15 @@ async function deleteRecHandler (res: any, object: ReccuringInstance): Promise<v
   }
 }
 
+async function canDeleteOwnEvent (value?: Doc | Doc[]): Promise<boolean> {
+  if (value === undefined) return false
+  const values = Array.isArray(value) ? value : [value]
+  const ids = getCurrentAccount().socialIds
+  return values.length > 0 && values.every((event) => ids.includes((event as Event).user))
+}
+
 async function deleteRecEvent (object: ReccuringInstance): Promise<void> {
+  if (!await canDeleteOwnEvent(object)) return
   if (object.virtual === true) {
     showPopup(UpdateRecInstancePopup, { label: calendar.string.RemoveRecEvent }, undefined, async (res) => {
       if (res !== null) {
@@ -147,7 +155,7 @@ async function deleteRecEvent (object: ReccuringInstance): Promise<void> {
         object,
         deleteAction: async () => {
           const objs = Array.isArray(object) ? object : [object]
-          await deleteObjects(getClient(), objs).catch((err) => {
+          await deleteObjects(getClient(), objs, true).catch((err) => {
             console.error(err)
           })
           closePopup()
@@ -219,6 +227,7 @@ export default async (): Promise<Resources> => ({
     }
   },
   function: {
+    CanDeleteOwnEvent: canDeleteOwnEvent,
     ConfigureCalDavAccess: configureCalDavAccess,
     EventTitleProvider: eventTitleProvider
   }

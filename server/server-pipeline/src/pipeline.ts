@@ -73,6 +73,7 @@ import { CommunicationMiddleware, type CommunicationApiFactory } from './communi
 
 import { RatingMiddleware } from '@hcengineering/server-rating'
 import { TaskAssigneesMiddleware } from './TaskAssigneesMiddleware'
+import { CalendarPrivacyMiddleware } from './CalendarPrivacyMiddleware'
 import { WorkspaceAuthorizationMiddleware } from './WorkspaceAuthorizationMiddleware'
 import { DocumentLockMiddleware } from '@hcengineering/server-document-resources'
 
@@ -142,6 +143,7 @@ export function createServerPipeline (
     const conf = getConfig(metrics, dbUrl, wsMetrics, opt, extensions)
 
     const middlewares: MiddlewareCreator[] = [
+      CalendarPrivacyMiddleware.create,
       LookupMiddleware.create,
       NormalizeTxMiddleware.create,
       IdentityMiddleware.create,

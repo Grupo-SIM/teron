@@ -42,6 +42,7 @@ export default mergeIds(calendarId, calendar, {
     CalendarSettings: '' as AnyComponent
   },
   action: {
+    DeleteEvent: '' as Ref<Action>,
     SaveEventReminder: '' as Ref<Action>,
     DeleteRecEvent: '' as Ref<Action>
   },
