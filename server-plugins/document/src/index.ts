@@ -19,6 +19,7 @@ export const serverDocumentId = 'server-document' as Plugin
  */
 export default plugin(serverDocumentId, {
   function: {
+    FindTeamspaceDocuments: '' as Resource<ObjectDDParticipantFunc>,
     DocumentHTMLPresenter: '' as Resource<Presenter>,
     DocumentTextPresenter: '' as Resource<Presenter>,
     DocumentLinkIdProvider: '' as Resource<(doc: Doc) => Promise<string>>,

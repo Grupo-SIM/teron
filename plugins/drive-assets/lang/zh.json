@@ -1,5 +1,6 @@
 {
   "string": {
+    "DeleteDriveConfirm": "Delete the file space and all its folders, files, versions and attachments? This is permanent.",
     "Drive": "磁盘",
     "Drives": "磁盘",
     "Grid": "网格",

@@ -62,9 +62,21 @@ export async function FindFolderResources (
 ): Promise<Doc[]> {
   const folder = doc as Folder
 
-  const files = await findAll(drive.class.File, { parent: folder._id })
-  const folders = await findAll(drive.class.Folder, { parent: folder._id })
+  const files = await findAll(drive.class.File, { parent: folder._id, space: doc.space })
+  const folders = await findAll(drive.class.Folder, { parent: folder._id, space: doc.space })
   return [...files, ...folders]
+}
+
+export async function FindDriveResources (
+  doc: Doc,
+  hierarchy: Hierarchy,
+  findAll: <T extends Doc>(clazz: Ref<Class<T>>, query: DocumentQuery<T>, options?: FindOptions<T>) => Promise<FindResult<T>>
+): Promise<Doc[]> {
+  const space = doc._id as Folder['space']
+  const files = await findAll(drive.class.File, { space })
+  const folders = await findAll(drive.class.Folder, { space })
+  const versions = await findAll(drive.class.FileVersion, { space })
+  return [...files, ...folders, ...versions]
 }
 
 // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
@@ -73,6 +85,7 @@ export default async () => ({
     OnFileVersionDelete
   },
   function: {
-    FindFolderResources
+    FindFolderResources,
+    FindDriveResources
   }
 })

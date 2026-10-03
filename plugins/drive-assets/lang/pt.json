@@ -1,5 +1,6 @@
 {
   "string": {
+    "DeleteDriveConfirm": "Excluir espaço de arquivos e todas as pastas, arquivos, versões e anexos contidos? Exclusão permanente.",
     "Drive": "Unidade",
     "Drives": "Unidades",
     "Grid": "Grade",

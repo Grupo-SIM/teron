@@ -1,5 +1,6 @@
 {
   "string": {
+    "DeleteTeamspaceConfirm": "Excluir espaço de diretrizes e todos os documentos, versões e anexos contidos? Exclusão permanente.",
     "RemoveCustomIcon": "Remover ícone personalizado",
     "CustomIconRemoved": "Ícone padrão restaurado",
     "Document": "Documento",

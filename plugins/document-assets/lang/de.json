@@ -1,5 +1,6 @@
 {
   "string": {
+    "DeleteTeamspaceConfirm": "Delete the guideline space and all its documents, versions and attachments? This is permanent.",
     "RemoveCustomIcon": "Remove custom icon",
     "CustomIconRemoved": "Default icon restored",
     "Document": "Dokument",

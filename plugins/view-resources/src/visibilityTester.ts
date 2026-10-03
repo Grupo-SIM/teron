@@ -34,7 +34,7 @@ function isTypedSpace (space: Space): space is TypedSpace {
 
 function isSpaceOwner (space: Space): boolean {
   const currentAccount = getCurrentAccount()
-  return currentAccount.role === AccountRole.Owner || (space.owners ?? []).includes(currentAccount.uuid)
+  return hasAccountRole(currentAccount, AccountRole.Maintainer) || (space.owners ?? []).includes(currentAccount.uuid)
 }
 
 export async function canDeleteObject (doc?: Doc | Doc[]): Promise<boolean> {

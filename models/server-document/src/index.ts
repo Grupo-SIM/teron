@@ -15,6 +15,11 @@ import serverView from '@hcengineering/server-view'
 export { serverDocumentId } from '@hcengineering/server-document'
 
 export function createModel (builder: Builder): void {
+  builder.mixin<Class<Doc>, ObjectDDParticipant>(
+    document.class.Teamspace, core.class.Class, serverCore.mixin.ObjectDDParticipant,
+    { collectDocs: serverDocument.function.FindTeamspaceDocuments }
+  )
+
   builder.mixin(document.class.Document, core.class.Class, serverNotification.mixin.HTMLPresenter, {
     presenter: serverDocument.function.DocumentHTMLPresenter
   })

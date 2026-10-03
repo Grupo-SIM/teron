@@ -184,6 +184,19 @@ function defineTeamspace (builder: Builder): void {
     document.spaceType.DefaultTeamspaceType
   )
 
+  createAction(builder, {
+    action: view.actionImpl.Delete,
+    actionProps: { confirmation: document.string.DeleteTeamspaceConfirm },
+    label: view.string.Delete,
+    icon: view.icon.Delete,
+    category: view.category.General,
+    input: 'focus',
+    target: document.class.Teamspace,
+    visibilityTester: view.function.CanArchiveSpace,
+    context: { mode: ['context', 'browser'], group: 'remove' },
+    override: [view.action.Archive, view.action.Delete]
+  }, document.action.DeleteTeamspace)
+
   // Navigator
 
   builder.mixin(document.class.Teamspace, core.class.Class, view.mixin.SpacePresenter, {

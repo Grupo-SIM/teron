@@ -30,6 +30,7 @@ export default plugin(serverDriveId, {
     OnFileVersionDelete: '' as Resource<TriggerFunc>
   },
   function: {
+    FindDriveResources: '' as Resource<ObjectDDParticipantFunc>,
     FindFolderResources: '' as Resource<ObjectDDParticipantFunc>
   }
 })

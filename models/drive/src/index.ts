@@ -223,6 +223,19 @@ function defineDrive (builder: Builder): void {
     encode: drive.function.DriveLinkProvider
   })
 
+  createAction(builder, {
+    action: view.actionImpl.Delete,
+    actionProps: { confirmation: drive.string.DeleteDriveConfirm },
+    label: view.string.Delete,
+    icon: view.icon.Delete,
+    category: view.category.General,
+    input: 'focus',
+    target: drive.class.Drive,
+    visibilityTester: view.function.CanArchiveSpace,
+    context: { mode: ['context', 'browser'], group: 'remove' },
+    override: [view.action.Archive, view.action.Delete]
+  }, drive.action.DeleteDrive)
+
   // Space type
 
   builder.createDoc(

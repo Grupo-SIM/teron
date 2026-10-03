@@ -45,3 +45,5 @@
 - Papel Somente leitura não é selecionável em convites/configurações. Conversão de contas legadas para User reserva vaga com comparação do papel original; não excede contrato nem limite de redução agendada. Contas sem vaga permanecem no papel legado, com pendência visível ao Owner. Conta anônima de sistema permanece excluída da conversão.
 
 Busca global indexada trata consulta como trecho literal: caixa e acentos são normalizados em campo adicional, mantendo texto original. Caracteres especiais não viram operadores. Índices legados recebem reconstrução aditiva e idempotente, executada explicitamente apenas no ambiente local autorizado; filtros de workspace, espaço, classe e paginação continuam aplicáveis.
+
+Owner/Maintainer com acesso ao espaço podem excluir diretamente documentos, arquivos e espaços ativos de Diretrizes/Arquivos. Confirmação informa exclusão permanente e conteúdo descendente afetado. Limpeza usa participantes existentes e restringe descendentes ao espaço excluído, inclusive versões; referência de pai em outro espaço não autoriza excluir seu conteúdo.

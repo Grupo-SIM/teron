@@ -1,5 +1,6 @@
 {
     "string": {
+        "DeleteDriveConfirm": "Delete the file space and all its folders, files, versions and attachments? This is permanent.",
         "Drive": "드라이브",
         "Drives": "드라이브",
         "Grid": "그리드",
