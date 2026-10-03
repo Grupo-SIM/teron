@@ -41,3 +41,5 @@
 
 - Responsáveis de tarefa são lista única de pessoas; zero responsáveis é lista vazia. Lista explícita prevalece sobre campo escalar legado, inclusive quando vazia. Novas transações persistem lista; integrações antigas são normalizadas no servidor.
 - Templates, subtarefas e duplicações preservam todos os responsáveis. Colaboradores e destinatários devem ser únicos, sem notificações repetidas por pessoa.
+
+- Papel Somente leitura não é selecionável em convites/configurações. Conversão de contas legadas para User reserva vaga com comparação do papel original; não excede contrato nem limite de redução agendada. Contas sem vaga permanecem no papel legado, com pendência visível ao Owner. Conta anônima de sistema permanece excluída da conversão.

@@ -167,7 +167,7 @@ function effectivePlan (plan: string): WorkspaceSubscriptionPlan {
   return plan === 'business' || LEGACY_BUSINESS_PLANS.has(plan) ? 'business' : 'free'
 }
 
-async function getEntitlement (
+export async function getEntitlement (
   db: AccountDB,
   workspaceUuid: WorkspaceUuid,
   now: number = Date.now()

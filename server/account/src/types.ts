@@ -450,7 +450,8 @@ export interface AccountDB {
     accountId: AccountUuid,
     workspaceId: WorkspaceUuid,
     role: AccountRole,
-    capacity: number
+    capacity: number,
+    expectedRole?: AccountRole
   ) => Promise<boolean>
   batchAssignWorkspacePermission: (
     workspaceId: WorkspaceUuid,

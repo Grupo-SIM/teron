@@ -943,12 +943,18 @@ export class MongoAccountDB implements AccountDB {
     accountId: AccountUuid,
     workspaceId: WorkspaceUuid,
     role: AccountRole,
-    capacity: number
+    capacity: number,
+    expectedRole?: AccountRole
   ): Promise<boolean> {
     return (await this.withSeatReservation(workspaceId, async () => {
+      const current = await this.getWorkspaceRole(accountId, workspaceId)
+      if (current == null || (expectedRole !== undefined && current !== expectedRole)) return false
       if (!(await this.hasSeatCapacity(workspaceId, capacity))) return false
-      await this.updateWorkspaceRole(accountId, workspaceId, role)
-      return true
+      const result = await this.workspaceMembers.collection.updateOne(
+        { workspaceUuid: workspaceId, accountUuid: accountId, role: current },
+        { $set: { role } }
+      )
+      return result.modifiedCount === 1
     })) ?? false
   }
 
