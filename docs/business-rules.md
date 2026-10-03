@@ -31,3 +31,10 @@
 - Mudança de dia usa intervalo entre meia-noite local e a seguinte; compromissos que atravessam o limite aparecem no dia correspondente. Eventos privados alheios não oferecem edição.
 - Contatos mantém seções Funcionários, Externos e Clientes; Departamento e vínculo interno de colaboradores não aparecem como campos editáveis. Mesclar contatos não é ação disponível.
 - Buscas de listas e seletores tratam consulta como trecho literal, ignorando caixa e acentos; texto persistido permanece intacto.
+
+## Autorização de workspace
+
+- Owner/Maintainer administram estrutura, contatos, responsáveis, prazos, permissões e exclusões, respeitando acesso ao espaço.
+- User pode editar descrição de tarefa acessível; status exige participação nos responsáveis. Demais mudanças organizacionais são recusadas pelo servidor, inclusive lotes e transações condicionais.
+- Usuários podem usar suas agendas/eventos, conversar, entrar em chamadas, enviar arquivos e editar conteúdo de documentos acessíveis e desbloqueados. Concessões específicas de Diretrizes ainda estão em implementação.
+- Exceções de contadores, histórico e notificações pertencem somente a contextos internos confiáveis; transações cliente não podem usar essas exceções.

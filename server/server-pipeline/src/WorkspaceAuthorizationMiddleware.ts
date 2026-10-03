@@ -1,0 +1,87 @@
+import attachment from '@hcengineering/attachment'
+import calendar, { type Event } from '@hcengineering/calendar'
+import chunter from '@hcengineering/chunter'
+import contact from '@hcengineering/contact'
+import core, {
+  AccountRole, hasAccountRole, type Doc, type MeasureContext, type Ref, type SessionData,
+  systemAccountUuid, TxProcessor, type Tx, type TxCreateDoc, type TxUpdateDoc
+} from '@hcengineering/core'
+import document from '@hcengineering/document'
+import love from '@hcengineering/love'
+import notification from '@hcengineering/notification'
+import preference from '@hcengineering/preference'
+import task from '@hcengineering/task'
+import { BaseMiddleware, type Middleware, type PipelineContext, type TxMiddlewareResult } from '@hcengineering/server-core'
+import { changedFields, clientTransactions, isWorkspaceAdministrator, memberTaskUpdateAllowed } from './workspace-policy'
+
+/** Runs before triggers; only trusted server trigger contexts can bypass client restrictions. */
+export class WorkspaceAuthorizationMiddleware extends BaseMiddleware {
+  static async create (_ctx: MeasureContext, context: PipelineContext, next?: Middleware): Promise<Middleware> {
+    return new WorkspaceAuthorizationMiddleware(context, next)
+  }
+
+  async tx (ctx: MeasureContext<SessionData>, txes: Tx[]): Promise<TxMiddlewareResult> {
+    const account = ctx.contextData.account
+    if (account.uuid === systemAccountUuid || ctx.contextData.isTriggerCtx === true) return await this.provideTx(ctx, txes)
+    const administrator = isWorkspaceAdministrator(account)
+    if (!hasAccountRole(account, AccountRole.User)) throw new Error('Workspace is read-only for this member.')
+    const reader = this.context.head ?? this.next
+    if (reader === undefined) throw new Error('Missing authorization reader.')
+    const people = await reader.findAll(ctx, contact.class.SocialIdentity, { _id: { $in: account.socialIds } })
+    const personIds = people.map((item) => item.attachedTo)
+    const hierarchy = this.context.hierarchy
+    const pending = new Map<Ref<Doc>, Doc>()
+    for (const tx of clientTransactions(txes)) {
+      const created = tx._class === core.class.TxCreateDoc
+      const updated = tx._class === core.class.TxUpdateDoc
+      const data = created
+        ? TxProcessor.createDoc2Doc(tx as TxCreateDoc<Doc>)
+        : pending.get(tx.objectId) ?? (await reader.findAll(ctx, tx.objectClass, { _id: tx.objectId }))[0]
+      if (data === undefined || data.space !== tx.objectSpace) throw new Error('Cannot modify an inaccessible document or spoof its space.')
+      const spaces = await reader.findAll(ctx, core.class.Space, { _id: tx.objectSpace })
+      if (spaces.length === 0) throw new Error('Cannot modify an inaccessible space.')
+      if (administrator) {
+        if (created) pending.set(tx.objectId, data)
+        continue
+      }
+      if (created && tx.attachedTo !== undefined && tx.attachedToClass !== undefined) {
+        const parent = pending.get(tx.attachedTo) ?? (await reader.findAll(ctx, tx.attachedToClass, { _id: tx.attachedTo }))[0]
+        if (parent === undefined || parent.space !== tx.objectSpace) throw new Error('Cannot attach content to an inaccessible parent.')
+      }
+      const fields = updated ? changedFields((tx as TxUpdateDoc<Doc>).operations) : []
+      if (updated && fields.some((field) => ['*', '_id', '_class', 'space', 'createdBy', 'createdOn', 'modifiedBy', 'modifiedOn'].includes(field))) throw new Error('Cannot change document identity or move content.')
+      let allowed = false
+      if (hierarchy.isDerived(tx.objectClass, task.class.Task)) {
+        allowed = memberTaskUpdateAllowed(tx, data, personIds)
+      } else if (hierarchy.isDerived(tx.objectClass, calendar.class.Event)) {
+        allowed = account.socialIds.includes((data as Event).user) && (created || (updated && fields.every((field) => [
+          'title', 'description', 'date', 'dueDate', 'allDay', 'timeZone', 'visibility', 'participants',
+          'externalParticipants', 'location', 'reminders', 'rules', 'rdate', 'exdate', 'isCancelled'
+        ].includes(field))) || tx._class === core.class.TxRemoveDoc)
+      } else if (hierarchy.isDerived(tx.objectClass, calendar.class.Calendar)) {
+        allowed = account.socialIds.includes((data as Doc & { user: any }).user) && (created || (updated && fields.every((field) => ['name', 'hidden', 'visibility'].includes(field))))
+      } else if (hierarchy.isDerived(tx.objectClass, calendar.class.Schedule)) {
+        allowed = personIds.includes((data as Doc & { owner: Ref<Doc> }).owner) && (created || (updated && fields.every((field) => ['title', 'description', 'meetingDuration', 'meetingInterval', 'availability', 'timeZone', 'calendar'].includes(field))) || tx._class === core.class.TxRemoveDoc)
+      } else if (hierarchy.isDerived(tx.objectClass, document.class.Document)) {
+        allowed = (data as Doc & { lockedBy?: unknown }).lockedBy == null && (created || (updated && fields.every((field) => ['title', 'content', 'icon', 'color'].includes(field))))
+      } else if (hierarchy.isDerived(tx.objectClass, attachment.class.Attachment)) {
+        allowed = created
+      } else if (hierarchy.isDerived(tx.objectClass, chunter.class.ChatMessage)) {
+        allowed = created || (updated && data.createdBy !== undefined && account.socialIds.includes(data.createdBy) && fields.every((field) => ['message', 'editedOn'].includes(field)))
+      } else if (hierarchy.isDerived(tx.objectClass, core.class.Collaborator)) {
+        allowed = (data as Doc & { collaborator: string }).collaborator === account.uuid && (created || tx._class === core.class.TxRemoveDoc)
+      } else if (hierarchy.isDerived(tx.objectClass, notification.class.InboxNotification)) {
+        allowed = (data as Doc & { user: string }).user === account.uuid && ((updated && fields.every((field) => ['isViewed', 'archived'].includes(field))) || tx._class === core.class.TxRemoveDoc)
+      } else if (hierarchy.isDerived(tx.objectClass, notification.class.DocNotifyContext)) {
+        allowed = (data as Doc & { user: string }).user === account.uuid && updated && fields.every((field) => ['isPinned', 'hidden', 'lastViewedTimestamp'].includes(field))
+      } else if (hierarchy.isDerived(tx.objectClass, preference.class.Preference)) {
+        allowed = created || (data.createdBy !== undefined && account.socialIds.includes(data.createdBy))
+      } else if (hierarchy.isDerived(tx.objectClass, love.class.ParticipantInfo)) {
+        allowed = personIds.includes((data as Doc & { person: Ref<Doc> }).person) && (created || (updated && fields.every((field) => ['room', 'x', 'y', 'sessionId'].includes(field))) || tx._class === core.class.TxRemoveDoc)
+      }
+      if (!allowed) throw new Error('Member is not authorized to change workspace structure or this document.')
+      if (created) pending.set(tx.objectId, data)
+    }
+    return await this.provideTx(ctx, txes)
+  }
+}

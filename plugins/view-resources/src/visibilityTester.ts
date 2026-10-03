@@ -19,6 +19,7 @@ import core, {
   getCurrentAccount,
   toIdMap,
   AccountRole,
+  hasAccountRole,
   type Doc,
   type Space,
   type TypedSpace
@@ -37,6 +38,7 @@ function isSpaceOwner (space: Space): boolean {
 }
 
 export async function canDeleteObject (doc?: Doc | Doc[]): Promise<boolean> {
+  if (!hasAccountRole(getCurrentAccount(), AccountRole.Maintainer)) return false
   if (doc === undefined) {
     return false
   }
@@ -58,6 +60,7 @@ export async function canDeleteObject (doc?: Doc | Doc[]): Promise<boolean> {
 }
 
 export async function canEditSpace (doc?: Doc | Doc[]): Promise<boolean> {
+  if (!hasAccountRole(getCurrentAccount(), AccountRole.Maintainer)) return false
   if (doc === undefined || Array.isArray(doc)) {
     return false
   }
@@ -84,6 +87,7 @@ export async function canEditSpace (doc?: Doc | Doc[]): Promise<boolean> {
 }
 
 export async function canArchiveSpace (doc?: Doc | Doc[]): Promise<boolean> {
+  if (!hasAccountRole(getCurrentAccount(), AccountRole.Maintainer)) return false
   if (doc === undefined || Array.isArray(doc)) {
     return false
   }
@@ -110,6 +114,7 @@ export async function canArchiveSpace (doc?: Doc | Doc[]): Promise<boolean> {
 }
 
 export async function canDeleteSpace (doc?: Doc | Doc[]): Promise<boolean> {
+  if (!hasAccountRole(getCurrentAccount(), AccountRole.Maintainer)) return false
   if (doc === undefined || Array.isArray(doc)) {
     return false
   }
