@@ -112,13 +112,16 @@ export class CalendarPrivacyMiddleware extends BaseMiddleware {
     const events = ctx.contextData.broadcast.txes.filter((tx) => TxProcessor.isExtendsCUD(tx._class) && this.context.hierarchy.isDerived((tx as TxCUD<Doc>).objectClass, calendar.class.Event)) as TxCUD<Event>[]
     if (events.length > 0) {
       const ids = new Set(events.map((tx) => tx._id))
-      ctx.contextData.broadcast.targets.calendarPrivacy = async (tx) => {
+      const privacyTarget = async (tx: any) => {
         if (!ids.has(tx._id)) return undefined
         const cud = tx as TxCUD<Event>
         const event = (await this.provideFindAll(ctx, calendar.class.Event, { _id: cud.objectId }))[0] ?? ctx.contextData.removedMap.get(cud.objectId) as Event | undefined
         const account = event == null ? undefined : ctx.contextData.socialStringsToUsers.get(event.user)?.accontUuid
         return { target: account == null ? [] : [account] }
       }
+      // Broadcast chooses the first matching target. Privacy must precede
+      // general space routing, including targets installed during tx handling.
+      ctx.contextData.broadcast.targets = { calendarPrivacy: privacyTarget, ...ctx.contextData.broadcast.targets }
       ctx.contextData.broadcast.txes.push(createBroadcastEvent([calendar.class.Event]))
     }
     await this.next?.handleBroadcast(ctx)

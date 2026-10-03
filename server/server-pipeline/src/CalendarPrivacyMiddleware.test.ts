@@ -67,9 +67,11 @@ describe('server calendar privacy', () => {
   it('targets raw realtime payloads to owner and sends only invalidation to everyone else', async () => {
     const { middleware, ctx } = fixture()
     const tx: any = { _id: 'tx', _class: core.class.TxUpdateDoc, objectId: event._id, objectClass: calendar.class.Event, operations: { title: 'Secret' } }
+    ctx.contextData.broadcast.targets.spaceSec = async () => ({ target: ['workspace-member'] })
     ctx.contextData.broadcast.txes.push(tx)
     await middleware.handleBroadcast(ctx)
     expect(await ctx.contextData.broadcast.targets.calendarPrivacy(tx)).toEqual({ target: ['other-account'] })
+    expect(Object.keys(ctx.contextData.broadcast.targets)[0]).toBe('calendarPrivacy')
     const invalidation: any = ctx.contextData.broadcast.txes[1]
     expect(invalidation.event).toBe(WorkspaceEvent.BulkUpdate)
     expect(invalidation._class).toBe(core.class.TxWorkspaceEvent)
