@@ -456,19 +456,19 @@ export function createModel (builder: Builder): void {
             id: 'employees',
             component: workbench.component.SpecialView,
             icon: contact.icon.Person,
-            label: contact.string.Employee,
+            label: contact.string.Employees,
             accessLevel: AccountRole.DocGuest,
             componentProps: {
               _class: contact.mixin.Employee,
               icon: contact.icon.Person,
-              label: contact.string.Employee
+              label: contact.string.Employees
             }
           },
           {
             id: 'persons',
             component: workbench.component.SpecialView,
             icon: contact.icon.Person,
-            label: contact.string.Person,
+            label: contact.string.Persons,
             accessLevel: AccountRole.DocGuest,
             componentProps: {
               _class: contact.class.Person,
@@ -476,7 +476,7 @@ export function createModel (builder: Builder): void {
                 [contact.mixin.Employee]: { $exists: false }
               },
               icon: contact.icon.Person,
-              label: contact.string.Person,
+              label: contact.string.Persons,
               createLabel: contact.string.CreatePerson,
               createComponent: contact.component.CreatePerson
             }
@@ -485,12 +485,12 @@ export function createModel (builder: Builder): void {
             id: 'companies',
             component: workbench.component.SpecialView,
             icon: contact.icon.Company,
-            label: contact.string.Organization,
+            label: contact.string.Organizations,
             accessLevel: AccountRole.DocGuest,
             componentProps: {
               _class: contact.class.Organization,
               icon: contact.icon.Company,
-              label: contact.string.Organization,
+              label: contact.string.Organizations,
               createLabel: contact.string.CreateOrganization,
               createComponent: contact.component.CreateOrganization
             }

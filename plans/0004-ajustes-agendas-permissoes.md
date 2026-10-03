@@ -71,3 +71,5 @@ Regressão específica ampliada passou sete grupos reais: anexos privados e real
 Rascunhos/subtarefas: gravação local normaliza listas recursivamente e remove campo escalar, mantendo leitura legada opcional. Três testes do helper e parser de cinco componentes passaram. Cabeçalho genérico bloqueia estrutura para membros e status quando não atribuídos; servidor continua validando todos os caminhos.
 
 Validação retomada após reinício local: build web atual passou nas duas configurações; Calendário com duas contas passou no navegador (Minhas Agendas/equipe, detalhes próprios e ocupado privado alheio). Runner específico agora prepara estado ativo e aguarda gatilhos assíncronos para conferir agendas pessoais em reexecuções. Cabeçalho vertical genérico mantém edição de status para membro atribuído, isolada dos campos estruturais.
+
+Contatos: navegação e títulos usam chaves plurais existentes (Funcionários, Externos, Clientes), preservando catálogos sincronizados. Conferência autenticada das três seções passou no navegador.
