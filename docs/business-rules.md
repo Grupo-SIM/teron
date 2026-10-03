@@ -36,7 +36,7 @@
 
 - Owner/Maintainer administram estrutura, contatos, responsáveis, prazos, permissões e exclusões, respeitando acesso ao espaço.
 - User pode editar descrição de tarefa acessível; status exige participação nos responsáveis. Demais mudanças organizacionais são recusadas pelo servidor, inclusive lotes e transações condicionais.
-- Usuários podem usar suas agendas/eventos, conversar, entrar em chamadas, enviar arquivos e editar conteúdo de documentos acessíveis e desbloqueados. Concessões específicas de Diretrizes ainda estão em implementação.
+- Usuários podem usar suas agendas/eventos, conversar, entrar em chamadas, enviar arquivos e editar conteúdo de documentos acessíveis e desbloqueados. Diretrizes aplicam concessões herdadas Leitor/Editor também em busca, realtime e colaboração.
 - Exceções de contadores, histórico e notificações pertencem somente a contextos internos confiáveis; transações cliente não podem usar essas exceções.
 
 - Responsáveis de tarefa são lista única de pessoas; zero responsáveis é lista vazia. Lista explícita prevalece sobre campo escalar legado, inclusive quando vazia. Novas transações persistem lista; integrações antigas são normalizadas no servidor.
@@ -53,3 +53,5 @@ Diretrizes herdam concessões Leitor/Editor do espaço. Concessões individuais 
 Privacidade de eventos é aplicada no servidor mesmo para Owner/Maintainer: eventos privados/de disponibilidade alheios expõem só intervalo ocupado e dados de recorrência necessários. Detalhes, local, participantes, anexos e referências são removidos de leituras e lookups; consultas por detalhes, agregações e busca global não revelam esses registros. Realtime envia payload original somente ao proprietário do evento; demais clientes recebem invalidação sem conteúdo e consultam versão protegida. Membros criam/editam/excluem eventos próprios; criação exige agenda própria. Conteúdo anexado valida pai real, inclusive criação direta. Concluir item pessoal vinculado a tarefa exige atribuição, evitando alteração indireta de status sem permissão.
 
 Busca global aplica exclusões de eventos privados e seus anexos antes do limite e da contagem; filtrar apenas a página já retornada não preserva paginação nem privacidade da contagem. Broadcast de anexos privados obedece à mesma prioridade de privacidade do evento.
+
+Foto na edição do Escritório ocupa largura e altura do squircle, com recorte central `cover` e máscara preservada. Sem foto, fallback permanece. Troca de andar usa token de fundo do painel nos temas claro e escuro.

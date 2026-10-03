@@ -2,13 +2,13 @@
 
 ## Execução do plano aprovado
 
-- [ ] Permissões no servidor, compatibilidade e conversão do papel somente leitura com limite de vagas.
-- [ ] Busca parcial sem distinguir caixa ou acentos, caracteres literais e autorização.
-- [ ] Calendário: compromissos do dia, Minhas Agendas/Agendas da Equipe, privacidade e fuso.
-- [ ] Tarefas: responsáveis múltiplos, migração, integrações, filtros e cores.
-- [ ] Diretrizes/Arquivos: acesso Leitor/Editor individual ou por setor, ícones e exclusão direta.
-- [ ] Contatos/Escritório: campos, ações, nomenclatura, foto e fundo.
-- [ ] Regressão local, navegador com duas contas e commits atômicos.
+- [x] Permissões no servidor, compatibilidade e conversão do papel somente leitura com limite de vagas.
+- [x] Busca parcial sem distinguir caixa ou acentos, caracteres literais e autorização.
+- [x] Calendário: compromissos do dia, Minhas Agendas/Agendas da Equipe, privacidade e fuso.
+- [x] Tarefas: responsáveis múltiplos, migração, integrações, filtros e cores.
+- [x] Diretrizes/Arquivos: acesso Leitor/Editor individual ou por setor, ícones e exclusão direta.
+- [x] Contatos/Escritório: campos, ações, nomenclatura, foto e fundo.
+- [x] Regressão local, navegador com duas contas e commits atômicos.
 
 ## Relação com plano 0003
 
@@ -79,3 +79,12 @@ Navegador ampliado: eventos de dia inteiro e atravessando meia-noite passaram, i
 Foto validada no navegador: largura e altura iguais à célula inteira, cover e máscara preservados; nova captura confirma preenchimento do squircle. Build web com correção passou nas duas configurações.
 
 Reabertura com status/responsáveis combinados reproduziu quatro itens pessoais ativos para duas pessoas no backend anterior. Gatilho agora reconcilia uma vez pelo caminho de status; mesmo teste passou com exatamente dois itens, junto aos sete grupos específicos completos. Bundle servidor atualizado passou; runner encerrou normalmente.
+
+
+## Resultado final e limites da verificação
+
+Implementação concluída em commits locais atômicos, com autor/committer configurado e trailer Codex. Regressão existente: sete grupos aprovados. Regressão específica: sete grupos aprovados, incluindo reabertura combinada sem duplicação, RPC/websocket e revogação, lote atômico e limpeza real de blobs. Migração PostgreSQL executada duas vezes e comparação idempotente aprovada; conversão concorrente em MongoDB/PostgreSQL e busca Elasticsearch aprovadas nas etapas anteriores.
+
+Navegador autenticado: dois casos aprovados nas rodadas finais correspondentes (Calendário com duas contas/dia inteiro/meia-noite; Contatos/Diretrizes/Escritório com foto ocupando célula inteira e fundos claro/escuro). Capturas inspecionadas. Teste claro altera somente classe CSS da página descartável, pois aplicação força tema escuro. Menus individuais de ícone/exclusão e cores de agrupamento tiveram revisão de implementação; esses cliques não fazem parte da suíte automatizada de navegador. Exclusão e autorização foram exercitadas diretamente no servidor.
+
+Build web final passou nas duas configurações; bundle servidor e geração de código passaram. Verificação completa de tipos não certificada: checkout apresenta declarações ausentes em dependências e não possui hook pre-commit/Lefthook instalado. Commits normais realizados sem bypass. Nenhum push/deploy/migração remota. Stack descartável encerrada com remoção dos volumes; estado temporário de autenticação removido.

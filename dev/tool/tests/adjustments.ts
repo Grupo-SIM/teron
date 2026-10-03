@@ -50,6 +50,21 @@ async function main (): Promise<void> {
     assert.equal(events.find((event) => event._id === 'regression-event-public')?.title, 'Reunião pública')
     assert.equal((await owner.findOne(calendar.class.Event, { _id: 'regression-event-secret' as any }))?.title, 'Segredo Owner')
     passed.push('two-account event privacy and detail-predicate protection')
+    const publicEvent = await owner.findOne(calendar.class.Event, { _id: 'regression-event-public' as any })
+    assert.ok(publicEvent)
+    const midnight = new Date(publicEvent.date); midnight.setHours(0, 0, 0, 0)
+    for (const fixture of [
+      { id: 'regression-event-all-day', title: 'Compromisso dia inteiro', allDay: true, date: midnight.getTime(), dueDate: midnight.getTime() + 86400000 },
+      { id: 'regression-event-cross-midnight', title: 'Compromisso atravessa meia-noite', allDay: false, date: midnight.getTime() - 3600000, dueDate: midnight.getTime() + 3600000 }
+    ]) {
+      const { id, ...timing } = fixture
+      if (await owner.findOne(calendar.class.Event, { _id: id as any }) === undefined) {
+        await owner.addCollection(calendar.class.Event, publicEvent.space, publicEvent.attachedTo, publicEvent.attachedToClass, 'events', {
+          ...timing, eventId: id, description: '', calendar: publicEvent.calendar, participants: [], visibility: 'public', access: publicEvent.access, user: publicEvent.user, blockTime: true
+        }, id as any)
+      }
+    }
+
 
     async function uploadBlob (text: string): Promise<string> {
       const form = new FormData()
@@ -58,6 +73,11 @@ async function main (): Promise<void> {
       assert.equal(response.status, 200)
       return (await response.json())[0].id
     }
+    const avatarForm = new FormData()
+    avatarForm.append('file', new Blob([new Uint8Array(readFileSync(resolve('dev/prod/public/teron/icon-192.png')))], { type: 'image/png' }), 'office-avatar.png')
+    const avatarResponse = await fetch('http://localhost:30180/files', { method: 'POST', headers: { Authorization: `Bearer ${state.ownerWs.token}` }, body: avatarForm })
+    assert.equal(avatarResponse.status, 200)
+    await owner.updateDoc(contact.class.Person, contact.space.Contacts, state.fixtures.person, { avatar: (await avatarResponse.json())[0].id, avatarType: AvatarType.IMAGE })
     async function blobExists (id: string): Promise<boolean> {
       const response = await fetch(`http://localhost:30180/files?file=${encodeURIComponent(id)}`, { headers: { Authorization: `Bearer ${state.ownerWs.token}` } })
       assert.ok([200, 404].includes(response.status), `Unexpected blob status ${response.status}`)

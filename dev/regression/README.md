@@ -30,3 +30,11 @@ Busca global literal (plano 0004): `node dev/regression/elastic.mjs` usa Elastic
 Conversão de contas legadas: `node dev/regression/roles.mjs` executa `convertLegacyReadOnlyMembers` em MongoDB/PostgreSQL novos, dentro de rede interna sem portas públicas. Usa apenas imagens já instaladas. Valida vagas disponíveis/insuficientes, convites reservados, concorrência pela última vaga e repetição. Não inicializa nem modifica bancos existentes; contêineres e volumes são descartados ao finalizar.
 
 Plano 0004: `node dev/tool/bundle/adjustments.cjs` valida duas contas, privacidade, concessões individuais/por setor, revogação, RPC colaborativo e atribuição múltipla/status. Depois das fixtures, `python3 dev/regression/migrations.py` injeta dados legados somente nesta stack, migra duas vezes e confere tarefas, templates aninhados e privacidade dos espaços. Runner pausa/reinicia apenas o transactor descartável.
+
+Navegador do plano 0004 (após ambos os runners e as migrações, com transactor ativo):
+
+```sh
+node tests/sanity/node_modules/@playwright/test/cli.js test --config dev/regression/playwright.config.cjs
+```
+
+Configuração usa Chromium já instalado, sem download. Testes locais são ignorados pela suíte comum sem `TERON_LOCAL_REGRESSION=1`. Verifica duas contas, privacidade, dia inteiro/meia-noite, nomes das seções, foto cover na edição e tokens de fundo nos temas claro/escuro. Produto atualmente força tema escuro; teste claro aplica classe CSS apenas na página descartável para conferir tokens, sem alterar preferência do produto. Capturas ficam em `/tmp/teron-regression-*`.
