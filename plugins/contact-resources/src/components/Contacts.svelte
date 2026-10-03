@@ -34,7 +34,7 @@
   let resultQuery: DocumentQuery<Doc> = searchQuery
 
   function updateResultQuery (search: string): void {
-    searchQuery = search.trim() === '' ? {} : { name: { $like: `%${search.trim()}%` } }
+    searchQuery = search.trim() === '' ? {} : { name: { $contains: search.trim() } }
   }
 
   let viewlet: Viewlet | undefined

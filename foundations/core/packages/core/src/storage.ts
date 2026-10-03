@@ -48,6 +48,7 @@ export type QuerySelector<T> = {
   $lt?: T extends number ? number : never
   $lte?: T extends number ? number : never
   $exists?: boolean
+  $contains?: string
   $like?: string
   $regex?: string
   $options?: string

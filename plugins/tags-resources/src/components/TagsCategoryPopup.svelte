@@ -54,7 +54,7 @@
 
   $: query.query(
     tags.class.TagElement,
-    { title: { $like: '%' + search + '%' }, targetClass, category: category._id },
+    { title: { $contains: search }, targetClass, category: category._id },
     (result) => {
       elements = result
     },

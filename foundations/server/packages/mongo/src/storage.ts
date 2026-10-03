@@ -19,6 +19,7 @@ import core, {
   DOMAIN_RELATION,
   DOMAIN_TX,
   SortingOrder,
+  searchLiteralPattern,
   TxProcessor,
   addOperation,
   cutObjectArray,
@@ -212,6 +213,10 @@ abstract class MongoAdapterBase implements DbAdapter {
       const value = (query as any)[key]
       if (value !== null && typeof value === 'object') {
         const keys = Object.keys(value)
+        if (keys[0] === '$contains') {
+          translated[key] = { $regex: searchLiteralPattern(value.$contains as string), $options: 'i' }
+          continue
+        }
         if (keys[0] === '$like') {
           const pattern = value.$like as string
           translated[key] = {
@@ -308,6 +313,10 @@ abstract class MongoAdapterBase implements DbAdapter {
       const translated = tkey.lookup ? translatedLookup : translatedBase
       if (value !== null && typeof value === 'object') {
         const keys = Object.keys(value)
+        if (keys[0] === '$contains') {
+          translated[tkey.key] = { $regex: searchLiteralPattern(value.$contains as string), $options: 'i' }
+          continue
+        }
         if (keys[0] === '$like') {
           translated[tkey.key] = translateLikeQuery(value.$like as string)
           continue

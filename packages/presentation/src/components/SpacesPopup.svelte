@@ -53,7 +53,7 @@
       ...(spaceQuery ?? {}),
       ...(search !== undefined && search !== ''
         ? {
-            name: { $like: `%${search}%` }
+            name: { $contains: search }
           }
         : {})
     },

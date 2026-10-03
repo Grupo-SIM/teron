@@ -89,7 +89,7 @@
     const resultQuery =
       search !== ''
         ? {
-            [filter.key.key]: { $like: '%' + search + '%' }
+            [filter.key.key]: { $contains: search }
           }
         : {}
     let prefix = ''

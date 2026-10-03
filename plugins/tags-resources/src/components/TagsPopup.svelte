@@ -65,7 +65,7 @@
   })
 
   // TODO: Add $not: {$in: []} query
-  $: query.query(tags.class.TagElement, { title: { $like: '%' + search + '%' }, targetClass }, (result) => {
+  $: query.query(tags.class.TagElement, { title: { $contains: search }, targetClass }, (result) => {
     objects = newElements.concat(result)
   })
 

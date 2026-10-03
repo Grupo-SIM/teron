@@ -60,7 +60,7 @@
     const resultQuery: DocumentQuery<Milestone> =
       search !== ''
         ? {
-            label: { $like: '%' + search + '%' }
+            label: { $contains: search }
           }
         : {}
     objectsPromise = client.findAll(

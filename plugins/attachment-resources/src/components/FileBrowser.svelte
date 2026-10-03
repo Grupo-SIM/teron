@@ -64,7 +64,7 @@
   ) {
     isLoading = true
 
-    const nameQuery = searchQuery_ ? { name: { $like: '%' + searchQuery_ + '%' } } : {}
+    const nameQuery = searchQuery_ ? { name: { $contains: searchQuery_ } } : {}
 
     const allSocialIds = await client.findAll(contact.class.SocialIdentity, {
       attachedTo: { $in: selectedParticipants_ },

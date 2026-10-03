@@ -34,7 +34,7 @@
     _class,
     {
       _id: { $in: [...completionMap.keys()] },
-      ...(search === '' ? {} : { name: { $like: `%${search}%` } })
+      ...(search === '' ? {} : { name: { $contains: search } })
     },
     (result) => {
       items = result

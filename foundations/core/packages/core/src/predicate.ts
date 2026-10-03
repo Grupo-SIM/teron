@@ -15,6 +15,7 @@
 //
 
 import type { Doc } from './classes'
+import { containsSearch } from './search'
 import { getObjectValue } from './objvalue'
 import { escapeLikeForRegexp } from './utils'
 
@@ -76,6 +77,12 @@ const predicates: Record<string, PredicateFactory> = {
           return !o.some((p) => p == value)
         }
       })
+  },
+
+  $contains: (query: string, propertyKey: string): Predicate => {
+    return (docs) => execPredicate(docs, propertyKey, (value) => Array.isArray(value)
+      ? value.some((item) => containsSearch(item, query))
+      : containsSearch(value, query))
   },
 
   $like: (query: string, propertyKey: string): Predicate => {

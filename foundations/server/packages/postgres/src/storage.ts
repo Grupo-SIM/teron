@@ -37,6 +37,7 @@ import core, {
   groupByArray,
   type Hierarchy,
   isOperator,
+  normalizeSearch,
   type Iterator,
   type Lookup,
   type MeasureContext,
@@ -1359,6 +1360,9 @@ abstract class PostgresAdapterBase implements DbAdapter {
             } else if (Array.isArray(val) && val.length > 0) {
               res.push(`${tlkey} != ALL(${vars.addArray(val, valType)})`)
             }
+            break
+          case '$contains':
+            res.push(`strpos(lower(regexp_replace(normalize(${tlkey}, NFD), '[̀-ͯ]', '', 'g')), ${vars.add(normalizeSearch(String(val)), valType)}) > 0`)
             break
           case '$like':
             res.push(`${tlkey} ILIKE ${vars.add(val, valType)}`)

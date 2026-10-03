@@ -9,7 +9,7 @@
 
   let isCardArchive = true
   let search: string = ''
-  $: query = { space, title: { $like: '%' + search + '%' } }
+  $: query = { space, title: { $contains: search } }
   $: label = isCardArchive ? board.string.SwitchToLists : board.string.SwitchToCards
 </script>
 

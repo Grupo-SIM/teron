@@ -112,7 +112,7 @@
             : { _id: { $nin: ignoreObjects, ..._idExtra } }
         default:
           return search !== ''
-            ? { [searchField]: { $like: '%' + search + '%' }, _id: { $nin: ignoreObjects, ..._idExtra } }
+            ? { [searchField]: { $contains: search }, _id: { $nin: ignoreObjects, ..._idExtra } }
             : { _id: { $nin: ignoreObjects, ..._idExtra } }
       }
     })()
@@ -132,7 +132,7 @@
     sQuery.query<Doc>(
       _class,
       search !== ''
-        ? { [searchField]: { $like: '%' + search + '%' }, _id: { $in: selectedObjects } }
+        ? { [searchField]: { $contains: search }, _id: { $in: selectedObjects } }
         : { _id: { $in: selectedObjects } },
       (result) => {
         result.sort(sort)

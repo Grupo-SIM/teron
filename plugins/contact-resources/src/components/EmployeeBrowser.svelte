@@ -8,7 +8,7 @@
   export let search: string = ''
   const client = getClient()
   // export let withHeader: boolean = true
-  $: searchQuery = search.trim().length ? { name: { $like: `%${search.trim()}%` } } : {}
+  $: searchQuery = search.trim().length ? { name: { $contains: search.trim() } } : {}
   $: resultQuery = { ...searchQuery }
   let employees: Employee[] = []
 
