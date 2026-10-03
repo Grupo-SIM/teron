@@ -205,8 +205,12 @@ export class TIssue extends TTask implements Issue {
   @ReadOnly()
   declare number: number
 
-  @Prop(TypeRef(contact.class.Person), tracker.string.Assignee)
+  @Prop(ArrOf(TypeRef(contact.class.Person)), tracker.string.Assignee)
   @Index(IndexKind.Indexed)
+  declare assignees?: Ref<Person>[]
+
+  @Prop(TypeRef(contact.class.Person), tracker.string.Assignee)
+  @Hidden()
   declare assignee: Ref<Person> | null
 
   @Prop(TypeRef(tracker.class.Component), tracker.string.Component, { icon: tracker.icon.Component })
@@ -286,7 +290,11 @@ export class TIssueTemplate extends TDoc implements IssueTemplate {
   @Prop(TypeIssuePriority(), tracker.string.Priority)
     priority!: IssuePriority
 
+  @Prop(ArrOf(TypeRef(contact.class.Person)), tracker.string.Assignee)
+    assignees?: Ref<Person>[]
+
   @Prop(TypeRef(contact.class.Person), tracker.string.Assignee)
+  @Hidden()
     assignee!: Ref<Person> | null
 
   @Prop(TypeRef(tracker.class.Component), tracker.string.Component)

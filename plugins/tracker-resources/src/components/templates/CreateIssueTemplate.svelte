@@ -13,6 +13,7 @@
 // limitations under the License.
 -->
 <script lang="ts">
+  import { getTaskAssignees } from '@hcengineering/task'
   import { Person } from '@hcengineering/contact'
   import { Data, Doc, Ref, generateId } from '@hcengineering/core'
   import { Card, KeyedAttribute, SpaceSelector, createQuery, getClient } from '@hcengineering/presentation'
@@ -96,7 +97,8 @@
     const value: Data<IssueTemplate> = {
       title: getTitle(object.title),
       description: object.description,
-      assignee: object.assignee,
+      assignee: null,
+        assignees: getTaskAssignees(object),
       component: null,
       milestone: object.milestone,
       priority: object.priority,
@@ -208,7 +210,7 @@
       object={{ ...object, space }}
       kind={'regular'}
       size={'large'}
-      on:change={({ detail }) => (object.assignee = detail)}
+      on:change={({ detail }) => (object.assignees = detail)}
     />
     <Component
       is={tags.component.TagsDropdownEditor}

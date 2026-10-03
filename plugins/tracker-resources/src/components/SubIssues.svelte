@@ -13,6 +13,7 @@
  // limitations under the License.
  -->
 <script lang="ts">
+  import { getTaskAssignees } from '@hcengineering/task'
   import attachment, { Attachment } from '@hcengineering/attachment'
   import core, { AttachedData, Doc, makeCollabId, Ref } from '@hcengineering/core'
   import { DraftController, draftsStore, getClient, deleteFile, createMarkup } from '@hcengineering/presentation'
@@ -77,7 +78,8 @@
       const cvalue: AttachedData<Issue> = {
         title: subIssue.title.trim(),
         description: null,
-        assignee: subIssue.assignee,
+        assignee: null,
+        assignees: getTaskAssignees(subIssue),
         component: subIssue.component,
         milestone: subIssue.milestone,
         number,

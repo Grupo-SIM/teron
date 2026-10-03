@@ -406,7 +406,7 @@ export function createActions (builder: Builder, issuesId: string, myIssuesId: s
       action: view.actionImpl.AttributeSelector,
       actionPopup: tracker.component.AssigneeEditor,
       actionProps: {
-        attribute: 'assignee',
+        attribute: 'assignees',
         isAction: true,
         valueKey: 'object'
         // _class: contact.mixin.Employee,

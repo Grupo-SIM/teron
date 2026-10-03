@@ -72,6 +72,7 @@ import { createStorageDataAdapter } from './blobStorage'
 import { CommunicationMiddleware, type CommunicationApiFactory } from './communication'
 
 import { RatingMiddleware } from '@hcengineering/server-rating'
+import { TaskAssigneesMiddleware } from './TaskAssigneesMiddleware'
 import { WorkspaceAuthorizationMiddleware } from './WorkspaceAuthorizationMiddleware'
 import { DocumentLockMiddleware } from '@hcengineering/server-document-resources'
 
@@ -144,6 +145,7 @@ export function createServerPipeline (
       LookupMiddleware.create,
       NormalizeTxMiddleware.create,
       IdentityMiddleware.create,
+      TaskAssigneesMiddleware.create,
       WorkspaceAuthorizationMiddleware.create,
       ModifiedMiddleware.create,
       RankMiddleware.create,

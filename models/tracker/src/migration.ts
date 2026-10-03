@@ -41,10 +41,11 @@ import { DOMAIN_ACTIVITY } from '@hcengineering/model-activity'
 import { DOMAIN_SPACE } from '@hcengineering/model-core'
 import { DOMAIN_TASK, migrateDefaultStatusesBase } from '@hcengineering/model-task'
 import tags from '@hcengineering/tags'
-import task, { type ProjectStatus, type ProjectType, type TaskType } from '@hcengineering/task'
+import task, { getTaskAssignees, type ProjectStatus, type ProjectType, type TaskType } from '@hcengineering/task'
 import tracker, {
   type Issue,
   type IssueStatus,
+  type IssueTemplate,
   type Project,
   TimeReportDayType,
   isTimedIssueStatus,
@@ -53,6 +54,7 @@ import tracker, {
   trackerId
 } from '@hcengineering/tracker'
 
+import { DOMAIN_TRACKER } from './types'
 import { classicIssueTaskStatuses } from '.'
 
 function currentIssueStatus (status: Ref<Status>): Ref<Status> {
@@ -630,6 +632,31 @@ export const trackerOperation: MigrateOperation = {
   },
   async migrate (client: MigrationClient, mode): Promise<void> {
     await tryMigrate(mode, client, trackerId, [
+      {
+        state: 'template-assignees-list',
+        func: async (client) => {
+          const templates = await client.traverse<IssueTemplate>(DOMAIN_TRACKER, { _class: tracker.class.IssueTemplate })
+          const normalize = (value: any): any => {
+            const result = { ...value, assignees: getTaskAssignees(value) }
+            delete result.assignee
+            if (Array.isArray(result.children)) result.children = result.children.map(normalize)
+            return result
+          }
+          try {
+            while (true) {
+              const batch = await templates.next(500)
+              if (batch === null || batch.length === 0) break
+              for (const item of batch) {
+                await client.update(DOMAIN_TRACKER, { _id: item._id }, {
+                  assignees: getTaskAssignees(item), children: item.children.map(normalize), $unset: { assignee: true }
+                })
+              }
+            }
+          } finally {
+            await templates.close()
+          }
+        }
+      },
       {
         state: 'identifier',
         mode: 'upgrade',

@@ -38,3 +38,6 @@
 - User pode editar descrição de tarefa acessível; status exige participação nos responsáveis. Demais mudanças organizacionais são recusadas pelo servidor, inclusive lotes e transações condicionais.
 - Usuários podem usar suas agendas/eventos, conversar, entrar em chamadas, enviar arquivos e editar conteúdo de documentos acessíveis e desbloqueados. Concessões específicas de Diretrizes ainda estão em implementação.
 - Exceções de contadores, histórico e notificações pertencem somente a contextos internos confiáveis; transações cliente não podem usar essas exceções.
+
+- Responsáveis de tarefa são lista única de pessoas; zero responsáveis é lista vazia. Lista explícita prevalece sobre campo escalar legado, inclusive quando vazia. Novas transações persistem lista; integrações antigas são normalizadas no servidor.
+- Templates, subtarefas e duplicações preservam todos os responsáveis. Colaboradores e destinatários devem ser únicos, sem notificações repetidas por pessoa.

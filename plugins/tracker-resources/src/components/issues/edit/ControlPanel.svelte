@@ -14,7 +14,7 @@
 -->
 <script lang="ts">
   import { EmployeeBox, getPersonRefByPersonIdCb } from '@hcengineering/contact-resources'
-  import core, { Class, ClassifierKind, Doc, Mixin, Ref } from '@hcengineering/core'
+  import core, { Class, ClassifierKind, Doc, Mixin, Ref, AccountRole, getCurrentAccount, hasAccountRole } from '@hcengineering/core'
   import { AttributeBarEditor, createQuery, getClient, KeyedAttribute } from '@hcengineering/presentation'
   import { Person } from '@hcengineering/contact'
   import tags from '@hcengineering/tags'
@@ -38,6 +38,7 @@
 
   export let issue: Issue
   export let readonly = false
+  $: structureReadonly = readonly || !hasAccountRole(getCurrentAccount(), AccountRole.Maintainer)
 
   const query = createQuery()
   let showIsBlocking = false
@@ -56,7 +57,7 @@
     'status',
     'kind',
     'number',
-    'assignee',
+    'assignees',
     'component',
     'dueDate',
     'milestone',
@@ -131,7 +132,7 @@
     <span class="labelTop">
       <Label label={tracker.string.BlockedBy} />
     </span>
-    <RelationEditor value={issue} type="blockedBy" {readonly} disabled={$restrictionStore.disableNavigation} />
+    <RelationEditor value={issue} type="blockedBy" readonly={structureReadonly} disabled={$restrictionStore.disableNavigation} />
   {/if}
   {#if showIsBlocking}
     <span class="labelTop">
@@ -141,7 +142,7 @@
       value={issue}
       type="isBlocking"
       {blockedBy}
-      {readonly}
+      readonly={structureReadonly}
       disabled={$restrictionStore.disableNavigation}
     />
   {/if}
@@ -149,13 +150,13 @@
     <span class="labelTop">
       <Label label={tracker.string.Related} />
     </span>
-    <RelationEditor value={issue} type="relations" {readonly} disabled={$restrictionStore.disableNavigation} />
+    <RelationEditor value={issue} type="relations" readonly={structureReadonly} disabled={$restrictionStore.disableNavigation} />
   {/if}
 
   <span class="labelOnPanel">
     <Label label={tracker.string.Priority} />
   </span>
-  <PriorityEditor value={issue} size={'medium'} shouldShowLabel isEditable={!readonly} width={'100%'} />
+  <PriorityEditor value={issue} size={'medium'} shouldShowLabel isEditable={!structureReadonly} width={'100%'} />
 
   <span class="labelOnPanel">
     <Label label={core.string.CreatedBy} />
@@ -174,20 +175,20 @@
   <span class="labelOnPanel">
     <Label label={tracker.string.Assignee} />
   </span>
-  <AssigneeEditor object={issue} size={'medium'} avatarSize={'card'} width="100%" {readonly} />
+  <AssigneeEditor object={issue} size={'medium'} avatarSize={'card'} width="100%" readonly={structureReadonly} />
 
   <span class="labelTop">
     <Label label={tracker.string.Labels} />
   </span>
   <Component
     is={tags.component.TagsAttributeEditor}
-    props={{ object: issue, label: tracker.string.AddLabel, readonly }}
+    props={{ object: issue, label: tracker.string.AddLabel, readonly: structureReadonly }}
   />
 
   <span class="labelOnPanel">
     <Label label={tracker.string.Milestone} />
   </span>
-  <MilestoneEditor value={issue} space={issue.space} size={'medium'} isEditable={!readonly} />
+  <MilestoneEditor value={issue} space={issue.space} size={'medium'} isEditable={!structureReadonly} />
 
   {#if issue.dueDate !== null}
     <div class="divider" />
@@ -195,14 +196,14 @@
     <span class="labelOnPanel">
       <Label label={tracker.string.DueDate} />
     </span>
-    <DueDateEditor value={issue} width={'100%'} editable={!readonly} />
+    <DueDateEditor value={issue} width={'100%'} editable={!structureReadonly} />
   {/if}
 
   {#if keys.length > 0}
     <div class="divider" />
     {#each keys as key (typeof key === 'string' ? key : key.key)}
       <AttributeBarEditor
-        {readonly}
+        readonly={structureReadonly}
         {key}
         identifier={issue.identifier}
         _class={issue._class}
@@ -222,7 +223,7 @@
           {key}
           identifier={issue.identifier}
           _class={mixin._id}
-          {readonly}
+          readonly={structureReadonly}
           object={hierarchy.as(issue, mixin._id)}
           showHeader={true}
           size={'medium'}

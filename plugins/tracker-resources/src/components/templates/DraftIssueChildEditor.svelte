@@ -17,7 +17,7 @@
   import core, { Doc, generateId, type PersonId, Ref } from '@hcengineering/core'
   import presentation, { DraftController, getClient, KeyedAttribute } from '@hcengineering/presentation'
   import tags, { TagElement, TagReference } from '@hcengineering/tags'
-  import { TaskType } from '@hcengineering/task'
+  import { TaskType, getTaskAssignees } from '@hcengineering/task'
   import { TaskKindSelector } from '@hcengineering/task-resources'
   import {
     Component as ComponentType,
@@ -93,7 +93,7 @@
 
   function objectChange (object: IssueDraft, empty: any) {
     if (shouldSaveDraft) {
-      draftController.save(object, empty)
+      draftController.save({ ...object, assignee: null, assignees: getTaskAssignees(object) }, empty)
     }
   }
 
@@ -223,7 +223,7 @@
             {object}
             size="small"
             kind="no-border"
-            on:change={({ detail }) => (object.assignee = detail)}
+            on:change={({ detail }) => (object.assignees = detail)}
           />
         {/key}
       </div>

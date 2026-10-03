@@ -148,7 +148,7 @@ function defineNotifications (builder: Builder): void {
       generated: false,
       label: task.string.AssignedToMe,
       group: tracker.ids.TrackerNotificationGroup,
-      field: 'assignee',
+      field: 'assignees',
       txClasses: [core.class.TxCreateDoc, core.class.TxUpdateDoc],
       objectClass: tracker.class.Issue,
       onlyOwn: true,
@@ -167,7 +167,7 @@ function defineNotifications (builder: Builder): void {
     tracker.class.Issue,
     tracker.ids.TrackerNotificationGroup,
     [],
-    ['comments', 'status', 'priority', 'assignee', 'subIssues', 'blockedBy', 'milestone', 'dueDate']
+    ['comments', 'status', 'priority', 'assignees', 'subIssues', 'blockedBy', 'milestone', 'dueDate']
   )
 }
 
@@ -184,7 +184,7 @@ function defineFilters (builder: Builder): void {
       'priority',
       'space',
       'createdBy',
-      'assignee',
+      'assignees',
       {
         _class: tracker.class.Issue,
         key: 'milestone',
@@ -498,7 +498,7 @@ export function createModel (builder: Builder): void {
 
   builder.createDoc<ClassCollaborators<Issue>>(core.class.ClassCollaborators, core.space.Model, {
     attachedTo: tracker.class.Issue,
-    fields: ['createdBy', 'assignee']
+    fields: ['createdBy', 'assignees']
   })
 
   builder.mixin(tracker.class.Issue, core.class.Class, setting.mixin.Editable, {
@@ -704,7 +704,7 @@ export function createModel (builder: Builder): void {
       { status: 1 },
       { project: 1 },
       { priority: 1 },
-      { assignee: 1 },
+      { assignees: 1 },
       { sprint: 1 },
       { component: 1 },
       { category: 1 },

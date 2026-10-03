@@ -13,6 +13,7 @@
 // limitations under the License.
 -->
 <script lang="ts">
+  import { getTaskAssignees } from '@hcengineering/task'
   import activity from '@hcengineering/activity'
   import { Analytics } from '@hcengineering/analytics'
   import { Attachment } from '@hcengineering/attachment'
@@ -100,6 +101,7 @@
   export let status: Ref<IssueStatus> | undefined = undefined
   export let priority: IssuePriority | undefined = undefined
   export let assignee: Ref<Employee> | null = null
+  export let assignees: Ref<Employee>[] | undefined = undefined
   export let component: Ref<ComponentType> | null = null
   export let milestone: Ref<Milestone> | null = null
   export let relatedTo: Doc | undefined
@@ -152,7 +154,7 @@
 
   function objectChange (object: IssueDraft, empty: any): void {
     if (shouldSaveDraft) {
-      draftController.save(object, empty)
+      draftController.save({ ...object, assignee: null, assignees: getTaskAssignees(object) }, empty)
     }
   }
 
@@ -179,9 +181,11 @@
     const _parentIssue = parentIssue
     return {
       ...draft,
+      assignee: null,
+      assignees: getTaskAssignees(draft),
       ...(status != null ? { status } : {}),
       ...(priority != null ? { priority } : {}),
-      ...(assignee != null ? { assignee } : {}),
+      ...(assignees !== undefined ? { assignees } : assignee != null ? { assignee: null, assignees: [assignee] } : {}),
       ...(milestone != null ? { milestone } : {}),
       ...(_parentIssue !== undefined ? { parentIssue: _parentIssue._id } : {})
     }
@@ -202,6 +206,7 @@
       milestone: milestone ?? $activeMilestone ?? null,
       status,
       assignee,
+      assignees,
       labels: [],
       parentIssue: parentIssue?._id,
       subIssues: []
@@ -212,7 +217,8 @@
         status: originalIssue.status,
         priority: originalIssue.priority,
         dueDate: originalIssue.dueDate,
-        assignee: originalIssue.assignee,
+        assignee: null,
+        assignees: getTaskAssignees(originalIssue),
         estimation: originalIssue.estimation,
         parentIssue: originalIssue.parents[0]?.parentId,
         title: `${originalIssue.title} (copy)`
@@ -250,6 +256,7 @@
 
   $: empty = {
     assignee: assignee ?? currentProject?.defaultAssignee,
+    assignees,
     status: status ?? currentProject?.defaultIssueStatus,
     parentIssue: parentIssue?._id,
     description: EmptyMarkup,
@@ -316,6 +323,8 @@
     object.subIssues = template.children.map((p) => {
       return {
         ...p,
+        assignee: null,
+        assignees: getTaskAssignees(p),
         kind: p.kind ?? kind ?? ('' as Ref<TaskType>),
         _id: generateId(),
         space: _space as Ref<Project>,
@@ -338,10 +347,13 @@
       ...object,
       description: description ?? EmptyMarkup,
       ...templBase,
+      assignee: null,
+      assignees: getTaskAssignees(template),
       template: {
         template: template._id
       }
     }
+    isAssigneeTouched = true
     appliedTemplateId = templateId
     object.labels =
       labels !== undefined
@@ -389,18 +401,16 @@
   }
 
   function resetDefaultAssigneeId (): void {
-    if (!isAssigneeTouched && !(object.assignee == null) && object.assignee === currentProject?.defaultAssignee) {
-      object = { ...object, assignee: assignee ?? null }
+    const selected = getTaskAssignees(object)
+    if (!isAssigneeTouched && selected.length === 1 && selected[0] === currentProject?.defaultAssignee) {
+      object = { ...object, assignee: null, assignees: getTaskAssignees({ assignee, assignees }) }
     }
   }
 
   function updateAssigneeId (object: IssueDraft, currentProject: Project | undefined): void {
-    if (!isAssigneeTouched && object.assignee == null && currentProject !== undefined) {
-      if (currentProject.defaultAssignee !== undefined) {
-        object.assignee = currentProject.defaultAssignee
-      } else {
-        object.assignee = null
-      }
+    if (!isAssigneeTouched && getTaskAssignees(object).length === 0 && currentProject !== undefined) {
+      object.assignees = getTaskAssignees({ assignee: currentProject.defaultAssignee })
+      object.assignee = null
     }
   }
   function clearParentIssue (): void {
@@ -421,7 +431,7 @@
 
   export function onOutsideClick (): void {
     if (shouldSaveDraft) {
-      draftController.save(object, empty)
+      draftController.save({ ...object, assignee: null, assignees: getTaskAssignees(object) }, empty)
     }
   }
 
@@ -487,7 +497,8 @@
       const value: DocData<Issue> = {
         title: getTitle(object.title),
         description: null,
-        assignee: object.assignee,
+        assignee: null,
+        assignees: getTaskAssignees(object),
         component: null,
         milestone: object.milestone,
         number,
@@ -659,7 +670,7 @@
   }
 
   async function showConfirmationDialog (): Promise<void> {
-    draftController.save(object, empty)
+    draftController.save({ ...object, assignee: null, assignees: getTaskAssignees(object) }, empty)
     const isFormEmpty = draft === undefined
 
     if (isFormEmpty) {
@@ -754,7 +765,8 @@
   $: extraProps = {
     status: object.status,
     priority: object.priority,
-    assignee: object.assignee,
+    assignee: null,
+        assignees: getTaskAssignees(object),
     milestone: object.milestone,
     relatedTo,
     parentIssue,
@@ -945,7 +957,7 @@
         short
         on:change={({ detail }) => {
           isAssigneeTouched = true
-          object.assignee = detail
+          object.assignees = detail
           manager.setFocusPos(5)
         }}
       />

@@ -107,7 +107,11 @@ export class TTask extends TAttachedDoc implements Task {
   @Hidden()
     number!: number
 
+  @Prop(ArrOf(TypeRef(contact.mixin.Employee)), task.string.TaskAssignee)
+    assignees?: Ref<Person>[]
+
   @Prop(TypeRef(contact.mixin.Employee), task.string.TaskAssignee)
+  @Hidden()
     assignee!: Ref<Person> | null
 
   @Prop(TypeDate(), task.string.DueDate, { editor: task.component.DueDateEditor })

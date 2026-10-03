@@ -14,7 +14,7 @@
 -->
 <script lang="ts">
   import { AttachmentStyleBoxCollabEditor } from '@hcengineering/attachment-resources'
-  import { Class, Doc, Ref, WithLookup } from '@hcengineering/core'
+  import { Class, Doc, Ref, WithLookup, AccountRole, getCurrentAccount, hasAccountRole } from '@hcengineering/core'
   import { Panel } from '@hcengineering/panel'
   import presentation, {
     ActionContext,
@@ -77,6 +77,7 @@
   }
 
   let effectiveReadonly = true
+  $: structureReadonly = effectiveReadonly || !hasAccountRole(getCurrentAccount(), AccountRole.Maintainer)
   $: if (issue !== undefined) {
     const currentIssue = issue
     void canEditIssue(currentIssue).then((canEdit) => {
@@ -250,17 +251,17 @@
       {/if}
       <ComponentExtensions
         extension={tracker.extensions.EditIssueTitle}
-        props={{ size: 'medium', kind: 'ghost', space: issue.space, value: issue, readonly: effectiveReadonly }}
+        props={{ size: 'medium', kind: 'ghost', space: issue.space, value: issue, readonly: structureReadonly }}
       />
     </svelte:fragment>
     <svelte:fragment slot="pre-utils">
       <ComponentExtensions
         extension={view.extensions.EditDocTitleExtension}
-        props={{ size: 'medium', kind: 'ghost', _id, _class, value: issue, readonly: effectiveReadonly }}
+        props={{ size: 'medium', kind: 'ghost', _id, _class, value: issue, readonly: structureReadonly }}
       />
       <ComponentExtensions
         extension={tracker.extensions.EditIssueHeader}
-        props={{ size: 'medium', kind: 'ghost', space: issue.space, readonly: effectiveReadonly, value: issue }}
+        props={{ size: 'medium', kind: 'ghost', space: issue.space, readonly: structureReadonly, value: issue }}
       />
       {#if saved}
         <Label label={presentation.string.Saved} />
@@ -268,7 +269,7 @@
     </svelte:fragment>
 
     <svelte:fragment slot="utils">
-      {#if !effectiveReadonly && hasMenuActions}
+      {#if !structureReadonly && hasMenuActions}
         <Button
           icon={IconMoreH}
           iconProps={{ size: 'medium' }}
@@ -282,7 +283,7 @@
     {#if hasParentIssue}
       <div class="mb-6 flex-row-center">
         <SubIssueSelector {issue} />
-        {#if !effectiveReadonly}
+        {#if !structureReadonly}
           <div class="ml-2">
             <Button
               icon={tracker.icon.UnsetParent}
@@ -301,7 +302,7 @@
     <EditBox
       focusIndex={1}
       bind:value={title}
-      disabled={effectiveReadonly}
+      disabled={structureReadonly}
       placeholder={tracker.string.IssueTitlePlaceholder}
       kind="large-style"
       on:blur={save}
@@ -327,13 +328,13 @@
       {/key}
     </div>
 
-    <RelationsEditor object={issue} readonly={effectiveReadonly} />
+    <RelationsEditor object={issue} readonly={structureReadonly} />
 
     {#if editorFooter}
       <div class="step-tb-6">
         <Component
           is={editorFooter.footer}
-          props={{ object: issue, _class, ...editorFooter.props, readonly: effectiveReadonly }}
+          props={{ object: issue, _class, ...editorFooter.props, readonly: structureReadonly }}
         />
       </div>
     {/if}

@@ -198,8 +198,8 @@
       <AssigneeEditor
         object={{ ...issue, space: project }}
         on:change={(evt) => {
-          dispatch('update-issue', { id: issue.id, assignee: evt.detail })
-          issue.assignee = evt.detail
+          dispatch('update-issue', { id: issue.id, assignees: evt.detail })
+          issue.assignees = evt.detail
         }}
       />
     </div>

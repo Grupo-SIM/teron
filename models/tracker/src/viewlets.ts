@@ -26,7 +26,7 @@ import tracker from './plugin'
 export const issuesOptions = (kanban: boolean): ViewOptionsModel => ({
   groupBy: [
     'status',
-    'assignee',
+    'assignees',
     'priority',
     'space',
     'milestone',
@@ -171,9 +171,9 @@ export function issueConfig (
       displayProps: { key: key + 'modified', fixed: 'left', dividerBefore: true }
     },
     {
-      key: 'assignee',
+      key: 'assignees',
       presenter: tracker.component.AssigneeEditor,
-      displayProps: { key: 'assignee', fixed: 'right' },
+      displayProps: { key: 'assignees', fixed: 'right' },
       props: { kind: 'list', shouldShowName: false, avatarSize: 'x-small' }
     }
   ]
@@ -226,7 +226,7 @@ export function defineViewlets (builder: Builder): void {
   )
 
   const subIssuesOptions: ViewOptionsModel = {
-    groupBy: ['status', 'assignee', 'priority', 'milestone', 'createdBy', 'modifiedBy'],
+    groupBy: ['status', 'assignees', 'priority', 'milestone', 'createdBy', 'modifiedBy'],
     orderBy: [
       ['rank', SortingOrder.Ascending],
       ['status', SortingOrder.Ascending],
@@ -268,7 +268,7 @@ export function defineViewlets (builder: Builder): void {
   )
 
   const milestoneIssueOptions: ViewOptionsModel = {
-    groupBy: ['status', 'assignee', 'priority', 'createdBy', 'modifiedBy'],
+    groupBy: ['status', 'assignees', 'priority', 'createdBy', 'modifiedBy'],
     orderBy: [
       ['rank', SortingOrder.Ascending],
       ['status', SortingOrder.Ascending],
@@ -310,7 +310,7 @@ export function defineViewlets (builder: Builder): void {
   )
 
   const componentIssueOptions: ViewOptionsModel = {
-    groupBy: ['status', 'assignee', 'priority', 'milestone', 'createdBy', 'modifiedBy'],
+    groupBy: ['status', 'assignees', 'priority', 'milestone', 'createdBy', 'modifiedBy'],
     orderBy: [
       ['rank', SortingOrder.Ascending],
       ['status', SortingOrder.Ascending],
@@ -358,7 +358,7 @@ export function defineViewlets (builder: Builder): void {
       attachTo: tracker.class.IssueTemplate,
       descriptor: view.viewlet.List,
       viewOptions: {
-        groupBy: ['assignee', 'priority', 'milestone', 'createdBy', 'modifiedBy'],
+        groupBy: ['assignees', 'priority', 'milestone', 'createdBy', 'modifiedBy'],
         orderBy: [
           ['priority', SortingOrder.Ascending],
           ['modifiedOn', SortingOrder.Descending],
@@ -418,7 +418,7 @@ export function defineViewlets (builder: Builder): void {
           displayProps: { fixed: 'right', dividerBefore: true }
         },
         {
-          key: 'assignee',
+          key: 'assignees',
           presenter: tracker.component.AssigneeEditor,
           props: { kind: 'list', shouldShowName: false, avatarSize: 'x-small' }
         }

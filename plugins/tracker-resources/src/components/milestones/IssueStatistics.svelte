@@ -88,7 +88,7 @@
   )
 </script>
 
-{#if docs && (category === 'milestone' || category === 'assignee')}
+{#if docs && (category === 'milestone' || (category === 'assignees' || category === 'assignee'))}
   <FixedColumn key="estimation-editor">
     <!-- <Label label={tracker.string.MilestoneDay} value={}/> -->
     <div class="flex-row-center flex-no-shrink h-6" class:showWarning={totalEstimation > (capacity ?? 0)}>

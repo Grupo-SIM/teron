@@ -80,7 +80,7 @@ export const defaultPriorities = [
 
 export const issuesGroupBySorting: Record<IssuesGrouping, SortingQuery<Issue>> = {
   [IssuesGrouping.Status]: { '$lookup.status.rank': SortingOrder.Ascending },
-  [IssuesGrouping.Assignee]: { assignee: SortingOrder.Ascending },
+  [IssuesGrouping.Assignee]: { assignees: SortingOrder.Ascending },
   [IssuesGrouping.Priority]: { priority: SortingOrder.Ascending },
   [IssuesGrouping.Component]: { '$lookup.component.label': SortingOrder.Ascending },
   [IssuesGrouping.Milestone]: { '$lookup.milestone.label': SortingOrder.Ascending },

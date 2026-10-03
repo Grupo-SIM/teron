@@ -118,9 +118,7 @@ export async function getIssueNotificationContent (
     const updateTx = tx as TxUpdateDoc<Issue>
 
     if (
-      updateTx.operations.assignee !== null &&
-      updateTx.operations.assignee !== undefined &&
-      updateTx.operations.assignee === target
+      (updateTx.operations.assignees ?? (updateTx.operations.assignee == null ? [] : [updateTx.operations.assignee])).includes(target as any)
     ) {
       body = tracker.string.IssueAssignedToYou
     } else {

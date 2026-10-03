@@ -13,11 +13,12 @@
 // limitations under the License.
 //
 
-import { type Class, type Doc, type Hierarchy, type Ref, type PersonId } from '@hcengineering/core'
+import { type Class, type Doc, type Hierarchy, type Ref } from '@hcengineering/core'
 import trackerPlugin, { type Component, type IssueStatus, type Milestone, type Project } from '@hcengineering/tracker'
+import { getTaskAssignees } from '@hcengineering/task'
 import { type AttributeModel } from '@hcengineering/view'
 import { getClient } from '@hcengineering/presentation'
-import { getName, getPersonByPersonId } from '@hcengineering/contact'
+import contact, { getName } from '@hcengineering/contact'
 
 /**
  * Cache for IssueStatus ID -> name mappings to reduce database calls
@@ -148,38 +149,6 @@ async function loadMilestoneLabel (milestoneRef: Ref<Milestone>): Promise<string
 }
 
 /**
- * Cache for Person ID -> name mappings to reduce database calls
- */
-const personCache = new Map<PersonId, string>()
-
-/**
- * Load person name from PersonId with caching support
- */
-async function loadPersonName (personId: PersonId): Promise<string> {
-  // Check cache first
-  const cachedName = personCache.get(personId)
-  if (cachedName !== undefined) {
-    return cachedName
-  }
-
-  try {
-    const client = getClient()
-    const person = await getPersonByPersonId(client, personId)
-    if (person !== undefined && person !== null) {
-      const name = getName(client.getHierarchy(), person)
-      // Store in cache
-      personCache.set(personId, name)
-      return name
-    }
-  } catch (error) {
-    console.warn('Failed to lookup person name for:', personId, error)
-  }
-
-  // Return original ID if lookup failed
-  return String(personId)
-}
-
-/**
  * Value formatter for issue fields
  * Handles special cases for status, assignee, component, space (project), and milestone fields
  */
@@ -220,26 +189,13 @@ export async function formatIssueValue (
     return ''
   }
 
-  // Handle assignee field - format PersonId to person name
-  if (attr.key === 'assignee') {
-    const assigneeValue: unknown = issueDoc.assignee
-    if (assigneeValue !== undefined && assigneeValue !== null) {
-      // Check if assignee is in lookup
-      const issueWithLookup = issueDoc as Record<string, unknown> & { $lookup?: Record<string, unknown> }
-      const lookupAssignee: unknown = issueWithLookup.$lookup?.assignee
-      if (lookupAssignee !== undefined && lookupAssignee !== null) {
-        const assigneeObj = lookupAssignee as Record<string, unknown>
-        const assigneeName: unknown = assigneeObj.name
-        if (typeof assigneeName === 'string') {
-          return assigneeName
-        }
-      }
-      // If not in lookup, fetch it
-      if (typeof assigneeValue === 'string') {
-        return await loadPersonName(assigneeValue as PersonId)
-      }
-    }
-    return ''
+  // New and legacy column preferences render every assigned person.
+  if (attr.key === 'assignees' || attr.key === 'assignee') {
+    const names = await Promise.all(getTaskAssignees(issueDoc as any).map(async (ref) => {
+      const person = await getClient().findOne(contact.class.Person, { _id: ref })
+      return person === undefined ? String(ref) : getName(hierarchy, person)
+    }))
+    return names.join(', ')
   }
 
   // Handle component field - format Component ID to label

@@ -191,8 +191,8 @@
       <AssigneeEditor
         object={issue}
         on:change={(evt) => {
-          dispatch('update-issue', { id: issue._id, assignee: evt.detail })
-          issue.assignee = evt.detail
+          dispatch('update-issue', { id: issue._id, assignees: evt.detail })
+          issue.assignees = evt.detail
         }}
       />
     </div>

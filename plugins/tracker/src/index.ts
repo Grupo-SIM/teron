@@ -125,7 +125,7 @@ export enum IssuePriority {
  */
 export enum IssuesGrouping {
   Status = 'status',
-  Assignee = 'assignee',
+  Assignee = 'assignees',
   Priority = 'priority',
   Component = 'component',
   Milestone = 'milestone',
@@ -236,6 +236,7 @@ export interface IssueDraft {
   description: Markup
   status?: Ref<IssueStatus>
   priority: IssuePriority
+  assignees?: Ref<Person>[]
   assignee: Ref<Person> | null
   component: Ref<Component> | null
   space: Ref<Project>
@@ -264,6 +265,7 @@ export interface IssueTemplateData {
   description: Markup
   priority: IssuePriority
 
+  assignees?: Ref<Person>[]
   assignee: Ref<Person> | null
   component: Ref<Component> | null
 

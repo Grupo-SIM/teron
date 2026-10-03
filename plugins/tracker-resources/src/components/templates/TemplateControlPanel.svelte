@@ -37,7 +37,7 @@
     keys = filtredKeys.filter((key) => !isCollectionAttr(hierarchy, key))
   }
 
-  $: updateKeys(['title', 'description', 'priority', 'number', 'assignee', 'component', 'milestone', 'kind'])
+  $: updateKeys(['title', 'description', 'priority', 'number', 'assignees', 'component', 'milestone', 'kind'])
 
   const key: KeyedAttribute = {
     key: 'labels',
