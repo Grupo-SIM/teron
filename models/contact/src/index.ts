@@ -1174,31 +1174,6 @@ export function createModel (builder: Builder): void {
     contact.action.OpenChannel
   )
 
-  createAction(
-    builder,
-    {
-      action: view.actionImpl.ShowPopup,
-      actionProps: {
-        component: contact.component.MergePersons,
-        element: 'top',
-        fillProps: {
-          _object: 'value'
-        }
-      },
-      query: {},
-      label: contact.string.MergePersons,
-      category: contact.category.Contact,
-      target: contact.class.Person,
-      visibilityTester: contact.function.CanMergePersons,
-      input: 'focus',
-      context: {
-        mode: ['context'],
-        group: 'remove'
-      },
-      secured: true
-    },
-    contact.action.MergePersons
-  )
 
   // Allow to use fuzzy search for mixins
   builder.createDoc(core.class.FullTextSearchContext, core.space.Model, {

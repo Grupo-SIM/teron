@@ -66,7 +66,7 @@
     {/if}
   </svelte:fragment>
 </Header>
-<div class="teronModal-container noTopIndent type-aside">
+<div class="teronModal-container noTopIndent type-aside office-floor-selector">
   <div class="teronModal-content">
     <Scroller>
       {#each $floors as _floor}
@@ -87,3 +87,9 @@
     </Scroller>
   </div>
 </div>
+
+<style lang="scss">
+  .office-floor-selector {
+    background-color: var(--theme-panel-color);
+  }
+</style>

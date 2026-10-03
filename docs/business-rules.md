@@ -29,3 +29,4 @@
 
 - Calendário exibe compromissos do dia selecionado; Minhas Agendas restringe agendas ao titular, Agendas da Equipe permite selecionar funcionário do workspace e sua agenda, sem conceder acesso a documentos.
 - Mudança de dia usa intervalo entre meia-noite local e a seguinte; compromissos que atravessam o limite aparecem no dia correspondente. Eventos privados alheios não oferecem edição.
+- Contatos mantém seções Funcionários, Externos e Clientes; Departamento e vínculo interno de colaboradores não aparecem como campos editáveis. Mesclar contatos não é ação disponível.

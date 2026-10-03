@@ -130,11 +130,11 @@
     margin: 0 0.5rem 0.5rem;
     border: 1px solid var(--global-ui-BorderColor);
     border-radius: var(--small-BorderRadius);
-    background-color: var(--theme-button-default);
+    background-color: var(--theme-panel-color);
 
     &.selected {
       border-color: var(--theme-button-focused-border);
-      background-color: var(--theme-button-pressed);
+      background-color: var(--theme-panel-color);
     }
 
     &:not(:has(.floor-preview-content)) {

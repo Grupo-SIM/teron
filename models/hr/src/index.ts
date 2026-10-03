@@ -107,6 +107,7 @@ export class TDepartment extends TDoc implements Department {
 @UX(hr.string.Staff, hr.icon.HR, 'STFF', 'name')
 export class TStaff extends TEmployee implements Staff {
   @Prop(TypeRef(hr.class.Department), hr.string.Department)
+  @Hidden()
     department!: Ref<Department>
 }
 

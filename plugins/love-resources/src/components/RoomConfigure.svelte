@@ -276,4 +276,15 @@
     height: 100%;
     justify-content: center;
   }
+  .floorGrid-configureRoom__field :global(.teronAvatar-container),
+  .floorGrid-configureRoom__field :global(.teronAvatar-container img.ava-image) {
+    width: 100%;
+    height: 100%;
+    max-width: none;
+    max-height: none;
+  }
+  .floorGrid-configureRoom__field :global(.teronAvatar-container img.ava-image) {
+    object-fit: cover;
+    object-position: center;
+  }
 </style>
