@@ -271,9 +271,14 @@
 <style lang="scss">
   .floorGrid-configureRoom__field :global(.employee-presenter),
   .floorGrid-configureRoom__field :global(.employee-presenter .antiPresenter),
-  .floorGrid-configureRoom__field :global(.employee-presenter .ap-icon) {
+  .floorGrid-configureRoom__field :global(.employee-presenter .ap-icon),
+  .floorGrid-configureRoom__field :global(.employee-presenter .flex-presenter),
+  .floorGrid-configureRoom__field :global(.employee-presenter .relative),
+  .floorGrid-configureRoom__field :global(.employee-presenter .noOverflow) {
     width: 100%;
     height: 100%;
+    display: flex;
+    align-items: center;
     justify-content: center;
   }
   .floorGrid-configureRoom__field :global(.teronAvatar-container),

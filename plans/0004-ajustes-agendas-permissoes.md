@@ -73,3 +73,7 @@ Rascunhos/subtarefas: gravação local normaliza listas recursivamente e remove 
 Validação retomada após reinício local: build web atual passou nas duas configurações; Calendário com duas contas passou no navegador (Minhas Agendas/equipe, detalhes próprios e ocupado privado alheio). Runner específico agora prepara estado ativo e aguarda gatilhos assíncronos para conferir agendas pessoais em reexecuções. Cabeçalho vertical genérico mantém edição de status para membro atribuído, isolada dos campos estruturais.
 
 Contatos: navegação e títulos usam chaves plurais existentes (Funcionários, Externos, Clientes), preservando catálogos sincronizados. Conferência autenticada das três seções passou no navegador.
+
+Navegador ampliado: eventos de dia inteiro e atravessando meia-noite passaram, incluindo recorte 00:00–01:00; token de fundo de troca de andar passou em CSS claro/escuro. Captura com foto detectou wrappers internos ainda limitando avatar: correção expande apresentador/link/contêiner, mantendo máscara e cover. Teste mede largura/altura da imagem contra célula inteira, evitando falso positivo por contêiner interno pequeno. Verificação final dessa correção em andamento.
+
+Foto validada no navegador: largura e altura iguais à célula inteira, cover e máscara preservados; nova captura confirma preenchimento do squircle. Build web com correção passou nas duas configurações.
