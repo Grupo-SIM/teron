@@ -343,6 +343,12 @@ abstract class PostgresAdapterBase implements DbAdapter {
     res.push(`"workspaceId" = ${vars.add(this.workspaceId, '::uuid')}`)
     for (const key in query) {
       const value = query[key]
+      if (key === '$and' || key === '$or') {
+        if (!Array.isArray(value) || value.some((branch) => branch == null || typeof branch !== 'object' || Array.isArray(branch))) throw new Error('Invalid logical query.')
+        const clauses = value.map((branch) => `(${this.buildRawQuery(vars, domain, branch, options)})`)
+        res.push(clauses.length === 0 ? (key === '$and' ? 'TRUE' : 'FALSE') : `(${clauses.join(key === '$and' ? ' AND ' : ' OR ')})`)
+        continue
+      }
       const tkey = this.transformKey(domain, core.class.Doc, key, false)
       const translated = this.translateQueryValue(vars, tkey, value, 'common')
       if (translated !== undefined) {
@@ -1110,6 +1116,12 @@ abstract class PostgresAdapterBase implements DbAdapter {
       }
       const value = query[_key]
       if (value === undefined) continue
+      if (_key === '$and' || _key === '$or') {
+        if (!Array.isArray(value) || value.some((branch) => branch == null || typeof branch !== 'object' || Array.isArray(branch))) throw new Error('Invalid logical query.')
+        const clauses = value.map((branch) => `(${this.buildQuery(vars, _class, baseDomain, branch, joins, options)})`)
+        res.push(clauses.length === 0 ? (_key === '$and' ? 'TRUE' : 'FALSE') : `(${clauses.join(_key === '$and' ? ' AND ' : ' OR ')})`)
+        continue
+      }
       const key = escape(_key)
       const valueType = this.getValueType(_class, key)
       const tkey = this.getKey(_class, baseDomain, key, joins, valueType === 'dataArray')

@@ -166,6 +166,16 @@ export function matchQuery<T extends Doc> (
       continue
     }
     const value = (query as any)[key]
+    if (key === '$and' || key === '$or') {
+      if (!Array.isArray(value) || value.some((branch) => branch == null || typeof branch !== 'object' || Array.isArray(branch))) throw new Error('Invalid logical query.')
+      if (key === '$and') {
+        for (const branch of value) result = matchQuery(result, branch, clazz, hierarchy, skipLookup)
+      } else {
+        const matching = new Set(value.flatMap((branch) => matchQuery(result, branch, clazz, hierarchy, skipLookup)))
+        result = result.filter((doc) => matching.has(doc))
+      }
+      continue
+    }
     const tkey = checkMixinKey(key, clazz, hierarchy)
     result = findProperty(result, tkey, value)
     if (result.length === 0) {

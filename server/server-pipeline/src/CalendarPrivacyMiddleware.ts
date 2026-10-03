@@ -19,6 +19,11 @@ export function busyEvent (event: Event): Event {
   } as Event
 }
 
+function intersectQuery<T extends Doc> (query: DocumentQuery<T>, restriction: DocumentQuery<T>): DocumentQuery<T> {
+  const { $search, ...predicates } = query
+  return { ...($search === undefined ? {} : { $search }), $and: [predicates, restriction] }
+}
+
 /** Privacy applies to reads, lookups, global search and realtime, even for workspace administrators. */
 export class CalendarPrivacyMiddleware extends BaseMiddleware {
   static async create (_ctx: MeasureContext, context: PipelineContext, next?: Middleware): Promise<Middleware> {
@@ -45,17 +50,17 @@ export class CalendarPrivacyMiddleware extends BaseMiddleware {
       const sensitive = (value: any): boolean => Object.entries(value ?? {}).some(([key, item]) => key === '$search' || (!key.startsWith('$') && !busyFields.has(key)) || (key.startsWith('$') && typeof item === 'object' && (Array.isArray(item) ? item.some(sensitive) : sensitive(item))))
       if (sensitive(query) || Object.keys(options?.sort ?? {}).some((key) => !busyFields.has(key))) {
         const publicCalendars = [...calendars.values()].filter((row) => row.visibility === 'public').map((row) => row._id)
-        secured = { $and: [query, { $or: [{ _class: { $nin: hierarchy.getDescendants(calendar.class.Event) } }, { user: { $in: socialIds } }, { visibility: 'public' }, { visibility: { $exists: false }, calendar: { $in: publicCalendars } }] }] } as DocumentQuery<T>
+        secured = intersectQuery(query, { $or: [{ _class: { $nin: hierarchy.getDescendants(calendar.class.Event) } }, { user: { $in: socialIds } }, { visibility: 'public' }, { visibility: { $exists: false }, calendar: { $in: publicCalendars } }] } as DocumentQuery<T>)
       }
     }
     if (hierarchy.isDerived(clazz, core.class.AttachedDoc) && !hierarchy.isDerived(clazz, calendar.class.Event)) {
       const events = await this.provideFindAll(ctx, calendar.class.Event, {})
       const privateEvents = events.filter((event) => !eventDetailsAllowed(event, calendars, socialIds)).map((event) => event._id)
-      if (privateEvents.length > 0) secured = { $and: [secured, { attachedTo: { $nin: privateEvents } }] } as DocumentQuery<T>
+      if (privateEvents.length > 0) secured = intersectQuery(secured, { attachedTo: { $nin: privateEvents } } as DocumentQuery<T>)
     }
     // Event transaction history contains original details; only its author can read it.
     if (hierarchy.isDerived(clazz, core.class.Tx)) {
-      secured = { $and: [secured, { $or: [{ objectClass: { $nin: hierarchy.getDescendants(calendar.class.Event) } }, { modifiedBy: { $in: socialIds } }] }] } as DocumentQuery<T>
+      secured = intersectQuery(secured, { $or: [{ objectClass: { $nin: hierarchy.getDescendants(calendar.class.Event) } }, { modifiedBy: { $in: socialIds } }] } as DocumentQuery<T>)
     }
     const rows = await this.provideFindAll(ctx, clazz, secured, options)
     const sanitize = async (value: any, expectedEvent = false): Promise<any> => {
