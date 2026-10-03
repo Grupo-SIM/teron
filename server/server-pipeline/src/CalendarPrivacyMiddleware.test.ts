@@ -58,11 +58,29 @@ describe('server calendar privacy', () => {
     const nested = await middleware.findAll(ctx, core.class.Doc, {}, { lookup: {} })
     expect(nested.lookupMap?.['1']).toMatchObject({ _id: event._id, title: '', date: 100 })
   })
+  it('protects private event attachments in base-document reads, lookups and realtime', async () => {
+    const { middleware, ctx, find } = fixture()
+    const attached: any = { _id: 'attachment', _class: core.class.AttachedDoc, attachedTo: event._id, attachedToClass: event._class, name: 'Private file' }
+    find.mockImplementation(async (_ctx: unknown, clazz: string) => Object.assign(clazz === calendar.class.Calendar ? [...calendars] : clazz === calendar.class.Event ? [event] : [attached], { total: 1 }))
+    expect(await middleware.findAll(ctx, core.class.Doc, { _id: attached._id })).toHaveLength(0)
+    const tx: any = { _id: 'attachment-tx', _class: core.class.TxCreateDoc, objectId: attached._id, objectClass: attached._class }
+    ctx.contextData.broadcast.txes.push(tx)
+    await middleware.handleBroadcast(ctx)
+    expect(await ctx.contextData.broadcast.targets.calendarPrivacy(tx)).toEqual({ target: ['other-account'] })
+  })
   it('restricts predicates on details and removes private fulltext hits/counts', async () => {
     const { middleware, ctx, find } = fixture()
     await middleware.findAll(ctx, calendar.class.Event, { title: 'Secret' })
     expect(find.mock.calls.some((call) => call[2].$and !== undefined)).toBe(true)
-    expect(await middleware.searchFulltext(ctx, { query: 'Secret' }, {})).toEqual({ docs: [], total: 0 })
+    expect(await middleware.searchFulltext(ctx, { query: 'Secret' }, {})).toEqual({ docs: [], total: undefined })
+  })
+  it('applies search privacy before limits and preserves authorized totals', async () => {
+    const { middleware, ctx } = fixture()
+    const search = jest.fn(async () => ({ docs: [{ doc: { _id: 'public', _class: core.class.Doc } }], total: 17 }))
+    ;(middleware as any).next.searchFulltext = search
+    const result = await middleware.searchFulltext(ctx, { query: 'Reunião' }, { limit: 1 })
+    expect(search.mock.calls[0]).toEqual([ctx, { query: 'Reunião', excludeDocIds: [event._id] }, { limit: 1 }])
+    expect(result.total).toBe(17)
   })
   it('targets raw realtime payloads to owner and sends only invalidation to everyone else', async () => {
     const { middleware, ctx } = fixture()

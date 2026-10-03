@@ -53,7 +53,7 @@ export class CalendarPrivacyMiddleware extends BaseMiddleware {
         secured = intersectQuery(query, { $or: [{ _class: { $nin: hierarchy.getDescendants(calendar.class.Event) } }, { user: { $in: socialIds } }, { visibility: 'public' }, { visibility: { $exists: false }, calendar: { $in: publicCalendars } }] } as DocumentQuery<T>)
       }
     }
-    if (hierarchy.isDerived(clazz, core.class.AttachedDoc) && !hierarchy.isDerived(clazz, calendar.class.Event)) {
+    if ((hierarchy.isDerived(clazz, core.class.AttachedDoc) || hierarchy.isDerived(core.class.AttachedDoc, clazz)) && !hierarchy.isDerived(clazz, calendar.class.Event)) {
       const events = await this.provideFindAll(ctx, calendar.class.Event, {})
       const privateEvents = events.filter((event) => !eventDetailsAllowed(event, calendars, socialIds)).map((event) => event._id)
       if (privateEvents.length > 0) secured = intersectQuery(secured, { attachedTo: { $nin: privateEvents } } as DocumentQuery<T>)
@@ -65,7 +65,7 @@ export class CalendarPrivacyMiddleware extends BaseMiddleware {
     const rows = await this.provideFindAll(ctx, clazz, secured, options)
     const sanitize = async (value: any, expectedEvent = false): Promise<any> => {
       if (value == null || typeof value !== 'object') return value
-      if (Array.isArray(value)) return await Promise.all(value.map((item) => sanitize(item)))
+      if (Array.isArray(value)) return (await Promise.all(value.map((item) => sanitize(item)))).filter((item) => item !== undefined)
       if (expectedEvent || (value._class != null && hierarchy.isDerived(value._class, calendar.class.Event))) {
         // Projection cannot remove the metadata needed to decide privacy.
         const fetched = (await this.provideFindAll(ctx, calendar.class.Event, { _id: value._id }))[0]
@@ -77,13 +77,18 @@ export class CalendarPrivacyMiddleware extends BaseMiddleware {
           return busyEvent(full)
         }
       }
+      if (value.attachedToClass != null && hierarchy.isDerived(value.attachedToClass, calendar.class.Event)) {
+        const parent = (await this.provideFindAll(ctx, calendar.class.Event, { _id: value.attachedTo }))[0]
+        if (parent == null || !eventDetailsAllowed(parent, calendars, socialIds)) return undefined
+      }
       const result = { ...value }
       if (result.$lookup != null) result.$lookup = Object.fromEntries(await Promise.all(Object.entries(result.$lookup).map(async ([key, entry]) => [key, await sanitize(entry)])))
       return result
     }
     const scalarPredicates = Object.fromEntries(Object.entries(secured).filter(([, value]) => ['string', 'number', 'boolean'].includes(typeof value)))
     const lookupMap = rows.lookupMap == null ? undefined : Object.fromEntries(await Promise.all(Object.entries(rows.lookupMap).map(async ([key, value]) => [key, await sanitize(value)])))
-    return toFindResult(await Promise.all(rows.map((row) => sanitize({ ...scalarPredicates, ...row }, hierarchy.isDerived(clazz, calendar.class.Event)))), rows.total, lookupMap)
+    const sanitized = (await Promise.all(rows.map((row) => sanitize({ ...scalarPredicates, ...row }, hierarchy.isDerived(clazz, calendar.class.Event))))).filter((row) => row !== undefined)
+    return toFindResult(sanitized, rows.total - (rows.length - sanitized.length), lookupMap)
   }
   override async groupBy<T, P extends Doc> (ctx: MeasureContext<SessionData>, domain: Domain, field: string, query?: DocumentQuery<P>): Promise<Map<T, number>> {
     if (this.trusted(ctx) || domain !== this.context.hierarchy.getDomain(calendar.class.Event)) return await this.provideGroupBy(ctx, domain, field, query)
@@ -94,9 +99,11 @@ export class CalendarPrivacyMiddleware extends BaseMiddleware {
     return await this.provideGroupBy(ctx, domain, field, secured)
   }
   override async searchFulltext (ctx: MeasureContext<SessionData>, query: SearchQuery, options: SearchOptions): Promise<SearchResult> {
-    const result = await this.provideSearchFulltext(ctx, query, options)
-    if (this.trusted(ctx)) return result
+    if (this.trusted(ctx)) return await this.provideSearchFulltext(ctx, query, options)
     const calendars = await this.calendars(ctx)
+    const events = await this.provideFindAll(ctx, calendar.class.Event, {})
+    const privateIds = events.filter((event) => !eventDetailsAllowed(event, calendars, ctx.contextData.account.socialIds)).map((event) => event._id)
+    const result = await this.provideSearchFulltext(ctx, { ...query, excludeDocIds: [...new Set([...(query.excludeDocIds ?? []), ...privateIds])] }, options)
     const docs = []
     for (const row of result.docs) {
       if (this.context.hierarchy.isDerived(row.doc._class, calendar.class.Event) || row.doc.attachedToClass != null && this.context.hierarchy.isDerived(row.doc.attachedToClass, calendar.class.Event)) {
@@ -105,24 +112,40 @@ export class CalendarPrivacyMiddleware extends BaseMiddleware {
       }
       docs.push(row)
     }
-    return { ...result, docs, total: docs.length }
+    // Keep backend totals when exclusions were honored before pagination.
+    // Older services may ignore exclusions; never expose their private hit count.
+    return { ...result, docs, total: docs.length === result.docs.length ? result.total : undefined }
   }
   override async handleBroadcast (ctx: MeasureContext<SessionData>): Promise<void> {
-    // Event payloads go only to their owner. Other clients refresh through a detail-free event.
-    const events = ctx.contextData.broadcast.txes.filter((tx) => TxProcessor.isExtendsCUD(tx._class) && this.context.hierarchy.isDerived((tx as TxCUD<Doc>).objectClass, calendar.class.Event)) as TxCUD<Event>[]
-    if (events.length > 0) {
-      const ids = new Set(events.map((tx) => tx._id))
+    // Restrict event details and their attachments before generic space routing.
+    const owners = new Map<string, string>()
+    const affected = new Set<Ref<Class<Doc>>>()
+    const calendars = await this.calendars(ctx)
+    for (const tx of ctx.contextData.broadcast.txes) {
+      if (!TxProcessor.isExtendsCUD(tx._class)) continue
+      const cud = tx as TxCUD<Doc>
+      const isEvent = this.context.hierarchy.isDerived(cud.objectClass, calendar.class.Event)
+      if (!isEvent && !this.context.hierarchy.isDerived(cud.objectClass, core.class.AttachedDoc)) continue
+      const doc = (await this.provideFindAll(ctx, cud.objectClass, { _id: cud.objectId }))[0] ?? ctx.contextData.removedMap.get(cud.objectId)
+      let event = isEvent ? doc as Event | undefined : undefined
+      if (!isEvent && doc != null && (doc as any).attachedToClass != null && this.context.hierarchy.isDerived((doc as any).attachedToClass, calendar.class.Event)) {
+        event = (await this.provideFindAll(ctx, calendar.class.Event, { _id: (doc as any).attachedTo }))[0] ?? ctx.contextData.removedMap.get((doc as any).attachedTo) as Event | undefined
+        if (event != null && eventDetailsAllowed(event, calendars, [])) continue
+      }
+      if (event == null && !isEvent) continue
+      owners.set(tx._id, event?.user ?? '')
+      affected.add(cud.objectClass)
+    }
+    if (owners.size > 0) {
       const privacyTarget = async (tx: any) => {
-        if (!ids.has(tx._id)) return undefined
-        const cud = tx as TxCUD<Event>
-        const event = (await this.provideFindAll(ctx, calendar.class.Event, { _id: cud.objectId }))[0] ?? ctx.contextData.removedMap.get(cud.objectId) as Event | undefined
-        const account = event == null ? undefined : ctx.contextData.socialStringsToUsers.get(event.user)?.accontUuid
+        const owner = owners.get(tx._id)
+        if (owner === undefined) return undefined
+        const account = ctx.contextData.socialStringsToUsers.get(owner)?.accontUuid
         return { target: account == null ? [] : [account] }
       }
-      // Broadcast chooses the first matching target. Privacy must precede
-      // general space routing, including targets installed during tx handling.
+      // Broadcast chooses the first matching target, including rules installed in tx.
       ctx.contextData.broadcast.targets = { calendarPrivacy: privacyTarget, ...ctx.contextData.broadcast.targets }
-      ctx.contextData.broadcast.txes.push(createBroadcastEvent([calendar.class.Event]))
+      ctx.contextData.broadcast.txes.push(createBroadcastEvent([...affected]))
     }
     await this.next?.handleBroadcast(ctx)
   }

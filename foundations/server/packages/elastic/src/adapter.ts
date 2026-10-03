@@ -270,6 +270,13 @@ export class ElasticAdapter implements FullTextAdapter {
         }
       ]
 
+      if (query.excludeDocIds !== undefined && query.excludeDocIds.length > 0) {
+        elasticQuery.query.function_score.query.bool.must_not = [
+          { terms: this.getTerms(query.excludeDocIds, 'id') },
+          { terms: this.getTerms(query.excludeDocIds, 'attachedTo') }
+        ]
+      }
+
       if (query.spaces !== undefined) {
         filter.push({
           terms: this.getTerms(query.spaces, 'space')

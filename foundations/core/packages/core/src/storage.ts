@@ -242,6 +242,8 @@ export interface TxResult {}
  */
 export interface SearchQuery {
   query: string
+  /** Server privacy exclusions applied before ranking, limits and totals. */
+  excludeDocIds?: Ref<Doc>[]
   classes?: Ref<Class<Doc>>[]
   spaces?: Ref<Space>[]
 }

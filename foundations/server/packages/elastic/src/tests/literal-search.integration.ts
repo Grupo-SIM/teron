@@ -26,11 +26,17 @@ async function main (): Promise<void> {
       const result = await adapter.searchString(ctx, workspace, { query, spaces: ['visible'] as any }, { limit: 100 })
       assert.deepEqual(result.docs.map((doc) => doc.id).sort(), [...ids].sort(), query)
     }
+    await adapter.updateMany(ctx, workspace, [make('secret-event', 'Café segredo'), { ...make('secret-attachment', 'Café anexo'), attachedTo: 'secret-event' as Ref<Doc> }])
+    const filtered = await adapter.searchString(ctx, workspace, { query: 'cafe', spaces: ['visible'] as any, excludeDocIds: ['secret-event'] as Ref<Doc>[] }, { limit: 1 })
+    assert.equal(filtered.docs.length, 1)
+    assert.ok(['one', 'two'].includes(filtered.docs[0].id))
+    assert.equal(filtered.total, 2)
     const first = await adapter.search(ctx, workspace, [klass], { $search: 'cafe', space: 'visible' as any }, 1, 0)
     const second = await adapter.search(ctx, workspace, [klass], { $search: 'cafe', space: 'visible' as any }, 1, 1)
     assert.equal(first.length, 1)
     assert.equal(second.length, 1)
     assert.notEqual(first[0].id, second[0].id)
+    await adapter.remove(ctx, workspace, ['secret-event', 'secret-attachment'] as Ref<Doc>[])
     // Simulate a pre-migration record, then rebuild twice without replacing its index/source.
     await client.index({ index: 'teron_regression_literal_v2', id: `legacy@${workspace}`, refresh: true, body: { ...make('legacy', 'Relatório legádo'), workspaceId: workspace } })
     assert.equal(await adapter.rebuildLiteralSearch(), 1)

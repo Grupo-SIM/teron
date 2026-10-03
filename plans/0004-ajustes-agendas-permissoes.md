@@ -63,3 +63,5 @@ Migração real em PostgreSQL passou duas execuções: responsável escalar vira
 Realtime: filtro de privacidade agora antecede roteamento genérico por espaço, pois broadcast usa primeira regra aplicável. Teste com regra genérica já instalada passou; sete testes de privacidade continuam aprovados.
 
 Auditoria adicional da busca: seletores de referência e filtro genérico em onze pacotes passaram de `$like`/curingas para `$contains` literal normalizado, incluindo tarefas, contatos, documentos, arquivos, etiquetas e reuniões. Build web das duas configurações passou. Compilador TypeScript isolado de pacotes de recursos não oferece loader Svelte; validação desses recursos usa build web existente.
+
+Privacidade adicional: anexos de eventos protegidos em consultas diretas, lookups e broadcast, com nove testes unitários aprovados. Exclusões de eventos/anexos privados chegam ao Elasticsearch antes de ranking/limite/total; integração Elasticsearch passou contagem autorizada com limite de um resultado. Regra mantém contagem do backend quando filtro foi honrado, sem expor contagem privada de serviços antigos.
