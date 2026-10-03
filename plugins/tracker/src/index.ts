@@ -237,7 +237,7 @@ export interface IssueDraft {
   status?: Ref<IssueStatus>
   priority: IssuePriority
   assignees?: Ref<Person>[]
-  assignee: Ref<Person> | null
+  assignee?: Ref<Person> | null
   component: Ref<Component> | null
   space: Ref<Project>
   dueDate: Timestamp | null
@@ -266,7 +266,7 @@ export interface IssueTemplateData {
   priority: IssuePriority
 
   assignees?: Ref<Person>[]
-  assignee: Ref<Person> | null
+  assignee?: Ref<Person> | null
   component: Ref<Component> | null
 
   milestone?: Ref<Milestone> | null

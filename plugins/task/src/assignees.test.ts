@@ -1,4 +1,4 @@
-import { getTaskAssignees } from './assignees'
+import { getTaskAssignees, withTaskAssignees } from './assignees'
 import type { Person } from '@hcengineering/contact'
 import type { Ref } from '@hcengineering/core'
 const first = 'first' as Ref<Person>
@@ -14,4 +14,11 @@ describe('task assignees', () => {
     const assignees = getTaskAssignees({ assignee: first })
     expect(getTaskAssignees({ assignees })).toEqual(assignees)
   })
+})
+
+it('canonicalizes nested drafts without mutating legacy source or retaining scalar fields', () => {
+  const legacy: any = { assignee: 'one', subIssues: [{ assignee: 'two' }, { assignee: 'one', assignees: [] }], children: [{ assignees: ['one', 'one', 'two'] }] }
+  expect(withTaskAssignees(legacy)).toEqual({ assignees: ['one'], subIssues: [{ assignees: ['two'] }, { assignees: [] }], children: [{ assignees: ['one', 'two'] }] })
+  expect(legacy.assignee).toBe('one')
+  expect(legacy.subIssues[0].assignee).toBe('two')
 })

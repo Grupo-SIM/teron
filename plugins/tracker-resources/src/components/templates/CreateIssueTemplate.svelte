@@ -97,8 +97,7 @@
     const value: Data<IssueTemplate> = {
       title: getTitle(object.title),
       description: object.description,
-      assignee: null,
-        assignees: getTaskAssignees(object),
+      assignees: getTaskAssignees(object),
       component: null,
       milestone: object.milestone,
       priority: object.priority,

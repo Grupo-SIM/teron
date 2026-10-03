@@ -16,6 +16,7 @@
 <script lang="ts">
   import { AccountRole, getCurrentAccount, hasAccountRole, Doc, Mixin } from '@hcengineering/core'
   import { AttributesBar, getClient, KeyedAttribute } from '@hcengineering/presentation'
+  import { getCurrentEmployee } from '@hcengineering/contact'
   import { EmployeeArrayEditor } from '@hcengineering/contact-resources'
   import { getTaskAssignees } from '@hcengineering/task'
   import { Task } from '@hcengineering/task'
@@ -37,6 +38,8 @@
     if (readonly || !hasAccountRole(getCurrentAccount(), AccountRole.Maintainer)) return
     await client.update(object, { assignees: getTaskAssignees({ assignees }) })
   }
+  $: administrator = hasAccountRole(getCurrentAccount(), AccountRole.Maintainer)
+  $: statusReadonly = readonly || (!administrator && !getTaskAssignees(object).includes(getCurrentEmployee()))
   $: assigneeTitle = hierarchy.getAttribute(object._class, 'assignees').label
   const taskKeys = ['status', 'assignee', 'assignees']
 
@@ -53,13 +56,13 @@
         readonly={readonly || !hasAccountRole(getCurrentAccount(), AccountRole.Maintainer)}
       />
       <div class="column">
-        <AttributesBar {object} _class={object._class} keys={filtredKeys} {readonly} />
+        <AttributesBar {object} _class={object._class} keys={filtredKeys} readonly={readonly || !administrator} />
       </div>
     </div>
-    <AttributesBar {object} _class={object._class} keys={['status']} showHeader={false} {readonly} />
+    <AttributesBar {object} _class={object._class} keys={['status']} showHeader={false} readonly={statusReadonly} />
   </div>
 {:else}
-  <DocAttributeBar {object} {ignoreKeys} {mixins} {allowedCollections} {readonly} on:update />
+  <DocAttributeBar {object} {ignoreKeys} {mixins} {allowedCollections} readonly={readonly || !administrator} on:update />
 {/if}
 
 <style lang="scss">

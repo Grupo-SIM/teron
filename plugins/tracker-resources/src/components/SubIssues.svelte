@@ -78,7 +78,6 @@
       const cvalue: AttachedData<Issue> = {
         title: subIssue.title.trim(),
         description: null,
-        assignee: null,
         assignees: getTaskAssignees(subIssue),
         component: subIssue.component,
         milestone: subIssue.milestone,

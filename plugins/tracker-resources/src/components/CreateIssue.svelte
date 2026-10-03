@@ -13,7 +13,7 @@
 // limitations under the License.
 -->
 <script lang="ts">
-  import { getTaskAssignees } from '@hcengineering/task'
+  import { getTaskAssignees, withTaskAssignees } from '@hcengineering/task'
   import activity from '@hcengineering/activity'
   import { Analytics } from '@hcengineering/analytics'
   import { Attachment } from '@hcengineering/attachment'
@@ -154,7 +154,7 @@
 
   function objectChange (object: IssueDraft, empty: any): void {
     if (shouldSaveDraft) {
-      draftController.save({ ...object, assignee: null, assignees: getTaskAssignees(object) }, empty)
+      draftController.save(withTaskAssignees(object), empty)
     }
   }
 
@@ -181,7 +181,6 @@
     const _parentIssue = parentIssue
     return {
       ...draft,
-      assignee: null,
       assignees: getTaskAssignees(draft),
       ...(status != null ? { status } : {}),
       ...(priority != null ? { priority } : {}),
@@ -217,7 +216,6 @@
         status: originalIssue.status,
         priority: originalIssue.priority,
         dueDate: originalIssue.dueDate,
-        assignee: null,
         assignees: getTaskAssignees(originalIssue),
         estimation: originalIssue.estimation,
         parentIssue: originalIssue.parents[0]?.parentId,
@@ -323,7 +321,6 @@
     object.subIssues = template.children.map((p) => {
       return {
         ...p,
-        assignee: null,
         assignees: getTaskAssignees(p),
         kind: p.kind ?? kind ?? ('' as Ref<TaskType>),
         _id: generateId(),
@@ -347,7 +344,6 @@
       ...object,
       description: description ?? EmptyMarkup,
       ...templBase,
-      assignee: null,
       assignees: getTaskAssignees(template),
       template: {
         template: template._id
@@ -431,7 +427,7 @@
 
   export function onOutsideClick (): void {
     if (shouldSaveDraft) {
-      draftController.save({ ...object, assignee: null, assignees: getTaskAssignees(object) }, empty)
+      draftController.save(withTaskAssignees(object), empty)
     }
   }
 
@@ -497,7 +493,6 @@
       const value: DocData<Issue> = {
         title: getTitle(object.title),
         description: null,
-        assignee: null,
         assignees: getTaskAssignees(object),
         component: null,
         milestone: object.milestone,
@@ -670,7 +665,7 @@
   }
 
   async function showConfirmationDialog (): Promise<void> {
-    draftController.save({ ...object, assignee: null, assignees: getTaskAssignees(object) }, empty)
+    draftController.save(withTaskAssignees(object), empty)
     const isFormEmpty = draft === undefined
 
     if (isFormEmpty) {
@@ -765,8 +760,7 @@
   $: extraProps = {
     status: object.status,
     priority: object.priority,
-    assignee: null,
-        assignees: getTaskAssignees(object),
+    assignees: getTaskAssignees(object),
     milestone: object.milestone,
     relatedTo,
     parentIssue,
