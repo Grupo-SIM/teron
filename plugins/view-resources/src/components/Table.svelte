@@ -334,7 +334,8 @@
     config: Array<string | BuildModelKey>,
     lookup?: Lookup<Doc>
   ): Promise<void> {
-    const newModelOpts = { client, _class, keys: config, lookup }
+    // Saved column preferences can reference attributes removed from the current model.
+    const newModelOpts = { client, _class, keys: config, lookup, ignoreMissing: true }
     if (modelOptions == null || !deepEqual(modelOptions, newModelOpts)) {
       modelOptions = newModelOpts
       await build(modelOptions)
