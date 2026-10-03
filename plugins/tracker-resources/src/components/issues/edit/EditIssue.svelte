@@ -36,7 +36,7 @@
     createFocusManager
   } from '@hcengineering/ui'
   import view from '@hcengineering/view'
-  import { DocNavLink, ParentsNavigator, showMenu, RelationsEditor } from '@hcengineering/view-resources'
+  import { DocNavLink, ParentsNavigator, getActions, showMenu, RelationsEditor } from '@hcengineering/view-resources'
   import ProjectPresenter from '../../projects/ProjectPresenter.svelte'
   import { InboxNotificationsClientImpl } from '@hcengineering/notification-resources'
   import { Analytics } from '@hcengineering/analytics'
@@ -66,6 +66,15 @@
   let title = ''
   let innerWidth: number
   let descriptionBox: AttachmentStyleBoxCollabEditor
+
+  let hasMenuActions = false
+  $: void updateMenuActions(issue)
+  async function updateMenuActions (value: Issue | undefined): Promise<void> {
+    hasMenuActions = false
+    if (value === undefined) return
+    const actions = await getActions(client, value)
+    if (issue === value) hasMenuActions = actions.some((action) => action._id !== view.action.Open)
+  }
 
   let effectiveReadonly = true
   $: if (issue !== undefined) {
@@ -259,7 +268,7 @@
     </svelte:fragment>
 
     <svelte:fragment slot="utils">
-      {#if !effectiveReadonly}
+      {#if !effectiveReadonly && hasMenuActions}
         <Button
           icon={IconMoreH}
           iconProps={{ size: 'medium' }}

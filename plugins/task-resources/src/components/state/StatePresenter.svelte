@@ -82,12 +82,11 @@
     type = types.get(_space.type)
   }
 
-  $: projectState = type?.statuses.find((p) => p._id === value?._id)
+  $: projectState = type?.statuses.find((p) => p._id === value?._id && (taskType === undefined || p.taskType === taskType))
 
+  $: statusColor = projectState?.color ?? value?.color ?? category?.color
   $: color = getPlatformColorDef(
-    projectState?.color !== undefined && typeof projectState?.color !== 'string'
-      ? projectState?.color
-      : (category?.color ?? getColorNumberByText(value?.name ?? '')),
+    typeof statusColor === 'number' ? statusColor : getColorNumberByText(value?.name ?? ''),
     $themeStore.dark
   )
   $: void updateCategory(value)
@@ -119,7 +118,7 @@
   $: icon = emojiIcon ? IconWithEmoji : projectState?.icon
   $: iconProps = emojiIcon
     ? { icon: projectState?.color ?? value?.color ?? category?.color }
-    : { fill: projectState?.color ?? value?.color ?? category?.color ?? 0 }
+    : { fill: statusColor ?? 0 }
 
   const dispatchAccentColor = (color?: ColorDefinition, icon?: Asset | typeof IconWithEmoji): void => {
     if (icon == null) {

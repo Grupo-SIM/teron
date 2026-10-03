@@ -869,15 +869,6 @@ export function createModel (builder: Builder): void {
     card.viewlet.CardGrid
   )
 
-  builder.createDoc(
-    presentation.class.ComponentPointExtension,
-    core.space.Model,
-    {
-      extension: converter.extensions.CopyAsMarkdownAction,
-      component: converter.component.CopyAsMarkdownButton
-    },
-    converter.extensions.CopyAsMarkdownButton
-  )
 
   builder.createDoc(
     view.class.ViewletViewAction,
