@@ -13,7 +13,7 @@ export function eventDetailsAllowed (event: Event, calendars: Map<Ref<Calendar>,
 }
 export function busyEvent (event: Event): Event {
   return {
-    ...Object.fromEntries(Object.entries(event).filter(([key]) => busyFields.has(key))),
+    ...Object.fromEntries([...busyFields].filter((key) => (event as any)[key] !== undefined).map((key) => [key, (event as any)[key]])),
     title: '', description: '', participants: [], visibility: 'private', access: AccessLevel.FreeBusyReader,
     attachedTo: event._id, attachedToClass: calendar.class.Event, collection: 'events'
   } as Event
@@ -68,15 +68,22 @@ export class CalendarPrivacyMiddleware extends BaseMiddleware {
       if (Array.isArray(value)) return await Promise.all(value.map((item) => sanitize(item)))
       if (expectedEvent || (value._class != null && hierarchy.isDerived(value._class, calendar.class.Event))) {
         // Projection cannot remove the metadata needed to decide privacy.
-        const full = (await this.provideFindAll(ctx, calendar.class.Event, { _id: value._id }))[0]
+        const fetched = (await this.provideFindAll(ctx, calendar.class.Event, { _id: value._id }))[0]
+        // LookupMiddleware removes scalar predicates from wire documents. Restore
+        // identity before redaction; the client cannot infer this nested query.
+        const full = fetched == null ? undefined : { ...fetched, _id: value._id }
         if (full == null) return undefined
-        if (!eventDetailsAllowed(full, calendars, socialIds)) return busyEvent(full)
+        if (!eventDetailsAllowed(full, calendars, socialIds)) {
+          return busyEvent(full)
+        }
       }
       const result = { ...value }
       if (result.$lookup != null) result.$lookup = Object.fromEntries(await Promise.all(Object.entries(result.$lookup).map(async ([key, entry]) => [key, await sanitize(entry)])))
       return result
     }
-    return toFindResult(await Promise.all(rows.map((row) => sanitize(row, hierarchy.isDerived(clazz, calendar.class.Event)))), rows.total)
+    const scalarPredicates = Object.fromEntries(Object.entries(secured).filter(([, value]) => ['string', 'number', 'boolean'].includes(typeof value)))
+    const lookupMap = rows.lookupMap == null ? undefined : Object.fromEntries(await Promise.all(Object.entries(rows.lookupMap).map(async ([key, value]) => [key, await sanitize(value)])))
+    return toFindResult(await Promise.all(rows.map((row) => sanitize({ ...scalarPredicates, ...row }, hierarchy.isDerived(clazz, calendar.class.Event)))), rows.total, lookupMap)
   }
   override async groupBy<T, P extends Doc> (ctx: MeasureContext<SessionData>, domain: Domain, field: string, query?: DocumentQuery<P>): Promise<Map<T, number>> {
     if (this.trusted(ctx) || domain !== this.context.hierarchy.getDomain(calendar.class.Event)) return await this.provideGroupBy(ctx, domain, field, query)

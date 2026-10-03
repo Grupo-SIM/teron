@@ -31,12 +31,32 @@ describe('server calendar privacy', () => {
     expect(busy).not.toHaveProperty('attachments')
     expect(busy.attachedTo).not.toBe('hidden-document')
   })
+  it('preserves identity and intervals from cached documents with inherited metadata', () => {
+    const cached = Object.create(event) as Event
+    expect(busyEvent(cached)).toMatchObject({ _id: event._id, _class: event._class, space: event.space, calendar: event.calendar, user: event.user, date: 100, dueDate: 200 })
+  })
   it('redacts foreign private events for Owner too, including projections and nested lookups', async () => {
     const { middleware, ctx } = fixture()
     expect((await middleware.findAll(ctx, calendar.class.Event, {}))[0].title).toBe('')
     expect((await middleware.findAll(ctx, calendar.class.Event, {}, { projection: { title: 1 } } as any))[0].title).toBe('')
     const rows: any = await middleware.findAll(ctx, core.class.Doc, {})
     expect(rows[0].$lookup.events[0].description).toBe('')
+  })
+  it('restores identity omitted by lookup query compression and preserves compressed lookups', async () => {
+    const { middleware, ctx, find } = fixture()
+    find.mockImplementation(async (_ctx: unknown, clazz: string, query: any) => {
+      if (clazz === calendar.class.Calendar) return Object.assign([...calendars], { total: 1 })
+      if (clazz === calendar.class.Event) {
+        const row = { ...event }
+        if (query._id === event._id) delete row._id
+        return Object.assign([row], { total: 1 })
+      }
+      return Object.assign([{ _id: 'parent', $lookup: { event: 1 } }], { total: 1, lookupMap: { 1: event } })
+    })
+    const direct = await middleware.findAll(ctx, calendar.class.Event, { _id: event._id })
+    expect(direct[0]).toMatchObject({ _id: event._id, title: '', date: 100 })
+    const nested = await middleware.findAll(ctx, core.class.Doc, {}, { lookup: {} })
+    expect(nested.lookupMap?.['1']).toMatchObject({ _id: event._id, title: '', date: 100 })
   })
   it('restricts predicates on details and removes private fulltext hits/counts', async () => {
     const { middleware, ctx, find } = fixture()

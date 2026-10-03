@@ -121,3 +121,4 @@ ws-tests/docker-compose.override.yml
 *.webm
 !public/**/*.mp4
 !public/**/*.webm
+**/bundle/adjustments.cjs
