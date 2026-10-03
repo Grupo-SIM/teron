@@ -1,6 +1,7 @@
 import core, { AccountRole, type Account, type Doc, type MeasureContext, type SessionData, type Tx } from '@hcengineering/core'
 import contact from '@hcengineering/contact'
 import task from '@hcengineering/task'
+import document from '@hcengineering/document'
 import calendar from '@hcengineering/calendar'
 import { type Middleware, type PipelineContext } from '@hcengineering/server-core'
 import { WorkspaceAuthorizationMiddleware } from './WorkspaceAuthorizationMiddleware'
@@ -9,7 +10,11 @@ const space = 'visible'
 const person = 'person'
 const user = 'social'
 const docs = new Map<string, object>([
-  [space, { _id: space, _class: core.class.Space }],
+  [space, { _id: space, _class: core.class.Space, members: [] }],
+  ['readerSpace', { _id: 'readerSpace', _class: core.class.Space, members: ['account'], guidelineAccess: true, guidelineReaders: ['account'] }],
+  ['editorSpace', { _id: 'editorSpace', _class: core.class.Space, members: ['account'], guidelineAccess: true, guidelineEditors: ['account'] }],
+  ['readerDoc', { _id: 'readerDoc', _class: document.class.Document, space: 'readerSpace' }],
+  ['editorDoc', { _id: 'editorDoc', _class: document.class.Document, space: 'editorSpace' }],
   [user, { _id: user, _class: contact.class.SocialIdentity, attachedTo: person }],
   ['task', { _id: 'task', _class: task.class.Task, space, assignees: [person] }],
   ['otherTask', { _id: 'otherTask', _class: task.class.Task, space, assignees: [] }],
@@ -29,6 +34,13 @@ describe('server authorization before persistence', () => {
   it('allows assigned status and accessible descriptions, forwarding once', async () => {
     const { middleware, ctx, forward } = fixture()
     await middleware.tx(ctx, [update('task', task.class.Task, { status: 'done' }), update('otherTask', task.class.Task, { description: 'text' })])
+    expect(forward).toHaveBeenCalledTimes(1)
+  })
+  it('enforces inherited reader/editor grants and denies editor deletion', async () => {
+    const { middleware, ctx, forward } = fixture()
+    await expect(middleware.tx(ctx, [update('readerDoc', document.class.Document, { title: 'new' }, 'readerSpace')])).rejects.toThrow()
+    await middleware.tx(ctx, [update('editorDoc', document.class.Document, { title: 'new' }, 'editorSpace')])
+    await expect(middleware.tx(ctx, [{ _class: core.class.TxRemoveDoc, objectId: 'editorDoc', objectClass: document.class.Document, objectSpace: 'editorSpace' } as unknown as Tx])).rejects.toThrow()
     expect(forward).toHaveBeenCalledTimes(1)
   })
   it('rejects a batch containing any structural change without forwarding', async () => {

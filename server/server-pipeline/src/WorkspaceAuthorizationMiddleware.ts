@@ -6,7 +6,7 @@ import core, {
   AccountRole, hasAccountRole, type Doc, type MeasureContext, type Ref, type SessionData,
   systemAccountUuid, TxProcessor, type Tx, type TxCreateDoc, type TxUpdateDoc
 } from '@hcengineering/core'
-import document from '@hcengineering/document'
+import document, { guidelineAccessFor, type Teamspace } from '@hcengineering/document'
 import love from '@hcengineering/love'
 import notification from '@hcengineering/notification'
 import preference from '@hcengineering/preference'
@@ -63,7 +63,10 @@ export class WorkspaceAuthorizationMiddleware extends BaseMiddleware {
       } else if (hierarchy.isDerived(tx.objectClass, calendar.class.Schedule)) {
         allowed = personIds.includes((data as Doc & { owner: Ref<Doc> }).owner) && (created || (updated && fields.every((field) => ['title', 'description', 'meetingDuration', 'meetingInterval', 'availability', 'timeZone', 'calendar'].includes(field))) || tx._class === core.class.TxRemoveDoc)
       } else if (hierarchy.isDerived(tx.objectClass, document.class.Document)) {
-        allowed = (data as Doc & { lockedBy?: unknown }).lockedBy == null && (created || (updated && fields.every((field) => ['title', 'content', 'icon', 'color'].includes(field))))
+        const space = spaces[0] as Teamspace
+        const sectors = await reader.findAll(ctx, core.class.TypedSpace, { _id: { $in: space.guidelineEditorSectors ?? [] } })
+        const access = guidelineAccessFor(space, account.uuid, new Map(sectors.map((sector) => [sector._id, sector.members])))
+        allowed = access === 'editor' && (data as Doc & { lockedBy?: unknown }).lockedBy == null && (created || (updated && fields.every((field) => ['title', 'content', 'icon', 'color'].includes(field))))
       } else if (hierarchy.isDerived(tx.objectClass, attachment.class.Attachment)) {
         allowed = created
       } else if (hierarchy.isDerived(tx.objectClass, chunter.class.ChatMessage)) {

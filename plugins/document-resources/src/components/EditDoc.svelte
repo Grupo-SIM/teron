@@ -41,6 +41,7 @@
   import tags from '@hcengineering/tags'
   import { Heading } from '@hcengineering/text-editor'
   import { TableOfContents } from '@hcengineering/text-editor-resources'
+  import { createGuidelineAccessQuery } from '../guideline-access'
   import TeamspacePresenter from './teamspace/TeamspacePresenter.svelte'
 
   import {
@@ -85,7 +86,7 @@
   export let embedded: boolean = false
 
   $: locked = doc?.lockedBy != null
-  $: effectiveReadonly = readonly || $restrictionStore.readonly || locked
+  $: effectiveReadonly = readonly || $restrictionStore.readonly || locked || !$grantEditable
 
   let useMaxWidth = getUseMaxWidth()
   $: saveUseMaxWidth(useMaxWidth)
@@ -98,6 +99,9 @@
   const query = createQuery()
   const dispatch = createEventDispatcher()
   const client = getClient()
+  const grants = createGuidelineAccessQuery()
+  const grantEditable = grants.editable
+  $: if (doc?.space !== undefined) grants.query(doc.space)
 
   let doc: WithLookup<Document> | undefined
   let title = ''

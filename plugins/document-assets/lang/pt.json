@@ -1,6 +1,10 @@
 {
   "string": {
     "DeleteTeamspaceConfirm": "Excluir espaço de diretrizes e todos os documentos, versões e anexos contidos? Exclusão permanente.",
+    "GuidelineEditors": "Pessoas com acesso Editor",
+    "GuidelineEditorSectors": "Setores com acesso Editor",
+    "GuidelineReaders": "Pessoas com acesso Leitor",
+    "GuidelineReaderSectors": "Setores com acesso Leitor",
     "RemoveCustomIcon": "Remover ícone personalizado",
     "CustomIconRemoved": "Ícone padrão restaurado",
     "Document": "Documento",

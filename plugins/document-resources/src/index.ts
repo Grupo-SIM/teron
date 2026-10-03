@@ -1,3 +1,4 @@
+import { canCreateGuidelineDocument } from './guideline-access'
 //
 // Copyright © 2022, 2023 Hardcore Engineering Inc.
 //
@@ -178,6 +179,7 @@ export default async (): Promise<Resources> => ({
     UnlockContent: unlockContent
   },
   function: {
+    CanCreateGuidelineDocument: canCreateGuidelineDocument,
     GetObjectLinkFragment: getDocumentLink,
     DocumentTitleProvider: documentTitleProvider,
     CanLockDocument: canLockDocument,

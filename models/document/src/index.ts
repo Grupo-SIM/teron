@@ -28,6 +28,8 @@ import { AccountRole, AccountUuid, IndexKind } from '@hcengineering/core'
 import { type Document, type DocumentSnapshot, type Teamspace, documentId } from '@hcengineering/document'
 import {
   type Builder,
+  ArrOf,
+  TypeBoolean,
   Collection,
   Hidden,
   Index,
@@ -144,7 +146,27 @@ export class TDocumentSnapshot extends TDoc implements DocumentSnapshot {
 
 @Model(document.class.Teamspace, core.class.TypedSpace)
 @UX(document.string.Teamspace, document.icon.Teamspace, 'Teamspace', 'name')
-export class TTeamspace extends TTypedSpace implements Teamspace {}
+export class TTeamspace extends TTypedSpace implements Teamspace {
+  @Prop(TypeBoolean(), document.string.GuidelineReaders)
+  @Hidden()
+    guidelineAccess?: boolean
+
+  @Prop(ArrOf(TypeAccountUuid()), document.string.GuidelineReaders)
+  @Hidden()
+    guidelineReaders?: AccountUuid[]
+
+  @Prop(ArrOf(TypeAccountUuid()), document.string.GuidelineEditors)
+  @Hidden()
+    guidelineEditors?: AccountUuid[]
+
+  @Prop(ArrOf(TypeRef(tracker.class.Project)), document.string.GuidelineReaderSectors)
+  @Hidden()
+    guidelineReaderSectors?: Ref<TypedSpace>[]
+
+  @Prop(ArrOf(TypeRef(tracker.class.Project)), document.string.GuidelineEditorSectors)
+  @Hidden()
+    guidelineEditorSectors?: Ref<TypedSpace>[]
+}
 
 @Mixin(document.mixin.DefaultTeamspaceTypeData, document.class.Teamspace)
 @UX(getEmbeddedLabel('Default teamspace type'), document.icon.Document)
@@ -260,6 +282,7 @@ function defineTeamspace (builder: Builder): void {
     builder,
     {
       action: document.actionImpl.CreateDocument,
+      visibilityTester: document.function.CanCreateGuidelineDocument,
       label: document.string.CreateDocument,
       icon: document.icon.Add,
       input: 'focus',
@@ -355,6 +378,7 @@ function defineDocument (builder: Builder): void {
     builder,
     {
       action: document.actionImpl.CreateChildDocument,
+      visibilityTester: document.function.CanCreateGuidelineDocument,
       label: document.string.CreateDocument,
       icon: document.icon.Add,
       input: 'focus',

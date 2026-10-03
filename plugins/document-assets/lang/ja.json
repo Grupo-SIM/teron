@@ -1,6 +1,10 @@
 {
   "string": {
     "DeleteTeamspaceConfirm": "Delete the guideline space and all its documents, versions and attachments? This is permanent.",
+    "GuidelineEditors": "People with Editor access",
+    "GuidelineEditorSectors": "Sectors with Editor access",
+    "GuidelineReaders": "People with Reader access",
+    "GuidelineReaderSectors": "Sectors with Reader access",
     "RemoveCustomIcon": "Remove custom icon",
     "CustomIconRemoved": "Default icon restored",
     "Document": "ドキュメント",

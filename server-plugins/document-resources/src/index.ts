@@ -9,6 +9,7 @@ import { getMetadata } from '@hcengineering/platform'
 import { workbenchId } from '@hcengineering/workbench'
 import serverCore, { TriggerControl } from '@hcengineering/server-core'
 import slugify from 'slugify'
+import { GuidelineAccessChanged } from './GuidelineAccessChanged'
 export { DocumentLockMiddleware } from './DocumentLockMiddleware'
 
 function getDocumentId (doc: Document): string {
@@ -68,6 +69,7 @@ export async function findTeamspaceDocuments (
 
 // eslint-disable-next-line @typescript-eslint/explicit-function-return-type
 export default async () => ({
+  trigger: { GuidelineAccessChanged },
   function: {
     DocumentHTMLPresenter: documentHTMLPresenter,
     DocumentTextPresenter: documentTextPresenter,

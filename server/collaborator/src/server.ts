@@ -26,6 +26,10 @@ import { WebSocket, WebSocketServer } from 'ws'
 
 import { Config } from './config'
 import { Context } from './context'
+import { openCollaborationAccess } from './collaboration-access'
+import { decodeDocumentId } from '@hcengineering/collaborator-client'
+import { systemAccountUuid } from '@hcengineering/core'
+import { isReadOnlyOrGuest } from '@hcengineering/account'
 import { AuthenticationExtension } from './extensions/authentication'
 import { StorageExtension } from './extensions/storage'
 import { simpleClientFactory } from './platform'
@@ -194,9 +198,21 @@ export async function start (ctx: MeasureContext, config: Config, storageAdapter
       },
       async (ctx) => {
         try {
-          const response: RpcResponse = await rpcCtx.with(request.method, {}, (ctx) => {
-            return method(ctx, context, documentId, request.payload, { hocuspocus, storageAdapter, transformer })
-          })
+          if (decodeDocumentId(documentId).workspaceId !== context.wsIds.uuid) throw new Error('Document workspace does not match token.')
+          const authorization = token.account === systemAccountUuid || request.method === 'createContent'
+            ? undefined
+            : await openCollaborationAccess(token, documentId, request.method === 'getContent' ? (request.payload as any)?.source : undefined)
+          let response: RpcResponse
+          try {
+            if (request.method !== 'getContent' && (isReadOnlyOrGuest(token.account, token.extra) || (authorization !== undefined && await authorization.check()))) {
+              throw new Error('Collaborative document is read-only.')
+            }
+            response = await rpcCtx.with(request.method, {}, (ctx) => {
+              return method(ctx, context, documentId, request.payload, { hocuspocus, storageAdapter, transformer })
+            })
+          } finally {
+            await authorization?.close()
+          }
           res.status(200).send(response)
         } catch (err: any) {
           Analytics.handleError(err)

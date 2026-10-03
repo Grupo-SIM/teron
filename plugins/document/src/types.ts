@@ -14,10 +14,11 @@
 //
 
 import { AccountUuid, Doc, MarkupBlobRef, Rank, Ref, TypedSpace } from '@hcengineering/core'
+import type { GuidelineGrants } from './access'
 import { IconProps } from '@hcengineering/view'
 
 /** @public */
-export interface Teamspace extends TypedSpace, IconProps {}
+export interface Teamspace extends TypedSpace, IconProps, GuidelineGrants {}
 
 /** @public */
 export interface Document extends Doc, IconProps {
