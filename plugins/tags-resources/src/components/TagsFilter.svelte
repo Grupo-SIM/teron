@@ -70,7 +70,7 @@
     const resultQuery =
       search !== ''
         ? {
-            title: { $like: search.replace('*', '%') + '%' },
+            title: { $contains: search },
             targetClass: _class
           }
         : { targetClass: _class }

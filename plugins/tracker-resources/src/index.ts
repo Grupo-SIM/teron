@@ -190,7 +190,7 @@ export async function queryIssue<D extends Issue> (
   search: string,
   filter?: { in?: RelatedDocument[], nin?: RelatedDocument[] }
 ): Promise<ObjectSearchResult[]> {
-  const q: DocumentQuery<Issue> = { identifier: { $like: `%${search}%` } }
+  const q: DocumentQuery<Issue> = { identifier: { $contains: search } }
   if (filter?.in !== undefined || filter?.nin !== undefined) {
     q._id = {}
     if (filter.in !== undefined) {
@@ -207,7 +207,7 @@ export async function queryIssue<D extends Issue> (
     })
   )
 
-  const q2: DocumentQuery<Issue> = { title: { $like: `%${search}%` } }
+  const q2: DocumentQuery<Issue> = { title: { $contains: search } }
   if (q._id !== undefined) {
     q2._id = q._id
   }

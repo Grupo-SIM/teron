@@ -88,7 +88,7 @@ export async function afterResult (filter: Filter): Promise<ObjQueryType<any>> {
 export async function containsResult (filter: Filter): Promise<ObjQueryType<any>> {
   const [value] = filter.value
 
-  return typeof value === 'string' ? { $like: `%${value}%` } : {}
+  return typeof value === 'string' ? { $contains: value } : {}
 }
 
 export async function nestedMatchResult (filter: Filter, onUpdate: () => void): Promise<ObjQueryType<any>> {

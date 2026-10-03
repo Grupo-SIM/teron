@@ -67,7 +67,7 @@
   let resultQuery: DocumentQuery<Staff> = {}
 
   function updateResultQuery (search: string, viewOptions: ViewOptions | undefined): void {
-    const q: DocumentQuery<Staff> = search === '' ? {} : { name: { $like: '%' + search + '%' } }
+    const q: DocumentQuery<Staff> = search === '' ? {} : { name: { $contains: search } }
     resultQuery = viewOptions?.hideInactive !== false ? { ...q, active: true } : q
   }
 

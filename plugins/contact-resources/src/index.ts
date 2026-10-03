@@ -228,7 +228,7 @@ async function queryContact (
   search: string,
   filter?: { in?: RelatedDocument[], nin?: RelatedDocument[] }
 ): Promise<ObjectSearchResult[]> {
-  const q: DocumentQuery<Contact> = { name: { $like: `%${search}%` } }
+  const q: DocumentQuery<Contact> = { name: { $contains: search } }
   return await doContactQuery(_class, q, filter, client)
 }
 
@@ -239,13 +239,13 @@ async function queryEmployee (
 ): Promise<ObjectSearchResult[]> {
   const q1 = await doContactQuery(
     contact.mixin.Employee,
-    { name: { $like: `%${search}%` }, active: true },
+    { name: { $contains: search }, active: true },
     filter,
     client
   )
   const q2 = await doContactQuery(
     contact.mixin.Employee,
-    { displayName: { $like: `%${search}%` }, active: true },
+    { displayName: { $contains: search }, active: true },
     {
       in: filter?.in,
       nin: [...(filter?.nin ?? []), ...Array.from(q1.map((it) => ({ _id: it.doc._id, _class: it.doc._class })))]

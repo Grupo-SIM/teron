@@ -135,7 +135,7 @@ async function queryDocumentMeta (
   search: string,
   filter?: { in?: RelatedDocument[], nin?: RelatedDocument[] }
 ): Promise<ObjectSearchResult[]> {
-  const q: DocumentQuery<DocumentMeta> = { name: { $like: `%${search}%` } }
+  const q: DocumentQuery<DocumentMeta> = { name: { $contains: search } }
   if (filter?.in !== undefined || filter?.nin !== undefined) {
     q._id = {}
     if (filter.in !== undefined) {
