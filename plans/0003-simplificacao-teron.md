@@ -3,13 +3,13 @@
 ## Progresso
 
 - [x] 1. Corrigir modal de setor, exclusão do registro selecionado, fotos e troca de escritório.
-- [ ] 2. Ajustar nomes, traduções e abas do navegador.
+- [x] 2. Ajustar nomes, traduções e abas do navegador.
 - [x] 3. Reorganizar tarefas, projetos, status, tempo e modelos.
 - [x] 4. Corrigir calendário, privacidade e agendas compartilhadas.
 - [x] 5. Corrigir drawer, andares e ações do escritório.
 - [x] 6. Simplificar contatos e remover Recrutamento, RH e Planejador de equipes.
-- [ ] 7. Simplificar ações, Conversa, Diretrizes e Configurações.
-- [ ] 8. Conferir regressões e todos os itens aprovados.
+- [x] 7. Simplificar ações, Conversa, Diretrizes e Configurações.
+- [x] 8. Conferir regressões e todos os itens aprovados.
 
 ## Decisões
 
@@ -23,11 +23,17 @@
 - Desbloqueio de Diretrizes cabe a Owner e Maintainer.
 - Migrações são preparadas e testadas localmente; nenhuma execução em banco remoto.
 
-## Pendências para fechamento
+## Resultado final — 04/10/2026
 
-- Repetir criação/inserção de modelos de texto e abertura de tarefa em aba real após corrigir IDs duplicados no plugin de recursos.
-- Executar suíte final de sete testes no navegador; encerrar somente a stack descartável e registrar resultados.
-- Imagens originais não estão disponíveis neste checkout. Validação funcional usa requisitos registrados; não certifica comparação visual pixel a pixel.
+Plano concluído no escopo funcional registrado. Sete cenários de navegador validados com Owner/User: privacidade e seleção de agendas; contatos, diretrizes, foto e temas do escritório; substituição/restauração de identidade por OTP; drawer e convite real recebido/recusado; funções múltiplas, busca parcial e dias opcionais; criação/listagem/inserção de modelos sem publicação; menus simplificados e tarefa em aba real com `window.opener` nulo. Seis passaram na rodada final; o cenário de modelos passou na repetição após limitar seu seletor ao botão do comentário.
+
+Também passaram sete grupos do runner base, sete do runner complementar, doze testes de autorização e inicialização dos IDs de modelos. Bundle web completo recompilou com sucesso; builds de servidor e pacotes afetados e testes de tempo/migração/visibilidade estão registrados no histórico.
+
+Regressão corrigiu sincronização de identidade verificada, presença online da própria conta, handles de eventos privados, editor de coleções de contatos, busca parcial na navegação real e strings públicas de modelos sem IDs duplicados. Testes e preparação da stack descartável ficam versionados para repetição.
+
+Imagens originais não estão disponíveis neste checkout; conferência funcional e capturas locais não certificam comparação pixel a pixel com essas imagens. Convite foi recebido e recusado, sem iniciar mídia externa.
+
+Somente trabalho local. Stack `teron-regression`, seus volumes e arquivos temporários de autenticação/resultados foram descartados ao fechar. Nenhum push, deploy ou migração remota.
 
 ## Histórico de execução
 

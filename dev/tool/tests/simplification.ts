@@ -122,7 +122,8 @@ async function main (): Promise<void> {
     const skill = await tag('regression-tag-skill', 'Svelte')
     const label = await tag('regression-tag-label', 'Equipe A')
     async function reference (id: string, attachedTo: Ref<any>, collection: string, tagId: Ref<any>, title: string): Promise<void> {
-      if (await owner.findOne(tags.class.TagReference, { _id: id as Ref<any> }) === undefined) {
+      if (await owner.findOne(tags.class.TagReference, { _id: id as Ref<any> }) === undefined &&
+        await owner.findOne(tags.class.TagReference, { attachedTo, collection, tag: tagId }) === undefined) {
         await owner.addCollection(tags.class.TagReference, contact.space.Contacts, attachedTo, contact.class.Person, collection, {
           tag: tagId, title, color: 1
         }, id as Ref<any>)

@@ -47,7 +47,7 @@ run(['node_modules/webpack-cli/bin/cli.js', '--config', '../regression/webpack.c
   resolve(root, 'dev/prod'), {
     NODE_PATH: resolve(root, 'dev/prod/node_modules'),
     NODE_ENV: 'production',
-    NODE_OPTIONS: '--max-old-space-size=2048'
+    NODE_OPTIONS: '--max-old-space-size=3072'
   })
 
 cpSync(resolve(root, 'dev/prod/public/teron'), resolve(root, 'dev/prod/dist/teron'), { recursive: true })

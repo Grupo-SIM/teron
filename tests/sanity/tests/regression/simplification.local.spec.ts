@@ -1,11 +1,11 @@
 import { expect, test, type Page } from '@playwright/test'
 import { execFileSync } from 'node:child_process'
-import { readFileSync } from 'node:fs'
+import { readFileSync, writeFileSync } from 'node:fs'
 const local = process.env.TERON_LOCAL_REGRESSION === '1'
 test.skip(!local, 'Requires disposable local regression stack')
 const state = local ? JSON.parse(readFileSync('/tmp/teron-regression-accounts.json', 'utf8')) : { ws: {} }
 async function login (page: Page, email = 'user@regression.local'): Promise<void> {
-  await page.route('**/*', route => ['localhost', '127.0.0.1'].includes(new URL(route.request().url()).hostname) ? route.continue() : route.abort())
+  await page.context().route('**/*', route => ['localhost', '127.0.0.1'].includes(new URL(route.request().url()).hostname) ? route.continue() : route.abort())
   await page.goto('/')
   await page.locator('input[name=email]').fill(email)
   await page.locator('input[type=password]').fill('Regression123!')
@@ -34,12 +34,22 @@ test('User replaces email through OTP and keeps global and workspace identities 
   }
   await page.reload()
   await expect(page.getByText('user@regression.local', { exact: true })).toBeVisible({ timeout: 120000 })
+  async function rpc (method: string, params: object, token = ''): Promise<any> {
+    const response = await fetch('http://localhost:30130', { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` }, body: JSON.stringify({ method, params }) })
+    const result = await response.json()
+    if (result.error !== undefined) throw new Error(JSON.stringify(result.error))
+    return result.result
+  }
+  const latest = JSON.parse(readFileSync('/tmp/teron-regression-accounts.json', 'utf8'))
+  latest.user = await rpc('login', { email: 'user@regression.local', password: 'Regression123!' })
+  latest.userWs = await rpc('selectWorkspace', { workspaceUrl: state.ws.workspaceUrl }, latest.user.token)
+  writeFileSync('/tmp/teron-regression-accounts.json', JSON.stringify(latest), { mode: 0o600 })
 })
 
 
 test('office drawer expands, selects floors and delivers a declined invitation between accounts', async ({ page, browser }) => {
   execFileSync(process.execPath, ['dev/tool/bundle/office-invite-fixture.cjs'], { stdio: 'pipe', maxBuffer: 16 * 1024 * 1024 })
-  const context = await browser.newContext({ timezoneId: 'America/Recife', viewport: { width: 1440, height: 1000 } })
+  const context = await browser.newContext({ baseURL: 'http://localhost:30180', timezoneId: 'America/Recife', viewport: { width: 1440, height: 1000 } })
   try {
     await login(page, 'owner@regression.local')
     const user = await context.newPage()
@@ -67,4 +77,97 @@ test('office drawer expands, selects floors and delivers a declined invitation b
     await context.close()
     execFileSync(process.execPath, ['dev/tool/bundle/office-invite-fixture.cjs', '--cleanup'], { stdio: 'pipe', maxBuffer: 16 * 1024 * 1024 })
   }
+})
+
+test('contacts show multiple functions with stale counters, partial search and optional weekly days', async ({ page }) => {
+  await login(page, 'owner@regression.local')
+  await page.goto(`/workbench/${state.ws.workspaceUrl}/contact/persons`)
+  const ana = page.locator('tr').filter({ hasText: 'Ana Silva' })
+  await expect(ana).toBeVisible({ timeout: 120000 })
+  await expect(ana).toContainText('Designer')
+  await expect(ana).toContainText('Redação')
+  const search = page.getByPlaceholder('Pesquisar', { exact: true })
+  await search.locator('..').click()
+  await search.fill('silv')
+  await expect(page.getByText('Ana Silva', { exact: true }).first()).toBeVisible()
+  await expect(page.getByText('Anabela Silva', { exact: true }).first()).toBeVisible()
+  await search.fill('nabel')
+  await expect(page.getByText('Ana Silva', { exact: true })).toHaveCount(0)
+  await expect(page.getByText('Anabela Silva', { exact: true }).first()).toBeVisible()
+  await search.fill('')
+  await page.getByText('Ana Silva', { exact: true }).first().click()
+  const days = page.locator('.work-mode-days input')
+  await expect(days).toHaveCount(2)
+  await days.nth(0).fill('7'); await days.nth(0).blur()
+  await expect(page.locator('.work-mode-error')).toBeVisible()
+  expect(sql("select data->>'remoteDaysPerWeek' from contact where _id='regression-person-a'")).toBe('2')
+  await days.nth(1).fill('0'); await days.nth(1).blur()
+  await expect(page.locator('.work-mode-error')).toHaveCount(0)
+  await expect.poll(() => sql("select data->>'remoteDaysPerWeek' from contact where _id='regression-person-a'")).toBe('7')
+  await days.nth(0).fill(''); await days.nth(0).blur()
+  await days.nth(1).fill(''); await days.nth(1).blur()
+  await expect.poll(() => sql("select coalesce(data->>'remoteDaysPerWeek','unset') from contact where _id='regression-person-a'")).toBe('unset')
+  await days.nth(0).fill('2'); await days.nth(0).blur()
+  await days.nth(1).fill('3'); await days.nth(1).blur()
+  await expect(page.locator('.functions')).toContainText('Designer')
+  await expect(page.locator('.functions')).toContainText('Redação')
+  await expect(page.getByText('Svelte', { exact: true }).last()).toBeVisible()
+  await page.locator('.functions .listitems-container').filter({ hasText: 'Designer' }).locator('.btn-close').click()
+  await expect(page.locator('.functions')).not.toContainText('Designer')
+  await expect(page.locator('.functions')).toContainText('Redação')
+  expect(sql("select count(*) from tags where data->>'collection'='skills' and \"attachedTo\"='regression-person-a'")).toBe('1')
+  expect(sql("select count(*) from tags where data->>'collection'='labels' and \"attachedTo\"='regression-person-a'")).toBe('1')
+  await page.locator('.functions .tag-button').click()
+  const popup = page.locator('.selectPopup').last()
+  await popup.getByPlaceholder(/^Pesquisar/).fill('Designer')
+  await popup.getByText('Designer', { exact: true }).click()
+  await page.keyboard.press('Escape')
+  await expect(page.locator('.functions')).toContainText('Designer')
+  await expect(page.locator('div.text-input div.tiptap')).toHaveCount(0)
+})
+
+test('text templates can be created, listed, selected and inserted without publishing a comment', async ({ page }) => {
+  await login(page, 'owner@regression.local')
+  page.on('pageerror', error => console.error('Template page error:', error.message))
+  const title = `Modelo regressão ${Date.now()}`
+  const message = `Mensagem de regressão ${Date.now()}`
+  await page.goto(`/workbench/${state.ws.workspaceUrl}/tracker/tracker%3Aproject%3ADefaultProject/templates`)
+  await expect(page.getByRole('button', { name: 'Modelo de texto', exact: true }).nth(1)).toBeVisible({ timeout: 120000 })
+  await page.getByRole('button', { name: 'Modelo de texto', exact: true }).nth(1).click()
+  await page.getByPlaceholder('Novo modelo', { exact: true }).fill(title)
+  await page.locator('[contenteditable=true]').fill(message)
+  await page.getByRole('button', { name: 'Guardar modelo', exact: true }).click()
+  await page.getByRole('button', { name: 'Modelo de texto', exact: true }).first().click()
+  await expect(page.getByText(title, { exact: true }).first()).toBeVisible({ timeout: 30000 })
+  await page.goto(`/workbench/${state.ws.workspaceUrl}/tracker/tracker%3Aproject%3ADefaultProject/issues`)
+  await expect(page.getByText('Tarefa regressão', { exact: true }).first()).toBeVisible({ timeout: 120000 })
+  await page.getByText('Tarefa regressão', { exact: true }).first().click()
+  const editor = page.locator('div.text-input div.tiptap')
+  await expect(editor).toBeVisible({ timeout: 30000 })
+  await page.locator('div.text-input').locator('..').locator('button').filter({ has: page.locator('use[href$="#template"]') }).click()
+  await page.getByText(title, { exact: true }).last().click()
+  await expect(editor).toContainText(message)
+  await expect(page.locator('.activityMessage .content').filter({ hasText: message })).toHaveCount(0)
+  expect(sql(`select count(*) from chunter where _class='chunter:class:ChatMessage' and data::text like '%${message}%'`)).toBe('0')
+  await page.screenshot({ path: '/tmp/teron-regression-template-draft.png' })
+})
+
+test('simplified navigation and task context menu open a real browser tab', async ({ page }) => {
+  await login(page, 'owner@regression.local')
+  for (const app of ['recruit', 'hr', 'teamplanner']) await expect(page.locator(`a[href*="/${app}"]`)).toHaveCount(0)
+  await page.goto(`/workbench/${state.ws.workspaceUrl}/tracker/tracker%3Aproject%3ADefaultProject/issues`)
+  const task = page.getByText('Tarefa regressão', { exact: true }).first()
+  await expect(task).toBeVisible({ timeout: 120000 })
+  await task.click({ button: 'right' })
+  for (const label of ['Adicionar relação', 'Nova tarefa relacionada', 'Copiar link', 'Copiar título', 'Copiar URL', 'Adicionar relatório de tempo', 'Link público']) {
+    await expect(page.getByText(label, { exact: true })).toHaveCount(0)
+  }
+  const popupPromise = page.waitForEvent('popup')
+  await page.getByText('Abrir num novo separador', { exact: true }).click()
+  const popup = await popupPromise
+  try {
+    await expect(popup).toHaveURL(/workbench/, { timeout: 30000 })
+    await expect(popup.getByPlaceholder('Título da tarefa', { exact: true })).toHaveValue('Tarefa regressão', { timeout: 120000 })
+    expect(await popup.evaluate(() => window.opener)).toBeNull()
+  } finally { await popup.close() }
 })

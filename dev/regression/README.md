@@ -1,6 +1,6 @@
 # Regressão local da simplificação
 
-Stack descartável do checkout atual. Usa contas `owner@regression.local` e `user@regression.local`, senha `Regression123!`. Dados ficam nos volumes `teron-regression_*`; nenhum serviço ou banco existente é reutilizado. Portas públicas limitadas a localhost: 30130 (contas), 30133 (transactor), 30178 (colaboração), 30180 (interface). Integrações, e-mail e telemetria externos ficam desativados.
+Stack descartável do checkout atual. Usa contas `owner@regression.local` e `user@regression.local`, senha `Regression123!`. Dados ficam nos volumes `teron-regression_*`; nenhum serviço ou banco existente é reutilizado. Portas públicas limitadas a localhost: 30130 (contas), 30133 (transactor), 30178 (colaboração), 30180 (interface), 30199 (Pulse). Integrações, e-mail e telemetria externos ficam desativados.
 
 Dependências Rush já precisam estar instaladas. Preparação compila os pacotes necessários, gera modelo/bundles e frontend sem minificação; não publica imagens nem executa migrações remotas.
 
@@ -14,10 +14,11 @@ node dev/tool/bundle/simplification.cjs
 
 Runner cria workspace e duas contas caso ainda não existam. Estado de autenticação fica em `/tmp/teron-regression-accounts.json`, com permissão 0600; variável `TERON_REGRESSION_STATE` permite mudar caminho. Runner reexecuta com IDs fixos, restaura papel User após testar Maintainer e preserva fixtures para conferir interface. Resultado de backend fica em `/tmp/teron-regression-api-results.json`.
 
-Cobertura de backend: funções múltiplas, isolamento de habilidades/etiquetas, exclusão com referências em duas pessoas, busca parcial, dias opcionais, agendas compartilhadas, papéis de desbloqueio, tempo com reabertura/resumo do pai e troca de titular do escritório. Privacidade visual, menus, formulários, modelos de texto e substituição de identidade exigem a regressão no navegador.
+Cobertura de backend: funções múltiplas, isolamento de habilidades/etiquetas, exclusão com referências em duas pessoas, busca parcial, dias opcionais, agendas compartilhadas, papéis de desbloqueio, tempo com reabertura/resumo do pai e troca de titular do escritório. Privacidade visual, menus, formulários, modelos de texto e substituição de identidade são cobertos pela regressão no navegador abaixo.
 
-Execução desta etapa: sete grupos do runner passaram e foram repetidos com duas contas reais na stack isolada. A regressão encontrou e corrigiu o gatilho de tempo que consultava o status já persistido. Seis testes de cálculo e um teste de gatilho passaram; build dos recursos de Tracker e bundle web passaram. Seleção de agendas no Calendário principal recebeu correção adicional, com build dos recursos de Calendário/Tempo e parser de três componentes aprovados. A conferência visual completa não foi concluída; estes resultados não certificam os fluxos de OTP, inserção de modelo de texto ou convites de escritório.
+Fechamento em 04/10/2026: sete grupos do runner base e sete do complementar passaram com duas contas reais. Doze testes de autorização passaram; builds de servidor/pacotes e bundle web passaram. Sete cenários de navegador validados: seis na rodada final e o cenário de modelos na repetição após corrigir seletor ambíguo entre descrição e comentário. A suíte confirma OTP com restauração da identidade, convite recebido/recusado, funções múltiplas e coleções isoladas, busca parcial, dias opcionais, seleção/privacidade das agendas, modelo inserido sem publicação e tarefa aberta em aba real sem `opener`.
 
+Regressões corrigiram gatilho de tempo, sincronização de identidades verificadas, presença online da própria conta, handles de eventos privados, editor de coleções, busca na navegação de contatos e IDs públicos de strings de modelos. Imagens originais indisponíveis; capturas locais verificam requisitos funcionais, sem comparação pixel a pixel. Stack e volumes descartados ao fechar; nenhum push ou comando remoto de banco/deploy.
 ```sh
 # Encerra somente esta stack; --volumes descarta apenas seus dados.
 docker compose -f dev/docker-compose.regression.yaml down --volumes
@@ -31,7 +32,7 @@ Conversão de contas legadas: `node dev/regression/roles.mjs` executa `convertLe
 
 Plano 0004: `node dev/tool/bundle/adjustments.cjs` valida duas contas, privacidade, concessões individuais/por setor, revogação, RPC colaborativo e atribuição múltipla/status. Depois das fixtures, `python3 dev/regression/migrations.py` injeta dados legados somente nesta stack, migra duas vezes e confere tarefas, templates aninhados e privacidade dos espaços. Runner pausa/reinicia apenas o transactor descartável.
 
-Navegador do plano 0004 (após ambos os runners e as migrações, com transactor ativo):
+Navegador dos planos 0003/0004 (após ambos os runners, com transactor ativo; migrações são opcionais para conferir dados legados):
 
 ```sh
 node tests/sanity/node_modules/@playwright/test/cli.js test --config dev/regression/playwright.config.cjs
