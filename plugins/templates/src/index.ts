@@ -89,6 +89,11 @@ export default plugin(templatesId, {
     TemplatePopup: '' as AnyComponent
   },
   string: {
+    CreateTemplate: '' as IntlString,
+    Message: '' as IntlString,
+    SaveTemplate: '' as IntlString,
+    TemplateCategory: '' as IntlString,
+    TemplatePlaceholder: '' as IntlString,
     Template: '' as IntlString
   },
   space: {

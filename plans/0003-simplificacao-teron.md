@@ -4,7 +4,7 @@
 
 - [x] 1. Corrigir modal de setor, exclusão do registro selecionado, fotos e troca de escritório.
 - [ ] 2. Ajustar nomes, traduções e abas do navegador.
-- [ ] 3. Reorganizar tarefas, projetos, status, tempo e modelos.
+- [x] 3. Reorganizar tarefas, projetos, status, tempo e modelos.
 - [x] 4. Corrigir calendário, privacidade e agendas compartilhadas.
 - [x] 5. Corrigir drawer, andares e ações do escritório.
 - [x] 6. Simplificar contatos e remover Recrutamento, RH e Planejador de equipes.
@@ -25,13 +25,15 @@
 
 ## Pendências para fechamento
 
-- Validar fluxos reais com contas locais: Calendário privado/compartilhado, troca e convite em Escritório, substituição de identidade, desbloqueio por papel e funções múltiplas em Contatos.
-- Conferir telas de Tarefas e Projetos contra todos os controles indicados nas imagens originais; verificar criação e inserção de modelos de texto sem envio automático.
-- Revisar modelos legados de Recrutamento após migração e auditar rotas, menus e strings residuais no fechamento.
-- Validar inclusão, exibição e exclusão de Função com dois valores e registros semelhantes, além de busca parcial e colunas de Contatos.
-- Executar regressão do conjunto aprovado antes de marcar marcos 2–8 como concluídos. Banco remoto continua intocado.
+- Repetir criação/inserção de modelos de texto e abertura de tarefa em aba real após corrigir IDs duplicados no plugin de recursos.
+- Executar suíte final de sete testes no navegador; encerrar somente a stack descartável e registrar resultados.
+- Imagens originais não estão disponíveis neste checkout. Validação funcional usa requisitos registrados; não certifica comparação visual pixel a pixel.
 
-## Próximo passo
+## Histórico de execução
+
+Modelos de texto concluídos em 04/10: strings de criação publicadas no plugin base e retiradas do merge de recursos para evitar IDs duplicados. Inicialização direta dos IDs e bundle web passaram. Navegador criou, listou, selecionou e inseriu modelo no editor de comentário como rascunho; DOM e PostgreSQL confirmaram ausência de publicação. Teste passou (1/1). A seleção do botão foi limitada ao comentário, pois descrição também oferece modelos.
+
+Entradas abaixo registram etapas anteriores. Pendências históricas não substituem o estado atual do progresso acima.
 
 Contatos validados no navegador em 04/10: duas funções aparecem mesmo com contador desatualizado, busca parcial encontra nomes semelhantes, dias opcionais validam soma e persistem campos vazios. Remover/reinserir Designer preserva Redação, habilidades e etiquetas. Editor de coleções agora usa InlineAttributeBarEditor; busca do SpecialView usa nome parcial para contatos. Teste completo passou (1/1).
 
