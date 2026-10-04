@@ -16,7 +16,7 @@
 <script lang="ts">
   import { Channel, Person, combineName, getCurrentEmployee, getFirstName, getLastName } from '@hcengineering/contact'
   import { AccountRole, Ref, getCurrentAccount, hasAccountRole, type AccountUuid } from '@hcengineering/core'
-  import { AttributeEditor, createQuery, getClient, hasResource } from '@hcengineering/presentation'
+  import { AttributeEditor, InlineAttributeBarEditor, createQuery, getClient, hasResource } from '@hcengineering/presentation'
   import type { PersonRating } from '@hcengineering/rating'
   import ratingPlugin from '@hcengineering/rating'
   import setting, { IntegrationType } from '@hcengineering/setting'
@@ -173,17 +173,22 @@
         <AttributeEditor maxWidth="20rem" _class={contact.class.Person} {object} {editable} key="city" focusIndex={3} />
       </div>
       <div class="functions">
-        <AttributeEditor
-          maxWidth="20rem"
+        <InlineAttributeBarEditor
           _class={contact.class.Person}
           {object}
-          {editable}
           key="functions"
-          focusIndex={4}
+          readonly={!editable}
+          extraProps={{ attribute: h.getAttribute(contact.class.Person, 'functions') }}
         />
       </div>
 
-      <AttributeEditor maxWidth="20rem" _class={contact.class.Person} {object} {editable} key="skills" />
+      <InlineAttributeBarEditor
+        _class={contact.class.Person}
+        {object}
+        key="skills"
+        readonly={!editable}
+        extraProps={{ attribute: h.getAttribute(contact.class.Person, 'skills') }}
+      />
 
       <AttributeEditor maxWidth="20rem" _class={contact.class.Person} {object} {editable} key="professionalTitle" />
       <AttributeEditor maxWidth="20rem" _class={contact.class.Person} {object} {editable} key="contactSource" />

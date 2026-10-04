@@ -13,6 +13,7 @@
 // limitations under the License.
 -->
 <script lang="ts">
+  import contact from '@hcengineering/contact'
   import { Class, Doc, DocumentQuery, FindOptions, Ref, Space, WithLookup, mergeQueries } from '@hcengineering/core'
   import { Asset, getResource, IntlString, Resource } from '@hcengineering/platform'
   import { getClient, ComponentExtensions } from '@hcengineering/presentation'
@@ -81,7 +82,14 @@
 
   $: _baseQuery = mergeQueries(mergeQueries(baseQuery ?? {}, baseQueryMixin?.baseQuery ?? {}), viewlet?.baseQuery ?? {})
   $: query = { ..._baseQuery }
-  $: searchQuery = search === '' ? query : { ...query, $search: search }
+  $: searchQuery = search.trim() === ''
+    ? query
+    : {
+        ...query,
+        ...(hierarchy.isDerived(_class, contact.class.Contact)
+          ? { name: { $contains: search.trim() } }
+          : { $search: search })
+      }
   $: resultQuery = isQueryLoaded ? searchQuery : undefined
 
   let options = viewlet?.options

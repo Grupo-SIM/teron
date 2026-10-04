@@ -6,8 +6,8 @@
 - [ ] 2. Ajustar nomes, traduções e abas do navegador.
 - [ ] 3. Reorganizar tarefas, projetos, status, tempo e modelos.
 - [x] 4. Corrigir calendário, privacidade e agendas compartilhadas.
-- [ ] 5. Corrigir drawer, andares e ações do escritório.
-- [ ] 6. Simplificar contatos e remover Recrutamento, RH e Planejador de equipes.
+- [x] 5. Corrigir drawer, andares e ações do escritório.
+- [x] 6. Simplificar contatos e remover Recrutamento, RH e Planejador de equipes.
 - [ ] 7. Simplificar ações, Conversa, Diretrizes e Configurações.
 - [ ] 8. Conferir regressões e todos os itens aprovados.
 
@@ -32,6 +32,8 @@
 - Executar regressão do conjunto aprovado antes de marcar marcos 2–8 como concluídos. Banco remoto continua intocado.
 
 ## Próximo passo
+
+Contatos validados no navegador em 04/10: duas funções aparecem mesmo com contador desatualizado, busca parcial encontra nomes semelhantes, dias opcionais validam soma e persistem campos vazios. Remover/reinserir Designer preserva Redação, habilidades e etiquetas. Editor de coleções agora usa InlineAttributeBarEditor; busca do SpecialView usa nome parcial para contatos. Teste completo passou (1/1).
 
 Calendário validado no navegador em 04/10 com Owner/User: agendas próprias/equipe, seleção de agenda pública/privada, compromissos de dia inteiro e meia-noite, títulos privados ocultos e blocos ocupados sem popup, menu, arraste ou redimensionamento. Handles do Calendário principal agora verificam visibilidade e permissão de edição, como o conteúdo do evento. Primeiro teste da suíte final passou (1/1).
 
