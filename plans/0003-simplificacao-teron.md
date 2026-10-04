@@ -5,7 +5,7 @@
 - [x] 1. Corrigir modal de setor, exclusão do registro selecionado, fotos e troca de escritório.
 - [ ] 2. Ajustar nomes, traduções e abas do navegador.
 - [ ] 3. Reorganizar tarefas, projetos, status, tempo e modelos.
-- [ ] 4. Corrigir calendário, privacidade e agendas compartilhadas.
+- [x] 4. Corrigir calendário, privacidade e agendas compartilhadas.
 - [ ] 5. Corrigir drawer, andares e ações do escritório.
 - [ ] 6. Simplificar contatos e remover Recrutamento, RH e Planejador de equipes.
 - [ ] 7. Simplificar ações, Conversa, Diretrizes e Configurações.
@@ -32,6 +32,8 @@
 - Executar regressão do conjunto aprovado antes de marcar marcos 2–8 como concluídos. Banco remoto continua intocado.
 
 ## Próximo passo
+
+Calendário validado no navegador em 04/10 com Owner/User: agendas próprias/equipe, seleção de agenda pública/privada, compromissos de dia inteiro e meia-noite, títulos privados ocultos e blocos ocupados sem popup, menu, arraste ou redimensionamento. Handles do Calendário principal agora verificam visibilidade e permissão de edição, como o conteúdo do evento. Primeiro teste da suíte final passou (1/1).
 
 Regressão OTP concluída em 04/10: User substituiu e restaurou e-mail pelo código real do PostgreSQL descartável. Teste de navegador conferiu chaves, valores e exclusões em identidades globais/locais, incluindo recarregamento. Autorização do servidor agora permite sincronizar somente identidades verificadas pelo serviço de contas e vinculadas à própria pessoa; doze testes cobrem presença online da própria conta, falsificação, vínculo estrangeiro e demais permissões. Convites também passaram: duas contas receberam e recusaram convite real pelo Pulse local; drawer expandiu, minimizou e selecionou andar. Teste automatizado repetiu o fluxo (1/1). Logs de login também revelaram bloqueio da presença online do próprio User; autorização permite apenas criar/atualizar booleano online da própria conta. Build de servidor e doze testes de autorização passaram. Modelos de texto e auditoria visual restante continuam em execução.
 
