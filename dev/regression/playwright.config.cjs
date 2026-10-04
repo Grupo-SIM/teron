@@ -4,7 +4,7 @@ const { resolve } = require('node:path')
 process.env.TERON_LOCAL_REGRESSION = '1'
 module.exports = defineConfig({
   testDir: resolve(__dirname, '../../tests/sanity/tests/regression'),
-  testMatch: 'adjustments.local.spec.ts',
+  testMatch: '*.local.spec.ts',
   timeout: 300000,
   workers: 1,
   reporter: 'list',

@@ -47,6 +47,14 @@ services:
     command: [redpanda, start, --overprovisioned, --smp, "1", --memory, 512M, --reserve-memory, 0M, --node-id, "0", --check=false, --kafka-addr, 0.0.0.0:9092, --advertise-kafka-addr, redpanda:9092]
     volumes: [queue:/var/lib/redpanda/data]
     networks: [local]
+  pulse:
+    image: hardcoreeng/hulypulse:s0.7.428
+    networks: [local, ingress]
+    environment:
+      HULY_BACKEND: memory
+      HULY_TOKEN_SECRET: regression-local-secret
+      HULY_BIND_PORT: "8099"
+    ports: [127.0.0.1:30199:8099]
   account:
     <<: *pod
     networks: [local, ingress]
@@ -107,6 +115,7 @@ services:
       ACCOUNTS_URL_INTERNAL: http://account:3000
       UPLOAD_URL: /files
       COLLABORATOR_URL: ws://localhost:30178
+      PULSE_URL: ws://localhost:30199/ws
       GMAIL_URL: ""
       CALENDAR_URL: ""
       TELEGRAM_URL: ""

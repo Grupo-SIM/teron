@@ -33,7 +33,7 @@
 
 ## Próximo passo
 
-Regressão OTP concluída em 04/10: User substituiu e restaurou e-mail pelo código real do PostgreSQL descartável. Teste de navegador conferiu chaves, valores e exclusões em identidades globais/locais, incluindo recarregamento. Autorização do servidor agora permite sincronizar somente identidades verificadas pelo serviço de contas e vinculadas à própria pessoa; onze testes cobrem falsificação, vínculo estrangeiro e demais permissões. Modelos de texto, convites e auditoria visual restante continuam em execução.
+Regressão OTP concluída em 04/10: User substituiu e restaurou e-mail pelo código real do PostgreSQL descartável. Teste de navegador conferiu chaves, valores e exclusões em identidades globais/locais, incluindo recarregamento. Autorização do servidor agora permite sincronizar somente identidades verificadas pelo serviço de contas e vinculadas à própria pessoa; onze testes cobrem falsificação, vínculo estrangeiro e demais permissões. Convites também passaram: duas contas receberam e recusaram convite real pelo Pulse local; drawer expandiu, minimizou e selecionou andar. Teste automatizado repetiu o fluxo (1/1). Modelos de texto e auditoria visual restante continuam em execução.
 
 Retomada em 04/10: workspace descartável foi recriado. Runner base agora prepara pessoas, identidades verificadas e mixin de funcionário com papel de login antes de testar tarefas; runner de ajustes reutiliza pessoa existente por `personUuid` em vez de criar duplicata. Sete grupos de backend e o runner de ajustes passaram. Login de User também abriu Configurações após completar fixture. Testes de navegador continuam nos fluxos de modelos e OTP.
 

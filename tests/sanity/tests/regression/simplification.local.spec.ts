@@ -4,10 +4,10 @@ import { readFileSync } from 'node:fs'
 const local = process.env.TERON_LOCAL_REGRESSION === '1'
 test.skip(!local, 'Requires disposable local regression stack')
 const state = local ? JSON.parse(readFileSync('/tmp/teron-regression-accounts.json', 'utf8')) : { ws: {} }
-async function login (page: Page): Promise<void> {
+async function login (page: Page, email = 'user@regression.local'): Promise<void> {
   await page.route('**/*', route => ['localhost', '127.0.0.1'].includes(new URL(route.request().url()).hostname) ? route.continue() : route.abort())
   await page.goto('/')
-  await page.locator('input[name=email]').fill('user@regression.local')
+  await page.locator('input[name=email]').fill(email)
   await page.locator('input[type=password]').fill('Regression123!')
   await page.getByRole('button', { name: 'Entrar', exact: true }).click()
   await expect(page).toHaveURL(/mode=workspaces/, { timeout: 30000 })
@@ -34,4 +34,37 @@ test('User replaces email through OTP and keeps global and workspace identities 
   }
   await page.reload()
   await expect(page.getByText('user@regression.local', { exact: true })).toBeVisible({ timeout: 120000 })
+})
+
+
+test('office drawer expands, selects floors and delivers a declined invitation between accounts', async ({ page, browser }) => {
+  execFileSync(process.execPath, ['dev/tool/bundle/office-invite-fixture.cjs'], { stdio: 'pipe', maxBuffer: 16 * 1024 * 1024 })
+  const context = await browser.newContext({ timezoneId: 'America/Recife', viewport: { width: 1440, height: 1000 } })
+  try {
+    await login(page, 'owner@regression.local')
+    const user = await context.newPage()
+    await login(user)
+    await page.goto(`/workbench/${state.ws.workspaceUrl}/love`)
+    await expect(page.getByText('Trocar andar', { exact: true })).toBeVisible({ timeout: 120000 })
+    await page.getByText('Trocar andar', { exact: true }).click()
+    const card = page.locator('.floor-card.preview').filter({ hasText: 'Andar regressão' })
+    const toggle = card.locator('.floor-preview-toggle')
+    if (await toggle.getAttribute('aria-expanded') !== 'true') await toggle.click()
+    await expect(card.locator('.floor-preview-content')).toBeVisible()
+    await toggle.click()
+    await expect(card.locator('.floor-preview-content')).toHaveCount(0)
+    await toggle.click()
+    await card.locator('.floor-select').click()
+    await expect(page.getByText('Escritório regressão', { exact: true }).first()).toBeVisible()
+    await page.getByText('Trocar andar', { exact: true }).click()
+    await card.locator('.floorGrid-room__field').filter({ has: page.locator('[data-name=UR]') }).click()
+    await page.locator('.antiPopup button').last().click()
+    await expect(user.getByRole('button', { name: 'Recusar', exact: true })).toBeVisible({ timeout: 30000 })
+    await user.getByRole('button', { name: 'Recusar', exact: true }).click()
+    await expect(user.getByRole('button', { name: 'Recusar', exact: true })).toHaveCount(0)
+    await expect(page.getByRole('button', { name: 'Cancelar', exact: true })).toHaveCount(0)
+  } finally {
+    await context.close()
+    execFileSync(process.execPath, ['dev/tool/bundle/office-invite-fixture.cjs', '--cleanup'], { stdio: 'pipe', maxBuffer: 16 * 1024 * 1024 })
+  }
 })

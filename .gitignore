@@ -122,3 +122,5 @@ ws-tests/docker-compose.override.yml
 !public/**/*.mp4
 !public/**/*.webm
 **/bundle/adjustments.cjs
+
+**/bundle/office-invite-fixture.cjs

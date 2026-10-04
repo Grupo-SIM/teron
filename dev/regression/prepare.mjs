@@ -53,7 +53,7 @@ run(['node_modules/webpack-cli/bin/cli.js', '--config', '../regression/webpack.c
 cpSync(resolve(root, 'dev/prod/public/teron'), resolve(root, 'dev/prod/dist/teron'), { recursive: true })
 cpSync(resolve(root, 'dev/regression/branding.json'), resolve(root, 'dev/prod/dist/regression-branding.json'))
 
-for (const suite of ['simplification', 'adjustments']) esbuild.buildSync({
+for (const suite of ['simplification', 'adjustments', 'office-invite-fixture']) esbuild.buildSync({
   entryPoints: [resolve(root, `dev/tool/tests/${suite}.ts`)],
   bundle: true,
   platform: 'node',

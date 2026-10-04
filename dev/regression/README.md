@@ -38,3 +38,5 @@ node tests/sanity/node_modules/@playwright/test/cli.js test --config dev/regress
 ```
 
 Configuração usa Chromium já instalado, sem download. Testes locais são ignorados pela suíte comum sem `TERON_LOCAL_REGRESSION=1`. Verifica duas contas, privacidade, dia inteiro/meia-noite, nomes das seções, foto cover na edição e tokens de fundo nos temas claro/escuro. Produto atualmente força tema escuro; teste claro aplica classe CSS apenas na página descartável para conferir tokens, sem alterar preferência do produto. Capturas ficam em `/tmp/teron-regression-*`.
+
+Regressão do plano 0003 inclui OTP real de User com substituição/restauração de e-mail e comparação dos registros globais/locais. Pulse descartável (`s0.7.428`, memória, porta localhost 30199) permite entrega/recusa de convite sem áudio externo. `office-invite-fixture.cjs` prepara presença local em duas salas e remove as presenças após o teste; nenhum servidor de mídia é acionado.
