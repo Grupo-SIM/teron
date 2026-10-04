@@ -33,6 +33,8 @@
 
 ## Próximo passo
 
+Regressão OTP concluída em 04/10: User substituiu e restaurou e-mail pelo código real do PostgreSQL descartável. Teste de navegador conferiu chaves, valores e exclusões em identidades globais/locais, incluindo recarregamento. Autorização do servidor agora permite sincronizar somente identidades verificadas pelo serviço de contas e vinculadas à própria pessoa; onze testes cobrem falsificação, vínculo estrangeiro e demais permissões. Modelos de texto, convites e auditoria visual restante continuam em execução.
+
 Retomada em 04/10: workspace descartável foi recriado. Runner base agora prepara pessoas, identidades verificadas e mixin de funcionário com papel de login antes de testar tarefas; runner de ajustes reutiliza pessoa existente por `personUuid` em vez de criar duplicata. Sete grupos de backend e o runner de ajustes passaram. Login de User também abriu Configurações após completar fixture. Testes de navegador continuam nos fluxos de modelos e OTP.
 
 Encerramento desta etapa: stack descartável, preparação dos bundles e runner de regressão foram versionados em `dev/docker-compose.regression.yaml`, `dev/regression/` e `dev/tool/tests/simplification.ts`. Runner prepara workspace/Owner/User locais, repete sete grupos de regressão e deixa fixtures para conferência visual. Compose validado; scripts de preparação passaram pela verificação de sintaxe. Build web completo passou antes da correção adicional do Calendário principal, que teve build de pacotes e parser próprios aprovados. Nenhum push, deploy, migração ou seed remoto foi executado.

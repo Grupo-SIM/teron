@@ -1,4 +1,4 @@
-import core, { AccountRole, type Account, type Doc, type MeasureContext, type SessionData, type Tx } from '@hcengineering/core'
+import core, { AccountRole, type Account, type Doc, type MeasureContext, type SessionData, type SocialId, type Tx } from '@hcengineering/core'
 import contact from '@hcengineering/contact'
 import task from '@hcengineering/task'
 import document from '@hcengineering/document'
@@ -23,12 +23,13 @@ const docs = new Map<string, object>([
   ['event', { _id: 'event', _class: calendar.class.Event, space, user }],
   ['calendar', { _id: 'calendar', _class: calendar.class.Calendar, space, user }],
   ['todo', { _id: 'todo', _class: time.class.ToDo, space, user: person, attachedTo: 'otherTask', attachedToClass: task.class.Task }],
+  ['released', { _id: 'released', _class: contact.class.SocialIdentity, space, attachedTo: person, collection: 'socialIds', type: 'email', value: 'old@example.test', key: 'email:old@example.test', verifiedOn: 100, isDeleted: false }],
   ['otherEvent', { _id: 'otherEvent', _class: calendar.class.Event, space, user: 'other' }]
 ])
-function fixture (role = AccountRole.User): { middleware: WorkspaceAuthorizationMiddleware, ctx: MeasureContext<SessionData>, forward: jest.Mock } {
+function fixture (role = AccountRole.User, verifiedIdentities: SocialId[] = []): { middleware: WorkspaceAuthorizationMiddleware, ctx: MeasureContext<SessionData>, forward: jest.Mock } {
   const forward = jest.fn(async () => [])
   const next = { tx: forward, findAll: async (_ctx: unknown, _class: string, query: any) => [...docs.values()].filter((doc: any) => doc._class === _class && (query._id?.$in?.includes(doc._id) || query._id === doc._id)) } as unknown as Middleware
-  const context = { hierarchy: { isDerived: (actual: string, expected: string) => actual === expected || expected === core.class.AttachedDoc && [attachment.class.Attachment, calendar.class.Event, time.class.ToDo, task.class.Task].includes(actual as any) }, head: next } as unknown as PipelineContext
+  const context = { contextVars: { getVerifiedSocialIds: async () => verifiedIdentities }, hierarchy: { isDerived: (actual: string, expected: string) => actual === expected || expected === core.class.AttachedDoc && [attachment.class.Attachment, contact.class.SocialIdentity, calendar.class.Event, time.class.ToDo, task.class.Task].includes(actual as any) }, head: next } as unknown as PipelineContext
   const account = { uuid: 'account', role, primarySocialId: user, socialIds: [user] } as Account
   return { middleware: new WorkspaceAuthorizationMiddleware(context, next), ctx: { contextData: { account } } as MeasureContext<SessionData>, forward }
 }
@@ -88,6 +89,23 @@ describe('server authorization before persistence', () => {
       await middleware.tx(ctx, [update('task', task.class.Task, { dueDate: 0 })])
       expect(forward).toHaveBeenCalledTimes(1)
     }
+  })
+  it('synchronizes only authoritative verified identities belonging to the caller', async () => {
+    const verified = { _id: 'new', type: 'email', value: 'new@example.test', key: 'email:new@example.test', verifiedOn: 200, isDeleted: false } as SocialId
+    const released = { _id: 'released', type: 'email', value: 'old@example.test#released', key: 'email:old@example.test#released', verifiedOn: 100, isDeleted: true } as SocialId
+    const { middleware, ctx, forward } = fixture(AccountRole.User, [verified, released])
+    const create = (attributes: object): Tx => ({ _class: core.class.TxCreateDoc, objectId: 'new', objectClass: contact.class.SocialIdentity, objectSpace: space,
+      attributes: { attachedTo: person, attachedToClass: contact.class.Person, collection: 'socialIds', ...verified, ...attributes } }) as unknown as Tx
+    docs.set(person, { _id: person, _class: contact.class.Person, space })
+    try {
+      await middleware.tx(ctx, [create({})])
+      await middleware.tx(ctx, [update('released', contact.class.SocialIdentity, { value: released.value, key: released.key, isDeleted: true })])
+      await expect(middleware.tx(ctx, [create({ value: 'forged@example.test' })])).rejects.toThrow()
+      await expect(middleware.tx(ctx, [create({ verifiedOn: 999 })])).rejects.toThrow()
+      await expect(middleware.tx(ctx, [create({ attachedTo: 'another-person' })])).rejects.toThrow()
+      await expect(middleware.tx(ctx, [update('released', contact.class.SocialIdentity, { attachedTo: 'another-person' })])).rejects.toThrow()
+      expect(forward).toHaveBeenCalledTimes(2)
+    } finally { docs.delete(person) }
   })
   it('refuses readonly members and preserves trusted trigger transactions', async () => {
     const { middleware, ctx, forward } = fixture(AccountRole.ReadOnlyGuest)

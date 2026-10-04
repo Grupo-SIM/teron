@@ -1,10 +1,10 @@
 import attachment from '@hcengineering/attachment'
 import calendar, { type Event } from '@hcengineering/calendar'
 import chunter from '@hcengineering/chunter'
-import contact from '@hcengineering/contact'
+import contact, { type SocialIdentity } from '@hcengineering/contact'
 import core, {
   AccountRole, hasAccountRole, type Doc, type MeasureContext, type Ref, type SessionData,
-  systemAccountUuid, TxProcessor, type Tx, type TxCreateDoc, type TxUpdateDoc
+  systemAccountUuid, TxProcessor, type AccountUuid, type SocialId, type Tx, type TxCreateDoc, type TxUpdateDoc
 } from '@hcengineering/core'
 import document, { guidelineAccessFor, type Teamspace } from '@hcengineering/document'
 import love from '@hcengineering/love'
@@ -32,6 +32,9 @@ export class WorkspaceAuthorizationMiddleware extends BaseMiddleware {
     const personIds = people.map((item) => item.attachedTo)
     const hierarchy = this.context.hierarchy
     const pending = new Map<Ref<Doc>, Doc>()
+    let verifiedIdentities: SocialId[] | undefined
+    const getVerifiedSocialIds = this.context.contextVars?.getVerifiedSocialIds as
+      ((account: AccountUuid) => Promise<SocialId[]>) | undefined
     for (const tx of clientTransactions(txes)) {
       const created = tx._class === core.class.TxCreateDoc
       const updated = tx._class === core.class.TxUpdateDoc
@@ -61,6 +64,16 @@ export class WorkspaceAuthorizationMiddleware extends BaseMiddleware {
       let allowed = false
       if (hierarchy.isDerived(tx.objectClass, task.class.Task)) {
         allowed = memberTaskUpdateAllowed(tx, data, personIds)
+      } else if (tx.objectClass === contact.class.SocialIdentity && (created || updated)) {
+        if (getVerifiedSocialIds !== undefined && (created || fields.every((field) => ['type', 'value', 'key', 'verifiedOn', 'isDeleted'].includes(field)))) {
+          verifiedIdentities ??= await getVerifiedSocialIds(account.uuid)
+          const identity = updated ? TxProcessor.updateDoc2Doc({ ...data }, tx as TxUpdateDoc<Doc>) : data
+          const verified = verifiedIdentities.find((item) => item._id === identity._id)
+          const local = identity as SocialIdentity
+          allowed = local.collection === 'socialIds' && personIds.includes(local.attachedTo) && verified !== undefined && verified.verifiedOn != null &&
+            local.type === verified.type && local.value === verified.value && local.key === verified.key &&
+            local.verifiedOn === verified.verifiedOn && (local.isDeleted === true) === (verified.isDeleted === true)
+        }
       } else if (hierarchy.isDerived(tx.objectClass, time.class.ToDo)) {
         allowed = personIds.includes((data as ToDo).user) && (created || (updated && fields.every((field) => ['title', 'description', 'doneOn', 'priority', 'visibility', 'rank'].includes(field))) || tx._class === core.class.TxRemoveDoc)
         const todo = data as ToDo
