@@ -64,6 +64,11 @@ export class WorkspaceAuthorizationMiddleware extends BaseMiddleware {
       let allowed = false
       if (hierarchy.isDerived(tx.objectClass, task.class.Task)) {
         allowed = memberTaskUpdateAllowed(tx, data, personIds)
+      } else if (tx.objectClass === core.class.UserStatus) {
+        const status = data as Doc & { user: AccountUuid, online: boolean }
+        const nextStatus = updated ? TxProcessor.updateDoc2Doc({ ...status }, tx as TxUpdateDoc<Doc>) : status
+        allowed = status.user === account.uuid && typeof (nextStatus as typeof status).online === 'boolean' &&
+          (created || (updated && fields.every((field) => field === 'online')))
       } else if (tx.objectClass === contact.class.SocialIdentity && (created || updated)) {
         if (getVerifiedSocialIds !== undefined && (created || fields.every((field) => ['type', 'value', 'key', 'verifiedOn', 'isDeleted'].includes(field)))) {
           verifiedIdentities ??= await getVerifiedSocialIds(account.uuid)

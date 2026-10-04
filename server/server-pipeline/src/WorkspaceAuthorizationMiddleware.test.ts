@@ -23,6 +23,8 @@ const docs = new Map<string, object>([
   ['event', { _id: 'event', _class: calendar.class.Event, space, user }],
   ['calendar', { _id: 'calendar', _class: calendar.class.Calendar, space, user }],
   ['todo', { _id: 'todo', _class: time.class.ToDo, space, user: person, attachedTo: 'otherTask', attachedToClass: task.class.Task }],
+  ['ownPresence', { _id: 'ownPresence', _class: core.class.UserStatus, space, user: 'account', online: false }],
+  ['otherPresence', { _id: 'otherPresence', _class: core.class.UserStatus, space, user: 'other', online: false }],
   ['released', { _id: 'released', _class: contact.class.SocialIdentity, space, attachedTo: person, collection: 'socialIds', type: 'email', value: 'old@example.test', key: 'email:old@example.test', verifiedOn: 100, isDeleted: false }],
   ['otherEvent', { _id: 'otherEvent', _class: calendar.class.Event, space, user: 'other' }]
 ])
@@ -106,6 +108,17 @@ describe('server authorization before persistence', () => {
       await expect(middleware.tx(ctx, [update('released', contact.class.SocialIdentity, { attachedTo: 'another-person' })])).rejects.toThrow()
       expect(forward).toHaveBeenCalledTimes(2)
     } finally { docs.delete(person) }
+  })
+  it('permits own online presence without accepting other accounts or identity changes', async () => {
+    const { middleware, ctx, forward } = fixture()
+    const create = (user: string): Tx => ({ _class: core.class.TxCreateDoc, objectId: 'presence', objectClass: core.class.UserStatus, objectSpace: space, attributes: { user, online: true } }) as unknown as Tx
+    await middleware.tx(ctx, [create('account')])
+    await expect(middleware.tx(ctx, [create('other')])).rejects.toThrow()
+    await middleware.tx(ctx, [update('ownPresence', core.class.UserStatus, { online: true })])
+    await expect(middleware.tx(ctx, [update('otherPresence', core.class.UserStatus, { online: true })])).rejects.toThrow()
+    await expect(middleware.tx(ctx, [update('ownPresence', core.class.UserStatus, { user: 'other' })])).rejects.toThrow()
+    await expect(middleware.tx(ctx, [update('ownPresence', core.class.UserStatus, { online: 'true' })])).rejects.toThrow()
+    expect(forward).toHaveBeenCalledTimes(2)
   })
   it('refuses readonly members and preserves trusted trigger transactions', async () => {
     const { middleware, ctx, forward } = fixture(AccountRole.ReadOnlyGuest)
