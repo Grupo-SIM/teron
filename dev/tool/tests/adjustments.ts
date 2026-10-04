@@ -22,10 +22,11 @@ async function main (): Promise<void> {
   const providers: any[] = []
   try {
     async function ensureIdentity (account: any, token: string, label: string): Promise<any> {
-      const person: any = `regression-account-${label}-person`
+      const existing = await owner.findOne(contact.class.Person, { personUuid: account.account })
+      const person: any = existing?._id ?? `regression-account-${label}-person`
       if (await owner.findOne(contact.class.Person, { _id: person }) === undefined) {
-        await owner.createDoc(contact.class.Person, contact.space.Contacts, { name: `${label},Regressão`, avatarType: AvatarType.COLOR, personUuid: account.account }, person)
-        await owner.createMixin(person, contact.class.Person, contact.space.Contacts, contact.mixin.Employee, { active: true })
+        await owner.createDoc(contact.class.Person, contact.space.Contacts, { name: `Regressão,${label === 'owner' ? 'Owner' : 'User'}`, avatarType: AvatarType.COLOR, personUuid: account.account }, person)
+        await owner.createMixin(person, contact.class.Person, contact.space.Contacts, contact.mixin.Employee, { active: true, role: 'USER' })
       }
       const response = await fetch('http://localhost:30130', { method: 'POST', headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` }, body: JSON.stringify({ method: 'getSocialIds', params: {} }) })
       const { result: identities } = await response.json()

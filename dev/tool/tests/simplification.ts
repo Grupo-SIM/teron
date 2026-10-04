@@ -88,6 +88,22 @@ async function main (): Promise<void> {
     return ref
   }
   try {
+    // A fresh workspace needs account people before task visibility and browser login.
+    for (const [account, workspaceToken, label] of [[state.owner, state.ownerWs.token, 'owner'], [state.user, state.userWs.token, 'user']] as const) {
+      const existing = await owner.findOne(contact.class.Person, { personUuid: account.account })
+      const accountPerson = existing?._id ?? await ensure(contact.class.Person, contact.space.Contacts, `regression-account-${label}-person`, {
+        name: `Regressão,${label === 'owner' ? 'Owner' : 'User'}`, avatarType: AvatarType.COLOR, personUuid: account.account
+      })
+      if (!owner.getHierarchy().hasMixin((await owner.findOne(contact.class.Person, { _id: accountPerson }))!, contact.mixin.Employee)) {
+        await owner.createMixin(accountPerson, contact.class.Person, contact.space.Contacts, contact.mixin.Employee, { active: true, role: 'USER' })
+      }
+      for (const identity of await rpc('getSocialIds', {}, workspaceToken)) {
+        await ensure(contact.class.SocialIdentity, contact.space.Contacts, identity._id, {
+          attachedTo: accountPerson, attachedToClass: contact.class.Person, collection: 'socialIds', type: identity.type,
+          value: identity.value, key: `${identity.type}:${identity.value}`, verifiedOn: identity.verifiedOn, isDeleted: false
+        })
+      }
+    }
     const person = await ensure(contact.class.Person, contact.space.Contacts, 'regression-person-a', {
       name: 'Silva,Ana', avatarType: AvatarType.COLOR, city: 'Recife', remoteDaysPerWeek: 2, onsiteDaysPerWeek: 3
     })
