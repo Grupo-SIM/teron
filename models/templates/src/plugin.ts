@@ -44,7 +44,6 @@ export default mergeIds(templatesId, templates, {
     MessageTemplate: '' as Ref<ActionCategory>
   },
   string: {
-    Title: '' as IntlString,
-    Message: '' as IntlString
+    Title: '' as IntlString
   }
 })
