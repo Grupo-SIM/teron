@@ -1,4 +1,5 @@
 import core, { AccountRole, type Account, type Doc, type MeasureContext, type SessionData, type SocialId, type Tx } from '@hcengineering/core'
+import chunter from '@hcengineering/chunter'
 import contact from '@hcengineering/contact'
 import task from '@hcengineering/task'
 import drive from '@hcengineering/drive'
@@ -42,6 +43,25 @@ function fixture (role = AccountRole.User, verifiedIdentities: SocialId[] = []):
 const update = (objectId: string, objectClass: string, operations: object, objectSpace = space): Tx => ({ _class: core.class.TxUpdateDoc, objectId, objectClass, operations, objectSpace }) as unknown as Tx
 
 describe('server authorization before persistence', () => {
+  it('allows only self membership changes in public channels, including array operators', async () => {
+    const { middleware, ctx, forward } = fixture()
+    docs.set('channel', { _id: 'channel', _class: chunter.class.Channel, space, private: false, members: ['other'] })
+    try {
+      await middleware.tx(ctx, [update('channel', chunter.class.Channel, { members: ['other', 'account'] })])
+      await middleware.tx(ctx, [update('channel', chunter.class.Channel, { $push: { members: 'account' } })])
+      await middleware.tx(ctx, [update('channel', chunter.class.Channel, { $push: { members: { $each: ['account'], $position: 0 } } })])
+      await expect(middleware.tx(ctx, [update('channel', chunter.class.Channel, { members: ['account'] })])).rejects.toThrow()
+      await expect(middleware.tx(ctx, [update('channel', chunter.class.Channel, { $push: { members: 'stranger' } })])).rejects.toThrow()
+      await expect(middleware.tx(ctx, [update('channel', chunter.class.Channel, { members: ['other', 'account'], private: true })])).rejects.toThrow()
+      await expect(middleware.tx(ctx, [update('channel', chunter.class.Channel, { members: ['other', 'account', 'account'] })])).rejects.toThrow()
+      docs.set('channel', { _id: 'channel', _class: chunter.class.Channel, space, private: true, members: ['other'] })
+      await expect(middleware.tx(ctx, [update('channel', chunter.class.Channel, { members: ['other', 'account'] })])).rejects.toThrow()
+      docs.set('channel', { _id: 'channel', _class: chunter.class.Channel, space, private: true, members: ['other', 'account'] })
+      await middleware.tx(ctx, [update('channel', chunter.class.Channel, { $pull: { members: 'account' } })])
+      await expect(middleware.tx(ctx, [update('channel', chunter.class.Channel, { members: ['other'] }), update('channel', chunter.class.Channel, { members: ['other', 'account'] })])).rejects.toThrow()
+      expect(forward).toHaveBeenCalledTimes(4)
+    } finally { docs.delete('channel') }
+  })
   it('allows User folder creation/deletion but rejects updates and inaccessible parents', async () => {
     const { middleware, ctx, forward } = fixture()
     const create = (parent: string, path: string[]): Tx => ({ _class: core.class.TxCreateDoc, objectId: 'new-folder', objectClass: drive.class.Folder, objectSpace: space, attributes: { title: 'Folder', parent, path } }) as unknown as Tx

@@ -65,3 +65,5 @@ Foto na edição do Escritório ocupa largura e altura do squircle, com recorte 
 Tabelas de contatos permitem selecionar e reordenar colunas. Funcionários e Externos mostram nome, localização, função e informações de contato por padrão; Aniversário, Dias presenciais e Dias remotos são opcionais. Clientes mantém nome, localização e informações de contato por padrão. Preferências individuais salvas prevalecem sobre o padrão.
 
 Conta mantém um único email ativo confirmado. Alteração exige código enviado ao novo endereço; email anterior permanece válido até confirmação. Após confirmar, endereços anteriores são liberados, inclusive em chamadas diretas ao servidor. Cancelar ou falhar na confirmação preserva email atual.
+
+User pode entrar e sair de canais públicos ativos alterando somente a própria participação; não pode adicionar/remover terceiros nem alterar configuração do canal. Canal privado permite somente saída da própria conta já participante; entrada exige administração.

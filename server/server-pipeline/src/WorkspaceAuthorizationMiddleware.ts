@@ -62,7 +62,7 @@ export class WorkspaceAuthorizationMiddleware extends BaseMiddleware {
         }
       }
       const fields = updated ? changedFields((tx as TxUpdateDoc<Doc>).operations) : []
-      if (updated && fields.some((field) => ['*', '_id', '_class', 'space', 'createdBy', 'createdOn', 'modifiedBy', 'modifiedOn'].includes(field))) throw new Error('Cannot change document identity or move content.')
+      if (updated && fields.some((field) => (field === '*' ? tx.objectClass !== chunter.class.Channel : ['_id', '_class', 'space', 'createdBy', 'createdOn', 'modifiedBy', 'modifiedOn'].includes(field)))) throw new Error('Cannot change document identity or move content.')
       let allowed = false
       if (hierarchy.isDerived(tx.objectClass, task.class.Task)) {
         allowed = memberTaskUpdateAllowed(tx, data, personIds)
@@ -120,6 +120,33 @@ export class WorkspaceAuthorizationMiddleware extends BaseMiddleware {
         allowed = created
       } else if (hierarchy.isDerived(tx.objectClass, chunter.class.ChatMessage)) {
         allowed = created || (updated && data.createdBy !== undefined && account.socialIds.includes(data.createdBy) && fields.every((field) => ['message', 'editedOn'].includes(field)))
+      } else if (tx.objectClass === chunter.class.Channel && updated) {
+        const channel = data as Doc & { members: AccountUuid[], private: boolean, archived?: boolean }
+        const operations = (tx as TxUpdateDoc<Doc>).operations as Record<string, any>
+        // Array operators may only target the caller; never authorize other member changes.
+        const operatorAllowed = Object.entries(operations).every(([key, value]) => {
+          if (key === 'members') return Array.isArray(value)
+          if (value === null || typeof value !== 'object' || Array.isArray(value)) return false
+          if (key === '$set') return Object.keys(value).length === 1 && Array.isArray(value.members)
+          if (key !== '$push' && key !== '$pull') return false
+          if (Object.keys(value).length !== 1 || value.members === undefined) return false
+          const target = value.members
+          if (target === account.uuid) return true
+          if (target === null || typeof target !== 'object') return false
+          const listKey = key === '$push' ? '$each' : '$in'
+          return Object.keys(target).every((field) => field === listKey || (key === '$push' && field === '$position')) &&
+            Array.isArray(target[listKey]) && target[listKey].length === 1 && target[listKey][0] === account.uuid
+        })
+        if (operatorAllowed && channel.archived !== true) {
+          const nextChannel = TxProcessor.updateDoc2Doc({ ...channel, members: [...channel.members] }, tx as TxUpdateDoc<Doc>) as typeof channel
+          const others = channel.members.filter((member) => member !== account.uuid)
+          allowed = Array.isArray(nextChannel.members) &&
+            nextChannel.members.every((member) => typeof member === 'string') &&
+            nextChannel.members.filter((member) => member === account.uuid).length <= 1 &&
+            JSON.stringify(nextChannel.members.filter((member) => member !== account.uuid)) === JSON.stringify(others) &&
+            (channel.private === false || (channel.members.includes(account.uuid) && !nextChannel.members.includes(account.uuid)))
+          if (allowed) pending.set(tx.objectId, nextChannel)
+        }
       } else if (hierarchy.isDerived(tx.objectClass, core.class.Collaborator)) {
         allowed = (data as Doc & { collaborator: string }).collaborator === account.uuid && (created || tx._class === core.class.TxRemoveDoc)
       } else if (hierarchy.isDerived(tx.objectClass, notification.class.InboxNotification)) {
