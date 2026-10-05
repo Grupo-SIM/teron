@@ -92,7 +92,7 @@ function loadPlugin (id: Plugin): Resources | Promise<Resources> {
           }
           return await plugin.default()
         } catch (err: any) {
-          console.error(err)
+          console.error('Failed to initialize plugin', id, err)
           throw err
         }
       }

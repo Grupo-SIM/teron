@@ -14,6 +14,7 @@
 //
 
 import platform, { type Plugin, addLocation, addStringsLoader, platformId } from '@hcengineering/platform'
+import { loadPlugin } from './load-plugin'
 
 import { activityId } from '@hcengineering/activity'
 import aiBot, { aiBotId } from '@hcengineering/ai-bot'
@@ -417,19 +418,7 @@ function configureI18n(): void {
 }
 
 export async function configurePlatform() {
-  setMetadata(platform.metadata.LoadHelper, async (loader) => {
-    for (let i = 0; i < 5; i++) {
-      try {
-        return await loader()
-      } catch (err: any) {
-        if (err.message.includes('Loading chunk') && i != 4) {
-          continue
-        }
-        console.log('reload due to loading error')
-        location.reload()
-      }
-    }
-  })
+  setMetadata(platform.metadata.LoadHelper, loadPlugin)
   configureI18n()
 
   const config: Config = await loadServerConfig(configs[clientType ?? ''] ?? '/config.json')
