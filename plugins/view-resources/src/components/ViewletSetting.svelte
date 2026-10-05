@@ -373,7 +373,9 @@
 
     for (const key of viewlet.configOptions?.optionalKeys ?? []) {
       const attribute = hierarchy.getAllAttributes(viewlet.attachTo).get(key)
-      if (attribute !== undefined) processAttribute(attribute, result)
+      if (attribute !== undefined) {
+        processAttribute({ ...attribute, label: attribute.shortLabel ?? attribute.label }, result)
+      }
     }
 
     if (viewlet.configOptions?.strict !== true) {

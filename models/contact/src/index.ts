@@ -230,10 +230,16 @@ export class TPerson extends TContact implements Person {
   @Prop(TypeString(), contact.string.ContactSource)
     contactSource?: string
 
-  @Prop(TypeNumber(), contact.string.RemoteDaysPerWeek, { editor: contact.component.WorkModeDays })
+  @Prop(TypeNumber(), contact.string.RemoteDaysPerWeek, {
+    editor: contact.component.WorkModeDays,
+    shortLabel: contact.string.RemoteDaysPerWeekShort
+  })
     remoteDaysPerWeek?: number | null
 
-  @Prop(TypeNumber(), contact.string.OnsiteDaysPerWeek, { editor: contact.component.WorkModeDays })
+  @Prop(TypeNumber(), contact.string.OnsiteDaysPerWeek, {
+    editor: contact.component.WorkModeDays,
+    shortLabel: contact.string.OnsiteDaysPerWeekShort
+  })
     onsiteDaysPerWeek?: number | null
 
   @Prop(CollectionType(contact.class.SocialIdentity), contact.string.SocialIds)
