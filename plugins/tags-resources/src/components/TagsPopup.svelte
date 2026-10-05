@@ -75,6 +75,7 @@
     const tag = await getClient().findOne(tags.class.TagElement, { _id: res })
     dispatch('update', { action: 'add', tag })
     selected = [...selected, res]
+    search = ''
     inProcess = false
   }
 
