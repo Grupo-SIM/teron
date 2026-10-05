@@ -20,7 +20,7 @@
   }
 </script>
 
-<div class="flex-row-center gap-2">
+<div class="time-input flex-row-center">
   <EditBox
     bind:value={amount}
     placeholder={tracker.string.TimeInputAmount}
@@ -49,3 +49,11 @@
     on:selected={(event) => changeUnit(event.detail)}
   />
 </div>
+
+<style>
+  .time-input {
+    flex: 0 0 auto;
+    gap: 0.75rem;
+    width: max-content;
+  }
+</style>
