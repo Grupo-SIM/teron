@@ -1,5 +1,10 @@
 {
   "string": {
+    "ChangeEmail": "E-Mail ändern",
+    "SetEmail": "E-Mail festlegen",
+    "CurrentEmail": "Aktuelle E-Mail",
+    "EmailReplacementHint": "Ihre aktuelle E-Mail wird erst ersetzt, nachdem Sie die neue Adresse bestätigt haben.",
+    "EmailPlaceholder": "name@example.com",
     "LegacyReadOnlyMembers": "Legacy read-only members await conversion to User: {count}. Available seats are required.",
     "Setting": "Einstellung",
     "Spaces": "Bereiche",

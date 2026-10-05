@@ -1,5 +1,10 @@
 {
   "string": {
+    "ChangeEmail": "Změnit email",
+    "SetEmail": "Nastavit email",
+    "CurrentEmail": "Současný email",
+    "EmailReplacementHint": "Současný email bude nahrazen až po potvrzení nové adresy.",
+    "EmailPlaceholder": "name@example.com",
     "LegacyReadOnlyMembers": "Legacy read-only members await conversion to User: {count}. Available seats are required.",
     "Setting": "Nastavení",
     "Spaces": "Prostory",

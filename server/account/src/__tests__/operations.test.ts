@@ -2547,6 +2547,8 @@ describe('account operations', () => {
     describe('validateOtp', () => {
       beforeEach(() => {
         jest.spyOn(utils, 'setPassword').mockResolvedValue()
+        ;(mockDb.socialId.find as jest.Mock).mockResolvedValue([])
+        jest.spyOn(utils, 'doReleaseSocialId').mockResolvedValue({} as SocialId)
       })
 
       test('should validate OTP and create account for signup', async () => {
@@ -2634,6 +2636,54 @@ describe('account operations', () => {
 
         expect(mockDb.otp.deleteMany).toHaveBeenCalledWith({ socialId: mockSocialId._id })
         expect(utils.setPassword).not.toHaveBeenCalled()
+        expect(utils.doReleaseSocialId).not.toHaveBeenCalled()
+      })
+
+      test('should replace previous emails only after verifying the new email', async () => {
+        const mockSocialId: SocialId = {
+          _id: 'new-email' as PersonId,
+          personUuid: mockAccountId,
+          type: SocialIdType.EMAIL,
+          value: mockEmail,
+          key: `email:${mockEmail}`
+        }
+        const previousEmails = ['old@example.com', 'legacy@example.com'].map((value) => ({
+          ...mockSocialId,
+          _id: value as PersonId,
+          value
+        }))
+        ;(decodeTokenVerbose as jest.Mock).mockReturnValue({ account: mockAccountId })
+        jest.spyOn(utils, 'getEmailSocialId').mockResolvedValue(mockSocialId)
+        jest.spyOn(utils, 'isOtpValid').mockResolvedValue(true)
+        ;(mockDb.account.findOne as jest.Mock).mockResolvedValue({ uuid: mockAccountId })
+        ;(mockDb.socialId.findOne as jest.Mock).mockResolvedValue({ ...mockSocialId, verifiedOn: Date.now() })
+        ;(mockDb.socialId.find as jest.Mock).mockResolvedValue([...previousEmails, mockSocialId])
+        ;(mockDb.person.findOne as jest.Mock).mockResolvedValue({
+          uuid: mockAccountId,
+          firstName: mockFirstName,
+          lastName: mockLastName
+        })
+
+        await validateOtp(mockCtx, mockDb, mockBranding, mockToken, {
+          email: mockEmail,
+          code: '123456',
+          action: 'verify'
+        })
+
+        expect(mockDb.socialId.find).toHaveBeenCalledWith({
+          personUuid: mockAccountId,
+          type: SocialIdType.EMAIL,
+          isDeleted: { $ne: true }
+        })
+        expect(utils.doReleaseSocialId).toHaveBeenCalledTimes(2)
+        for (const previousEmail of previousEmails) {
+          expect(utils.doReleaseSocialId).toHaveBeenCalledWith(
+            mockDb, mockAccountId, SocialIdType.EMAIL, previousEmail.value, `replaceEmail@${mockAccountId}`, true
+          )
+        }
+        expect((mockDb.socialId.update as jest.Mock).mock.invocationCallOrder[0]).toBeLessThan(
+          (utils.doReleaseSocialId as jest.Mock).mock.invocationCallOrder[0]
+        )
       })
 
       test('should validate OTP for unverified social id belonging to caller', async () => {
@@ -2800,9 +2850,12 @@ describe('account operations', () => {
         await expect(
           validateOtp(mockCtx, mockDb, mockBranding, mockToken, {
             email: mockEmail,
-            code: '123456'
+            code: '123456',
+            action: 'verify'
           })
         ).rejects.toThrow(new PlatformError(new Status(Severity.ERROR, platform.status.InvalidOtp, {})))
+        expect(mockDb.socialId.update).not.toHaveBeenCalled()
+        expect(utils.doReleaseSocialId).not.toHaveBeenCalled()
       })
 
       test('should fail if email not found', async () => {
@@ -2844,6 +2897,7 @@ describe('account operations', () => {
             action: 'verify'
           })
         ).rejects.toThrow(new PlatformError(new Status(Severity.ERROR, platform.status.AccountAlreadyExists, {})))
+        expect(utils.doReleaseSocialId).not.toHaveBeenCalled()
       })
     })
 

@@ -35,14 +35,17 @@
       .map((it) => [it.type, it])
   )
 
-  $: socialIds = account.fullSocialIds.filter((si) => socialIdProviders.has(si.type) && si.isDeleted !== true)
+  $: socialIds = account.fullSocialIds.filter((si) => socialIdProviders.has(si.type) && si.isDeleted !== true &&
+    (si.type !== SocialIdType.EMAIL || si.verifiedOn != null))
 
   const emailProvider = socialIdProviders.get(SocialIdType.EMAIL)
 
-  function handleAdd (ev: MouseEvent): void {
+  function handleChangeEmail (ev: MouseEvent): void {
     if (emailProvider?.creator === undefined) return
     showPopup(emailProvider.creator, { provider: emailProvider, onAdded: handleAccountUpdated }, ev.target as HTMLElement)
   }
+
+  $: hasEmail = socialIds.some((it) => it.type === SocialIdType.EMAIL)
 
   $: onlyHuly = socialIds.filter((it) => it.type === SocialIdType.HULY).length === 1
   $: onlyLogin = socialIds.filter((it) => loginSocialTypes.includes(it.type)).length === 1
@@ -61,7 +64,7 @@
   <div class="title flex-between">
     <Label label={setting.string.ManageIdentities} />
     {#if emailProvider?.creator !== undefined}
-      <Button icon={emailProvider.icon ?? contact.icon.Profile} label={emailProvider.label} kind="link-bordered" size="small" on:click={handleAdd} />
+      <Button icon={emailProvider.icon ?? contact.icon.Profile} label={hasEmail ? setting.string.ChangeEmail : setting.string.SetEmail} kind="link-bordered" size="small" on:click={handleChangeEmail} />
     {/if}
   </div>
 

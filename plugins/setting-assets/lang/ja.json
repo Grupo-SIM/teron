@@ -1,5 +1,10 @@
 {
   "string": {
+    "ChangeEmail": "メールアドレスを変更",
+    "SetEmail": "メールアドレスを設定",
+    "CurrentEmail": "現在のメールアドレス",
+    "EmailReplacementHint": "新しいメールアドレスを確認した後にのみ、現在のメールアドレスが置き換えられます。",
+    "EmailPlaceholder": "name@example.com",
     "LegacyReadOnlyMembers": "Legacy read-only members await conversion to User: {count}. Available seats are required.",
     "Setting": "設定",
     "Spaces": "スペース",

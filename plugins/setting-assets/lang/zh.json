@@ -1,5 +1,10 @@
 {
   "string": {
+    "ChangeEmail": "更改邮箱",
+    "SetEmail": "设置邮箱",
+    "CurrentEmail": "当前邮箱",
+    "EmailReplacementHint": "确认新地址后才会替换当前邮箱。",
+    "EmailPlaceholder": "name@example.com",
     "LegacyReadOnlyMembers": "Legacy read-only members await conversion to User: {count}. Available seats are required.",
     "Setting": "设置",
     "Spaces": "空间",

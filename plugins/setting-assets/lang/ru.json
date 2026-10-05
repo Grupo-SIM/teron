@@ -1,5 +1,10 @@
 {
   "string": {
+    "ChangeEmail": "Изменить email",
+    "SetEmail": "Указать email",
+    "CurrentEmail": "Текущий email",
+    "EmailReplacementHint": "Текущий email будет заменён только после подтверждения нового адреса.",
+    "EmailPlaceholder": "name@example.com",
     "LegacyReadOnlyMembers": "Legacy read-only members await conversion to User: {count}. Available seats are required.",
     "Setting": "Настройки",
     "Spaces": "Пространства",

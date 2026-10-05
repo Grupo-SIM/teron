@@ -1,5 +1,10 @@
 {
   "string": {
+    "ChangeEmail": "E-postayı değiştir",
+    "SetEmail": "E-posta belirle",
+    "CurrentEmail": "Mevcut e-posta",
+    "EmailReplacementHint": "Mevcut e-postanız yalnızca yeni adresi doğruladıktan sonra değiştirilecektir.",
+    "EmailPlaceholder": "name@example.com",
     "LegacyReadOnlyMembers": "Legacy read-only members await conversion to User: {count}. Available seats are required.",
     "Setting": "Ayar",
     "Spaces": "Alanlar",

@@ -683,6 +683,25 @@ export async function validateOtp (
         throw new PlatformError(new Status(Severity.ERROR, platform.status.InternalServerError, {}))
       }
 
+      // Keep the previous email usable until its replacement has been verified.
+      const previousEmails = await db.socialId.find({
+        personUuid: callerAccountUuid,
+        type: SocialIdType.EMAIL,
+        isDeleted: { $ne: true }
+      })
+      for (const previousEmail of previousEmails) {
+        if (previousEmail._id !== emailSocialId._id) {
+          await doReleaseSocialId(
+            db,
+            callerAccountUuid,
+            SocialIdType.EMAIL,
+            previousEmail.value,
+            `replaceEmail@${callerAccountUuid}`,
+            true
+          )
+        }
+      }
+
       // We've already checked calledAccount is not null previously
       if ((callerAccount as Account).automatic === true) {
         // Drop automatic flag since the user added their social id
@@ -3104,7 +3123,10 @@ async function addEmailSocialId (
     throw new PlatformError(new Status(Severity.ERROR, platform.status.AccountNotFound, { account }))
   }
 
-  const normalizedEmail = normalizeValue(email)
+  const normalizedEmail = cleanEmail(email)
+  if (!isEmail(normalizedEmail)) {
+    throw new PlatformError(new Status(Severity.ERROR, platform.status.BadRequest, {}))
+  }
   const existing = await db.socialId.findOne({ type: SocialIdType.EMAIL, value: normalizedEmail })
 
   // This schema should be applied to all types in general, they should only differ by the verification process.

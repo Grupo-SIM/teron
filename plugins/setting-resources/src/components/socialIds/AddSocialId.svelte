@@ -21,6 +21,7 @@
 
   import setting from '../../plugin'
 
+  export let label: IntlString = setting.string.AddNew
   export let provider: SocialIdentityProvider
   export let canSubmit: boolean = false
   export let hideSubmit: boolean = true
@@ -44,7 +45,7 @@
 </script>
 
 <ModernDialog
-  label={setting.string.AddNew}
+  {label}
   labelProps={{ type: typeString }}
   {submitLabel}
   {canSubmit}
