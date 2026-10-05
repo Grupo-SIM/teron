@@ -38,9 +38,11 @@
   })
 
   $: groupedDocs = groupBy(items, 'space')
+  $: visibleItems = groups.flatMap((group) => groupedDocs[group._id] ?? [])
+  $: selected = Math.min(selected, Math.max(visibleItems.length - 1, 0))
 
   $: liveQuery.query(templates.class.MessageTemplate, query.trim().length === 0 ? {} : { $search: query }, (res) => {
-    items = res
+    items = Array.from(new Map(res.map((item) => [item._id, item])).values())
   })
 
   let selected = 0
@@ -65,7 +67,7 @@
 
   export function onKeyDown (ev: KeyboardEvent) {
     if (ev.key === 'ArrowDown') {
-      if (selected < items.length - 1) selected++
+      if (selected < visibleItems.length - 1) selected++
       return true
     }
     if (ev.key === 'ArrowUp') {
@@ -73,7 +75,7 @@
       return true
     }
     if (ev.key === 'Enter') {
-      const item = items[selected]
+      const item = visibleItems[selected]
       if (item) {
         dispatchItem(item)
         return true
@@ -109,12 +111,12 @@
     />
   </div>
   <div class="scroll mt-2">
-    {#each groups as group, gi}
+    {#each groups as group, gi (group._id)}
       {@const templates = groupedDocs[group._id]}
       {@const initIndex = getInitIndex(groups, gi)}
       {#if templates?.length}
         <b>{group.name}</b>
-        {#each templates as item, i}
+        {#each templates as item, i (item._id)}
           <!-- svelte-ignore a11y-click-events-have-key-events -->
           <!-- svelte-ignore a11y-no-static-element-interactions -->
           <div
