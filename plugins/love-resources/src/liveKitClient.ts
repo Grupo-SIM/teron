@@ -24,6 +24,7 @@ import LastParticipantNotification from './components/meeting/LastParticipantNot
 import love from './plugin'
 import { $myPreferences } from './stores'
 import { leaveMeeting } from './meetings'
+import { voiceReconnectPolicy } from './voice-reconnect-policy'
 
 export enum ScreenSharingState {
   Inactive,
@@ -62,6 +63,7 @@ export class LiveKitClient {
 
   constructor () {
     const lkRoom = new LKRoom({
+      reconnectPolicy: voiceReconnectPolicy,
       adaptiveStream: true,
       dynacast: true,
       publishDefaults: {
@@ -84,6 +86,9 @@ export class LiveKitClient {
     })
     lkRoom.on(RoomEvent.Connected, this.onConnected)
     lkRoom.on(RoomEvent.Disconnected, this.onDisconnected)
+    lkRoom.on(RoomEvent.Reconnecting, this.onReconnecting)
+    lkRoom.on(RoomEvent.SignalReconnecting, this.onReconnecting)
+    lkRoom.on(RoomEvent.Reconnected, this.onReconnected)
     this.liveKitRoom = lkRoom
   }
 
@@ -166,6 +171,17 @@ export class LiveKitClient {
     })
   }
 
+  onReconnecting = (): void => {
+    this.isConnecting = true
+    this.clearLastParticipantTimeouts()
+  }
+
+  onReconnected = (): void => {
+    this.isConnecting = false
+    lkSessionConnected.set(true)
+    this.clearLastParticipantTimeouts()
+  }
+
   onConnected = (): void => {
     this.isConnecting = false
     lkSessionConnected.set(true)
@@ -209,7 +225,7 @@ export class LiveKitClient {
   }
 
   onParticipantDisconnected = (_participant: RemoteParticipant): void => {
-    if (this.liveKitRoom.remoteParticipants.size === 0) {
+    if (this.liveKitRoom.state === ConnectionState.Connected && this.liveKitRoom.remoteParticipants.size === 0) {
       this.clearLastParticipantTimeouts()
       this.lastParticipantNotificationTimeout = window.setTimeout(() => {
         void this.showLastParticipantNotification()

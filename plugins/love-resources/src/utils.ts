@@ -76,7 +76,19 @@ export const isRecordingAvailable = writable<boolean>(false)
 export const isFullScreen = writable<boolean>(false)
 export const isShareWithSound = writable<boolean>(false)
 
-export const krispProcessor = KrispNoiseFilter()
+export let krispProcessor: ReturnType<typeof KrispNoiseFilter> | undefined
+
+export function isEnhancedNoiseFilterSupported (): boolean {
+  const endpoint = getMetadata(love.metadata.WebSocketURL)
+  if (endpoint === undefined) return false
+  try {
+    const hostname = new URL(endpoint).hostname
+    return (hostname.endsWith('.livekit.cloud') || hostname.endsWith('.livekit.run')) &&
+      isKrispNoiseFilterSupported()
+  } catch {
+    return false
+  }
+}
 export let blurProcessor: ProcessorWrapper<BackgroundOptions> | undefined
 let localVideo: LocalVideoTrack | undefined
 
@@ -88,15 +100,18 @@ try {
 
 async function setKrispProcessor (pub: LocalTrackPublication): Promise<void> {
   if (pub.track instanceof LocalAudioTrack) {
-    if (!isKrispNoiseFilterSupported()) {
-      console.warn('enhanced noise filter is currently not supported on this browser')
+    if (!isEnhancedNoiseFilterSupported()) {
+      // Self-hosted LiveKit uses the browser noise suppression configured on the room.
       return
     }
     try {
       // once instantiated the filter will begin initializing and will download additional resources
       console.log('enabling LiveKit enhanced noise filter')
-      await pub.track.setProcessor(krispProcessor)
-      await krispProcessor.setEnabled($myPreferences?.noiseCancellation ?? true)
+      if (pub.track.getProcessor() !== undefined) return
+      const processor = KrispNoiseFilter()
+      await pub.track.setProcessor(processor)
+      krispProcessor = processor
+      await processor.setEnabled($myPreferences?.noiseCancellation ?? true)
     } catch (err: any) {
       if (err?.message !== 'SDK_ALREADY_INITIALIZED') {
         console.error(err)
@@ -168,6 +183,9 @@ lk.on(RoomEvent.LocalTrackPublished, (pub) => {
   }
 })
 lk.on(RoomEvent.LocalTrackUnpublished, (pub) => {
+  if (pub.source === Track.Source.Microphone && pub.track?.getProcessor() === krispProcessor) {
+    krispProcessor = undefined
+  }
   if (pub.track?.kind === Track.Kind.Video && pub.track.source === Track.Source.Camera) {
     if (localVideo !== undefined) {
       localVideo = undefined

@@ -80,3 +80,5 @@ Funções cadastradas nos contatos podem ser excluídas pelo seletor. Exclusão 
 Owner/Maintainer podem reordenar andares do Escritório pela alça de arraste ou pelas setas do teclado. Ordem é compartilhada e persistida; novos andares sem ordem aparecem ao final.
 
 Cada contato pode ter somente um vínculo com cada função; atribuições repetidas ou simultâneas não criam duplicatas.
+
+Chamadas de voz retomam automaticamente na mesma sala após interrupções recuperáveis de rede, mantendo estado de microfone/câmera e tentativas com espera crescente. Saída explícita encerra recuperação. Reconexão não dispara saída por sala vazia. Filtro Krisp exige LiveKit Cloud; servidor próprio mantém supressão nativa do navegador.
