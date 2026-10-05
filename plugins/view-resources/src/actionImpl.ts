@@ -1,3 +1,4 @@
+import { getDeleteConfirmationDefaults } from './delete-confirmation'
 import contact from '@hcengineering/contact'
 import core, {
   type Blob,
@@ -183,13 +184,16 @@ function Delete (
   }
 ): void {
   const skipCheck = props?.skipCheck ?? false
+  const hierarchy = getClient().getHierarchy()
+  const objects = Array.isArray(object) ? object : [object]
+  const defaults = getDeleteConfirmationDefaults(objects.map((doc) => hierarchy.getAncestors(doc._class)))
   showPopup(
     contact.component.DeleteConfirmationPopup,
     {
       object,
       skipCheck,
-      confirmation: props?.confirmation,
-      confirmationTitle: props?.confirmationTitle,
+      confirmation: props?.confirmation ?? defaults?.confirmation,
+      confirmationTitle: props?.confirmationTitle ?? defaults?.confirmationTitle,
       confirmationName: props?.confirmationNameField !== undefined
         ? String(((Array.isArray(object) ? object[0] : object) as Doc & Record<string, unknown>)?.[props.confirmationNameField] ?? '')
         : undefined,
