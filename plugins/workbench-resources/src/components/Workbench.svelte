@@ -223,8 +223,20 @@
     checkOnHide()
   })
 
+  let previousPanelLocation = getCurrentLocation()
   onDestroy(
     location.subscribe((loc) => {
+      const screenChanged =
+        previousPanelLocation.path.length !== loc.path.length ||
+        previousPanelLocation.path.some((segment, index) => segment !== loc.path[index])
+      const inheritedPanel = screenChanged && loc.fragment !== undefined && loc.fragment === previousPanelLocation.fragment
+      previousPanelLocation = { ...loc, path: [...loc.path] }
+
+      if (inheritedPanel) {
+        closePanel(false)
+        navigate({ ...loc, fragment: undefined }, true)
+        return
+      }
       void doSyncLoc(loc)
     })
   )
