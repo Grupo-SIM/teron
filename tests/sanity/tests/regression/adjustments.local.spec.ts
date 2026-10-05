@@ -46,7 +46,7 @@ test('two accounts keep private agendas busy and own agendas separate', async ({
     await expect(user.locator('.selectPopup')).toHaveCount(0)
     await expect(user.getByText('Excluir', { exact: true })).toHaveCount(0)
     await expect(user.getByText('Editar', { exact: true })).toHaveCount(0)
-    await expect(user.getByText('Abrir num novo separador', { exact: true })).toHaveCount(0)
+    await expect(user.getByText('Abrir numa nova janela', { exact: true })).toHaveCount(0)
     await privateBlock.locator('.calendar-element-start').click({ button: 'right', force: true })
     await expect(user.getByText('Excluir', { exact: true })).toHaveCount(0)
     await user.getByRole('button', { name: 'Calendários', exact: true }).click()

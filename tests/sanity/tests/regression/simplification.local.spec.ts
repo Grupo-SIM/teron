@@ -165,7 +165,7 @@ test('simplified navigation and task context menu open a real browser tab', asyn
     await expect(page.getByText(label, { exact: true })).toHaveCount(0)
   }
   const popupPromise = page.waitForEvent('popup')
-  await page.getByText('Abrir num novo separador', { exact: true }).click()
+  await page.getByText('Abrir numa nova janela', { exact: true }).click()
   const popup = await popupPromise
   try {
     await expect(popup).toHaveURL(/workbench/, { timeout: 30000 })

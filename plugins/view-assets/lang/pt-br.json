@@ -23,7 +23,7 @@
     "Archive": "Arquivar",
     "ArchiveConfirm": "Deseja arquivar {count, plural, =1 {este objeto} other {estes # objetos}}?",
     "Open": "Abrir",
-    "OpenInNewTab": "Abrir num novo separador",
+    "OpenInNewTab": "Abrir numa nova janela",
     "Assignees": "Atribuídos",
     "Labels": "Etiquetas",
     "MoveLeft": "Mover para a esquerda",
