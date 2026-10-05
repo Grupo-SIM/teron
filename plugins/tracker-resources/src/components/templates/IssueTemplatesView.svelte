@@ -66,10 +66,8 @@
     <slot name="label_selector" />
   </svelte:fragment>
   <svelte:fragment slot="actions">
-    <Button label={tracker.string.IssueTemplate} kind={templateKind === 'issue' ? 'primary' : 'secondary'} on:click={() => (templateKind = 'issue')} />
-    <Button label={tracker.string.TextTemplate} kind={templateKind === 'text' ? 'primary' : 'secondary'} on:click={() => (templateKind = 'text')} />
     <Button icon={IconAdd} label={tracker.string.IssueTemplate} kind={'primary'} on:click={showCreateDialog} />
-    <Button icon={IconAdd} label={tracker.string.TextTemplate} on:click={showCreateTextDialog} />
+    <Button icon={IconAdd} label={tracker.string.TextTemplate} kind={'primary'} on:click={showCreateTextDialog} />
   </svelte:fragment>
 </SpaceHeader>
 <slot name="afterHeader" />

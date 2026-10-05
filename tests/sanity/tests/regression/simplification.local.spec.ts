@@ -135,12 +135,11 @@ test('text templates can be created, listed, selected and inserted without publi
   const title = `Modelo regressão ${Date.now()}`
   const message = `Mensagem de regressão ${Date.now()}`
   await page.goto(`/workbench/${state.ws.workspaceUrl}/tracker/tracker%3Aproject%3ADefaultProject/templates`)
-  await expect(page.getByRole('button', { name: 'Modelo de texto', exact: true }).nth(1)).toBeVisible({ timeout: 120000 })
-  await page.getByRole('button', { name: 'Modelo de texto', exact: true }).nth(1).click()
+  await expect(page.getByRole('button', { name: 'Modelo de texto', exact: true })).toBeVisible({ timeout: 120000 })
+  await page.getByRole('button', { name: 'Modelo de texto', exact: true }).click()
   await page.getByPlaceholder('Novo modelo', { exact: true }).fill(title)
   await page.locator('[contenteditable=true]').fill(message)
   await page.getByRole('button', { name: 'Guardar modelo', exact: true }).click()
-  await page.getByRole('button', { name: 'Modelo de texto', exact: true }).first().click()
   await expect(page.getByText(title, { exact: true }).first()).toBeVisible({ timeout: 30000 })
   await page.goto(`/workbench/${state.ws.workspaceUrl}/tracker/tracker%3Aproject%3ADefaultProject/issues`)
   await expect(page.getByText('Tarefa regressão', { exact: true }).first()).toBeVisible({ timeout: 120000 })
