@@ -96,7 +96,7 @@
     </div>
   {:else}
     {#each items as value, i}
-      <div bind:this={elements[i]} class="label-box no-shrink" title={value.title}>
+      <div bind:this={elements[i]} class="label-box list-label no-shrink" title={value.title}>
         <TagReferencePresenter attr={undefined} {value} {kind} />
       </div>
     {/each}
@@ -169,6 +169,9 @@
   }
   .wrap-short:not(:last-child) {
     margin-right: 0.375rem;
+  }
+  .list-label + .list-label {
+    margin-top: 0.25rem;
   }
   .wrap-full {
     margin: 0.125rem;
