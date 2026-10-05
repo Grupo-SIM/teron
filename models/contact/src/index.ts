@@ -569,6 +569,7 @@ export function createModel (builder: Builder): void {
       ],
       configOptions: {
         hiddenKeys: ['name'],
+        optionalKeys: ['birthday', 'onsiteDaysPerWeek', 'remoteDaysPerWeek'],
         strict: true,
         sortable: true
       },
@@ -604,6 +605,7 @@ export function createModel (builder: Builder): void {
       ],
       configOptions: {
         hiddenKeys: ['name'],
+        optionalKeys: ['birthday', 'onsiteDaysPerWeek', 'remoteDaysPerWeek'],
         strict: true,
         sortable: true
       },
@@ -642,6 +644,7 @@ export function createModel (builder: Builder): void {
       ],
       configOptions: {
         hiddenKeys: ['name'],
+        optionalKeys: [],
         strict: true,
         sortable: true
       }

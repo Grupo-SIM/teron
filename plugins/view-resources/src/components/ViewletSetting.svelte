@@ -371,6 +371,11 @@
   async function getConfig (viewlet: Viewlet, preference: ViewletPreference | undefined): Promise<Config[]> {
     const result = getBaseConfig(viewlet)
 
+    for (const key of viewlet.configOptions?.optionalKeys ?? []) {
+      const attribute = hierarchy.getAllAttributes(viewlet.attachTo).get(key)
+      if (attribute !== undefined) processAttribute(attribute, result)
+    }
+
     if (viewlet.configOptions?.strict !== true) {
       const allAttributes = hierarchy.getAllAttributes(viewlet.attachTo)
       for (const [, attribute] of allAttributes) {

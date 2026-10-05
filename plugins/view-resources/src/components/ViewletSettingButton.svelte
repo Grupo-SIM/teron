@@ -15,6 +15,9 @@
 <script lang="ts">
   import { ViewOptionModel, ViewOptions, Viewlet, type ViewOptionsModel, BuildModelKey } from '@hcengineering/view'
   import { getViewOptions, viewOptionStore, defaultOptions } from '../viewOptions'
+  import { ButtonIcon, IconSettings, showPopup } from '@hcengineering/ui'
+  import view from '../plugin'
+  import ViewletSetting from './ViewletSetting.svelte'
   import ViewOptionsButton from './ViewOptionsButton.svelte'
   import { restrictionStore } from '../utils'
 
@@ -25,6 +28,8 @@
   export let viewOptionsConfig: ViewOptionModel[] | undefined = undefined
   export let defaultViewOptions: ViewOptions | undefined = undefined
   export let defaultConfig: (BuildModelKey | string)[] | undefined = undefined
+
+  let columnsButton: HTMLButtonElement
 
   function getDefaults (viewOptions: ViewOptionsModel): ViewOptions {
     const res: ViewOptions = {
@@ -49,6 +54,19 @@
 </script>
 
 {#if viewlet}
+  {#if viewlet.configOptions?.optionalKeys !== undefined}
+    <ButtonIcon
+      icon={IconSettings}
+      {disabled}
+      {kind}
+      size={'small'}
+      hasMenu
+      tooltip={{ label: view.string.CustomizeView, direction: 'bottom' }}
+      dataId={'btn-columnSettings'}
+      bind:element={columnsButton}
+      on:click={() => showPopup(ViewletSetting, { viewlet, defaultConfig }, columnsButton)}
+    />
+  {/if}
   {#if viewOptions}
     <ViewOptionsButton {viewlet} {kind} {viewOptions} {viewOptionsConfig} {disabled} />
   {/if}

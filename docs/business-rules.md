@@ -57,3 +57,5 @@ Privacidade de eventos é aplicada no servidor mesmo para Owner/Maintainer: even
 Busca global aplica exclusões de eventos privados e seus anexos antes do limite e da contagem; filtrar apenas a página já retornada não preserva paginação nem privacidade da contagem. Broadcast de anexos privados obedece à mesma prioridade de privacidade do evento.
 
 Foto na edição do Escritório ocupa largura e altura do squircle, com recorte central `cover` e máscara preservada. Sem foto, fallback permanece. Troca de andar usa token de fundo do painel nos temas claro e escuro.
+
+Tabelas de contatos permitem selecionar e reordenar colunas. Funcionários e Externos mostram nome, localização, função e informações de contato por padrão; Aniversário, Dias presenciais e Dias remotos são opcionais. Clientes mantém nome, localização e informações de contato por padrão. Preferências individuais salvas prevalecem sobre o padrão.

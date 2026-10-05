@@ -470,6 +470,8 @@ export interface Viewlet extends Doc {
  * @public
  */
 export interface ViewletConfigOptions {
+  /** Additional selectable columns; also enables the column settings button. */
+  optionalKeys?: string[]
   hiddenKeys?: string[]
   strict?: boolean
   extraProps?: Omit<BuildModelKey, 'key'>
