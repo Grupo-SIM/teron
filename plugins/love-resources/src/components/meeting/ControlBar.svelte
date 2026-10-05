@@ -17,7 +17,6 @@
   import { IconMaximize, ModernButton, Popup, showPopup, TooltipInstance } from '@hcengineering/ui'
 
   import love from '../../plugin'
-  import { myInfo, myOffice } from '../../stores'
   import { isFullScreen } from '../../utils'
   import ControlBarContainer from './ControlBarContainer.svelte'
   import RoomModal from '../RoomModal.svelte'
@@ -36,10 +35,6 @@
   export let canMaximize: boolean = true
   export let fullScreen: boolean = false
   export let onFullScreen: (() => void) | undefined = undefined
-
-  let allowLeave: boolean = false
-
-  $: allowLeave = $myInfo?.room !== ($myOffice?._id ?? love.ids.Reception)
 
   function maximize (): void {
     showPopup(RoomModal, { room }, 'full-centered')
@@ -101,7 +96,7 @@
         />
       {/if}
       <MeetingOptionsButton {room} />
-      {#if allowLeave}
+      {#if $lkSessionConnected}
         <LeaveRoomButton {room} />
       {/if}
     </svelte:fragment>
