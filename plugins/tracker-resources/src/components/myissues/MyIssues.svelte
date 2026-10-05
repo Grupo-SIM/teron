@@ -13,12 +13,18 @@
 // limitations under the License.
 -->
 <script lang="ts">
+  import { getCurrentEmployee } from '@hcengineering/contact'
   import { IntlString, Asset } from '@hcengineering/platform'
   import tracker from '../../plugin'
   import IssuesView from '../issues/IssuesView.svelte'
 
   export let config: [string, IntlString, object][] = []
   export let icon: Asset | undefined = undefined
+
+  const me = getCurrentEmployee()
+  const query = {
+    $or: [{ assignees: me }, { assignees: { $exists: false }, assignee: me }]
+  }
 </script>
 
-<IssuesView query={{}} space={undefined} {icon} title={tracker.string.MyIssues} />
+<IssuesView {query} space={undefined} {icon} title={tracker.string.MyIssues} />
