@@ -220,7 +220,8 @@
 
     "NewMilestone": "Новый Этап",
     "CreateMilestone": "Создать",
-
+    "DeleteMilestoneConfirm": "Удалить выбранные проекты навсегда? Их задачи сохранятся без проекта.",
+    "DeleteMilestoneTitle": "Удалить {name}?",
     "MoveAndDeleteMilestone": "Переместить Задачи в {newMilestone} и Удалить {deleteMilestone}",
     "MoveAndDeleteMilestoneConfirm": "Вы действительно хотите удалить этап и перенести задачи в другой?",
 

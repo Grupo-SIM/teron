@@ -259,6 +259,9 @@ export default mergeIds(trackerId, tracker, {
     MoveToMilestone: '' as IntlString,
     NoMilestone: '' as IntlString,
 
+    DeleteMilestoneTitle: '' as IntlString,
+    DeleteMilestoneConfirm: '' as IntlString,
+
     MoveAndDeleteMilestone: '' as IntlString,
     MoveAndDeleteMilestoneConfirm: '' as IntlString,
 

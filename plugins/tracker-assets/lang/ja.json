@@ -209,6 +209,8 @@
     "MilestoneNamePlaceholder": "マイルストーン名",
     "NewMilestone": "新しいマイルストーン",
     "CreateMilestone": "作成",
+    "DeleteMilestoneConfirm": "選択したプロジェクトを完全に削除しますか？タスクはプロジェクトなしで保持されます。",
+    "DeleteMilestoneTitle": "{name}を削除しますか？",
     "MoveAndDeleteMilestone": "イシューを {newMilestone} に移動し、{deleteMilestone} を削除",
     "MoveAndDeleteMilestoneConfirm": "マイルストーンを削除し、イシューを別のマイルストーンに移動しますか？",
     "Estimation": "見積もり",

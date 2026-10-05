@@ -209,6 +209,8 @@
     "MilestoneNamePlaceholder": "Kilometre taşı adı",
     "NewMilestone": "Yeni Kilometre Taşı",
     "CreateMilestone": "Oluştur",
+    "DeleteMilestoneConfirm": "Seçilen projeler kalıcı olarak silinsin mi? Görevleri proje olmadan korunacaktır.",
+    "DeleteMilestoneTitle": "{name} silinsin mi?",
     "MoveAndDeleteMilestone": "Sorunları {newMilestone}'a taşı ve {deleteMilestone}'ı sil",
     "MoveAndDeleteMilestoneConfirm": "Kilometre taşını silmek ve sorunları başka bir kilometre taşına taşımak istiyor musunuz?",
     "Estimation": "Tahmin",

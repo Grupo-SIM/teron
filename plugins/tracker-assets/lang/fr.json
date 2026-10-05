@@ -209,6 +209,8 @@
     "MilestoneNamePlaceholder": "Nom du jalon",
     "NewMilestone": "Nouveau jalon",
     "CreateMilestone": "Créer",
+    "DeleteMilestoneConfirm": "Supprimer définitivement les projets sélectionnés ? Leurs tâches seront conservées sans projet.",
+    "DeleteMilestoneTitle": "Supprimer {name} ?",
     "MoveAndDeleteMilestone": "Déplacer les problèmes vers {newMilestone} et supprimer {deleteMilestone}",
     "MoveAndDeleteMilestoneConfirm": "Voulez-vous supprimer le jalon et déplacer les problèmes vers un autre jalon ?",
     "Estimation": "Estimation",

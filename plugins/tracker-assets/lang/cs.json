@@ -210,7 +210,8 @@
 
     "NewMilestone": "Nový milník",
     "CreateMilestone": "Vytvořit",
-
+    "DeleteMilestoneConfirm": "Trvale smazat vybrané projekty? Jejich úkoly zůstanou bez projektu.",
+    "DeleteMilestoneTitle": "Smazat {name}?",
     "MoveAndDeleteMilestone": "Přesunout úkoly do {newMilestone} a smazat {deleteMilestone}",
     "MoveAndDeleteMilestoneConfirm": "Chcete smazat milník a přesunout úkoly do jiného milníku?",
 

@@ -209,6 +209,8 @@
     "MilestoneNamePlaceholder": "Nome do marco",
     "NewMilestone": "Novo marco",
     "CreateMilestone": "Criar",
+    "DeleteMilestoneConfirm": "Excluir permanentemente os projetos selecionados? As tarefas serão mantidas em “Sem projeto”.",
+    "DeleteMilestoneTitle": "Excluir {name}?",
     "MoveAndDeleteMilestone": "Mover tarefas para {newMilestone} e apagar {deleteMilestone}",
     "MoveAndDeleteMilestoneConfirm": "Deseja apagar o marco e mover as tarefas para outro marco?",
     "Estimation": "Estimativa (horas)",

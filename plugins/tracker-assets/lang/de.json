@@ -220,7 +220,8 @@
 
     "NewMilestone": "Neuer Meilenstein",
     "CreateMilestone": "Erstellen",
-
+    "DeleteMilestoneConfirm": "Ausgewählte Projekte dauerhaft löschen? Ihre Aufgaben bleiben ohne Projekt erhalten.",
+    "DeleteMilestoneTitle": "{name} löschen?",
     "MoveAndDeleteMilestone": "Aufgaben zu {newMilestone} verschieben und {deleteMilestone} löschen",
     "MoveAndDeleteMilestoneConfirm": "Möchten Sie den Meilenstein löschen und die Aufgaben zu einem anderen Meilenstein verschieben?",
 

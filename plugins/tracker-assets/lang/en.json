@@ -220,7 +220,8 @@
 
     "NewMilestone": "New Milestone",
     "CreateMilestone": "Create",
-
+    "DeleteMilestoneConfirm": "Permanently delete the selected projects? Their tasks will be kept without a project.",
+    "DeleteMilestoneTitle": "Delete {name}?",
     "MoveAndDeleteMilestone": "Move issues to {newMilestone} and delete {deleteMilestone}",
     "MoveAndDeleteMilestoneConfirm": "Do you want to delete milestone and move issues to another milestone?",
 

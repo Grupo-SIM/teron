@@ -220,7 +220,8 @@
 
     "NewMilestone": "新里程碑",
     "CreateMilestone": "创建",
-
+    "DeleteMilestoneConfirm": "永久删除所选项目？其任务将保留，但不属于任何项目。",
+    "DeleteMilestoneTitle": "删除{name}？",
     "MoveAndDeleteMilestone": "将问题移动到 {newMilestone} 并删除 {deleteMilestone}",
     "MoveAndDeleteMilestoneConfirm": "您想要删除里程碑并将问题移动到其他里程碑吗？",
 

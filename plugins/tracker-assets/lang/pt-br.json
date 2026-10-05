@@ -209,6 +209,8 @@
     "MilestoneNamePlaceholder": "Nome do projeto",
     "NewMilestone": "Novo projeto",
     "CreateMilestone": "Criar",
+    "DeleteMilestoneConfirm": "Excluir permanentemente os projetos selecionados? As tarefas serão mantidas em “Sem projeto”.",
+    "DeleteMilestoneTitle": "Excluir {name}?",
     "MoveAndDeleteMilestone": "Mover tarefas para {newMilestone} e excluir {deleteMilestone}",
     "MoveAndDeleteMilestoneConfirm": "Deseja excluir o projeto e mover as tarefas para outro projeto?",
     "Estimation": "Estimativa (horas)",

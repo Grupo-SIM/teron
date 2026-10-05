@@ -209,6 +209,8 @@
     "MilestoneNamePlaceholder": "Nombre del hito",
     "NewMilestone": "Nuevo hito",
     "CreateMilestone": "Crear",
+    "DeleteMilestoneConfirm": "¿Eliminar permanentemente los proyectos seleccionados? Sus tareas se conservarán sin proyecto.",
+    "DeleteMilestoneTitle": "¿Eliminar {name}?",
     "MoveAndDeleteMilestone": "Mover problemas a {newMilestone} y eliminar {deleteMilestone}",
     "MoveAndDeleteMilestoneConfirm": "¿Desea eliminar el hito y mover los problemas a otro hito?",
     "Estimation": "Estimación",
