@@ -1,3 +1,4 @@
+import { ConnectionState } from 'livekit-client'
 import core, { AccountRole, getCurrentAccount, type Ref } from '@hcengineering/core'
 import love, { getFreeRoomPlace, MeetingStatus, type Room, RoomType, isOffice, RoomAccess } from '@hcengineering/love'
 import presentation, { getClient } from '@hcengineering/presentation'
@@ -87,7 +88,7 @@ export async function joinMeeting (room: Room): Promise<void> {
 }
 
 export async function joinOrCreateMeetingByInvite (roomId: Ref<Room>): Promise<void> {
-  if (currentMeetingRoom === roomId) return
+  if (currentMeetingRoom === roomId && liveKitClient.liveKitRoom.state !== ConnectionState.Disconnected) return
 
   const client = getClient()
   const room = getRoomById(roomId)
@@ -117,7 +118,7 @@ export async function kick (person: Ref<Person>): Promise<void> {
 
 async function connectToMeeting (room: Room): Promise<void> {
   if (getCurrentAccount().role === AccountRole.ReadOnlyGuest) return
-  if (currentMeetingRoom === room._id) return
+  if (currentMeetingRoom === room._id && liveKitClient.liveKitRoom.state !== ConnectionState.Disconnected) return
 
   if (currentMeetingRoom !== undefined) {
     await leaveMeeting()

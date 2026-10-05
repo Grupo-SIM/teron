@@ -58,6 +58,7 @@ export class LiveKitClient {
   private currentSessionSupportsVideo: boolean = false
   private lastParticipantNotificationTimeout: number = -1
   private lastParticipantDisconnectTimeout: number = -1
+  private lastParticipantGeneration: number = 0
 
   constructor () {
     const lkRoom = new LKRoom({
@@ -144,7 +145,7 @@ export class LiveKitClient {
 
   async disconnect (): Promise<void> {
     screenSharingState.set(ScreenSharingState.Inactive)
-    clearTimeout(this.lastParticipantNotificationTimeout)
+    this.clearLastParticipantTimeouts()
     const me = this.liveKitRoom.localParticipant
     await Promise.all([me.setScreenShareEnabled(false), me.setCameraEnabled(false), me.setMicrophoneEnabled(false)])
     await this.liveKitRoom.disconnect()
@@ -179,6 +180,12 @@ export class LiveKitClient {
   }
 
   onDisconnected = (): void => {
+    this.isConnecting = false
+    this.clearLastParticipantTimeouts()
+    screenSharingState.set(ScreenSharingState.Inactive)
+    this.currentMediaSession?.close()
+    this.currentMediaSession?.removeAllListeners()
+    this.currentMediaSession = undefined
     lkSessionConnected.set(false)
     this.liveKitRoom.off(RoomEvent.ParticipantConnected, this.onParticipantConnected)
     this.liveKitRoom.off(RoomEvent.ParticipantDisconnected, this.onParticipantDisconnected)
@@ -191,15 +198,19 @@ export class LiveKitClient {
     Analytics.handleEvent(LoveEvents.DisconnectedFromRoom)
   }
 
-  onParticipantConnected = (_participant: RemoteParticipant): void => {
+  private clearLastParticipantTimeouts (): void {
+    this.lastParticipantGeneration++
     clearTimeout(this.lastParticipantDisconnectTimeout)
     clearTimeout(this.lastParticipantNotificationTimeout)
   }
 
+  onParticipantConnected = (_participant: RemoteParticipant): void => {
+    this.clearLastParticipantTimeouts()
+  }
+
   onParticipantDisconnected = (_participant: RemoteParticipant): void => {
     if (this.liveKitRoom.remoteParticipants.size === 0) {
-      clearTimeout(this.lastParticipantDisconnectTimeout)
-      clearTimeout(this.lastParticipantNotificationTimeout)
+      this.clearLastParticipantTimeouts()
       this.lastParticipantNotificationTimeout = window.setTimeout(() => {
         void this.showLastParticipantNotification()
       }, LAST_PARTICIPANT_NOTIFICATION_DELAY_MS)
@@ -279,16 +290,25 @@ export class LiveKitClient {
   }
 
   async showLastParticipantNotification (): Promise<void> {
+    const generation = this.lastParticipantGeneration
+    const title = await translate(love.string.MeetingEmptyTitle, {}, getCurrentLanguage())
+    const message = await translate(love.string.MeetingEmptyMessage, {}, getCurrentLanguage())
+    const isStillEmpty = (): boolean =>
+      generation === this.lastParticipantGeneration &&
+      this.liveKitRoom.state === ConnectionState.Connected &&
+      this.liveKitRoom.remoteParticipants.size === 0
+    if (!isStillEmpty()) return
+
     addNotification(
-      await translate(love.string.MeetingEmptyTitle, {}, getCurrentLanguage()),
-      await translate(love.string.MeetingEmptyMessage, {}, getCurrentLanguage()),
+      title,
+      message,
       LastParticipantNotification,
       undefined,
       NotificationSeverity.Info,
       'love'
     )
     this.lastParticipantDisconnectTimeout = window.setTimeout(() => {
-      void leaveMeeting()
+      if (isStillEmpty()) void leaveMeeting()
     }, AUTO_DISCONNECT_DELAY_MS)
   }
 
