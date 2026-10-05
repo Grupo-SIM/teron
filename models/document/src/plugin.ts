@@ -68,6 +68,7 @@ export default mergeIds(documentId, document, {
   },
   string: {
     DeleteTeamspaceConfirm: '' as IntlString,
+    DeleteTeamspaceTitle: '' as IntlString,
     ConfigDescription: '' as IntlString,
     ParentDocument: '' as IntlString,
     ChildDocument: '' as IntlString,

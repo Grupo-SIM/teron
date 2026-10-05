@@ -208,7 +208,12 @@ function defineTeamspace (builder: Builder): void {
 
   createAction(builder, {
     action: view.actionImpl.Delete,
-    actionProps: { confirmation: document.string.DeleteTeamspaceConfirm },
+    actionProps: {
+      confirmation: document.string.DeleteTeamspaceConfirm,
+      confirmationTitle: document.string.DeleteTeamspaceTitle,
+      confirmationNameField: 'name',
+      richConfirmation: true
+    },
     label: view.string.Delete,
     icon: view.icon.Delete,
     category: view.category.General,

@@ -1,6 +1,7 @@
 {
   "string": {
-    "DeleteTeamspaceConfirm": "Excluir espaço de diretrizes e todos os documentos, versões e anexos contidos? Exclusão permanente.",
+    "DeleteTeamspaceTitle": "Apagar espaço de diretrizes",
+    "DeleteTeamspaceConfirm": "Excluir <b>permanente</b> o espaço \"{name}\" e todos os documentos, versões e anexos contidos?",
     "GuidelineEditors": "Pessoas com acesso Editor",
     "GuidelineEditorSectors": "Setores com acesso Editor",
     "GuidelineReaders": "Pessoas com acesso Leitor",

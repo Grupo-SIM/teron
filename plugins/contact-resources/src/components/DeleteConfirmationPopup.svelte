@@ -15,12 +15,12 @@
 <script lang="ts">
   import { getCurrentEmployee, Person } from '@hcengineering/contact'
   import { AccountRole, Doc, getCurrentAccount, PersonId, Ref, uniqueNotEmpty } from '@hcengineering/core'
-  import { Card, isAdminUser } from '@hcengineering/presentation'
+  import { Card, HTMLViewer, isAdminUser } from '@hcengineering/presentation'
   import ui, { Button, Label } from '@hcengineering/ui'
   import { ObjectPresenter } from '@hcengineering/view-resources'
   import view from '@hcengineering/view-resources/src/plugin'
   import { createEventDispatcher } from 'svelte'
-  import { IntlString } from '@hcengineering/platform'
+  import { IntlString, translate } from '@hcengineering/platform'
 
   import { getPersonRefsByPersonIdsCb, PersonRefPresenter } from '..'
 
@@ -29,6 +29,16 @@
   export let skipCheck: boolean = false
   export let canDeleteExtra: boolean = true
   export let confirmation: IntlString | undefined = undefined
+
+  export let confirmationTitle: IntlString | undefined = undefined
+  export let confirmationName: string | undefined = undefined
+  export let richConfirmation: boolean = false
+
+  function escapeHtml (value: string): string {
+    return value.replace(/[&<>"']/g, (char) => ({
+      '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;'
+    })[char] ?? char)
+  }
 
   const me = getCurrentEmployee()
   const objectArray = Array.isArray(object) ? object : [object]
@@ -44,7 +54,7 @@
       getCurrentAccount().role === AccountRole.Owner ||
       isAdminUser()) &&
     canDeleteExtra
-  $: label = canDelete ? view.string.DeleteObject : view.string.DeletePopupNoPermissionTitle
+  $: label = canDelete ? confirmationTitle ?? view.string.DeleteObject : view.string.DeletePopupNoPermissionTitle
 </script>
 
 <Card
@@ -62,9 +72,15 @@
   <div class="flex-grow flex-col">
     {#if canDelete}
       <div class="mb-2">
-        <Label label={confirmation ?? view.string.DeleteObjectConfirm} params={{ count: objectArray.length }} />
+        {#if richConfirmation && confirmation !== undefined}
+          {#await translate(confirmation, { count: objectArray.length, name: escapeHtml(confirmationName ?? '') }) then message}
+            <HTMLViewer value={message} />
+          {/await}
+        {:else}
+          <Label label={confirmation ?? view.string.DeleteObjectConfirm} params={{ count: objectArray.length, name: confirmationName }} />
+        {/if}
         <div class="mt-2">
-          {#if objectArray.length === 1}
+          {#if objectArray.length === 1 && confirmationName === undefined}
             <ObjectPresenter _class={objectArray[0]._class} objectId={objectArray[0]._id} value={objectArray[0]} />
           {/if}
         </div>

@@ -177,6 +177,9 @@ function Delete (
     skipCheck?: boolean
     afterDelete?: () => Promise<void>
     confirmation?: IntlString
+    confirmationTitle?: IntlString
+    confirmationNameField?: string
+    richConfirmation?: boolean
   }
 ): void {
   const skipCheck = props?.skipCheck ?? false
@@ -186,6 +189,11 @@ function Delete (
       object,
       skipCheck,
       confirmation: props?.confirmation,
+      confirmationTitle: props?.confirmationTitle,
+      confirmationName: props?.confirmationNameField !== undefined
+        ? String(((Array.isArray(object) ? object[0] : object) as Doc & Record<string, unknown>)?.[props.confirmationNameField] ?? '')
+        : undefined,
+      richConfirmation: props?.richConfirmation ?? false,
       deleteAction: async () => {
         try {
           const objs = Array.isArray(object) ? object : [object]
