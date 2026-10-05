@@ -32,7 +32,7 @@
   import { Floor, ParticipantInfo, Room } from '@hcengineering/love'
   import { createEventDispatcher } from 'svelte'
   import { translate } from '@hcengineering/platform'
-  import { getCurrentLanguage } from '@hcengineering/ui'
+  import { getCurrentLanguage } from '@hcengineering/theme'
   import plugin from '../plugin'
   import { infos } from '../stores'
   import { calculateFloorSize } from '../utils'
