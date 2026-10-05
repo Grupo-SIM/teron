@@ -1,6 +1,6 @@
 <script lang="ts">
   import { afterUpdate, onDestroy, createEventDispatcher } from 'svelte'
-  import { CalendarFilter, visibleCalendarStore } from '@hcengineering/calendar-resources'
+  import { visibleCalendarStore } from '@hcengineering/calendar-resources'
   import contact, { Person, SocialIdentity } from '@hcengineering/contact'
   import { AssigneeBox } from '@hcengineering/contact-resources'
   import { Ref, getCurrentAccount } from '@hcengineering/core'
@@ -21,7 +21,6 @@
   let replacedPanel: HTMLElement | undefined
   let currentDate = new Date()
   let mode: AgendaMode = migrateAgendaMode(localStorage.getItem('todos_last_mode'))
-  let selectedCalendar = 'all'
   localStorage.setItem('todos_last_mode', mode)
   localStorage.removeItem('todos_last_tag')
 
@@ -30,8 +29,7 @@
   })
   $: calendars = selectAgendaCalendars($visibleCalendarStore, mode, account.socialIds,
     person == null ? undefined : identities.filter((identity) => identity.attachedTo === person).map((identity) => identity._id))
-  $: if (selectedCalendar !== 'all' && !calendars.some((item) => item._id === selectedCalendar)) selectedCalendar = 'all'
-  $: calendarIds = calendars.filter((item) => selectedCalendar === 'all' || item._id === selectedCalendar).map((item) => item._id)
+  $: calendarIds = calendars.map((item) => item._id)
   $: visibleCalendar = $deviceInfo.docWidth > 800
 
   defineSeparators('time', timeSeparators)
@@ -49,7 +47,6 @@
     {#if mode === 'team'}
       <AssigneeBox label={contact.string.Employee} bind:value={person} kind="secondary" />
     {/if}
-    <CalendarFilter {calendars} bind:selectedCalendar />
   </div>
   <DayAgenda bind:currentDate {calendarIds} />
 </div>

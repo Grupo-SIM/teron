@@ -13,6 +13,8 @@
 // limitations under the License.
 //
 
+import { normalizeSearchSql } from './search'
+
 import core, {
   AccountRole,
   type AnyAttribute,
@@ -1374,7 +1376,7 @@ abstract class PostgresAdapterBase implements DbAdapter {
             }
             break
           case '$contains':
-            res.push(`strpos(lower(regexp_replace(normalize(${tlkey}, NFD), '[̀-ͯ]', '', 'g')), ${vars.add(normalizeSearch(String(val)), valType)}) > 0`)
+            res.push(`strpos(${normalizeSearchSql(tlkey)}, ${vars.add(normalizeSearch(String(val)), valType)}) > 0`)
             break
           case '$like':
             res.push(`${tlkey} ILIKE ${vars.add(val, valType)}`)
