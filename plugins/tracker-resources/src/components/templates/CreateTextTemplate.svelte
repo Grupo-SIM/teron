@@ -2,9 +2,10 @@
   import { Ref } from '@hcengineering/core'
   import { Card, getClient, SpaceSelector } from '@hcengineering/presentation'
   import templates, { type MessageTemplate, type TemplateCategory } from '@hcengineering/templates'
-  import { StyledTextEditor } from '@hcengineering/text-editor-resources'
+  import { StyledTextBox } from '@hcengineering/text-editor-resources'
   import { EditBox, Label } from '@hcengineering/ui'
   import { createEventDispatcher } from 'svelte'
+  import tracker from '../../plugin'
 
   const client = getClient()
   const dispatch = createEventDispatcher()
@@ -28,15 +29,31 @@
 </script>
 
 <Card
-  label={templates.string.CreateTemplate}
+  label={tracker.string.NewProcess}
   okAction={createTemplate}
   {canSave}
-  okLabel={templates.string.SaveTemplate}
+  okLabel={tracker.string.SaveProcess}
+  gap={'gapV-4'}
   on:close={() => dispatch('close')}
   on:changeContent
 >
-  <SpaceSelector _class={templates.class.TemplateCategory} label={templates.string.TemplateCategory} bind:space />
-  <EditBox bind:value={title} placeholder={templates.string.TemplatePlaceholder} autoFocus />
-  <Label label={templates.string.Message} />
-  <StyledTextEditor bind:content={message} maxHeight={'limited'} on:message={(event) => (message = event.detail)} />
+  <svelte:fragment slot="header">
+    <SpaceSelector
+      _class={templates.class.TemplateCategory}
+      label={templates.string.TemplateCategory}
+      bind:space
+      kind={'regular'}
+      size={'large'}
+    />
+  </svelte:fragment>
+  <svelte:fragment slot="title" let:label>
+    <div class="flex-row-center gap-2 pt-1 pb-1 pr-1">
+      <span class="overflow-label">
+        <Label {label} />
+      </span>
+    </div>
+  </svelte:fragment>
+
+  <EditBox bind:value={title} placeholder={templates.string.TemplatePlaceholder} kind={'large-style'} autoFocus />
+  <StyledTextBox alwaysEdit kind={'emphasized'} bind:content={message} maxHeight={'limited'} />
 </Card>
