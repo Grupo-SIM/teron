@@ -237,6 +237,7 @@
     "TimeSpendReportDescription": "Описание",
     "TimeSpendDays": "{value} д",
     "TimeSpendHours": "{value} ч",
+    "TimeInputMinutes": "e.g. 30 minutes",
     "TimeSpendMinutes": "{value} м",
     "ChildEstimation": "Оценка подзадач",
     "ChildReportedTime": "Время подзадач",

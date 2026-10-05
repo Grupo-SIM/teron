@@ -225,6 +225,7 @@
     "TimeSpendReportDescription": "Description",
     "TimeSpendDays": "{value}j",
     "TimeSpendHours": "{value}h",
+    "TimeInputMinutes": "e.g. 30 minutes",
     "TimeSpendMinutes": "{value}m",
     "ChildEstimation": "Estimation des sous-problèmes",
     "ChildReportedTime": "Temps des sous-problèmes",

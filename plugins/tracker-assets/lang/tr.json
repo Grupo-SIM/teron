@@ -225,6 +225,7 @@
     "TimeSpendReportDescription": "Açıklama",
     "TimeSpendDays": "{value}g",
     "TimeSpendHours": "{value}s",
+    "TimeInputMinutes": "e.g. 30 minutes",
     "TimeSpendMinutes": "{value}dk",
     "ChildEstimation": "Alt sorunlar tahmini",
     "ChildReportedTime": "Alt sorunlar zamanı",

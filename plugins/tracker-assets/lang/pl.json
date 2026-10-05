@@ -237,6 +237,7 @@
     "TimeSpendReportDescription": "Opis",
     "TimeSpendDays": "{value, plural, =1 {1 dzień} other {# dni}}",
     "TimeSpendHours": "{value, plural, =1 {1 godzina} few {# godziny} many {# godzin} other {# godziny}}",
+    "TimeInputMinutes": "e.g. 30 minutes",
     "TimeSpendMinutes": "{value, plural, =1 {1 minuta} few {# minuty} many {# minut} other {# minuty}}",
     "ChildEstimation": "Wycena podzagadnień",
     "ChildReportedTime": "Czas poświęcony na podzagadnienia",

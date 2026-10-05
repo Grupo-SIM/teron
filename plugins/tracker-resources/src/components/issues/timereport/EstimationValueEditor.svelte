@@ -19,6 +19,7 @@
   import { EditBox, Label, showPopup, eventToHTMLElement, Button } from '@hcengineering/ui'
   import { EditBoxPopup } from '@hcengineering/view-resources'
   import TimePresenter from './TimePresenter.svelte'
+  import tracker from '../../../plugin'
 
   // export let label: IntlString
   export let placeholder: IntlString
@@ -34,10 +35,12 @@
 
   let shown: boolean = false
 
+  $: minutes = value == null ? undefined : value * 60
+
   function _onchange (ev: Event) {
     const value = (ev.target as HTMLInputElement).valueAsNumber
     if (Number.isFinite(value)) {
-      onChange(value)
+      onChange(value / 60)
     }
   }
 </script>
@@ -51,9 +54,9 @@
     disabled={readonly}
     on:click={(ev) => {
       if (!shown && !readonly) {
-        showPopup(EditBoxPopup, { value, format: 'number' }, eventToHTMLElement(ev), (res) => {
+        showPopup(EditBoxPopup, { value: minutes, format: 'number', placeholder: tracker.string.TimeInputMinutes, minValue: 0 }, eventToHTMLElement(ev), (res) => {
           if (Number.isFinite(res)) {
-            value = res
+            value = res / 60
             onChange(value)
           }
           shown = false
@@ -76,5 +79,5 @@
     <span class="content-dark-color"><Label label={placeholder} /></span>
   {/if}
 {:else}
-  <EditBox {placeholder} bind:value format={'number'} {autoFocus} on:change={_onchange} />
+  <EditBox placeholder={tracker.string.TimeInputMinutes} bind:value={minutes} format={'number'} minValue={0} {autoFocus} on:change={_onchange} />
 {/if}

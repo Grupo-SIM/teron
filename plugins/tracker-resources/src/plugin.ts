@@ -276,6 +276,7 @@ export default mergeIds(trackerId, tracker, {
     TimeSpendReportDescription: '' as IntlString,
     TimeSpendDays: '' as IntlString,
     TimeSpendHours: '' as IntlString,
+    TimeInputMinutes: '' as IntlString,
     TimeSpendMinutes: '' as IntlString,
 
     ChildEstimation: '' as IntlString,

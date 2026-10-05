@@ -227,6 +227,7 @@
     "TimeSpendReportDescription": "Popis",
     "TimeSpendDays": "{value}d",
     "TimeSpendHours": "{value}h",
+    "TimeInputMinutes": "e.g. 30 minutes",
     "TimeSpendMinutes": "{value}m",
     "ChildEstimation": "Odhad podúkolů",
     "ChildReportedTime": "Čas podúkolů",

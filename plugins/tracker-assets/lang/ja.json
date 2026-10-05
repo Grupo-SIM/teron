@@ -225,6 +225,7 @@
     "TimeSpendReportDescription": "説明",
     "TimeSpendDays": "{value}日",
     "TimeSpendHours": "{value}時間",
+    "TimeInputMinutes": "e.g. 30 minutes",
     "TimeSpendMinutes": "{value}分",
     "ChildEstimation": "子イシューの見積もり",
     "ChildReportedTime": "子イシューの時間",
