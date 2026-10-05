@@ -242,6 +242,7 @@
     "AddedAsBlocked": "Engellendi olarak işaretlendi",
     "AddedAsBlocking": "Engelliyor olarak işaretlendi",
     "IssueTemplate": "Şablon",
+    "DiscardTemplate": "Discard",
     "TextTemplate": "Text template",
     "IssueTemplates": "Şablonlar",
     "NewProcess": "Yeni şablon",

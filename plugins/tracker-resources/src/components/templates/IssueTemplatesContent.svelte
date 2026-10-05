@@ -1,51 +1,62 @@
 <script lang="ts">
-  import core, { DocumentQuery, Ref, Space, WithLookup } from '@hcengineering/core'
+  import { type DocumentQuery, type Ref, type Space } from '@hcengineering/core'
   import { createQuery } from '@hcengineering/presentation'
-  import { IssueTemplate } from '@hcengineering/tracker'
-  import { Component } from '@hcengineering/ui'
-  import view, { ViewOptions, Viewlet, ViewletPreference } from '@hcengineering/view'
+  import templates, { type MessageTemplate } from '@hcengineering/templates'
+  import { type IssueTemplate } from '@hcengineering/tracker'
+  import { Scroller } from '@hcengineering/ui'
   import tracker from '../../plugin'
-  import CreateIssueTemplate from './CreateIssueTemplate.svelte'
+  import TemplateRow from './TemplateRow.svelte'
 
-  export let viewlet: WithLookup<Viewlet>
-  export let viewOptions: ViewOptions
   export let query: DocumentQuery<IssueTemplate> = {}
   export let space: Ref<Space> | undefined
+  export let search = ''
 
-  const preferenceQuery = createQuery()
-  let preference: ViewletPreference | undefined
+  let issues: IssueTemplate[] = []
+  let texts: MessageTemplate[] = []
+  let issuesPending = true
+  let textsPending = true
+  const issueQuery = createQuery()
+  const textQuery = createQuery()
 
-  $: viewlet &&
-    preferenceQuery.query(
-      view.class.ViewletPreference,
-      {
-        space: core.space.Workspace,
-        attachedTo: viewlet._id
-      },
-      (res) => {
-        preference = res[0]
-      },
-      { limit: 1 }
-    )
+  $: {
+    issuesPending = true
+    issueQuery.query(tracker.class.IssueTemplate, { ...query, ...(space !== undefined ? { space } : {}) }, (result) => {
+      issues = result
+      issuesPending = false
+    })
+  }
+  textQuery.query(templates.class.MessageTemplate, {}, (result) => {
+    texts = result
+    textsPending = false
+  })
 
-  const createItemDialog = CreateIssueTemplate
-  const createItemLabel = tracker.string.IssueTemplate
+  function normalize (value: string): string {
+    return value.normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLocaleLowerCase()
+  }
+
+  $: items = [...issues, ...texts]
+    .filter((item) => normalize(item.title).includes(normalize(search.trim())))
+    .sort((a, b) => b.modifiedOn - a.modifiedOn || a._id.localeCompare(b._id))
 </script>
 
-{#if viewlet?.$lookup?.descriptor?.component}
-  <Component
-    is={viewlet.$lookup.descriptor.component}
-    props={{
-      _class: tracker.class.IssueTemplate,
-      config: preference?.config ?? viewlet.config,
-      options: viewlet.options,
-      createItemDialog,
-      createItemLabel,
-      viewOptions,
-      viewOptionsConfig: viewlet.viewOptions?.other,
-      viewlet,
-      space,
-      query
-    }}
-  />
-{/if}
+<Scroller>
+  <div class="flex-col gap-2 p-4">
+    {#if issuesPending || textsPending}
+      {#each [0, 1, 2] as row (row)}
+        <div class="template-skeleton" />
+      {/each}
+    {:else}
+      {#each items as item (item._id)}
+        <TemplateRow {item} />
+      {/each}
+    {/if}
+  </div>
+</Scroller>
+
+<style lang="scss">
+  .template-skeleton {
+    height: 3rem;
+    border-radius: 0.5rem;
+    background: var(--theme-divider-color);
+  }
+</style>

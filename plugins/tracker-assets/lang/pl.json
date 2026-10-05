@@ -256,6 +256,7 @@
     "AddedAsBlocking": "Oznaczono jako blokujące",
 
     "IssueTemplate": "Szablon",
+    "DiscardTemplate": "Discard",
     "TextTemplate": "Text template",
     "IssueTemplates": "Szablony",
     "NewProcess": "Nowy szablon",

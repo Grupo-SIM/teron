@@ -246,6 +246,7 @@
     "AddedAsBlocking": "Označeno jako blokující",
 
     "IssueTemplate": "Šablona",
+    "DiscardTemplate": "Discard",
     "TextTemplate": "Text template",
     "IssueTemplates": "Šablony",
     "NewProcess": "Nová šablona",

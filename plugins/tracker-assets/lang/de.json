@@ -256,6 +256,7 @@
     "AddedAsBlocking": "Als blockierend markiert",
 
     "IssueTemplate": "Vorlage",
+    "DiscardTemplate": "Discard",
     "TextTemplate": "Text template",
     "IssueTemplates": "Vorlagen",
     "NewProcess": "Neue Vorlage",

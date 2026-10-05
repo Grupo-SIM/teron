@@ -242,6 +242,7 @@
     "AddedAsBlocked": "Marcado como bloqueado",
     "AddedAsBlocking": "Marcado como bloqueador",
     "IssueTemplate": "Modelo de tarefa",
+    "DiscardTemplate": "Discard",
     "TextTemplate": "Modelo de texto",
     "IssueTemplates": "Modelos",
     "NewProcess": "Novo Modelo",

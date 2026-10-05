@@ -242,6 +242,7 @@
     "AddedAsBlocked": "ブロックされているとしてマーク",
     "AddedAsBlocking": "ブロックしているとしてマーク",
     "IssueTemplate": "テンプレート",
+    "DiscardTemplate": "Discard",
     "TextTemplate": "Text template",
     "IssueTemplates": "テンプレート",
     "NewProcess": "新しいテンプレート",

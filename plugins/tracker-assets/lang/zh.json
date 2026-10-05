@@ -256,6 +256,7 @@
     "AddedAsBlocking": "标记为阻塞",
 
     "IssueTemplate": "模板",
+    "DiscardTemplate": "Discard",
     "TextTemplate": "Text template",
     "IssueTemplates": "模板",
     "NewProcess": "新模板",
