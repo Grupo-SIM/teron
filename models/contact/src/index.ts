@@ -229,6 +229,7 @@ export class TPerson extends TContact implements Person {
     professionalTitle?: string
 
   @Prop(TypeString(), contact.string.ContactSource)
+  @Hidden()
     contactSource?: string
 
   @Prop(TypeNumber(), contact.string.RemoteDaysPerWeek, {
@@ -247,6 +248,7 @@ export class TPerson extends TContact implements Person {
     socialIds?: Collection<SocialIdentity>
 
   @Prop(TypeRef(contact.class.UserProfile), contact.string.UserProfile)
+  @Hidden()
   @ReadOnly()
     profile?: Ref<Card>
 }

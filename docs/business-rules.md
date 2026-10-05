@@ -28,7 +28,7 @@
 
 - Evento privado ocupa horário para outras pessoas sem mostrar título, descrição, local ou participantes.
 - Habilidades é um campo legado de Recrutamento e não aparece no perfil nem nos atributos editáveis de contatos; dados existentes permanecem armazenados.
-- Função representa o cargo do contato; campo legado Cargo profissional permanece armazenado, mas não aparece na edição. Origem do contato indica o canal de aquisição (indicação, site, evento etc.) e fica nos atributos laterais.
+- Função representa o cargo do contato; campo legado Cargo profissional permanece armazenado, mas não aparece na edição. Origem do contato e Perfil do usuário não aparecem na tela de Contatos, incluindo atributos laterais, formulários, filtros e seleção de colunas; dados existentes permanecem armazenados.
 - Dias remotos e presenciais são editados nos atributos laterais do contato.
 - Contatos Externos podem ter dias remotos e presenciais opcionais por semana, cada contagem entre 0 e 7 e soma máxima de 7. Booleanos legados não inferem contagem.
 - Somente Owner e Maintainer podem desbloquear Diretrizes.

@@ -82,7 +82,9 @@
       'city',
       'functions',
       'skills',
-      'professionalTitle'
+      'professionalTitle',
+      'contactSource',
+      'profile'
     ]
   })
   onMount(sendOpen)
