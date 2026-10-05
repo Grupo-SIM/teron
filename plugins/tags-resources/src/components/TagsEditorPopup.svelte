@@ -18,6 +18,7 @@
   import tags, { TagElement, TagsEvents } from '@hcengineering/tags'
   import { Analytics } from '@hcengineering/analytics'
 
+  import { addTagReference } from '../add-tag-reference'
   import TagsPopup from './TagsPopup.svelte'
   import { getObjectId } from '@hcengineering/view-resources'
 
@@ -31,20 +32,10 @@
   })
   const client = getClient()
   const hierarchy = client.getHierarchy()
-  async function addRef ({ title, color, _id: tag }: TagElement): Promise<void> {
-    // check if tag already attached, could happen if 'add' clicked faster than ui updates
-    const containsTag = selected.some((refElement) => refElement === tag)
-    if (containsTag) {
-      return
-    }
+  async function addRef (tag: TagElement): Promise<void> {
+    const created = await addTagReference(client, object, object._class, 'labels', tag)
+    if (!created) return
 
-    selected.push(tag)
-
-    await client.addCollection(tags.class.TagReference, object.space, object._id, object._class, 'labels', {
-      title,
-      color,
-      tag
-    })
     const id = await getObjectId(object, hierarchy)
     Analytics.handleEvent(TagsEvents.TagCreated, { objectId: id, objectClass: object._class })
   }

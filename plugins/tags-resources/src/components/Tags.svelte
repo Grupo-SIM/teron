@@ -17,6 +17,7 @@
   import { createQuery, getClient, KeyedAttribute } from '@hcengineering/presentation'
   import { TagElement, TagReference } from '@hcengineering/tags'
   import tags from '../plugin'
+  import { addTagReference } from '../add-tag-reference'
   import TagsEditor from './TagsEditor.svelte'
 
   export let object: Doc
@@ -39,11 +40,7 @@
   )
 
   async function addRef (tag: TagElement): Promise<void> {
-    await client.addCollection(tags.class.TagReference, object.space, object._id, _class, key.key, {
-      title: tag.title,
-      tag: tag._id,
-      color: tag.color
-    })
+    await addTagReference(client, object, _class, key.key, tag)
   }
 
   async function removeTag (id: Ref<TagReference>): Promise<void> {

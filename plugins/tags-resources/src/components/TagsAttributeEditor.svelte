@@ -7,6 +7,8 @@
   import { getObjectId } from '@hcengineering/view-resources'
   import { Analytics } from '@hcengineering/analytics'
 
+  import { addTagReference } from '../add-tag-reference'
+
   import TagReferencePresenter from './TagReferencePresenter.svelte'
   import TagsPopup from './TagsPopup.svelte'
   import TagIcon from './icons/TagIcon.svelte'
@@ -54,12 +56,8 @@
       }
     )
   }
-  async function addTag ({ title, color, _id: tag }: TagElement): Promise<void> {
-    await client.addCollection(tags.class.TagReference, object.space, object._id, targetClass, attributeKey, {
-      title,
-      color,
-      tag
-    })
+  async function addTag (tag: TagElement): Promise<void> {
+    await addTagReference(client, object, targetClass, attributeKey, tag)
   }
   async function removeTag (tag: TagReference): Promise<void> {
     if (tag !== undefined) {

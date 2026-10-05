@@ -16,16 +16,15 @@
   import { Doc, Ref } from '@hcengineering/core'
   import { createQuery, getClient } from '@hcengineering/presentation'
   import tags, { TagElement, TagReference } from '@hcengineering/tags'
+  import { addTagReference } from '../add-tag-reference'
   import TagsPopup from './TagsPopup.svelte'
 
   export let value: Doc | Doc[]
   $: objects = Array.isArray(value) ? value : [value]
 
   let selected: Ref<TagElement>[] = []
-  let tagRefs: TagReference[] = []
   const query = createQuery()
   $: query.query(tags.class.TagReference, { attachedTo: { $in: objects.map((p) => p._id) }, collection: 'labels' }, (result) => {
-    tagRefs = result
     const res: Record<Ref<TagElement>, TagReference> = {}
     for (const value of result) {
       const arr = (res as any)[value.tag] ?? []
@@ -42,16 +41,10 @@
   })
 
   const client = getClient()
-  async function addRef ({ title, color, _id: tag }: TagElement): Promise<void> {
+  async function addRef (tag: TagElement): Promise<void> {
     await Promise.all(
       objects.map(async (object) => {
-        if (tagRefs.findIndex((p) => p.attachedTo === object._id && p.tag === tag) !== -1) return
-
-        await client.addCollection(tags.class.TagReference, object.space, object._id, object._class, 'labels', {
-          title,
-          color,
-          tag
-        })
+        await addTagReference(client, object, object._class, 'labels', tag)
       })
     )
   }
