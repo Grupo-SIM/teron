@@ -54,6 +54,7 @@ import ChannelIcon from './components/ChannelIcon.svelte'
 import DirectIcon from './components/DirectIcon.svelte'
 import { openChannelInSidebar, resetChunterLocIfEqual } from './navigation'
 import chunter from './plugin'
+import { getChannelDisplayName } from './channel-title'
 import { shownTranslatedMessagesStore, translatedMessagesStore, translatingMessagesStore } from './stores'
 import love, { type MeetingMinutes } from '@hcengineering/love'
 
@@ -193,7 +194,7 @@ export async function ChannelTitleProvider (client: Client, id: Ref<Channel>, do
     return ''
   }
 
-  return channel._id === chunter.space.Random && channel.name === 'random' ? 'Aleatório' : channel.name
+  return getChannelDisplayName(channel)
 }
 
 export enum SearchType {

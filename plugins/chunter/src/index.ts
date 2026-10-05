@@ -109,6 +109,10 @@ export * from './utils'
 export * from './analytics'
 
 export default plugin(chunterId, {
+  space: {
+    General: '' as Ref<Channel>,
+    Random: '' as Ref<Channel>
+  },
   icon: {
     Chunter: '' as Asset,
     Hashtag: '' as Asset,
