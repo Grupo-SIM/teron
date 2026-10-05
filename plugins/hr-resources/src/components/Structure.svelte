@@ -13,6 +13,7 @@
 // limitations under the License.
 -->
 <script lang="ts">
+  import { AccountRole, getCurrentAccount, hasAccountRole } from '@hcengineering/core'
   import contact from '@hcengineering/contact'
   import { containsSearch, Ref, WithLookup } from '@hcengineering/core'
   import type { Department, Staff } from '@hcengineering/hr'
@@ -87,7 +88,9 @@
   </div>
 
   <div class="mb-1 clear-mins">
-    <Button icon={IconAdd} label={hr.string.CreateDepartmentLabel} kind={'primary'} on:click={showCreateDialog} />
+    {#if hasAccountRole(getCurrentAccount(), AccountRole.Maintainer)}
+      <Button icon={IconAdd} label={hr.string.CreateDepartmentLabel} kind={'primary'} on:click={showCreateDialog} />
+    {/if}
   </div>
 </div>
 <div class="ac-header full divide search-start">

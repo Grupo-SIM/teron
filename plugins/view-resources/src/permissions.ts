@@ -1,22 +1,48 @@
-import { type PermissionsStore } from '@hcengineering/contact'
+import { getCurrentEmployee, type PermissionsStore } from '@hcengineering/contact'
 import core, {
+  AccountRole,
+  getCurrentAccount,
+  hasAccountRole,
   type AnyAttribute,
   type Class,
   type Doc,
   type Permission,
   type Ref,
+  type SocialId,
   type Space,
   type TypedSpace
 } from '@hcengineering/core'
 import { getMetadata } from '@hcengineering/platform'
 import { getClient } from '@hcengineering/presentation'
+import task, { getTaskAssignees, type Task } from '@hcengineering/task'
+import { canMutateWorkspaceClass } from './workspace-role-policy'
 
 export function canChangeAttribute (
   attr: AnyAttribute,
   space: Ref<TypedSpace>,
   store: PermissionsStore,
-  _class: Ref<Class<Doc>>
+  _class: Ref<Class<Doc>>,
+  object?: Doc
 ): boolean {
+  const account = getCurrentAccount()
+  const ancestors = getClient().getHierarchy().getAncestors(_class)
+  if (!hasAccountRole(account, AccountRole.Maintainer)) {
+    if (!hasAccountRole(account, AccountRole.User)) return false
+    if (ancestors.includes(task.class.Task)) {
+      if (attr.name !== 'description' && attr.name !== 'status') return false
+      if (attr.name === 'status' && (object === undefined || !getTaskAssignees(object as Task).includes(getCurrentEmployee()))) return false
+    }
+    if (ancestors.includes('document:class:Document' as Ref<Class<Doc>>) && object !== undefined && (object as Doc & { lockedBy?: unknown }).lockedBy != null) return false
+    if (ancestors.some((id) => ['calendar:class:Event', 'calendar:class:Calendar', 'calendar:class:Schedule', 'time:class:ToDo'].includes(id))) {
+      if (object === undefined) return false
+      const personal = object as Doc & { user?: string, owner?: string }
+      const own = ancestors.includes('calendar:class:Schedule' as Ref<Class<Doc>>)
+        ? personal.owner === getCurrentEmployee()
+        : personal.user === getCurrentEmployee() || account.socialIds.includes(personal.user as SocialId)
+      if (!own) return false
+    }
+  }
+  if (!canMutateWorkspaceClass(account, ancestors, 'update', attr.name)) return false
   const arePermissionsDisabled = getMetadata(core.metadata.DisablePermissions) ?? false
   if (arePermissionsDisabled) return true
   if (store.whitelist.has(space)) return true
@@ -47,6 +73,7 @@ export function canChangeAttribute (
 }
 
 export function canChangeDoc (_class: Ref<Class<Doc>>, space: Ref<Space>, store: PermissionsStore): boolean {
+  if (!canMutateWorkspaceClass(getCurrentAccount(), getClient().getHierarchy().getAncestors(_class), 'update')) return false
   const arePermissionsDisabled = getMetadata(core.metadata.DisablePermissions) ?? false
   if (arePermissionsDisabled) return true
   if (store.whitelist.has(space)) return true
@@ -86,6 +113,7 @@ export function canChangeDoc (_class: Ref<Class<Doc>>, space: Ref<Space>, store:
 }
 
 export function canRemoveDoc (_class: Ref<Class<Doc>>, space: Ref<Space>, store: PermissionsStore): boolean {
+  if (!canMutateWorkspaceClass(getCurrentAccount(), getClient().getHierarchy().getAncestors(_class), 'remove')) return false
   const arePermissionsDisabled = getMetadata(core.metadata.DisablePermissions) ?? false
   if (arePermissionsDisabled) return true
   if (store.whitelist.has(space)) return true
@@ -108,6 +136,7 @@ export function canRemoveDoc (_class: Ref<Class<Doc>>, space: Ref<Space>, store:
 }
 
 export function canCreateObject (_class: Ref<Class<Doc>>, space: Ref<Space>, store: PermissionsStore): boolean {
+  if (!canMutateWorkspaceClass(getCurrentAccount(), getClient().getHierarchy().getAncestors(_class), 'create')) return false
   const arePermissionsDisabled = getMetadata(core.metadata.DisablePermissions) ?? false
   if (arePermissionsDisabled) return true
   if (store.whitelist.has(space)) return true

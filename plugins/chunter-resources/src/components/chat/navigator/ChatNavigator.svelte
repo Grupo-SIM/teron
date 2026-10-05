@@ -69,11 +69,11 @@
   }
 </script>
 
-<div class="teronNavPanel-header" class:withButton={hasAccountRole(getCurrentAccount(), AccountRole.User)}>
+<div class="teronNavPanel-header" class:withButton={hasAccountRole(getCurrentAccount(), AccountRole.Maintainer)}>
   <span class="overflow-label">
     <Label label={chunter.string.Chat} />
   </span>
-  {#if hasAccountRole(getCurrentAccount(), AccountRole.User)}
+  {#if hasAccountRole(getCurrentAccount(), AccountRole.Maintainer)}
     <ButtonIcon icon={IconAdd} hasMenu {pressed} kind={'primary'} size={'small'} on:click={addButtonClicked} />
   {/if}
 </div>

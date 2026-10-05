@@ -34,7 +34,7 @@
       id: drive.string.CreateDrive,
       label: drive.string.CreateDrive,
       icon: drive.icon.Drive,
-      accountRole: AccountRole.User,
+      accountRole: AccountRole.Maintainer,
       callback: handleCreateDrive
     },
     {

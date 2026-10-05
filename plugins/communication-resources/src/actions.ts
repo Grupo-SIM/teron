@@ -249,7 +249,7 @@ export const canRemoveMessage: MessageActionVisibilityTester = (message: Message
 }
 
 export const createCard: MessageActionFunction = async (message: Message, card: Card): Promise<void> => {
-  if (!hasAccountRole(getCurrentAccount(), AccountRole.User)) {
+  if (!hasAccountRole(getCurrentAccount(), AccountRole.Maintainer)) {
     await showForbidden()
     return
   }
@@ -260,7 +260,7 @@ export const createCard: MessageActionFunction = async (message: Message, card: 
 }
 
 export const canCreateCard: MessageActionVisibilityTester = (message: Message): boolean => {
-  return canReplyInThread(message)
+  return hasAccountRole(getCurrentAccount(), AccountRole.Maintainer) && canReplyInThread(message)
 }
 
 let allMessageActions: MessageAction[] | undefined

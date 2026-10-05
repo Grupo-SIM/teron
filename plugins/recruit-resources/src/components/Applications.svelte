@@ -13,6 +13,7 @@
 // limitations under the License.
 -->
 <script lang="ts">
+  import { AccountRole, getCurrentAccount, hasAccountRole } from '@hcengineering/core'
   import type { Doc, Ref } from '@hcengineering/core'
   import { Button, IconAdd, Label, Scroller, Section, showPopup } from '@hcengineering/ui'
   import { Viewlet, ViewletPreference } from '@hcengineering/view'
@@ -47,7 +48,9 @@
         bind:preference
       />
       {#if !readonly}
-        <Button id="appls.add" icon={IconAdd} kind={'ghost'} on:click={createApp} />
+        {#if hasAccountRole(getCurrentAccount(), AccountRole.Maintainer)}
+          <Button id="appls.add" icon={IconAdd} kind={'ghost'} on:click={createApp} />
+        {/if}
       {/if}
     </div>
   </svelte:fragment>

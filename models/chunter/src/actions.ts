@@ -46,6 +46,7 @@ export function defineActions (builder: Builder): void {
   )
 
   createAction(builder, {
+    secured: true,
     action: chunter.actionImpl.StartConversation,
     label: chunter.string.Message,
     icon: view.icon.Bubble,
@@ -107,6 +108,7 @@ function defineMessageActions (builder: Builder): void {
   createAction(
     builder,
     {
+      secured: true,
       action: chunter.actionImpl.DeleteChatMessage,
       label: view.string.Delete,
       icon: view.icon.Delete,
@@ -175,6 +177,7 @@ function defineMessageActions (builder: Builder): void {
 
 function defineChannelActions (builder: Builder): void {
   createAction(builder, {
+    secured: true,
     action: view.actionImpl.ShowPanel,
     actionProps: {
       component: chunter.component.EditChannel,
@@ -195,6 +198,7 @@ function defineChannelActions (builder: Builder): void {
   createAction(
     builder,
     {
+      secured: true,
       action: chunter.actionImpl.UnarchiveChannel,
       label: chunter.string.UnarchiveChannel,
       icon: view.icon.Archive,
@@ -215,6 +219,7 @@ function defineChannelActions (builder: Builder): void {
   createAction(
     builder,
     {
+      secured: true,
       action: chunter.actionImpl.ConvertDmToPrivateChannel,
       label: chunter.string.ConvertToPrivate,
       icon: chunter.icon.Lock,
@@ -232,6 +237,7 @@ function defineChannelActions (builder: Builder): void {
   createAction(
     builder,
     {
+      secured: true,
       action: chunter.actionImpl.ArchiveChannel,
       label: chunter.string.ArchiveChannel,
       icon: view.icon.Archive,
@@ -288,6 +294,7 @@ function defineChannelActions (builder: Builder): void {
   createAction(
     builder,
     {
+      secured: true,
       ...actionTemplates.removeChannel,
       action: chunter.actionImpl.LeaveChannel,
       label: chunter.string.LeaveChannel,

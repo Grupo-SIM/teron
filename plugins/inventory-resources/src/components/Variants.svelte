@@ -13,6 +13,7 @@
 // limitations under the License.
 -->
 <script lang="ts">
+  import { AccountRole, getCurrentAccount, hasAccountRole } from '@hcengineering/core'
   import type { Doc, Ref } from '@hcengineering/core'
   import { Button, eventToHTMLElement, Icon, IconAdd, Label, showPopup } from '@hcengineering/ui'
   import { Table } from '@hcengineering/view-resources'
@@ -33,7 +34,9 @@
     <span class="antiSection-header__title">
       <Label label={inventory.string.Variants} />
     </span>
-    <Button icon={IconAdd} kind={'ghost'} on:click={create} />
+    {#if hasAccountRole(getCurrentAccount(), AccountRole.Maintainer)}
+      <Button icon={IconAdd} kind={'ghost'} on:click={create} />
+    {/if}
   </div>
   {#if variants > 0}
     <Table

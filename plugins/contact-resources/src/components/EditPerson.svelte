@@ -14,7 +14,7 @@
 // limitations under the License.
 -->
 <script lang="ts">
-  import { Channel, Person, combineName, getCurrentEmployee, getFirstName, getLastName } from '@hcengineering/contact'
+  import { Channel, Person, combineName, getFirstName, getLastName } from '@hcengineering/contact'
   import { AccountRole, Ref, getCurrentAccount, hasAccountRole, type AccountUuid } from '@hcengineering/core'
   import { AttributeEditor, InlineAttributeBarEditor, createQuery, getClient, hasResource } from '@hcengineering/presentation'
   import type { PersonRating } from '@hcengineering/rating'
@@ -36,15 +36,7 @@
   const h = client.getHierarchy()
 
   const account = getCurrentAccount()
-  const me = getCurrentEmployee()
-  $: owner = me === object._id
-
-  function isEditable (owner: boolean, object: Person): boolean {
-    if (owner) return true
-    if (!h.hasMixin(object, contact.mixin.Employee)) return true
-    return hasAccountRole(account, AccountRole.Maintainer)
-  }
-  $: editable = !readonly && isEditable(owner, object)
+  $: editable = !readonly && hasAccountRole(account, AccountRole.Maintainer)
 
   let avatarEditor: EditableAvatar
 

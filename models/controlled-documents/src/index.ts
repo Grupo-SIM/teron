@@ -494,6 +494,7 @@ export function createModel (builder: Builder): void {
   createAction(
     builder,
     {
+      secured: true,
       action: view.actionImpl.ShowPopup,
       actionProps: {
         component: documentsPlugin.component.ChangeOwnerPopup,
@@ -638,6 +639,7 @@ export function createModel (builder: Builder): void {
   createAction(
     builder,
     {
+      secured: true,
       action: view.actionImpl.ShowPopup,
       actionProps: {
         component: documentsPlugin.component.DeleteCategoryPopup,
@@ -870,6 +872,7 @@ export function createModel (builder: Builder): void {
   createAction(
     builder,
     {
+      secured: true,
       action: documents.actionImpl.TransferDocument,
       label: documents.string.Transfer,
       icon: view.icon.Move,
@@ -888,6 +891,7 @@ export function createModel (builder: Builder): void {
   createAction(
     builder,
     {
+      secured: true,
       action: view.actionImpl.ShowPopup,
       actionProps: {
         component: exportPlugin.component.ExportToWorkspaceModal,
@@ -911,6 +915,7 @@ export function createModel (builder: Builder): void {
   createAction(
     builder,
     {
+      secured: true,
       action: view.actionImpl.ShowPopup,
       actionProps: {
         component: exportPlugin.component.ExportToWorkspaceModal,
@@ -938,6 +943,7 @@ export function createModel (builder: Builder): void {
   createAction(
     builder,
     {
+      secured: true,
       action: view.actionImpl.ShowPopup,
       actionProps: {
         component: exportPlugin.component.ExportToWorkspaceModal,
@@ -1007,6 +1013,7 @@ export function createModel (builder: Builder): void {
   createAction(
     builder,
     {
+      secured: true,
       action: documents.actionImpl.DeleteDocument,
       label: view.string.Delete,
       icon: view.icon.Delete,
@@ -1049,6 +1056,7 @@ export function createModel (builder: Builder): void {
   createAction(
     builder,
     {
+      secured: true,
       action: documents.actionImpl.MakeDocumentObsolete,
       label: documents.string.MakeDocumentObsolete,
       icon: view.icon.Archive,
@@ -1070,6 +1078,7 @@ export function createModel (builder: Builder): void {
   createAction(
     builder,
     {
+      secured: true,
       action: documents.actionImpl.EditDocSpace,
       label: documents.string.EditDocumentSpace,
       icon: view.icon.Edit,

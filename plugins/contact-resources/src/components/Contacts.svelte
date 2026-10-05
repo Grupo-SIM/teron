@@ -14,7 +14,7 @@
 // limitations under the License.
 -->
 <script lang="ts">
-  import { Doc, DocumentQuery } from '@hcengineering/core'
+  import { AccountRole, getCurrentAccount, hasAccountRole, Doc, DocumentQuery } from '@hcengineering/core'
   import { ActionContext } from '@hcengineering/presentation'
   import { Button, Label, Loading, SearchEdit, showPopup } from '@hcengineering/ui'
   import view, { Viewlet, ViewletPreference, ViewOptions } from '@hcengineering/view'
@@ -57,6 +57,7 @@
     <div class="ac-header__wrap-title mr-3">
       <span class="ac-header__title"><Label label={contact.string.Contacts} /></span>
     </div>
+    {#if hasAccountRole(getCurrentAccount(), AccountRole.Maintainer)}
     <div class="mb-1 clear-mins">
       <Button
         label={contact.string.ContactCreateLabel}
@@ -67,6 +68,7 @@
         }}
       />
     </div>
+    {/if}
   </div>
   <div class="ac-header full divide search-start">
     <div class="ac-header-full small-gap">

@@ -65,7 +65,7 @@
   })
 
   function canChange (attr: AnyAttribute, permissionsStore: PermissionsStore): boolean {
-    return canChangeAttribute(attr, object.space as Ref<TypedSpace>, permissionsStore, _class)
+    return canChangeAttribute(attr, object.space as Ref<TypedSpace>, permissionsStore, _class, object)
   }
 </script>
 

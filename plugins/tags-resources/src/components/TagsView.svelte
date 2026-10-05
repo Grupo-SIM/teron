@@ -13,6 +13,7 @@
 // limitations under the License.
 -->
 <script lang="ts">
+  import { AccountRole, getCurrentAccount, hasAccountRole } from '@hcengineering/core'
   import { Class, Doc, DocumentQuery, FindOptions, Ref } from '@hcengineering/core'
   import { Asset, IntlString, translateCB } from '@hcengineering/platform'
   import { createQuery } from '@hcengineering/presentation'
@@ -113,7 +114,9 @@
   </svelte:fragment>
   <svelte:fragment slot="actions">
     <slot />
-    <Button icon={IconAdd} label={createItemLabel} kind={'primary'} on:click={showCreateDialog} />
+    {#if hasAccountRole(getCurrentAccount(), AccountRole.Maintainer)}
+      <Button icon={IconAdd} label={createItemLabel} kind={'primary'} on:click={showCreateDialog} />
+    {/if}
   </svelte:fragment>
 </Header>
 <CategoryBar

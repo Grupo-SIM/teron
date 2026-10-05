@@ -397,6 +397,7 @@ export function createModel (builder: Builder): void {
   )
 
   createAction(builder, {
+    secured: true,
     action: view.actionImpl.Delete,
     label: view.string.Delete,
     icon: view.icon.Delete,
@@ -411,6 +412,7 @@ export function createModel (builder: Builder): void {
   createAction(
     builder,
     {
+      secured: true,
       action: view.actionImpl.ValueSelector,
       actionPopup: process.component.RunProcessPopup,
       actionProps: {
@@ -431,6 +433,7 @@ export function createModel (builder: Builder): void {
   createAction(
     builder,
     {
+      secured: true,
       action: process.actionImpl.ContinueExecution,
       query: {
         error: { $exists: true, $ne: null }

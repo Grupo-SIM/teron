@@ -139,7 +139,7 @@
 
 <Header
   adaptive={'freezeActions'}
-  hideActions={!(viewlet?.descriptor === view.viewlet.Table || hasAccountRole(getCurrentAccount(), AccountRole.User))}
+  hideActions={!(viewlet?.descriptor === view.viewlet.Table || hasAccountRole(getCurrentAccount(), AccountRole.Maintainer))}
 >
   <svelte:fragment slot="beforeTitle">
     <ViewletSelector
@@ -182,7 +182,7 @@
         }}
       />
     {/if}
-    {#if hasAccountRole(getCurrentAccount(), AccountRole.User)}
+    {#if hasAccountRole(getCurrentAccount(), AccountRole.Maintainer)}
       <Button icon={IconAdd} label={recruit.string.VacancyCreateLabel} kind={'primary'} on:click={showCreateDialog} />
     {/if}
   </svelte:fragment>

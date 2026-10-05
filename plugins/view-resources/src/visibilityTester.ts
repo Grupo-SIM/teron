@@ -140,6 +140,7 @@ export async function canDeleteSpace (doc?: Doc | Doc[]): Promise<boolean> {
 }
 
 export async function canJoinSpace (doc?: Doc | Doc[]): Promise<boolean> {
+  if (!hasAccountRole(getCurrentAccount(), AccountRole.Maintainer)) return false
   if (doc === undefined || Array.isArray(doc)) {
     return false
   }
@@ -150,6 +151,7 @@ export async function canJoinSpace (doc?: Doc | Doc[]): Promise<boolean> {
 }
 
 export async function canLeaveSpace (doc?: Doc | Doc[]): Promise<boolean> {
+  if (!hasAccountRole(getCurrentAccount(), AccountRole.Maintainer)) return false
   if (doc === undefined || Array.isArray(doc)) {
     return false
   }

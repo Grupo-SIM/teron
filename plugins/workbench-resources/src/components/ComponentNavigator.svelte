@@ -35,7 +35,7 @@
     twoPanelsSeparators,
     resizeObserver
   } from '@hcengineering/ui'
-  import { Doc, DocumentQuery, Ref, Space, mergeQueries } from '@hcengineering/core'
+  import { Doc, DocumentQuery, Ref, Space, mergeQueries, AccountRole, getCurrentAccount, hasAccountRole } from '@hcengineering/core'
   import { IntlString, Asset } from '@hcengineering/platform'
 
   export let space: Ref<Space> | undefined = undefined
@@ -79,7 +79,7 @@
   }
 
   function showCreateDialog (): void {
-    if (createComponent === undefined) return
+    if (createComponent === undefined || !hasAccountRole(getCurrentAccount(), AccountRole.Maintainer)) return
     showPopup(createComponent, { ...createComponentProps, space }, 'top')
   }
 
@@ -133,7 +133,7 @@
         <Header adaptive={'disabled'}>
           <Breadcrumb icon={navigationComponentIcon} label={navigationComponentLabel} size={'large'} isCurrent />
           <svelte:fragment slot="actions">
-            {#if createComponent}
+            {#if createComponent && hasAccountRole(getCurrentAccount(), AccountRole.Maintainer)}
               <Button
                 icon={IconAdd}
                 kind={'icon'}

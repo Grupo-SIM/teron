@@ -301,6 +301,7 @@ export function createModel (builder: Builder): void {
   createAction(
     builder,
     {
+      secured: true,
       ...actionTemplates.editStatus,
       target: task.class.Project,
       query: {
@@ -365,6 +366,7 @@ export function createModel (builder: Builder): void {
   createAction(
     builder,
     {
+      secured: true,
       ...viewTemplates.move,
       target: task.class.Task,
       context: {

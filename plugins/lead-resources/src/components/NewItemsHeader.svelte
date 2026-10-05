@@ -34,7 +34,7 @@
     {
       id: lead.string.CreateCustomerLabel,
       label: lead.string.CreateCustomerLabel,
-      accountRole: AccountRole.User,
+      accountRole: AccountRole.Maintainer,
       callback: newIssue
     }
   ]}

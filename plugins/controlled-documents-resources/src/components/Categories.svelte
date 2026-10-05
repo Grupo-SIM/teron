@@ -13,6 +13,7 @@
 // limitations under the License.
 -->
 <script lang="ts">
+  import { AccountRole, getCurrentAccount, hasAccountRole } from '@hcengineering/core'
   import documents, { DocumentCategory } from '@hcengineering/controlled-documents'
   import { Class, DocumentQuery, Ref, TypedSpace } from '@hcengineering/core'
   import { ActionContext } from '@hcengineering/presentation'
@@ -66,13 +67,15 @@
 >
   <svelte:fragment slot="actions">
     {#if canCreate}
-      <Button
-        icon={IconAdd}
-        label={document.string.DocumentCategoryCreateLabel}
-        size="small"
-        kind="primary"
-        on:click={showCreateDialog}
-      />
+      {#if hasAccountRole(getCurrentAccount(), AccountRole.Maintainer)}
+        <Button
+          icon={IconAdd}
+          label={document.string.DocumentCategoryCreateLabel}
+          size="small"
+          kind="primary"
+          on:click={showCreateDialog}
+        />
+      {/if}
     {/if}
   </svelte:fragment>
 </ViewletPanelHeader>

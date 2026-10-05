@@ -224,6 +224,7 @@ function defineDrive (builder: Builder): void {
   })
 
   createAction(builder, {
+    secured: true,
     action: view.actionImpl.Delete,
     actionProps: { confirmation: drive.string.DeleteDriveConfirm },
     label: view.string.Delete,
@@ -316,6 +317,7 @@ function defineDrive (builder: Builder): void {
   createAction(
     builder,
     {
+      secured: true,
       action: drive.actionImpl.EditDrive,
       label: drive.string.EditDrive,
       icon: view.icon.Edit,
@@ -524,6 +526,7 @@ function defineFolder (builder: Builder): void {
   createAction(
     builder,
     {
+      secured: true,
       action: drive.actionImpl.RenameFolder,
       label: drive.string.Rename,
       icon: view.icon.Edit,
@@ -560,6 +563,7 @@ function defineFolder (builder: Builder): void {
   )
 
   createAction(builder, {
+    secured: true,
     ...actionTemplates.move,
     action: view.actionImpl.ShowPopup,
     actionProps: {
@@ -601,6 +605,7 @@ function defineFileVersion (builder: Builder): void {
   createAction(
     builder,
     {
+      secured: true,
       action: drive.actionImpl.RestoreFileVersion,
       label: drive.string.Restore,
       icon: drive.icon.Restore,
@@ -620,6 +625,7 @@ function defineFileVersion (builder: Builder): void {
   createAction(
     builder,
     {
+      secured: true,
       action: view.actionImpl.Delete,
       visibilityTester: drive.function.CanDeleteFileVersion,
       label: view.string.Delete,
@@ -720,6 +726,7 @@ function defineFile (builder: Builder): void {
   createAction(
     builder,
     {
+      secured: true,
       action: drive.actionImpl.RenameFile,
       label: drive.string.Rename,
       icon: view.icon.Edit,
@@ -739,6 +746,7 @@ function defineFile (builder: Builder): void {
   createAction(
     builder,
     {
+      secured: true,
       action: view.actionImpl.Delete,
       label: view.string.Delete,
       icon: view.icon.Delete,
@@ -774,6 +782,7 @@ function defineFile (builder: Builder): void {
   // )
 
   createAction(builder, {
+    secured: true,
     ...actionTemplates.move,
     action: view.actionImpl.ShowPopup,
     actionProps: {

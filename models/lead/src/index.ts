@@ -363,6 +363,7 @@ export function createModel (builder: Builder): void {
   createAction(
     builder,
     {
+      secured: true,
       ...actionTemplates.editStatus,
       target: lead.class.Funnel,
       query: {
@@ -591,6 +592,7 @@ export function createModel (builder: Builder): void {
   )
 
   createAction(builder, {
+    secured: true,
     action: view.actionImpl.ShowPopup,
     actionProps: {
       component: lead.component.CreateLead,
@@ -618,6 +620,7 @@ export function createModel (builder: Builder): void {
   createAction(
     builder,
     {
+      secured: true,
       action: view.actionImpl.ShowPopup,
       actionProps: {
         component: lead.component.CreateLead,
@@ -638,6 +641,7 @@ export function createModel (builder: Builder): void {
   )
 
   createAction(builder, {
+    secured: true,
     action: view.actionImpl.ShowPopup,
     actionProps: {
       component: lead.component.CreateFunnel,

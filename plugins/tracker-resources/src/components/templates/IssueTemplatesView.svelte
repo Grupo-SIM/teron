@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { AccountRole, getCurrentAccount, hasAccountRole } from '@hcengineering/core'
   import { DocumentQuery, Ref, Space, WithLookup } from '@hcengineering/core'
   import { IntlString, translate } from '@hcengineering/platform'
   import { IssueTemplate } from '@hcengineering/tracker'
@@ -66,8 +67,12 @@
     <slot name="label_selector" />
   </svelte:fragment>
   <svelte:fragment slot="actions">
-    <Button icon={IconAdd} label={tracker.string.IssueTemplate} kind={'primary'} on:click={showCreateDialog} />
-    <Button icon={IconAdd} label={tracker.string.TextTemplate} kind={'primary'} on:click={showCreateTextDialog} />
+    {#if hasAccountRole(getCurrentAccount(), AccountRole.Maintainer)}
+      <Button icon={IconAdd} label={tracker.string.IssueTemplate} kind={'primary'} on:click={showCreateDialog} />
+    {/if}
+    {#if hasAccountRole(getCurrentAccount(), AccountRole.Maintainer)}
+      <Button icon={IconAdd} label={tracker.string.TextTemplate} kind={'primary'} on:click={showCreateTextDialog} />
+    {/if}
   </svelte:fragment>
 </SpaceHeader>
 <slot name="afterHeader" />

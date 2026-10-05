@@ -207,6 +207,7 @@ function defineTeamspace (builder: Builder): void {
   )
 
   createAction(builder, {
+    secured: true,
     action: view.actionImpl.Delete,
     actionProps: {
       confirmation: document.string.DeleteTeamspaceConfirm,
@@ -267,6 +268,7 @@ function defineTeamspace (builder: Builder): void {
   createAction(
     builder,
     {
+      secured: true,
       action: document.actionImpl.EditTeamspace,
       label: document.string.EditTeamspace,
       icon: view.icon.Edit,
@@ -401,6 +403,7 @@ function defineDocument (builder: Builder): void {
   createAction(
     builder,
     {
+      secured: true,
       action: document.actionImpl.LockContent,
       label: document.string.Lock,
       icon: document.icon.Lock,
@@ -420,6 +423,7 @@ function defineDocument (builder: Builder): void {
   createAction(
     builder,
     {
+      secured: true,
       action: document.actionImpl.UnlockContent,
       label: document.string.Unlock,
       icon: document.icon.Unlock,
@@ -456,6 +460,7 @@ function defineDocument (builder: Builder): void {
   createAction(
     builder,
     {
+      secured: true,
       action: view.actionImpl.Delete,
       actionProps: { confirmation: document.string.DeleteDocumentConfirm },
       label: view.string.Delete,

@@ -187,6 +187,7 @@ export function createModel (builder: Builder): void {
   createAction(
     builder,
     {
+      secured: true,
       ...taskActionTemplates.editStatus,
       target: board.class.Board,
       query: {
@@ -316,6 +317,7 @@ export function createModel (builder: Builder): void {
   createAction(
     builder,
     {
+      secured: true,
       action: view.actionImpl.ShowPopup,
       actionProps: {
         component: tags.component.TagsEditorPopup,
@@ -337,6 +339,7 @@ export function createModel (builder: Builder): void {
   createAction(
     builder,
     {
+      secured: true,
       action: view.actionImpl.ShowPopup,
       actionProps: {
         component: board.component.DatesActionPopup,
@@ -358,6 +361,7 @@ export function createModel (builder: Builder): void {
   createAction(
     builder,
     {
+      secured: true,
       action: view.actionImpl.ShowPopup,
       actionProps: {
         component: board.component.CoverActionPopup,
@@ -379,6 +383,7 @@ export function createModel (builder: Builder): void {
   createAction(
     builder,
     {
+      secured: true,
       ...actionTemplates.move,
       action: view.actionImpl.ShowPopup,
       actionProps: {
@@ -399,6 +404,7 @@ export function createModel (builder: Builder): void {
   createAction(
     builder,
     {
+      secured: true,
       action: view.actionImpl.ShowPopup,
       actionProps: {
         component: board.component.CopyActionPopup,
@@ -421,6 +427,7 @@ export function createModel (builder: Builder): void {
   createAction(
     builder,
     {
+      secured: true,
       action: view.actionImpl.UpdateDocument,
       actionProps: {
         key: 'isArchived',
@@ -444,6 +451,7 @@ export function createModel (builder: Builder): void {
   createAction(
     builder,
     {
+      secured: true,
       action: view.actionImpl.UpdateDocument,
       actionProps: {
         key: 'isArchived',
@@ -465,6 +473,7 @@ export function createModel (builder: Builder): void {
   createAction(
     builder,
     {
+      secured: true,
       action: view.actionImpl.Delete,
       query: {
         isArchived: true

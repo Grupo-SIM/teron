@@ -13,12 +13,12 @@
 // limitations under the License.
 -->
 <script lang="ts">
-  import core, { AccountRole, Ref, Space, getCurrentAccount } from '@hcengineering/core'
+  import core, { AccountRole, Ref, Space, getCurrentAccount, hasAccountRole, type TypedSpace } from '@hcengineering/core'
   import { createQuery, getClient } from '@hcengineering/presentation'
   import { HeaderButton, showPopup } from '@hcengineering/ui'
   import { openDoc } from '@hcengineering/view-resources'
   import { Analytics } from '@hcengineering/analytics'
-  import { DocumentEvents } from '@hcengineering/document'
+  import { DocumentEvents, guidelineAccessFor, type Teamspace } from '@hcengineering/document'
 
   import document from '../plugin'
   import { getDocumentIdFromFragment } from '../utils'
@@ -34,14 +34,18 @@
 
   let loading = true
   let hasTeamspace = false
+  let teamspaces: Teamspace[] = []
+  let sectors: TypedSpace[] = []
+  const sectorsQuery = createQuery()
+  sectorsQuery.query(core.class.TypedSpace, {}, (rows) => { sectors = rows })
   query.query(
     document.class.Teamspace,
     { archived: false, members: myAcc.uuid },
     (res) => {
       hasTeamspace = res.length > 0
+      teamspaces = res
       loading = false
-    },
-    { limit: 1, projection: { _id: 1 } }
+    }
   )
 
   $: parent = getDocumentIdFromFragment(currentFragment ?? '')
@@ -64,16 +68,21 @@
 
   let mainActionId: string | undefined = undefined
   let visibleActions: string[] = []
-  function updateActions (teamspace: boolean): void {
+  function updateActions (teamspace: boolean, canCreateDocument: boolean): void {
     mainActionId = document.string.CreateDocument
     if (teamspace) {
-      visibleActions = [document.string.CreateTeamspace, document.string.CreateDocument]
+      visibleActions = [document.string.CreateTeamspace, ...(canCreateDocument ? [document.string.CreateDocument] : [])]
     } else {
       visibleActions = [document.string.CreateTeamspace]
     }
   }
 
-  $: updateActions(hasTeamspace)
+  $: sectorMembers = new Map(sectors.map((sector) => [sector._id, sector.members]))
+  $: canCreateDocument = hasAccountRole(myAcc, AccountRole.User) && teamspaces.some((space) =>
+    (currentSpace === undefined || space._id === currentSpace) &&
+    (hasAccountRole(myAcc, AccountRole.Maintainer) || guidelineAccessFor(space, myAcc.uuid, sectorMembers) === 'editor')
+  )
+  $: updateActions(hasTeamspace, canCreateDocument)
 </script>
 
 <HeaderButton
@@ -85,7 +94,7 @@
     {
       id: document.string.CreateTeamspace,
       label: document.string.CreateTeamspace,
-      accountRole: AccountRole.User,
+      accountRole: AccountRole.Maintainer,
       callback: newTeamspace
     },
     {

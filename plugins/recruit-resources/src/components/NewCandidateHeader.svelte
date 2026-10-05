@@ -60,7 +60,7 @@
     {
       id: recruit.string.CreateTalent,
       label: recruit.string.CreateTalent,
-      accountRole: AccountRole.User,
+      accountRole: AccountRole.Maintainer,
       keyBindingPromise: newRecruitKeyBindingPromise,
       callback: newCandidate
     },
@@ -68,7 +68,7 @@
       id: recruit.string.ResumeDraft,
       label: recruit.string.ResumeDraft,
       draft: true,
-      accountRole: AccountRole.User,
+      accountRole: AccountRole.Maintainer,
       keyBindingPromise: newRecruitKeyBindingPromise,
       callback: newCandidate
     }

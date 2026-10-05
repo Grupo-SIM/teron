@@ -13,6 +13,7 @@
 // limitations under the License.
 -->
 <script lang="ts">
+  import { AccountRole, getCurrentAccount, hasAccountRole } from '@hcengineering/core'
   import { Button, IconAdd, showPopup } from '@hcengineering/ui'
   import products from '../../plugin'
   import CreateProduct from './CreateProduct.svelte'
@@ -28,12 +29,14 @@
 </script>
 
 <div class="antiNav-subheader">
-  <Button
-    icon={IconAdd}
-    label={products.string.CreateProduct}
-    kind={'primary'}
-    justify={'left'}
-    width="100%"
-    on:click={newProduct}
-  />
+  {#if hasAccountRole(getCurrentAccount(), AccountRole.Maintainer)}
+    <Button
+      icon={IconAdd}
+      label={products.string.CreateProduct}
+      kind={'primary'}
+      justify={'left'}
+      width="100%"
+      on:click={newProduct}
+    />
+  {/if}
 </div>

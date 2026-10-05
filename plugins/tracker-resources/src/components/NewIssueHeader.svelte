@@ -87,12 +87,13 @@
     {
       id: tracker.string.CreateProject,
       label: tracker.string.CreateProject,
-      accountRole: AccountRole.User,
+      accountRole: AccountRole.Maintainer,
       callback: newProject
     },
     {
       id: tracker.string.ResumeDraft,
       label: tracker.string.ResumeDraft,
+      accountRole: AccountRole.Maintainer,
       draft: true,
       keyBindingPromise: newIssueKeyBindingPromise,
       callback: newIssue
@@ -100,13 +101,14 @@
     {
       id: tracker.string.NewIssue,
       label: tracker.string.NewIssue,
+      accountRole: AccountRole.Maintainer,
       keyBindingPromise: newIssueKeyBindingPromise,
       callback: newIssue
     },
     {
       id: tracker.string.Import,
       label: tracker.string.Import,
-      accountRole: AccountRole.User,
+      accountRole: AccountRole.Maintainer,
       callback: newIssue
     }
   ]}
