@@ -21,6 +21,7 @@
     FindResult,
     getObjectValue,
     Ref,
+    RefTo,
     SortingOrder,
     Space
   } from '@hcengineering/core'
@@ -36,7 +37,8 @@
     resizeObserver
   } from '@hcengineering/ui'
   import { Filter } from '@hcengineering/view'
-  import { createEventDispatcher } from 'svelte'
+  import { createEventDispatcher, onDestroy } from 'svelte'
+  import { getTaskAssignees, type TaskAssignees } from '@hcengineering/task'
   import { FILTER_DEBOUNCE_MS } from '../../filter'
   import view from '../../plugin'
   import { getPresenter } from '../../utils'
@@ -46,10 +48,14 @@
   export let filter: Filter
   export let onChange: (e: Filter) => void
 
-  filter.modes = [view.filter.FilterArrayAll, view.filter.FilterArrayAny]
+  filter.modes = [view.filter.FilterArrayAll, view.filter.FilterArrayAny, view.filter.FilterObjectNin]
   filter.mode = filter.mode === undefined ? filter.modes[0] : filter.mode
 
   const client = getClient()
+  const elementType = (filter.key.attribute.type as ArrOf<Doc>).of
+  const isReference = elementType._class === core.class.RefTo
+  const isTaskAssignment = filter.key.key === 'assignees'
+  const hierarchy = client.getHierarchy()
   const key = { key: filter.key.key }
   const promise = getPresenter(client, filter.key._class, key, key, undefined, false, 'attribute')
 
@@ -87,7 +93,7 @@
       return
     }
     const resultQuery =
-      search !== ''
+      search !== '' && !isReference
         ? {
             [filter.key.key]: { $contains: search }
           }
@@ -103,7 +109,7 @@
       { ...resultQuery, ...(space ? { space } : {}) },
       {
         sort: { [filter.key.key]: SortingOrder.Ascending },
-        projection: { [prefix + filter.key.key]: 1, space: 1 }
+        projection: { [prefix + filter.key.key]: 1, ...(isTaskAssignment ? { assignee: 1 } : {}), space: 1 }
       }
     )
     const res = await objectsPromise
@@ -113,7 +119,7 @@
       if (hieararchy.isMixin(filter.key._class)) {
         asDoc = hieararchy.as(object, filter.key._class)
       }
-      const arr = getObjectValue(filter.key.key, asDoc)
+      const arr = isTaskAssignment ? getTaskAssignees(asDoc as Doc & TaskAssignees) : getObjectValue(filter.key.key, asDoc)
       if (!Array.isArray(arr)) continue
       for (const realValue of arr) {
         const value = getValue(realValue)
@@ -124,11 +130,23 @@
     for (const object of filter.value.map((p) => p[0])) {
       values.add(object)
     }
+    if (isReference && search !== '') {
+      const targetClass = (elementType as RefTo<Doc>).to
+      const filteringKey = hierarchy.getClass(targetClass).filteringKey
+      if (filteringKey !== undefined) {
+        const matches = await client.findAll(targetClass, {
+          _id: { $in: [...values] },
+          [filteringKey]: { $contains: search }
+        })
+        values = new Set(matches.map((doc) => doc._id))
+      }
+    }
     values = values
     objectsPromise = undefined
   }
 
   function getValue (obj: any): any {
+    if (isReference) return obj ?? undefined
     if (typeof obj === 'string') {
       const trim = obj.trim()
       return trim.length > 0 ? trim.toUpperCase() : undefined
@@ -157,12 +175,14 @@
 
     filterUpdateTimeout = setTimeout(() => {
       filter.value = [...newValues.values()].map((v) => {
-        return [v, [...(realValues.get(v) ?? [])]]
+        return [v, [...(realValues.get(v) ?? new Set([v]))]]
       })
 
       onChange(filter)
     }, FILTER_DEBOUNCE_MS)
   }
+
+  onDestroy(() => { clearTimeout(filterUpdateTimeout) })
 
   let search: string = ''
 

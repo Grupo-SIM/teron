@@ -17,7 +17,8 @@
   import { getClient } from '@hcengineering/presentation'
   import { Button, IconFilter, resolvedLocationStore, showPopup } from '@hcengineering/ui'
   import { Filter, ViewOptions } from '@hcengineering/view'
-  import { filterStore, getFilterKey, selectedFilterStore, setFilters } from '../../filter'
+  import { buildFilterKey, filterStore, getFilterKey, selectedFilterStore, setFilters } from '../../filter'
+  import { normalizeStoredFilters } from '../../filter-persistence'
   import view from '../../plugin'
   import FilterTypePopup from './FilterTypePopup.svelte'
   import IconClose from '../icons/Close.svelte'
@@ -31,7 +32,7 @@
   const client = getClient()
   const hierarchy = client.getHierarchy()
 
-  resolvedLocationStore.subscribe(() => {
+  const unsubscribeLocation = resolvedLocationStore.subscribe(() => {
     if ($selectedFilterStore === undefined) {
       load(_class)
     }
@@ -40,9 +41,11 @@
   function load (_class: Ref<Class<Doc>> | undefined): void {
     const key = getFilterKey(_class)
     const items = localStorage.getItem(key)
-    if (items !== null) {
-      filterStore.set(JSON.parse(items))
-    }
+    const filters: Filter[] = items === null ? [] : JSON.parse(items)
+    setFilters(normalizeStoredFilters(filters, (filter) => {
+      const attribute = hierarchy.findAttribute(filter.key._class, 'assignees')
+      return attribute === undefined ? undefined : buildFilterKey(hierarchy, filter.key._class, 'assignees', attribute)
+    }))
   }
 
   function save (_class: Ref<Class<Doc>> | undefined, p: Filter[]): void {
@@ -50,16 +53,17 @@
     localStorage.setItem(key, JSON.stringify(p))
   }
 
-  filterStore.subscribe((p) => {
+  const unsubscribeFilters = filterStore.subscribe((p) => {
     save(_class, p)
   })
 
   function onChange (e: Filter | undefined): void {
-    if (e !== undefined) setFilters([e])
+    if (e !== undefined) setFilters(e.key.component === view.component.ArrayFilter && e.value.length === 0 ? [] : [e])
   }
 
   onDestroy(() => {
-    _class = undefined
+    unsubscribeLocation()
+    unsubscribeFilters()
   })
 
   let popupOpen = false

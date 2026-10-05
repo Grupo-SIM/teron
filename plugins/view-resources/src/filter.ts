@@ -43,6 +43,14 @@ export function removeFilter (i: number): void {
 export function updateFilter (filter: Filter): void {
   const old = get(filterStore)
   const index = old.findIndex((p) => p.index === filter.index)
+  if (filter.value.length === 0 && [
+    view.filter.FilterArrayAll, view.filter.FilterArrayAny,
+    view.filter.FilterObjectIn, view.filter.FilterObjectNin,
+    view.filter.FilterValueIn, view.filter.FilterValueNin
+  ].includes(filter.mode)) {
+    if (index !== -1) removeFilter(index)
+    return
+  }
   if (index === -1) {
     old.push(filter)
   } else {

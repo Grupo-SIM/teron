@@ -23,6 +23,8 @@
   import view from '../../plugin'
   import { activeViewlet, getActiveViewletId, makeViewletKey } from '../../utils'
   import { getViewOptions, viewOptionStore } from '../../viewOptions'
+  import { assignmentFilterQuery } from '../../assignment-filter-query'
+  import { getFilterPresenterValue } from '../../filter-presenter-value'
   import FilterSave from './FilterSave.svelte'
   import FilterSection from './FilterSection.svelte'
   import FilterTypePopup from './FilterTypePopup.svelte'
@@ -82,10 +84,18 @@
     const newQuery = hierarchy.clone(query)
     for (let i = 0; i < filters.length; i++) {
       const filter = filters[i]
+      if (filter.value.length === 0 && [
+        view.filter.FilterArrayAll, view.filter.FilterArrayAny,
+        view.filter.FilterObjectIn, view.filter.FilterObjectNin,
+        view.filter.FilterValueIn, view.filter.FilterValueNin
+      ].includes(filter.mode)) continue
       const mode = await client.findOne(view.class.FilterMode, { _id: filter.mode })
       if (mode === undefined) continue
       const result = await getResource(mode.result)
-      const newValue = await result(filter, () => {
+      const resultFilter = filter.key.component === view.component.ArrayFilter && filter.mode === view.filter.FilterObjectNin
+        ? { ...filter, value: getFilterPresenterValue(filter.value, true) }
+        : filter
+      const newValue = await result(resultFilter, () => {
         makeQuery(query, filters)
       })
 
@@ -94,6 +104,11 @@
       const attr = client.getHierarchy().getAttribute(filter.key._class, filter.key.key)
       if (client.getHierarchy().isMixin(attr.attributeOf)) {
         filterKey = attr.attributeOf + '.' + filter.key.key
+      }
+
+      if (filterKey === 'assignees') {
+        newQuery.$and = [...(newQuery.$and ?? []), assignmentFilterQuery(newValue)]
+        continue
       }
 
       if (newQuery[filterKey] === null || newQuery[filterKey] === undefined) {
