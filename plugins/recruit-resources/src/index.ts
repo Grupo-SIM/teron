@@ -15,6 +15,7 @@
 
 import contact from '@hcengineering/contact'
 import core, {
+  containsSearch,
   toIdMap,
   type Client,
   type Doc,
@@ -139,7 +140,7 @@ export async function queryApplication (
   if (sequence > 0) {
     for (let n = 0; n <= sequence; n++) {
       const v = `${n}`
-      if (v.includes(search)) {
+      if (containsSearch(v, search)) {
         nids.push(n)
       }
     }
@@ -191,7 +192,7 @@ export async function queryVacancy (
     }
     const numbered = await client.findAll(_class, q2, { limit: 5000, projection: { _id: 1, name: 1, _class: 1 } })
     return numbered
-      .filter((it) => it.name.includes(search))
+      .filter((it) => containsSearch(it.name, search))
       .map((e) => ({
         doc: e,
         title: `${e.name}`,

@@ -39,7 +39,7 @@
 
   let searchQuery: DocumentQuery<Milestone> = { ...query }
   function updateSearchQuery (search: string): void {
-    searchQuery = search === '' ? { ...query } : { ...query, $search: search }
+    searchQuery = search.trim() === '' ? { ...query } : { ...query, label: { $contains: search.trim() } }
   }
   $: if (query) updateSearchQuery(search)
 

@@ -50,7 +50,9 @@
   let resultQuery: DocumentQuery<TagElement> = { targetClass }
 
   function updateResultQuery (search: string, category?: Ref<TagCategory>): void {
-    resultQuery = search === '' ? { targetClass } : { $search: search, targetClass }
+    resultQuery = search === ''
+      ? { targetClass }
+      : { targetClass, $or: [{ title: { $contains: search } }, { description: { $contains: search } }] }
     if (category !== undefined) {
       resultQuery.category = category
     }

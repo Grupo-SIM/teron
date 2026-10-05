@@ -29,7 +29,7 @@
   import TelegramIcon from './icons/TelegramColor.svelte'
   import telegram from '../plugin'
   import { type TelegramChannelConfig, getIntegrationClient, listChannels, restart } from '../api'
-  import core, { getCurrentAccount, Space } from '@hcengineering/core'
+  import core, { containsSearch, getCurrentAccount, Space } from '@hcengineering/core'
 
   export let readonly: boolean = false
 
@@ -127,8 +127,8 @@
   $: filteredChannels = channels.filter((channel) => {
     // Search filter
     if (searchQuery.trim() !== '') {
-      const query = searchQuery.toLowerCase().trim()
-      if (!(channel.name.toLowerCase().includes(query) || channel.id.toLowerCase().includes(query))) {
+      const query = searchQuery.trim()
+      if (!(containsSearch(channel.name, query) || containsSearch(channel.id, query))) {
         return false
       }
     }

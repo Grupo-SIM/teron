@@ -1,6 +1,7 @@
 <script lang="ts">
   import { RegionInfo, AccountAggregatedInfo } from '@hcengineering/account-client'
   import {
+    containsSearch,
     AccountUuid,
     groupByArray,
     isActiveMode,
@@ -124,10 +125,10 @@
   $: sortedWorkspaces = workspaces
     .filter(
       (it) =>
-        ((it.name?.includes(search) ?? false) ||
-          (it.url?.includes(search) ?? false) ||
-          it.uuid?.includes(search) ||
-          it.createdBy?.includes(search)) &&
+        (containsSearch(it.name, search) ||
+          containsSearch(it.url, search) ||
+          containsSearch(it.uuid, search) ||
+          containsSearch(it.createdBy, search)) &&
         (showSelectedRegionOnly ? it.region === filterRegionId : true) &&
         (showInactive ? isWorkspaceInactive(it, statsByWorkspace.get(it.uuid)) : true) &&
         ((showActive && isActiveMode(it.mode)) ||

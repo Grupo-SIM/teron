@@ -14,7 +14,7 @@
 -->
 <script lang="ts">
   import contact from '@hcengineering/contact'
-  import { DocumentQuery, Ref, WithLookup } from '@hcengineering/core'
+  import { containsSearch, Ref, WithLookup } from '@hcengineering/core'
   import type { Department, Staff } from '@hcengineering/hr'
   import { createQuery } from '@hcengineering/presentation'
   import { Button, IconAdd, Label, Scroller, SearchEdit, eventToHTMLElement, showPopup } from '@hcengineering/ui'
@@ -23,11 +23,7 @@
   import DepartmentCard from './DepartmentCard.svelte'
 
   let search = ''
-  let resultQuery: DocumentQuery<Department> = {}
-
-  function updateResultQuery (search: string): void {
-    resultQuery = search === '' ? {} : { $search: search }
-  }
+  let departments: Department[] = []
 
   function showCreateDialog (ev: MouseEvent) {
     showPopup(CreateDepartment, {}, eventToHTMLElement(ev))
@@ -43,20 +39,10 @@
   query.query(
     hr.class.Department,
     {
-      ...resultQuery,
       archived: false
     },
     (res) => {
-      head = res.find((p) => p._id === hr.ids.Head)
-      descendants.clear()
-      for (const doc of res) {
-        if (doc.parent !== undefined) {
-          const current = descendants.get(doc.parent) ?? []
-          current.push(doc)
-          descendants.set(doc.parent, current)
-        }
-      }
-      descendants = descendants
+      departments = res
     },
     {
       lookup: {
@@ -64,6 +50,31 @@
       }
     }
   )
+
+  $: {
+    const term = search.trim()
+    const byId = new Map(departments.map((department) => [department._id, department]))
+    const visible = new Set<Ref<Department>>()
+    for (const department of departments) {
+      if (term !== '' && !containsSearch(department.name, term) && !containsSearch(department.description, term)) {
+        continue
+      }
+      let current: Department | undefined = department
+      while (current !== undefined && !visible.has(current._id)) {
+        visible.add(current._id)
+        current = current.parent === undefined ? undefined : byId.get(current.parent)
+      }
+    }
+    head = departments.find((department) => department._id === hr.ids.Head && visible.has(department._id))
+    descendants = new Map()
+    for (const department of departments) {
+      if (department.parent !== undefined && visible.has(department._id)) {
+        const children = descendants.get(department.parent) ?? []
+        children.push(department)
+        descendants.set(department.parent, children)
+      }
+    }
+  }
 
   spaceMembers.query(hr.mixin.Staff, {}, (res) => {
     allEmployees = res
@@ -81,12 +92,7 @@
 </div>
 <div class="ac-header full divide search-start">
   <div class="ac-header-full small-gap">
-    <SearchEdit
-      bind:value={search}
-      on:change={() => {
-        updateResultQuery(search)
-      }}
-    />
+    <SearchEdit bind:value={search} />
     <!-- <ActionIcon icon={IconMoreH} size={'small'} /> -->
   </div>
 </div>

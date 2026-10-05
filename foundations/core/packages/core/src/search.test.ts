@@ -2,6 +2,9 @@ import { containsSearch, normalizeSearch, searchLiteralPattern } from './search'
 
 describe('literal accent-insensitive substring search', () => {
   it('matches beginning, middle and end regardless of case or accents', () => {
+    for (const query of ['gr', 'G', 'rupo', 'sim']) {
+      expect(containsSearch('GRUPO SIM', query)).toBe(true)
+    }
     for (const query of ['acao', 'ÇÃO', 'caf', 'AFE', 'afé']) {
       expect(containsSearch('Ação Café', query)).toBe(true)
     }
