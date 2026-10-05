@@ -64,6 +64,8 @@ Busca global aplica exclusões de eventos privados e seus anexos antes do limite
 
 Foto na edição do Escritório ocupa largura e altura do squircle, com recorte central `cover` e máscara preservada. Sem foto, fallback permanece. Troca de andar usa token de fundo do painel nos temas claro e escuro.
 
+Andares sem salas permanecem expandidos e não oferecem controle para colapsar. Remover a última sala de um andar colapsado restaura sua expansão.
+
 Tabelas de contatos permitem selecionar e reordenar colunas. Funcionários e Externos mostram nome, localização, função e informações de contato por padrão; Aniversário, Dias presenciais e Dias remotos são opcionais. Clientes mantém nome, localização e informações de contato por padrão. Preferências individuais salvas prevalecem sobre o padrão.
 
 Conta mantém um único email ativo confirmado. Alteração exige código enviado ao novo endereço; email anterior permanece válido até confirmação. Após confirmar, endereços anteriores são liberados, inclusive em chamadas diretas ao servidor. Cancelar ou falhar na confirmação preserva email atual.

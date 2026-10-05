@@ -44,6 +44,7 @@
   export let selected: boolean
   export let removable: boolean = true
   let expanded = true
+  $: if (rooms.length === 0) expanded = true
 
   const me = getCurrentAccount()
   const dispatch = createEventDispatcher()
@@ -97,10 +98,16 @@
 
 <div class="floor-card preview" class:selected class:empty={rooms.length === 0} class:expanded>
   <div class="floor-row">
-    <button class="floor-select" aria-expanded={expanded} on:click={() => (expanded = !expanded)}>
-      <span class="overflow-label">{floor.name}</span>
-      <Icon icon={expanded ? IconChevronDown : IconChevronRight} size={'small'} />
-    </button>
+    {#if rooms.length > 0}
+      <button class="floor-select" aria-expanded={expanded} on:click={() => (expanded = !expanded)}>
+        <span class="overflow-label">{floor.name}</span>
+        <Icon icon={expanded ? IconChevronDown : IconChevronRight} size={'small'} />
+      </button>
+    {:else}
+      <div class="floor-select floor-title">
+        <span class="overflow-label">{floor.name}</span>
+      </div>
+    {/if}
     <button
       class="floor-activate"
       class:selected
@@ -168,6 +175,10 @@
     padding: 0.5rem;
     color: var(--theme-content-color);
     cursor: pointer;
+  }
+
+  .floor-title {
+    cursor: default;
   }
 
   .floor-activate {
