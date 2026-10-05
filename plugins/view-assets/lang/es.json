@@ -78,6 +78,7 @@
     "FilteredViews": "Vistas filtradas",
     "NewFilteredView": "Nueva vista filtrada",
     "FilteredViewName": "Nombre de la vista filtrada",
+    "LegacyMyTasks": "Mis tareas",
     "Then": "Entonces",
     "ShowPreviewOnClick": "Haga clic para mostrar la vista previa del índice del documento...",
     "Shown": "mostrando {len} resultados {total, plural, =-1 {} other {de # elementos filtrados}}",

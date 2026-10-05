@@ -226,7 +226,8 @@ function wrapMessages (
 
   for (const message of messages) {
     if (isDocUpdateMessage(message)) {
-      if (hierarchy.isDerived(message.attachedToClass, contact.class.Channel)) {
+      // Each edit is a history entry, even when the same field changes again immediately.
+      if (message.action === 'update' || hierarchy.isDerived(message.attachedToClass, contact.class.Channel)) {
         uncombined.push(message)
       } else {
         toCombine.push(message)

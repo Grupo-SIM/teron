@@ -184,6 +184,8 @@
     "RequiredSlots": "必需槽",
     "Bindings": "绑定",
     "AskRequired": "询问必需字段"
+  ,
+    "NoSlotsDefined": "No slots defined for this process"
   },
   "error": {
     "MethodNotFound": "找不到方法：{methodId}",

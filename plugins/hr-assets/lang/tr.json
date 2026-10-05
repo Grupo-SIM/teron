@@ -11,7 +11,7 @@
     "MemberCount": "{count, plural, =0 {çalışan yok} =1 {1 çalışan} other {# çalışan}}",
     "AssignLead": "Takım lideri ata",
     "TeamLeadTooltip": "{value}",
-    "HRApplication": "İnsan kaynakları (beta)",
+    "HRApplication": "İnsan kaynakları",
     "MoveStaff": "Çalışan transferi",
     "MoveStaffDescr": "Çalışanı {current}'ten {department}'e transfer etmek istiyor musunuz?",
     "Departments": "Departmanlar",

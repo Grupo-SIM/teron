@@ -1,5 +1,4 @@
-import { getMetadata, type Resources } from '@hcengineering/platform'
-import aiBot from '@hcengineering/ai-bot'
+import { type Resources } from '@hcengineering/platform'
 import { AccountRole, getCurrentAccount, hasAccountRole } from '@hcengineering/core'
 
 import ControlExt from './components/meeting/ControlExt.svelte'
@@ -34,8 +33,6 @@ import {
   createMeeting,
   createMeetingSchedule,
   showRoomSettings,
-  startTranscription,
-  stopTranscription,
   getMeetingMinutesTitle,
   queryMeetingMinutes
 } from './utils'
@@ -79,9 +76,7 @@ export default async (): Promise<Resources> => ({
       if (!hasAccountRole(getCurrentAccount(), AccountRole.User)) {
         return
       }
-      // For now settings is available only when AI bot is enabled
-      const url = getMetadata(aiBot.metadata.EndpointURL) ?? ''
-      return url !== ''
+      return true
     },
     CanCopyGuestLink: () => {
       return hasAccountRole(getCurrentAccount(), AccountRole.User)
@@ -91,8 +86,6 @@ export default async (): Promise<Resources> => ({
   actionImpl: {
     ToggleMic: toggleMicState,
     ToggleVideo: toggleCamState,
-    StartTranscribing: startTranscription,
-    StopTranscribing: stopTranscription,
     ShowRoomSettings: showRoomSettings,
     CopyGuestLink: copyGuestLink
   },

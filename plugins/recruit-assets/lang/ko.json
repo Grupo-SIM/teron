@@ -122,6 +122,12 @@
         "SwapFirstAndLastNames": "이름과 성 바꾸기",
         "ForbidCreateVacancyPermission": "채용 공고 생성 금지",
         "ForbidCreateVacancyPermissionDescription": "사용자의 새 채용 공고 생성을 금지합니다"
+    ,
+      "Analyse": "Analyze",
+      "ExportExpertSkills": "Export expert skills",
+      "ExportPlan": "Export plan",
+      "Optimize": "Optimize",
+      "SkillsOptimizer": "Skills optimizer"
     },
     "status": {
         "ApplicationExists": "이미 존재하는 지원입니다",

@@ -14,13 +14,15 @@
 -->
 <script lang="ts">
   import core, { Data, DocumentUpdate } from '@hcengineering/core'
-  import { Card, createQuery, getClient } from '@hcengineering/presentation'
+  import presentation, { Card, MessageBox, createQuery, getClient } from '@hcengineering/presentation'
   import { TagElement, TagReference } from '@hcengineering/tags'
   import {
+    Button,
     DropdownLabels,
     EditBox,
     eventToHTMLElement,
     getPlatformColorDef,
+    IconDelete,
     showPopup,
     themeStore
   } from '@hcengineering/ui'
@@ -81,6 +83,26 @@
     }
 
     dispatch('close')
+  }
+
+  function confirmDelete (): void {
+    showPopup(
+      MessageBox,
+      {
+        label: presentation.string.Delete,
+        message: tags.string.DeleteTagConfirmation,
+        params: { title: value.title },
+        okLabel: presentation.string.Delete,
+        dangerous: true,
+        action: async () => {
+          await client.remove(value)
+        }
+      },
+      'top',
+      (confirmed) => {
+        if (confirmed === true) dispatch('close')
+      }
+    )
   }
 
   const query = createQuery()
@@ -146,6 +168,9 @@
       {/if}
     </div>
   </div>
+  <svelte:fragment slot="buttons">
+    <Button icon={IconDelete} label={presentation.string.Delete} kind={'dangerous'} on:click={confirmDelete} />
+  </svelte:fragment>
 </Card>
 
 <style lang="scss">

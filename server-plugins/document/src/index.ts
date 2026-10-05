@@ -6,7 +6,7 @@
 import { Doc } from '@hcengineering/core'
 import type { Plugin, Resource } from '@hcengineering/platform'
 import { plugin } from '@hcengineering/platform'
-import { ObjectDDParticipantFunc } from '@hcengineering/server-core'
+import { ObjectDDParticipantFunc, TriggerFunc } from '@hcengineering/server-core'
 import { Presenter } from '@hcengineering/server-notification'
 
 /**
@@ -18,7 +18,11 @@ export const serverDocumentId = 'server-document' as Plugin
  * @public
  */
 export default plugin(serverDocumentId, {
+  trigger: {
+    GuidelineAccessChanged: '' as Resource<TriggerFunc>
+  },
   function: {
+    FindTeamspaceDocuments: '' as Resource<ObjectDDParticipantFunc>,
     DocumentHTMLPresenter: '' as Resource<Presenter>,
     DocumentTextPresenter: '' as Resource<Presenter>,
     DocumentLinkIdProvider: '' as Resource<(doc: Doc) => Promise<string>>,

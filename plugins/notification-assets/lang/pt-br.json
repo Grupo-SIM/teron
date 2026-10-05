@@ -60,5 +60,9 @@
     "YouRemovedCollaborators": "Você foi removido dos colaboradores",
     "Unsubscribe": "Cancelar inscrição",
     "Unreads": "Não lidas"
+  ,
+    "ReactedToYourMessage": "Reagiu à sua mensagem",
+    "InboxNotifications": "Notificações da caixa de entrada",
+    "InboxSettings": "Configurações da caixa de entrada"
   }
 }

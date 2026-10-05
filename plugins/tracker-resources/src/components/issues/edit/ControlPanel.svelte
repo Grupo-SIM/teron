@@ -14,7 +14,7 @@
 -->
 <script lang="ts">
   import { EmployeeBox, getPersonRefByPersonIdCb } from '@hcengineering/contact-resources'
-  import core, { Class, ClassifierKind, Doc, Mixin, Ref } from '@hcengineering/core'
+  import core, { Class, ClassifierKind, Doc, Mixin, Ref, AccountRole, getCurrentAccount, hasAccountRole } from '@hcengineering/core'
   import { AttributeBarEditor, createQuery, getClient, KeyedAttribute } from '@hcengineering/presentation'
   import { Person } from '@hcengineering/contact'
   import tags from '@hcengineering/tags'
@@ -29,18 +29,16 @@
   } from '@hcengineering/view-resources'
 
   import tracker from '../../../plugin'
-  import ComponentEditor from '../../components/ComponentEditor.svelte'
   import MilestoneEditor from '../../milestones/MilestoneEditor.svelte'
   import AssigneeEditor from '../AssigneeEditor.svelte'
   import DueDateEditor from '../DueDateEditor.svelte'
   import PriorityEditor from '../PriorityEditor.svelte'
   import RelationEditor from '../RelationEditor.svelte'
   import StatusEditor from '../StatusEditor.svelte'
-  import notification from '@hcengineering/notification'
 
   export let issue: Issue
-  export let showAllMixins: boolean = false
   export let readonly = false
+  $: structureReadonly = readonly || !hasAccountRole(getCurrentAccount(), AccountRole.Maintainer)
 
   const query = createQuery()
   let showIsBlocking = false
@@ -57,8 +55,10 @@
     'description',
     'priority',
     'status',
+    'kind',
     'number',
-    'assignee',
+    'remainingTime',
+    'assignees',
     'component',
     'dueDate',
     'milestone',
@@ -76,13 +76,9 @@
 
   let mixins: Mixin<Doc>[] = []
 
-  $: _mixins = getDocMixins(issue, showAllMixins)
+  $: _mixins = getDocMixins(issue, false)
 
-  $: mixins = _mixins.find((p) => p._id === notification.mixin.Collaborators)
-    ? _mixins
-    : [..._mixins, hierarchy.getClass(notification.mixin.Collaborators)]
-
-  const allowedCollections = ['collaborators']
+  $: mixins = _mixins
 
   function getMixinKeys (mixin: Ref<Mixin<Doc>>): KeyedAttribute[] {
     const mixinClass = hierarchy.getClass(mixin)
@@ -92,7 +88,7 @@
       [],
       hierarchy.isMixin(mixinClass.extends as Ref<Class<Doc>>) ? mixinClass.extends : issue._class
     )
-    return filtredKeys.filter((key) => !isCollectionAttr(hierarchy, key) || allowedCollections.includes(key.key))
+    return filtredKeys.filter((key) => !isCollectionAttr(hierarchy, key))
   }
 
   $: updateKeys(issue._class, ignoreKeys)
@@ -137,7 +133,7 @@
     <span class="labelTop">
       <Label label={tracker.string.BlockedBy} />
     </span>
-    <RelationEditor value={issue} type="blockedBy" {readonly} disabled={$restrictionStore.disableNavigation} />
+    <RelationEditor value={issue} type="blockedBy" readonly={structureReadonly} disabled={$restrictionStore.disableNavigation} />
   {/if}
   {#if showIsBlocking}
     <span class="labelTop">
@@ -147,7 +143,7 @@
       value={issue}
       type="isBlocking"
       {blockedBy}
-      {readonly}
+      readonly={structureReadonly}
       disabled={$restrictionStore.disableNavigation}
     />
   {/if}
@@ -155,13 +151,13 @@
     <span class="labelTop">
       <Label label={tracker.string.Related} />
     </span>
-    <RelationEditor value={issue} type="relations" {readonly} disabled={$restrictionStore.disableNavigation} />
+    <RelationEditor value={issue} type="relations" readonly={structureReadonly} disabled={$restrictionStore.disableNavigation} />
   {/if}
 
   <span class="labelOnPanel">
     <Label label={tracker.string.Priority} />
   </span>
-  <PriorityEditor value={issue} size={'medium'} shouldShowLabel isEditable={!readonly} width={'100%'} />
+  <PriorityEditor value={issue} size={'medium'} shouldShowLabel isEditable={!structureReadonly} width={'100%'} />
 
   <span class="labelOnPanel">
     <Label label={core.string.CreatedBy} />
@@ -180,27 +176,20 @@
   <span class="labelOnPanel">
     <Label label={tracker.string.Assignee} />
   </span>
-  <AssigneeEditor object={issue} size={'medium'} avatarSize={'card'} width="100%" {readonly} />
+  <AssigneeEditor object={issue} size={'medium'} avatarSize={'card'} width="100%" readonly={structureReadonly} />
 
   <span class="labelTop">
     <Label label={tracker.string.Labels} />
   </span>
   <Component
     is={tags.component.TagsAttributeEditor}
-    props={{ object: issue, label: tracker.string.AddLabel, readonly }}
+    props={{ object: issue, label: tracker.string.AddLabel, readonly: structureReadonly }}
   />
-
-  <div class="divider" />
-
-  <span class="labelOnPanel">
-    <Label label={tracker.string.Component} />
-  </span>
-  <ComponentEditor value={issue} space={issue.space} size={'medium'} isEditable={!readonly} />
 
   <span class="labelOnPanel">
     <Label label={tracker.string.Milestone} />
   </span>
-  <MilestoneEditor value={issue} space={issue.space} size={'medium'} isEditable={!readonly} />
+  <MilestoneEditor value={issue} space={issue.space} size={'medium'} isEditable={!structureReadonly} />
 
   {#if issue.dueDate !== null}
     <div class="divider" />
@@ -208,14 +197,14 @@
     <span class="labelOnPanel">
       <Label label={tracker.string.DueDate} />
     </span>
-    <DueDateEditor value={issue} width={'100%'} editable={!readonly} />
+    <DueDateEditor value={issue} width={'100%'} editable={!structureReadonly} />
   {/if}
 
   {#if keys.length > 0}
     <div class="divider" />
     {#each keys as key (typeof key === 'string' ? key : key.key)}
       <AttributeBarEditor
-        {readonly}
+        readonly={structureReadonly}
         {key}
         identifier={issue.identifier}
         _class={issue._class}
@@ -235,7 +224,7 @@
           {key}
           identifier={issue.identifier}
           _class={mixin._id}
-          {readonly}
+          readonly={structureReadonly}
           object={hierarchy.as(issue, mixin._id)}
           showHeader={true}
           size={'medium'}

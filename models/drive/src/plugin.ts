@@ -81,6 +81,7 @@ export default mergeIds(driveId, drive, {
     Drive: '' as Ref<ActionCategory>
   },
   action: {
+    DeleteDrive: '' as Ref<Action<Doc, any>>,
     CreateChildFolder: '' as Ref<Action>,
     CreateRootFolder: '' as Ref<Action>,
     EditDrive: '' as Ref<Action>,
@@ -102,10 +103,12 @@ export default mergeIds(driveId, drive, {
     RestoreFileVersion: '' as ViewAction
   },
   ids: {
-    ModulePermissionGroup: '' as Ref<Doc>,
     ModulePermissionGroupReadOnlyGuest: '' as Ref<Doc>
   },
   string: {
+    DeleteDriveConfirm: '' as IntlString,
+    DeleteFile: '' as IntlString,
+    DeleteFileConfirm: '' as IntlString,
     Grid: '' as IntlString,
     Name: '' as IntlString,
     Description: '' as IntlString,

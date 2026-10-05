@@ -13,6 +13,7 @@
 // limitations under the License.
 -->
 <script lang="ts">
+  import { AccountRole, getCurrentAccount, hasAccountRole } from '@hcengineering/core'
   import type { Ref } from '@hcengineering/core'
   import type { Customer } from '@hcengineering/lead'
   import { Button, IconAdd, Label, showPopup, resizeObserver, Scroller } from '@hcengineering/ui'
@@ -35,7 +36,9 @@
     <span class="antiSection-header__title">
       <Label label={lead.string.Leads} />
     </span>
-    <Button icon={IconAdd} kind={'ghost'} on:click={createLead} />
+    {#if hasAccountRole(getCurrentAccount(), AccountRole.Maintainer)}
+      <Button icon={IconAdd} kind={'ghost'} on:click={createLead} />
+    {/if}
   </div>
   {#if leads !== undefined && leads > 0}
     {#if wSection < 640}

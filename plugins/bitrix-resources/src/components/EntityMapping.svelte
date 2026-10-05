@@ -4,7 +4,6 @@
     BitrixEntityMapping,
     BitrixFieldMapping,
     Fields,
-    mappingTypes,
     StatusValue,
     toClassRef
   } from '@hcengineering/bitrix'
@@ -32,6 +31,7 @@
   import { deepEqual } from 'fast-equals'
   import BitrixFieldLookup from './BitrixFieldLookup.svelte'
   import CreateMappingAttribute from './CreateMappingAttribute.svelte'
+  import { localizedMappingTypes } from '../localized-mapping-types'
 
   export let mapping: BitrixEntityMapping
   export let bitrixClient: BitrixClient
@@ -40,7 +40,7 @@
   const client = getClient()
   $: ofClass = client.getHierarchy().getClass(mapping.ofClass)
 
-  $: typeTitle = mappingTypes.find((it) => it.id === mapping.type)
+  $: typeTitle = localizedMappingTypes.find((it) => it.id === mapping.type)
 
   let fields: Fields = {}
   bitrixClient.call(mapping.type + '.fields', {}).then((res) => {
@@ -90,11 +90,11 @@
 
 <!-- svelte-ignore a11y-click-events-have-key-events -->
 <div class="antiComponent max-w-240 flex-grow p-1">
-  <Expandable icon={ofClass?.icon} label={getEmbeddedLabel(typeTitle?.label ?? '')}>
+  <Expandable icon={ofClass?.icon} label={typeTitle?.label ?? bitrix.string.BitrixEntityType}>
     <svelte:fragment slot="tools">
       <Button icon={IconDelete} on:click={() => client.remove(mapping)} size={'small'} />
     </svelte:fragment>
-    <Expandable label={getEmbeddedLabel('Options')}>
+    <Expandable label={bitrix.string.Options}>
       <div class="flex-col">
         <div class="flex-row-center">
           <CheckBox
@@ -102,7 +102,7 @@
             on:value={(evt) => client.update(mapping, { comments: evt.detail })}
           />
           <div class="ml-2">
-            <Label label={getEmbeddedLabel('Comments')} />
+            <Label label={bitrix.string.Comments} />
           </div>
         </div>
         <div class="flex-row-center">
@@ -111,7 +111,7 @@
             on:value={(evt) => client.update(mapping, { attachments: evt.detail })}
           />
           <div class="ml-2">
-            <Label label={getEmbeddedLabel('Attachments')} />
+            <Label label={bitrix.string.Attachments} />
           </div>
         </div>
         <div class="flex-row-center">
@@ -121,12 +121,12 @@
             on:value={(evt) => client.update(mapping, { activity: evt.detail })}
           />
           <div class="ml-2">
-            <Label label={getEmbeddedLabel('Activity')} />
+            <Label label={bitrix.string.Activity} />
           </div>
         </div>
         <div class="flex-row-center">
           <div class="ml-2">
-            <Label label={getEmbeddedLabel('Mixins to include')} />
+            <Label label={bitrix.string.MixinsToInclude} />
           </div>
           {#each mapping.mixins ?? [] as mixin}
             <div class="flex-row-center p-1 focused-button">
@@ -141,7 +141,7 @@
           {/each}
           <Button
             icon={IconAdd}
-            label={getEmbeddedLabel('Add mixin')}
+            label={bitrix.string.AddMixin}
             on:click={async () => {
               const h = client.getHierarchy()
               const mixins = toRefArray([])
@@ -171,7 +171,7 @@
         </div>
       </div>
     </Expandable>
-    <Expandable label={getEmbeddedLabel('Mappings')} expanded>
+    <Expandable label={bitrix.string.Mappings} expanded>
       <div class="flex-row flex-grow bottom-divider p-2">
         {#each Object.entries(fieldsByClass) as field, i}
           {@const cl = client.getHierarchy().getClass(toClassRef(field[0]))}
@@ -209,7 +209,7 @@
         {/each}
       </div>
     </Expandable>
-    <Expandable label={getEmbeddedLabel('Class settings')}>
+    <Expandable label={bitrix.string.ClassSettings}>
       <ClassSetting
         ofClass={mapping.ofClass}
         withoutHeader
@@ -220,7 +220,7 @@
         }}
       />
     </Expandable>
-    <Expandable label={getEmbeddedLabel('Bitrix field lookup')}>
+    <Expandable label={bitrix.string.BitrixFieldLookup}>
       <BitrixFieldLookup {mapping} {bitrixClient} {fields} />
     </Expandable>
   </Expandable>

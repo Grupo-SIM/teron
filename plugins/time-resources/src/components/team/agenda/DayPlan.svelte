@@ -3,7 +3,7 @@
   import { IdMap, Ref, Timestamp } from '@hcengineering/core'
   import { IntlString, getEmbeddedLabel } from '@hcengineering/platform'
   import { ToDo, WorkSlot } from '@hcengineering/time'
-  import { Label, Scroller, areDatesEqual, ticker } from '@hcengineering/ui'
+  import { Label, Scroller, areDatesEqual, themeStore, ticker } from '@hcengineering/ui'
   import time from '../../../plugin'
   import PlanGroup from './PlanGroup.svelte'
 
@@ -22,7 +22,7 @@
     if (areDatesEqual(day, tomorrow)) return time.string.Tomorrow
     const isCurrentYear = day.getFullYear() === new Date().getFullYear()
     return getEmbeddedLabel(
-      day.toLocaleDateString('default', {
+      day.toLocaleDateString($themeStore.language, {
         month: 'long',
         day: 'numeric',
         year: isCurrentYear ? undefined : 'numeric'

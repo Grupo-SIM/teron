@@ -109,6 +109,7 @@ export async function filterAvailableActions (
   doc: Doc | Doc[],
   derived: Ref<Class<Doc>> = core.class.Doc
 ): Promise<Action[]> {
+  actions = actions.filter((action) => action.secured !== true || hasAccountRole(getCurrentAccount(), AccountRole.Maintainer))
   actions = (Array.isArray(doc) ? doc : [doc]).reduce(
     (actions, doc) => filterActions(client, doc, actions, derived),
     actions
@@ -142,6 +143,7 @@ export async function invokeAction (
   action: Action,
   props?: Record<string, any>
 ): Promise<void> {
+  if (action.secured === true && !hasAccountRole(getCurrentAccount(), AccountRole.Maintainer)) return
   const impl = await getResource(action.action)
   Analytics.handleEvent(action.analyticsEvent ?? action._id)
   await impl(normalizeActionContext(object), evt, {
@@ -195,6 +197,7 @@ function filterAvailableActionsSync (
   doc: Doc | Doc[],
   derived: Ref<Class<Doc>> = core.class.Doc
 ): Action[] {
+  actions = actions.filter((action) => action.secured !== true || hasAccountRole(getCurrentAccount(), AccountRole.Maintainer))
   actions = (Array.isArray(doc) ? doc : [doc]).reduce(
     (actions, doc) => filterActions(client, doc, actions, derived),
     actions

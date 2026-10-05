@@ -24,7 +24,9 @@ import calendar from './plugin'
 import { getMetadata } from '@hcengineering/platform'
 import login from '@hcengineering/login'
 import { getClient as getAccountClientRaw, type AccountClient } from '@hcengineering/account-client'
+import { EmptyMarkup } from '@hcengineering/text'
 import CalDavAccess from './components/CalDavAccess.svelte'
+import { canViewEventDetails } from './event-visibility'
 
 export function saveUTC (date: Timestamp): Timestamp {
   const utcdate = new Date(date)
@@ -40,24 +42,20 @@ export function saveUTC (date: Timestamp): Timestamp {
 }
 
 export function hidePrivateEvents (events: Event[], calendars: IdMap<Calendar>, allowMe: boolean = true): Event[] {
-  const res: Event[] = []
-  for (const event of events) {
-    if (getCurrentAccount().socialIds.includes(event.user) && allowMe) {
-      res.push(event)
-    } else {
-      if (event.visibility !== undefined) {
-        if (event.visibility !== 'private') {
-          res.push(event)
-        }
-      } else {
-        const calendar = calendars.get(event.calendar)
-        if (calendar != null && calendar.visibility !== 'private') {
-          res.push(event)
-        }
-      }
+  return events.map((event) => {
+    if (allowMe && getCurrentAccount().socialIds.includes(event.user)) return event
+    if (isVisible(event, calendars)) return event
+    return {
+      ...event,
+      title: '',
+      description: EmptyMarkup,
+      location: undefined,
+      participants: [],
+      externalParticipants: [],
+      reminders: [],
+      attachments: 0
     }
-  }
-  return res
+  })
 }
 
 export function isReadOnly (value: Event): boolean {
@@ -67,18 +65,7 @@ export function isReadOnly (value: Event): boolean {
 }
 
 export function isVisible (value: Event, calendars: IdMap<Calendar>): boolean {
-  if (value.createdBy !== undefined && getCurrentAccount().socialIds.includes(value.user)) return true
-  if (value.visibility === 'freeBusy') {
-    return false
-  } else if (value.visibility === 'public') {
-    return true
-  }
-  const calendar = calendars.get(value.calendar)
-  if (calendar == null) {
-    return true
-  } else {
-    return calendar.visibility === 'public'
-  }
+  return canViewEventDetails(value, calendars, getCurrentAccount().socialIds)
 }
 
 export const calendarByIdStore = writable<IdMap<Calendar>>(new Map())

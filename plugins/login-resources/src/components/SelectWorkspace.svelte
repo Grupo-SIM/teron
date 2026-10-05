@@ -15,6 +15,7 @@
 -->
 <script lang="ts">
   import {
+    containsSearch,
     WorkspaceInfoWithStatus,
     isActiveMode,
     isArchivingMode,
@@ -167,7 +168,7 @@
       {/if}
       <div class="form">
         {#each workspaces
-          .filter((it) => search === '' || (it.name?.includes(search) ?? false) || it.url.includes(search))
+          .filter((it) => search === '' || containsSearch(it.name, search) || containsSearch(it.url, search))
           .slice(0, 500) as workspace}
           {@const wsName = workspace.name ?? workspace.url}
           {@const lastUsageDays =

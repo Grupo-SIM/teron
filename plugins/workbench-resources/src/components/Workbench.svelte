@@ -23,14 +23,13 @@
     getCurrentAccount,
     hasAccountRole,
     Ref,
-    SortingOrder,
     Space
   } from '@hcengineering/core'
   import login, { openAuthRoute } from '@hcengineering/login'
   import notification, { DocNotifyContext, InboxNotification, notificationId } from '@hcengineering/notification'
   import { BrowserNotificatator, InboxNotificationsClientImpl } from '@hcengineering/notification-resources'
   import inbox, { inboxId } from '@hcengineering/inbox'
-  import { broadcastEvent, getMetadata, getResource, IntlString, translate } from '@hcengineering/platform'
+  import { broadcastEvent, getMetadata, getResource, IntlString } from '@hcengineering/platform'
   import {
     ActionContext,
     ComponentExtensions,
@@ -55,14 +54,11 @@
     Dock,
     getCurrentLocation,
     getLocation,
-    IconSettings,
     isSameSegments,
     Label,
-    languageStore,
     Location,
     location,
     locationStorageKeyId,
-    locationToUrl,
     mainSeparators,
     navigate,
     PanelInstance,
@@ -97,8 +93,7 @@
     Application,
     NavigatorModel,
     SpecialNavModel,
-    ViewConfiguration,
-    WorkbenchTab
+    ViewConfiguration
   } from '@hcengineering/workbench'
   import communication from '@hcengineering/communication'
   import { getContext, onDestroy, onMount, tick } from 'svelte'
@@ -107,7 +102,6 @@
   import { buildNavModel, isAllowedToRole, logOut, workspacesStore } from '../utils'
   import AccountPopup from './AccountPopup.svelte'
   import AppItem from './AppItem.svelte'
-  import AppSwitcher from './AppSwitcher.svelte'
   import Applications from './Applications.svelte'
   import Logo from './Logo.svelte'
   import NavFooter from './NavFooter.svelte'
@@ -117,17 +111,7 @@
   import SpaceView from './SpaceView.svelte'
   import TopMenu from './icons/TopMenu.svelte'
   import WidgetsBar from './sidebar/Sidebar.svelte'
-  import { sidebarStore, SidebarVariant, syncSidebarState } from '../sidebar'
-  import {
-    getTabDataByLocation,
-    getTabLocation,
-    prevTabIdStore,
-    selectTab,
-    syncWorkbenchTab,
-    tabIdStore,
-    tabsStore
-  } from '../workbench'
-  import { get } from 'svelte/store'
+  import { minimizeSidebar, sidebarStore, SidebarVariant, syncSidebarState } from '../sidebar'
 
   const HIDE_NAVIGATOR = 720
   const FLOAT_ASIDE = 1024 // lg
@@ -188,83 +172,13 @@
     }
   }
 
-  let tabs: WorkbenchTab[] = []
-  let areTabsLoaded = false
-
-  const query = createQuery()
-  $: query.query(
-    workbench.class.WorkbenchTab,
-    { attachedTo: account.uuid },
-    (res) => {
-      tabs = res
-      tabsStore.set(tabs)
-      if (account.role === AccountRole.ReadOnlyGuest) return
-      if (!areTabsLoaded) {
-        void initCurrentTab(tabs)
-        areTabsLoaded = true
-      }
-    },
-    {
-      sort: {
-        isPinned: SortingOrder.Descending,
-        createdOn: SortingOrder.Ascending
-      }
-    }
-  )
-
-  async function initCurrentTab (tabs: WorkbenchTab[]): Promise<void> {
-    const tab = tabs.find((t) => t._id === $tabIdStore)
-    const loc = getCurrentLocation()
-    const tabLoc = tab ? getTabLocation(tab) : undefined
-    const isLocEqual = tabLoc ? areLocationsEqual(loc, tabLoc) : false
-    if (!isLocEqual) {
-      const url = locationToUrl(loc)
-      const data = await getTabDataByLocation(loc)
-      const name = data.name ?? (await translate(data.label, {}, get(languageStore)))
-      const tabByName = get(tabsStore).find((t) => {
-        if (t.location === url) return true
-        if (t.name !== name) return false
-
-        const tabLoc = getTabLocation(t)
-
-        return tabLoc.path[2] === loc.path[2] && tabLoc.path[3] === loc.path[3]
-      })
-      if (tabByName !== undefined) {
-        selectTab(tabByName._id)
-        prevTabIdStore.set(tabByName._id)
-      } else {
-        const tabToReplace = tabs.findLast((t) => !t.isPinned)
-        if (tabToReplace !== undefined) {
-          const op = client.apply(undefined, undefined, true)
-          await op.update(tabToReplace, {
-            location: url
-          })
-          await op.commit()
-          selectTab(tabToReplace._id)
-          prevTabIdStore.set(tabToReplace._id)
-        } else {
-          console.log('Creating new tab on init')
-          const _id = await client.createDoc(workbench.class.WorkbenchTab, core.space.Workspace, {
-            attachedTo: account.uuid,
-            location: url,
-            isPinned: false
-          })
-          selectTab(_id)
-          prevTabIdStore.set(_id)
-        }
-      }
-    }
-  }
-
   onMount(() => {
     pushRootBarComponent('right', view.component.SearchSelector)
-    pushRootBarComponent('left', workbench.component.WorkbenchTabs, 30)
     void getResource(login.function.GetWorkspaces).then(async (getWorkspaceFn) => {
       $workspacesStore = await getWorkspaceFn()
       await updateWindowTitle(getLocation())
     })
     syncSidebarState()
-    syncWorkbenchTab()
   })
 
   const workspaceId = $location.path[1]
@@ -423,16 +337,6 @@
   async function syncLoc (loc: Location): Promise<void> {
     accessDeniedStore.set(false)
     const originalLoc = JSON.stringify(loc)
-    if ($tabIdStore !== $prevTabIdStore) {
-      if ($prevTabIdStore) {
-        const prevTab = tabs.find((t) => t._id === $prevTabIdStore)
-        const prevTabLoc = prevTab ? getTabLocation(prevTab) : undefined
-        if (prevTabLoc === undefined || prevTabLoc.path[2] !== loc.path[2]) {
-          clear(1)
-        }
-      }
-      prevTabIdStore.set($tabIdStore)
-    }
     if (loc.path.length > 3 && getSpecialComponent(loc.path[3]) === undefined) {
       // resolve short links
       const resolvedLoc = await resolveShortLink(loc)
@@ -703,9 +607,22 @@
   ) {
     $sidebarStore.widget = Array.from($sidebarStore.widgetsState.keys())[0]
   }
-  location.subscribe(() => {
-    if (mobileAdaptive && $sidebarStore.variant !== SidebarVariant.MINI) $sidebarStore.variant = SidebarVariant.MINI
-  })
+  let previousScreenPath = [...getCurrentLocation().path]
+  onDestroy(
+    location.subscribe((loc) => {
+      const screenChanged =
+        previousScreenPath.length !== loc.path.length ||
+        previousScreenPath.some((segment, index) => segment !== loc.path[index])
+      previousScreenPath = [...loc.path]
+
+      if (screenChanged) {
+        minimizeSidebar()
+        hiddenAside = true
+      } else if (mobileAdaptive && $sidebarStore.variant !== SidebarVariant.MINI) {
+        $sidebarStore.variant = SidebarVariant.MINI
+      }
+    })
+  )
   $: $deviceInfo.navigator.direction = $deviceInfo.isMobile && $deviceInfo.isPortrait ? 'horizontal' : 'vertical'
   let appsMini: boolean
   $: appsMini =
@@ -784,7 +701,7 @@
   function isExcludedApp (alias: string): boolean {
     const me = getCurrentAccount()
 
-    if (me.role === AccountRole.ReadOnlyGuest || me.role === AccountRole.Guest) {
+    if (me.role === AccountRole.ReadOnlyGuest) {
       return (getMetadata(workbench.metadata.ExcludedApplicationsForAnonymous) ?? []).includes(alias)
     } else {
       return false
@@ -893,13 +810,6 @@
         class:vertical-mobile={$deviceInfo.navigator.direction === 'vertical'}
         class:mini={appsMini}
       >
-        <AppItem
-          icon={IconSettings}
-          label={setting.string.Customize}
-          dataId="workbench-app-customize"
-          size={appsMini ? 'small' : 'large'}
-          on:click={() => showPopup(AppSwitcher, { apps }, popupPosition)}
-        />
         <div
           class="flex-center"
           class:mt-3={$deviceInfo.navigator.direction === 'vertical'}

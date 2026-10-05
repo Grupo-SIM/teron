@@ -600,6 +600,9 @@
     &:disabled {
       color: var(--secondary-button-disabled-color);
       background-color: var(--secondary-button-disabled);
+
+      .btn-icon,
+      .btn-right-icon { color: var(--secondary-button-disabled-color); }
     }
   }
   &.positive {

@@ -56,7 +56,7 @@
                 dispatch('select', day)
               }}
             >
-              <div class="flex-center">{getWeekDayName(day, 'short')}</div>
+              <div class="flex-center">{getWeekDayName(day, 'short', $deviceInfo.language)}</div>
               <div class="flex-center">{day.getDate()}</div>
             </div>
           </th>

@@ -91,7 +91,10 @@
       (result) => {
         if (result !== undefined) {
           if (result.action === 'add') addRef(result.tag)
-          else if (result.action === 'remove') removeTag(items.filter((it) => it.tag === result.tag._id)[0]._id)
+          else if (result.action === 'remove') {
+            const reference = items.find((it) => it.tag === result.tag._id)
+            if (reference !== undefined) void removeTag(reference._id)
+          }
         }
       },
       {

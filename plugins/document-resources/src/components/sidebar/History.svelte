@@ -15,6 +15,7 @@
 //
 -->
 <script lang="ts">
+  import { AccountRole, getCurrentAccount, hasAccountRole } from '@hcengineering/core'
   import { Document, DocumentSnapshot } from '@hcengineering/document'
   import { createQuery } from '@hcengineering/presentation'
   import { Button, Label, Lazy, Scroller, showPopup } from '@hcengineering/ui'
@@ -51,7 +52,7 @@
 <div class="h-full flex-col clear-mins">
   <div class="header">
     <div class="title"><Label label={document.string.History} /></div>
-    {#if !readonly}
+    {#if !readonly && hasAccountRole(getCurrentAccount(), AccountRole.Maintainer)}
       <Button
         icon={document.icon.Add}
         iconProps={{ size: 'medium' }}

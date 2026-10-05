@@ -60,14 +60,14 @@
 <Button
   {disabled}
   label={calendar.string.TimeZone}
-  kind={'ghost'}
+  kind={'secondary'}
   padding={'0 .5rem'}
   justify={'left'}
   {flex}
   on:click={open}
 >
   <svelte:fragment slot="content">
-    <span class="ml-2 content-darker-color">
+    <span class="ml-2">
       {getTimeZoneName(timeZone)}
     </span>
   </svelte:fragment>

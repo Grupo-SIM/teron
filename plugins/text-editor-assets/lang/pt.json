@@ -76,6 +76,17 @@
     "Subscript": "Subscript",
     "Superscript": "Superscript",
     "Mathematics": "Mathematics",
-    "MathematicsBlock": "Mathematics block"
+    "MathematicsBlock": "Mathematics block",
+    "HeadedTable1x2": "1×2 com cabeçalho",
+    "HeadedTable2x1": "2×1 com cabeçalho",
+    "HeadedTable2x2": "2×2 com cabeçalho",
+    "HeadedTable3x3": "3×3 com cabeçalho",
+    "HeadedTable5x5": "5×5 com cabeçalho",
+    "LinkPlaceholder": "https://exemplo.com",
+    "Table1x2": "1×2",
+    "Table2x1": "2×1",
+    "Table2x2": "2×2",
+    "Table3x3": "3×3",
+    "Table5x5": "5×5"
   }
 }

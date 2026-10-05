@@ -13,7 +13,7 @@
 // limitations under the License.
 -->
 <script lang="ts">
-  import ui, { ButtonBase, DatePopup, showPopup } from '@hcengineering/ui'
+  import ui, { ButtonBase, DatePopup, showPopup, themeStore } from '@hcengineering/ui'
   import { createEventDispatcher } from 'svelte'
   import time from '../plugin'
 
@@ -23,7 +23,7 @@
 
   let opened: boolean = false
 
-  $: buttonTitle = value ? new Date(value).toLocaleDateString() : undefined
+  $: buttonTitle = value ? new Date(value).toLocaleDateString($themeStore.language) : undefined
   $: buttonLabel = buttonTitle === undefined ? ui.string.DueDate : undefined
 
   function handleClick (e: MouseEvent) {

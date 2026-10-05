@@ -45,7 +45,7 @@
   import { EmptyMarkup, isEmptyMarkup } from '@hcengineering/text'
   import textEditor, { type RefAction } from '@hcengineering/text-editor'
   import { AttachIcon, ReferenceInput } from '@hcengineering/text-editor-resources'
-  import { Loading, type AnySvelteComponent } from '@hcengineering/ui'
+  import { getCurrentLocation, Loading, type AnySvelteComponent } from '@hcengineering/ui'
   import {
     type FileUploadCallbackParams,
     type UploadHandlerDefinition,
@@ -455,7 +455,7 @@
   }
 
   let uploadActionIndex = 1000
-  const uploadHandlers = getUploadHandlers(client, { category: 'media' })
+  const uploadHandlers = getUploadHandlers(client, { category: 'media' }, getCurrentLocation().path[2])
   const uploadActions: RefAction[] = uploadHandlers.map((handler) => ({
     order: handler.order ?? uploadActionIndex++,
     label: handler.label,

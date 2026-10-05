@@ -21,7 +21,6 @@
   import { createEventDispatcher } from 'svelte'
   import { Message } from '@hcengineering/communication-types'
   import { markupToText } from '@hcengineering/text'
-  import { getEmbeddedLabel } from '@hcengineering/platform'
 
   import { toMarkup } from '../utils'
   import { attachCardToMessage } from '../actions'
@@ -122,7 +121,7 @@
   on:close
 >
   <div class="teronModal-content__titleGroup" style="padding: 0">
-    <ModernEditbox bind:value={title} label={getEmbeddedLabel('Title')} size="large" kind="ghost" />
+    <ModernEditbox bind:value={title} label={communication.string.Title} size="large" kind="ghost" />
   </div>
 
   <div class="teronModal-content__settingsSet">

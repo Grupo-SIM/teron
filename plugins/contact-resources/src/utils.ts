@@ -90,7 +90,8 @@ import {
   type LabelAndProps,
   type Location,
   type ResolvedLocation,
-  type TabItem
+  type TabItem,
+  getDateLocale
 } from '@hcengineering/ui'
 import view, { type Filter, type GrouppingManager } from '@hcengineering/view'
 import { accessDeniedStore, FilterQuery } from '@hcengineering/view-resources'
@@ -102,7 +103,7 @@ import { getPreviewPopup } from './components/person/utils'
 import ContactCacheStoreManager from './cache'
 
 export function formatDate (dueDateMs: Timestamp): string {
-  return new Date(dueDateMs).toLocaleString('default', {
+  return new Date(dueDateMs).toLocaleString(getDateLocale(), {
     month: 'short',
     day: 'numeric',
     hour: '2-digit',

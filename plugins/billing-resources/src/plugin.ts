@@ -96,6 +96,7 @@ export default mergeIds(billingId, billing, {
     PreviewSeatChange: '' as IntlString,
     ApplySeatChange: '' as IntlString,
     ProrationDueNow: '' as IntlString,
+    ProrationDays: '' as IntlString,
     NextRecurringAmount: '' as IntlString,
     SeatReductionScheduled: '' as IntlString,
     SeatReductionBlocked: '' as IntlString,

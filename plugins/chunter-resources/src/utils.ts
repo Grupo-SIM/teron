@@ -54,6 +54,7 @@ import ChannelIcon from './components/ChannelIcon.svelte'
 import DirectIcon from './components/DirectIcon.svelte'
 import { openChannelInSidebar, resetChunterLocIfEqual } from './navigation'
 import chunter from './plugin'
+import { getChannelDisplayName } from './channel-title'
 import { shownTranslatedMessagesStore, translatedMessagesStore, translatingMessagesStore } from './stores'
 import love, { type MeetingMinutes } from '@hcengineering/love'
 
@@ -193,7 +194,7 @@ export async function ChannelTitleProvider (client: Client, id: Ref<Channel>, do
     return ''
   }
 
-  return channel.name
+  return getChannelDisplayName(channel)
 }
 
 export enum SearchType {
@@ -545,7 +546,7 @@ export async function canSummarizeMessages (doc: Doc): Promise<boolean> {
 
   if (!hierarchy.isDerived(doc._class, love.class.MeetingMinutes)) return false
 
-  return ((doc as MeetingMinutes).transcription ?? 0) > 0
+  return true
 }
 
 export async function startConversationAction (docs?: Employee | Employee[]): Promise<void> {

@@ -1,5 +1,8 @@
 import type { Metadata } from "next";
 import { Manrope } from "next/font/google";
+
+import { defaultLocale, getDictionary } from "@/i18n/site";
+
 import "./globals.css";
 
 const manrope = Manrope({
@@ -7,18 +10,19 @@ const manrope = Manrope({
   subsets: ["latin"],
 });
 
+const metadataCopy = getDictionary(defaultLocale).metadata.site;
+
 export const metadata: Metadata = {
   applicationName: "Teron",
-  title: "Teron — Tudo o que sua equipe precisa para trabalhar melhor.",
-  description:
-    "Sua empresa mais organizada, sua equipe mais produtiva. Organize seu time, centralize o trabalho e simplifique a rotina da sua empresa.",
+  title: metadataCopy.title,
+  description: metadataCopy.description,
   manifest: "/teron/site.webmanifest",
   icons: {
     icon: [
-      { url: "/teron/favicon.svg", type: "image/svg+xml" },
       { url: "/teron/favicon.ico", sizes: "any" },
+      { url: "/teron/favicon.svg", type: "image/svg+xml", media: "(prefers-color-scheme: light)" },
+      { url: "/teron/favicon-dark.svg", type: "image/svg+xml", media: "(prefers-color-scheme: dark)" },
     ],
-    shortcut: "/teron/favicon.ico",
     apple: "/teron/apple-touch-icon.png",
   },
 };

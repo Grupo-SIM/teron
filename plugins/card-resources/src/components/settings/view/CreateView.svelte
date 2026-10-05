@@ -22,10 +22,8 @@
   import { EditBox, Label } from '@hcengineering/ui'
   import view, { MasterDetailConfig, Viewlet, ViewletDescriptor, ViewOptionsModel } from '@hcengineering/view'
 
-  import { AttributeConfig, Config } from '@hcengineering/view-resources'
   import card from '../../../plugin'
   import DescriptorBox from './DescriptorBox.svelte'
-  import { updateViewletConfig } from './utils'
   import ViewConfigSection from './ViewConfigSection.svelte'
   import ViewSettingButton from './ViewSettingButton.svelte'
 
@@ -90,10 +88,6 @@
       views: viewConfigs
     }
   }
-  function onConfigUpdate (items: (Config | AttributeConfig)[]): void {
-    if (viewletConfig === undefined) return
-    updateViewletConfig(viewletConfig, items)
-  }
   function onMasterDetailUpdate (items: MasterDetailConfig[]): void {
     if (viewletConfig === undefined) return
     viewConfigs = items
@@ -145,19 +139,13 @@
         onMasterDetailUpdate(e.detail)
       }}
     />
-  {:else}
+  {:else if viewletConfig?.viewOptions !== undefined}
     <div class="antiGrid-row">
       <div class="antiGrid-row__header withDesciption">
         <Label label={setting.string.Settings} />
       </div>
       <div class="padding flex-row-center relative">
-        <ViewSettingButton
-          viewlet={viewletConfig}
-          disabled={descriptor === undefined}
-          on:save={(event) => {
-            onConfigUpdate(event.detail ?? [])
-          }}
-        />
+        <ViewSettingButton viewlet={viewletConfig} />
       </div>
     </div>
   {/if}

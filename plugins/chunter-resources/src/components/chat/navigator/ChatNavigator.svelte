@@ -14,7 +14,7 @@
 -->
 <script lang="ts">
   import { AccountRole, Doc, getCurrentAccount, hasAccountRole } from '@hcengineering/core'
-  import { Scroller, SearchEdit, Label, ButtonIcon, IconAdd, showPopup, Menu } from '@hcengineering/ui'
+  import { Scroller, Label, ButtonIcon, IconAdd, showPopup, Menu } from '@hcengineering/ui'
   import { DocNotifyContext } from '@hcengineering/notification'
   import { SpecialNavModel } from '@hcengineering/workbench'
   import { NavLink } from '@hcengineering/view-resources'
@@ -26,8 +26,6 @@
   import ChatNavGroup from './ChatNavGroup.svelte'
   import { chatNavGroupModels, chatSpecials } from '../utils'
   import ChatSpecialElement from './ChatSpecialElement.svelte'
-  import { userSearch } from '../../../index'
-  import { navigateToSpecial } from '../../../navigation'
 
   export let object: Doc | undefined
   export let currentSpecial: SpecialNavModel | undefined
@@ -53,8 +51,6 @@
     }
   ]
 
-  const searchValue: string = ''
-
   async function isSpecialVisible (special: SpecialNavModel, contexts: DocNotifyContext[]): Promise<boolean> {
     if (special.visibleIf === undefined) {
       return true
@@ -73,11 +69,11 @@
   }
 </script>
 
-<div class="teronNavPanel-header" class:withButton={hasAccountRole(getCurrentAccount(), AccountRole.User)}>
+<div class="teronNavPanel-header" class:withButton={hasAccountRole(getCurrentAccount(), AccountRole.Maintainer)}>
   <span class="overflow-label">
     <Label label={chunter.string.Chat} />
   </span>
-  {#if hasAccountRole(getCurrentAccount(), AccountRole.User)}
+  {#if hasAccountRole(getCurrentAccount(), AccountRole.Maintainer)}
     <ButtonIcon icon={IconAdd} hasMenu {pressed} kind={'primary'} size={'small'} on:click={addButtonClicked} />
   {/if}
 </div>
@@ -95,30 +91,9 @@
   {/await}
 {/each}
 
-<div class="search">
-  <SearchEdit
-    value={searchValue}
-    width="auto"
-    kind={'secondary'}
-    on:change={(ev) => {
-      userSearch.set(ev.detail)
-
-      if (ev.detail !== '') {
-        navigateToSpecial('chunterBrowser')
-      }
-    }}
-  />
-</div>
 <Scroller shrink>
   {#each chatNavGroupModels as model (model.id)}
     <ChatNavGroup {object} {model} on:select />
   {/each}
 </Scroller>
 <NavFooter />
-
-<style lang="scss">
-  .search {
-    padding: var(--spacing-1_5);
-    border-bottom: 1px solid var(--theme-navpanel-divider);
-  }
-</style>

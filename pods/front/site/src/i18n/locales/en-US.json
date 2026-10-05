@@ -1,0 +1,568 @@
+{
+  "metadata": {
+    "site": {
+      "title": "Teron — Everything your team needs to work better.",
+      "description": "A more organized company and a more productive team. Organize your team, centralize work, and simplify your company's routine."
+    },
+    "login": {
+      "title": "Teron — Sign in",
+      "description": "Access your Teron account."
+    },
+    "signup": {
+      "title": "Teron — Create account",
+      "description": "Create your Teron account."
+    },
+    "pricing": {
+      "title": "Teron — Plans and pricing",
+      "description": "How each company contributes to Teron and the plans available for teams of every size."
+    },
+    "privacy": {
+      "title": "Teron — Privacy Policy",
+      "description": "How Teron collects, uses, shares, and protects personal data, and how to exercise your rights under the LGPD."
+    },
+    "terms": {
+      "title": "Teron — Terms of Service",
+      "description": "Terms covering Teron accounts, plans and billing, acceptable use, content ownership, and termination."
+    }
+  },
+  "common": {
+    "home": "Home",
+    "signIn": "Sign in",
+    "signUp": "Sign up",
+    "getStarted": "Get started",
+    "startFree": "Start for free",
+    "talkToTeam": "Talk to our team",
+    "workspace": "Go to workspace",
+    "terms": "Terms of Service",
+    "termsOfUse": "Terms of Use",
+    "privacy": "Privacy Policy",
+    "lastUpdated": "Last updated:",
+    "brandHomeLabel": "Teron — home",
+    "copyright": "Teron. All rights reserved.",
+    "menu": "Menu",
+    "closeMenu": "Close menu"
+  },
+  "header": {
+    "resources": "Features",
+    "integrations": "Integrations",
+    "pricing": "Pricing"
+  },
+  "auth": {
+    "loginTitle": "Sign in to Teron",
+    "signupTitle": "Create a new account",
+    "email": "Email",
+    "emailPlaceholder": "name@company.com",
+    "password": "Password",
+    "repeatPassword": "Repeat password",
+    "firstName": "First name",
+    "lastName": "Last name",
+    "enter": "Sign in",
+    "createAccount": "Create account",
+    "useCode": "Sign in with code",
+    "usePassword": "Sign in with password",
+    "setPassword": "Set password now",
+    "useCodeSignup": "Set password later",
+    "forgotPassword": "Forgot password",
+    "or": "or",
+    "googleLogin": "Sign in with Google",
+    "githubLogin": "Sign in with GitHub",
+    "googleSignup": "Sign up with Google",
+    "githubSignup": "Sign up with GitHub",
+    "continueWith": "Continue with",
+    "codeTitle": "Enter your code",
+    "codeDescription": "We sent a 6-digit code to",
+    "code": "Access code",
+    "verify": "Verify",
+    "resend": "Resend code",
+    "changeEmail": "Change email",
+    "tfaTitle": "Two-factor authentication",
+    "profileTitle": "What should we call you?",
+    "continue": "Continue",
+    "recoverTitle": "Recover password",
+    "recoverAction": "Send recovery link",
+    "recoverySent": "Check your email",
+    "recoverySentBody": "We sent you a link to reset your password.",
+    "restoreTitle": "Set a new password",
+    "restoreAction": "Save new password",
+    "changePasswordTitle": "Change password",
+    "currentPassword": "Current password",
+    "changePasswordAction": "Change password",
+    "confirming": "Confirming your email…",
+    "confirmationSent": "Confirm your email",
+    "confirmationSentBody": "We sent a confirmation message to the email address you provided.",
+    "workspacesTitle": "Choose a workspace",
+    "restoreWorkspaceTitle": "Restore archived workspace",
+    "restoreWorkspaceBody": "This workspace is archived. Restore it to access it again.",
+    "restoreWorkspace": "Restore workspace",
+    "createWorkspace": "Create workspace",
+    "workspaceName": "Workspace name",
+    "seats": "Number of members",
+    "billingTitle": "Monthly payment",
+    "billingDescription": "Enter your details to pay for the first month of access.",
+    "billingTotal": "Monthly total",
+    "document": "Tax ID",
+    "phone": "Phone",
+    "cardNumber": "Card number",
+    "cardExpiry": "Expiry (MM/YY)",
+    "cardCvv": "CVV",
+    "cardHolder": "Name on card",
+    "documentPlaceholder": "000.000.000-00",
+    "phonePlaceholder": "(00) 00000-0000",
+    "cardNumberPlaceholder": "0000 0000 0000 0000",
+    "cardExpiryPlaceholder": "MM/YY",
+    "cardCvvPlaceholder": "123",
+    "paidCreate": "Pay and create workspace",
+    "freeTrialDescription": "Your first workspace includes a 30-day free trial.",
+    "region": "Region",
+    "create": "Create and continue",
+    "demoContent": "Create sample projects and demo content",
+    "changeAccount": "Sign in with another account",
+    "joinTitle": "Join workspace",
+    "joinCurrent": "Join with this account",
+    "joinLogin": "Sign in and join",
+    "joinSignup": "Create account and join",
+    "joining": "Invitation to",
+    "loading": "Loading…",
+    "back": "Back",
+    "passwordsMismatch": "Passwords do not match.",
+    "requiredFields": "Complete all required fields."
+  },
+  "authPage": {
+    "loginPrompt": "Don't have an account?",
+    "signupPrompt": "Already have an account?",
+    "archived": "archived"
+  },
+  "authErrors": {
+    "configUnavailable": "Unable to load the access configuration.",
+    "accountServiceMissing": "The account service is not configured.",
+    "sessionStartFailed": "Unable to start the session.",
+    "sessionEndFailed": "Unable to end the session.",
+    "unknown": "Something went wrong. Please try again.",
+    "InvalidPassword": "Incorrect email or password.",
+    "AccountNotFound": "Account not found.",
+    "InvalidOtp": "Invalid or expired code.",
+    "AccountAlreadyExists": "An account with this email already exists.",
+    "Unauthorized": "Your session has expired. Sign in again.",
+    "WorkspaceNotFound": "Workspace not found.",
+    "WorkspacePaymentRequired": "Complete payment to create another workspace.",
+    "WorkspacePaymentFailed": "We could not approve the payment. Check your card details.",
+    "WorkspacePaymentDeclined": "Payment was declined by the gateway. Check the card or try another one.",
+    "WorkspacePaymentInvalidDetails": "Review your billing details and try again.",
+    "WorkspacePaymentUnavailable": "Payment service is unavailable. Try again shortly.",
+    "SimintpayNotConfigured": "Payment is not configured yet.",
+    "InvalidWorkspaceSeats": "Enter a valid number of members."
+  },
+  "home": {
+    "hero": {
+      "title": "Everything your team needs to work better.",
+      "description": "A more organized company and a more productive team. Organize your team, centralize work, and simplify your company's routine.",
+      "cta": "Start for free"
+    },
+    "problem": {
+      "title": "A new way to work as a team",
+      "description": "One complete platform to connect people, organize work, and keep your company moving. Everything integrated so your team can work more simply and efficiently.",
+      "cards": {
+        "communication": {
+          "title": "Communication",
+          "description": "Keep your team connected, share information, and follow everything happening in one place."
+        },
+        "organization": {
+          "title": "Organization",
+          "description": "Manage projects, files, and documents. Assign tasks, track deadlines, and know exactly what needs to be done."
+        },
+        "management": {
+          "title": "Team",
+          "titleComplement": "management",
+          "description": "Get a clear view of what is happening, who owns each task, and how projects are progressing."
+        }
+      }
+    },
+    "platform": {
+      "title": "Built for everyday work"
+    },
+    "operation": {
+      "title": "Your team, connected from anywhere",
+      "description": "Run your own digital office and meeting rooms for video calls whenever your team needs to get together.",
+      "capabilities": {
+        "customize": {
+          "title": "Customize",
+          "titleComplement": "your space",
+          "description": "Adapt the platform to the way your team works."
+        },
+        "simple": {
+          "title": "Simple",
+          "titleComplement": "to use",
+          "description": "An intuitive experience so your team can start working without friction."
+        },
+        "industries": {
+          "title": "For companies in",
+          "titleComplement": "every industry",
+          "description": "Tools to organize teams, projects, and processes across industries."
+        },
+        "growth": {
+          "title": "Grow with",
+          "titleComplement": "your team",
+          "description": "A platform ready to support your company at every stage of growth."
+        }
+      }
+    },
+    "evolution": {
+      "title": "More than project management. One complete space for your entire operation.",
+      "cards": {
+        "shortcuts": {
+          "title": "Keyboard shortcuts.",
+          "description": "Work faster and quickly access your most-used actions."
+        },
+        "workflows": {
+          "title": "Spaces and workflows.",
+          "description": "Create separate environments for teams, projects, or departments."
+        },
+        "realtime": {
+          "title": "Real-time updates.",
+          "description": "See team changes instantly. View appointments, tasks, and events in one place."
+        },
+        "notifications": {
+          "title": "Smart notifications.",
+          "description": "Receive only the updates that matter to you."
+        }
+      }
+    },
+    "finalCta": {
+      "title": "Join the movement",
+      "description": "Bring your team's work together with Teron. This journey is just beginning."
+    }
+  },
+  "bento": {
+    "tasks": {
+      "title": "Create tasks.",
+      "description": "Set owners, deadlines, and priorities."
+    },
+    "calendar": {
+      "title": "Manage your calendar.",
+      "description": "Organize appointments, tasks, and deadlines in one place."
+    },
+    "documents": {
+      "title": "Create documents.",
+      "description": "Write, organize, and share important information."
+    },
+    "presence": {
+      "title": "See who is online.",
+      "description": "Follow updates and keep your team aligned."
+    },
+    "chat": {
+      "title": "Chat with your team.",
+      "description": "Send messages and create groups to keep your team connected."
+    },
+    "projects": {
+      "title": "Manage projects.",
+      "description": "Customize your workspace around your teams' needs."
+    }
+  },
+  "meeting": {
+    "title": "Onboarding meeting",
+    "participants": "4 participants"
+  },
+  "knowledge": {
+    "people": {
+      "title": "Built for people",
+      "description": "A simple, intuitive experience that makes work easier."
+    },
+    "companies": {
+      "title": "Built for companies",
+      "description": "Teron gives your company everything it needs to keep work flowing."
+    },
+    "platform": {
+      "title": "One platform.",
+      "titleComplement": "Every way of working.",
+      "description": "An experience designed to make your company's routine simpler, more connected, and more efficient."
+    },
+    "mission": {
+      "prefix": "We built",
+      "description": "our platform with one goal: bringing everything teams need to work, collaborate, and grow into one place."
+    },
+    "evolution": "The platform keeps evolving with improvements and new features that follow the needs of companies and teams.",
+    "future": "Our technology follows new ways of working to keep your company ready for the future.",
+    "linkButton": "+ Link"
+  },
+  "integrations": {
+    "title": "Teron connects with",
+    "titleComplement": "the tools your company already uses.",
+    "description": "GitHub, email, Telegram, and other tools your company uses every day. Everything connected to simplify your routine.",
+    "cta": "Explore our plans",
+    "features": {
+      "security": { "title": "Security", "titleComplement": "and privacy" },
+      "belonging": { "title": "Belonging" },
+      "trust": { "title": "Trust" },
+      "transparency": { "title": "Transparency" },
+      "support": { "title": "Support" },
+      "commitment": { "title": "Commitment" }
+    },
+    "cards": {
+      "privacy": "Your information stays private and accessible only to people authorized by your company.",
+      "identity": "Your company works in its own way. Teron adapts to that identity.",
+      "trust": "Your work deserves a platform you can trust.",
+      "transparency": "Clarity in everything you purchase, use, and receive.",
+      "support": "Count on our team to answer questions and solve whatever you need.",
+      "relationship": "More than a platform, we want to build a long-term relationship with your company."
+    }
+  },
+  "faq": {
+    "title": "FAQ",
+    "items": {
+      "rollout": {
+        "question": "How long does it take to roll out the platform?",
+        "answer": "Initial setup takes only a few minutes. Small teams usually start the same day, while larger operations receive support migrating projects and documents."
+      },
+      "migration": {
+        "question": "Can I migrate data from the tools I already use?",
+        "answer": "Yes. You can import projects, tasks, documents, and history from common tools while preserving owners, due dates, and attachments."
+      },
+      "billing": {
+        "question": "How does billing work?",
+        "answer": "Billing is monthly per active user, with a discount on annual plans. There is no setup fee, and you can change plans at any time."
+      },
+      "security": {
+        "question": "Is my data secure?",
+        "answer": "Data is encrypted in transit and at rest, with project-level permissions, audit logs, and daily backups."
+      },
+      "mobile": {
+        "question": "Does the platform work on mobile?",
+        "answer": "Yes. Tasks, conversations, documents, and notifications are available in mobile browsers and apps with real-time synchronization."
+      },
+      "support": {
+        "question": "Is support available in English?",
+        "answer": "Yes. Our own team provides support through in-app chat and email."
+      }
+    }
+  },
+  "pricing": {
+    "pageTitle": "Teron pricing",
+    "brandArticle": "",
+    "perUser": "per user",
+    "opening": "Teron was created around one principle: offering a complete, accessible, and transparent platform for companies of every size.",
+    "intro": "To maintain the infrastructure behind the platform, including servers, storage, continuous development, security, and new features, each company contributes according to its team size.",
+    "categoriesBefore": "The platform was designed to support different operational needs,",
+    "categoriesTogether": "bringing together in one place:",
+    "management": "management,",
+    "control": "control",
+    "and": "and",
+    "advancedResources": "advanced features.",
+    "storageBefore": "Storage includes the files your team uses every day.",
+    "documents": "Documents",
+    "images": "images",
+    "videos": "videos",
+    "storageAfter": "are part of the storage used by your company.",
+    "networkBefore": "Audio and",
+    "video": "video",
+    "networkAfter": "are also part of the Teron experience, letting your team meet directly in the platform.",
+    "computeBefore": "Features powered by",
+    "automation": "AI and automation",
+    "computeAfter": "will be added continuously to Teron, opening new possibilities for your team to work more intelligently and efficiently.",
+    "closing": "The best way to understand Teron is to use it. Bring your team, explore the features, and experience a new way to organize, collaborate, and run work inside your company.",
+    "contact": "Ready to simplify your routine?",
+    "plansTitle": "Teron plans",
+    "plans": {
+      "free": {
+        "name": "Free",
+        "description": "Start at no cost and experience Teron in practice.",
+        "cta": "Start for free",
+        "features": [
+          "30 days to explore",
+          "Access to every feature",
+          "Support to get started",
+          "No charges during the free period"
+        ]
+      },
+      "business": {
+        "name": "Business",
+        "description": "Pay only for the people on your team.",
+        "cta": "Get started",
+        "features": [
+          "Every feature included",
+          "Up to BRL 250 cashback per transaction",
+          "Continuous support and updates",
+          "Add or remove members whenever needed"
+        ]
+      }
+    },
+    "comingSoon": "Coming soon",
+    "pricePending": "pricing to be announced"
+  },
+  "privacy": {
+    "title": "Privacy Policy",
+    "updatedAt": "August 11, 2026",
+    "intro": "This Policy explains which personal data Teron processes, why it is processed, who it is shared with, and how you can exercise your rights. It follows Brazil's General Data Protection Law (Law No. 13,709/2018).",
+    "sections": {
+      "controller": {
+        "title": "1. Who processes your data",
+        "controllerPrefix": "The data controller is",
+        "companySuffix": ", registered under CNPJ 38.486.051/0001-48.",
+        "organizationPrefix": "When you use the platform as a member of an organization, that organization decides what goes into documents, tasks, and messages. In that case, it is the controller of that content and Teron acts as a",
+        "processor": "processor",
+        "organizationSuffix": ", processing data according to its instructions."
+      },
+      "collected": {
+        "title": "2. Data we collect",
+        "provided": "Data you provide",
+        "automatic": "Data collected automatically",
+        "registration": "Account registration",
+        "registrationDetails": ": name, email, hashed password, profile picture, and organization.",
+        "payment": "Payment",
+        "paymentDetails": ": billing data required for the subscription. Card details are processed directly by the payment provider; we do not store the full card number.",
+        "content": "Content",
+        "contentDetails": ": what you create on the platform, including documents, tasks, messages, files, and recordings.",
+        "support": "Support",
+        "supportDetails": ": what you send us when requesting help.",
+        "usage": "Usage",
+        "usageDetails": ": pages and features accessed, actions performed, date, and time.",
+        "technical": "Technical data",
+        "technicalDetails": ": IP address, device type, browser, operating system, and session identifiers.",
+        "cookies": "Cookies",
+        "cookiesDetails": "and similar technologies, as described in section 5."
+      },
+      "purposes": {
+        "title": "3. How we use data and our legal basis",
+        "platform": "Provide the platform",
+        "platformDetails": "— create your account, synchronize team work, make calls, and store your content.",
+        "contractBasis": "Legal basis: performance of a contract.",
+        "billing": "Process payments and issue tax documents",
+        "billingBasis": "Legal basis: performance of a contract and legal obligation.",
+        "security": "Security",
+        "securityDetails": "— prevent fraud, abuse, and unauthorized access; maintain access records.",
+        "securityBasis": "Legal basis: legal obligation under the Brazilian Internet Civil Framework and legitimate interest.",
+        "support": "Support and operational communication",
+        "supportDetails": "— respond to requests and communicate service changes.",
+        "improvement": "Improve the product",
+        "improvementDetails": "— understand feature usage on an aggregated basis.",
+        "legitimateInterest": "Legal basis: legitimate interest.",
+        "marketing": "Marketing",
+        "marketingDetails": "— news and content when you choose to receive them.",
+        "consentBasis": "Legal basis: consent, which may be withdrawn at any time.",
+        "noSale": "We do not sell personal data or use the content of your documents and messages for advertising."
+      },
+      "sharing": {
+        "title": "4. Who we share data with",
+        "providers": "Providers that operate the platform",
+        "providersDetails": "— cloud hosting, payment processing, transactional email, usage analytics, and support. They process data only under our instructions and contractual terms.",
+        "organization": "Your organization",
+        "organizationDetails": "— workspace administrators can access account data and content created in the workspace.",
+        "authorities": "Authorities",
+        "authoritiesDetails": "— when required by law, court order, or to defend a legal claim.",
+        "successors": "Successors",
+        "successorsDetails": "— in a corporate reorganization, merger, or acquisition, subject to this Policy."
+      },
+      "cookies": {
+        "title": "5. Cookies",
+        "body": "We use necessary cookies for sessions, authentication, and security. They cannot be disabled without affecting the platform. Analytics cookies depend on your consent and help us understand product usage. You can manage preferences in your browser."
+      },
+      "security": {
+        "title": "6. Security and storage",
+        "safeguards": "We use technical and administrative safeguards, including encryption in transit (TLS) and at rest, permission-based access control, activity logs, and backups. The Business plan includes encrypted storage with no volume limit.",
+        "incidents": "No system is completely immune. If a security incident creates material risk, we will notify you and Brazil's data protection authority within the legally required timeframes."
+      },
+      "retention": {
+        "title": "7. How long we retain data",
+        "content": "Content and account data",
+        "contentDetails": "— while the account is active and for up to 30 days after closure to allow export.",
+        "accessLogs": "Access logs",
+        "accessLogsDetails": "— 6 months, as required by the Brazilian Internet Civil Framework.",
+        "billing": "Tax and billing data",
+        "billingDetails": "— 5 years, as required by applicable law."
+      },
+      "rights": {
+        "title": "8. Your rights",
+        "body": "The LGPD gives you the right to confirm processing, access and correct your data, request anonymization, blocking, or deletion of unnecessary data, request portability, withdraw consent, and object to processing based on legitimate interest.",
+        "contactPrefix": "To exercise any of these rights, email",
+        "contactSuffix": ". We respond within 15 days. If you use Teron through an organization, we will forward the request when that organization is responsible for the processing."
+      },
+      "transfers": {
+        "title": "9. International transfers",
+        "body": "Parts of our infrastructure may be outside Brazil. In those cases, transfers use safeguards required by the LGPD, including contractual clauses with providers and countries offering an adequate level of protection."
+      },
+      "children": {
+        "title": "10. Children and adolescents",
+        "body": "The platform is not intended for anyone under 18, and we do not knowingly collect their data. If we identify such data, it will be deleted."
+      },
+      "changes": {
+        "title": "11. Changes to this Policy",
+        "body": "We may update this Policy. The latest revision date appears at the top, and material changes will be communicated by email or in the platform.",
+        "termsPrefix": "For the terms governing use of the service, see the"
+      }
+    }
+  },
+  "terms": {
+    "title": "Terms of Service",
+    "updatedAt": "August 11, 2026",
+    "intro": "These Terms govern use of Teron, the work platform that brings projects, tasks, documents, and communication together. By creating an account or using the platform, you agree to these Terms.",
+    "sections": {
+      "about": {
+        "title": "1. About us",
+        "companyPrefix": "Teron is operated by",
+        "companySuffix": ", registered under CNPJ 38.486.051/0001-48. In this document, “Teron,” “we,” and “our” refer to that company, while “you” refers to anyone using the platform personally or for an organization.",
+        "authority": "If you accept these Terms for a company, you represent that you have authority to bind it, and “you” means that company."
+      },
+      "account": {
+        "title": "2. Account",
+        "responsibility": "To use the platform, you must create an account with accurate information and keep it current. You are responsible for protecting your credentials and for activity on your account.",
+        "age": "You must be at least 18, or the minimum age required in your jurisdiction with authorization from a legal guardian.",
+        "unauthorizedUse": "Notify us immediately of unauthorized use or suspected account compromise.",
+        "administrators": "Organization accounts may have administrators who can manage, suspend, or remove team access."
+      },
+      "billing": {
+        "title": "3. Plans, billing, and cancellation",
+        "intro": "Available plans and their features are described on the",
+        "plansLink": "plans and pricing page",
+        "summary": ". In summary:",
+        "free": "— no charge, with unlimited users, basic storage, and unlimited video calls, limited to one month of use.",
+        "business": "— BRL 9.99 per user, including everything in Free plus unlimited encrypted storage.",
+        "recurring": "Billing is monthly and recurring at the start of each cycle, based on contracted workspace seats. Seats added during a cycle are charged immediately for the remaining prorated period; reductions take effect at the next renewal.",
+        "cancellation": "You may cancel at any time. Paid access continues through the current paid period and will not renew. Payments are non-refundable unless required by law, including Brazil's statutory seven-day withdrawal right.",
+        "priceChanges": "Prices may change. We will provide at least 30 days' notice, and changes apply only to future billing cycles."
+      },
+      "acceptableUse": {
+        "title": "4. Acceptable use",
+        "intro": "When using Teron, you agree not to:",
+        "unlawful": "violate the law or third-party rights, or publish unlawful, defamatory, or infringing content;",
+        "malware": "send malware, attempt unauthorized system access, or bypass technical and usage limits;",
+        "spam": "use the platform for spam or to overload infrastructure through automation;",
+        "resale": "resell, sublicense, or provide the service outside your workspace without written permission."
+      },
+      "content": {
+        "title": "5. Your content",
+        "ownershipPrefix": "Everything you create or upload, including documents, tasks, messages, and files, remains",
+        "yours": "yours",
+        "ownershipSuffix": ". We do not claim ownership of that content.",
+        "license": "You grant us only the license needed to operate the service: storing, processing, transmitting, and displaying content to you and those you authorize, and making backups. This license ends when the content is deleted.",
+        "privacyPrefix": "Personal data in that content is processed under our"
+      },
+      "intellectualProperty": {
+        "title": "6. Our intellectual property",
+        "body": "The platform, code, brand, visual identity, and documentation belong to Teron or its licensors. These Terms grant a limited, non-exclusive, non-transferable right to use them, not a transfer of ownership."
+      },
+      "availability": {
+        "title": "7. Availability and service changes",
+        "body": "We work to keep the platform available, but scheduled maintenance and interruptions beyond our control may occur. Features may be added, changed, or discontinued. We will provide reasonable notice of material changes affecting your use."
+      },
+      "termination": {
+        "title": "8. Suspension and termination",
+        "body": "We may suspend or terminate access for violations of these Terms, nonpayment, or use that risks platform or user security. When reasonable, we will provide notice and an opportunity to correct the issue.",
+        "exportPrefix": "After account closure, you have",
+        "exportPeriod": "30 days",
+        "exportSuffix": "to export your content. After that period, data may be permanently deleted except where retention is required by law."
+      },
+      "liability": {
+        "title": "9. Warranties and liability",
+        "warranty": "The platform is provided as is. We do not warrant uninterrupted or error-free service or fitness for a specific purpose not agreed in writing.",
+        "limitation": "To the extent permitted by law, our total liability is limited to the amount you paid in the 12 months before the event giving rise to the claim. We are not liable for lost profits or indirect damages. Nothing here limits non-waivable consumer rights."
+      },
+      "changes": {
+        "title": "10. Changes to these Terms",
+        "body": "We may update these Terms. Material changes will be communicated by email or in the platform at least 30 days in advance. Continued use after the effective date means you accept the new version."
+      },
+      "contact": {
+        "title": "11. Contact",
+        "body": "Questions about these Terms:"
+      }
+    }
+  }
+}

@@ -328,7 +328,7 @@ async function migrateWorkspace (
     }
 
     // Actual roles are being set in workspace migration
-    await accountDB.assignWorkspace(accountUuid, workspaceUuid, AccountRole.Guest)
+    await accountDB.assignWorkspace(accountUuid, workspaceUuid, AccountRole.User)
   }
 
   return workspaceUuid

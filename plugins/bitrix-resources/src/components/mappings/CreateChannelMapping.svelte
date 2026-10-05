@@ -8,7 +8,6 @@
     MappingOperation
   } from '@hcengineering/bitrix'
   import { AnyAttribute } from '@hcengineering/core'
-  import { getEmbeddedLabel } from '@hcengineering/platform'
   import { getClient } from '@hcengineering/presentation'
 
   import contact, { ChannelProvider } from '@hcengineering/contact'
@@ -66,13 +65,13 @@
     <div class="pattern flex-row-center gap-2">
       <DropdownLabelsIntl
         minW0={false}
-        label={getEmbeddedLabel('Channel')}
+        label={bitrix.string.Channel}
         items={providerItems}
         bind:selected={p.provider}
       />
       <DropdownLabels minW0={false} label={bitrix.string.FieldMapping} {items} bind:selected={p.field} />
-      <EditBox bind:value={p.include} placeholder={getEmbeddedLabel('should...')} />
-      <EditBox bind:value={p.exclude} placeholder={getEmbeddedLabel('not...')} />
+      <EditBox bind:value={p.include} placeholder={bitrix.string.ShouldInclude} />
+      <EditBox bind:value={p.exclude} placeholder={bitrix.string.ShouldExclude} />
 
       <div class="ml-1">
         <Button

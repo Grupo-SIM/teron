@@ -17,10 +17,14 @@ import activity, { type DocUpdateMessage } from '@hcengineering/activity'
 import core, {
   DOMAIN_MODEL_TX,
   DOMAIN_STATUS,
+  DOMAIN_TX,
   type Ref,
   type Status,
   type TxCreateDoc,
+  type TxUpdateDoc,
   TxOperations,
+  type TxCUD,
+  SortingOrder,
   generateId,
   toIdMap
 } from '@hcengineering/core'
@@ -37,16 +41,242 @@ import { DOMAIN_ACTIVITY } from '@hcengineering/model-activity'
 import { DOMAIN_SPACE } from '@hcengineering/model-core'
 import { DOMAIN_TASK, migrateDefaultStatusesBase } from '@hcengineering/model-task'
 import tags from '@hcengineering/tags'
-import task from '@hcengineering/task'
+import task, { getTaskAssignees, type ProjectStatus, type ProjectType, type TaskType } from '@hcengineering/task'
 import tracker, {
   type Issue,
   type IssueStatus,
+  type IssueTemplate,
   type Project,
   TimeReportDayType,
+  isTimedIssueStatus,
+  transitionIssueTime,
+  type IssueTimeState,
   trackerId
 } from '@hcengineering/tracker'
 
+import { DOMAIN_TRACKER } from './types'
 import { classicIssueTaskStatuses } from '.'
+
+function currentIssueStatus (status: Ref<Status>): Ref<Status> {
+  return status === tracker.status.Todo ? tracker.status.Backlog : status
+}
+
+function currentIssueStatuses (statuses: Ref<Status>[]): Ref<Status>[] {
+  return Array.from(new Set(statuses.map(currentIssueStatus)))
+}
+
+function currentProjectStatuses (statuses: ProjectStatus[]): ProjectStatus[] {
+  const seen = new Set<string>()
+  return statuses.flatMap((status) => {
+    const updated = { ...status, _id: currentIssueStatus(status._id) }
+    const key = `${updated.taskType}:${updated._id}`
+    if (seen.has(key)) return []
+    seen.add(key)
+    return [updated]
+  })
+}
+
+async function consolidatePendingStatus (client: MigrationClient): Promise<void> {
+  await client.update(DOMAIN_TASK, {
+    _class: { $in: client.hierarchy.getDescendants(tracker.class.Issue) },
+    status: tracker.status.Todo
+  }, {
+    status: tracker.status.Backlog
+  })
+  await client.update(DOMAIN_SPACE, {
+    _class: tracker.class.Project,
+    defaultIssueStatus: tracker.status.Todo
+  }, { defaultIssueStatus: tracker.status.Backlog })
+
+  const issueStatusTxes = await client.traverse<TxCUD<Issue>>(DOMAIN_TX, {
+    objectClass: { $in: client.hierarchy.getDescendants(tracker.class.Issue) },
+    $or: [
+      { 'attributes.status': tracker.status.Todo },
+      { 'operations.status': tracker.status.Todo }
+    ]
+  })
+  try {
+    while (true) {
+      const txes = await issueStatusTxes.next(500)
+      if (txes === null || txes.length === 0) break
+      for (const tx of txes) {
+        if (tx._class === core.class.TxCreateDoc) {
+          await client.update(DOMAIN_TX, { _id: tx._id }, { 'attributes.status': tracker.status.Backlog })
+        } else if (tx._class === core.class.TxUpdateDoc) {
+          await client.update(DOMAIN_TX, { _id: tx._id }, { 'operations.status': tracker.status.Backlog })
+        }
+      }
+    }
+  } finally {
+    await issueStatusTxes.close()
+  }
+
+  const taskTypeCreates = await client.find<TxCreateDoc<TaskType>>(DOMAIN_MODEL_TX, {
+    _class: core.class.TxCreateDoc,
+    objectClass: task.class.TaskType,
+    'attributes.ofClass': tracker.class.Issue
+  })
+  for (const tx of taskTypeCreates) {
+    const statuses = currentIssueStatuses(tx.attributes.statuses)
+    if (statuses.length !== tx.attributes.statuses.length || statuses.some((status, index) => status !== tx.attributes.statuses[index])) {
+      await client.update(DOMAIN_MODEL_TX, { _id: tx._id }, { 'attributes.statuses': statuses })
+    }
+  }
+
+  const taskTypeUpdates = await client.find<TxUpdateDoc<TaskType>>(DOMAIN_MODEL_TX, {
+    _class: core.class.TxUpdateDoc,
+    objectClass: task.class.TaskType,
+    objectId: { $in: taskTypeCreates.map((tx) => tx.objectId) },
+    'operations.statuses': { $exists: true }
+  })
+  for (const tx of taskTypeUpdates) {
+    if (tx.operations.statuses === undefined) continue
+    const statuses = currentIssueStatuses(tx.operations.statuses)
+    if (statuses.length !== tx.operations.statuses.length || statuses.some((status, index) => status !== tx.operations.statuses?.[index])) {
+      await client.update(DOMAIN_MODEL_TX, { _id: tx._id }, { 'operations.statuses': statuses })
+    }
+  }
+
+  const projectTypeCreates = await client.find<TxCreateDoc<ProjectType>>(DOMAIN_MODEL_TX, {
+    _class: core.class.TxCreateDoc,
+    objectClass: task.class.ProjectType,
+    'attributes.descriptor': tracker.descriptors.ProjectType
+  })
+  for (const tx of projectTypeCreates) {
+    const statuses = currentProjectStatuses(tx.attributes.statuses)
+    if (JSON.stringify(statuses) !== JSON.stringify(tx.attributes.statuses)) {
+      await client.update(DOMAIN_MODEL_TX, { _id: tx._id }, { 'attributes.statuses': statuses })
+    }
+  }
+
+  const projectTypeUpdates = await client.find<TxUpdateDoc<ProjectType>>(DOMAIN_MODEL_TX, {
+    _class: core.class.TxUpdateDoc,
+    objectClass: task.class.ProjectType,
+    objectId: { $in: projectTypeCreates.map((tx) => tx.objectId) },
+    'operations.statuses': { $exists: true }
+  })
+  for (const tx of projectTypeUpdates) {
+    if (tx.operations.statuses === undefined) continue
+    const statuses = currentProjectStatuses(tx.operations.statuses)
+    if (JSON.stringify(statuses) !== JSON.stringify(tx.operations.statuses)) {
+      await client.update(DOMAIN_MODEL_TX, { _id: tx._id }, { 'operations.statuses': statuses })
+    }
+  }
+
+  const projectTypePushes = await client.find<TxUpdateDoc<ProjectType>>(DOMAIN_MODEL_TX, {
+    _class: core.class.TxUpdateDoc,
+    objectClass: task.class.ProjectType,
+    objectId: { $in: projectTypeCreates.map((tx) => tx.objectId) },
+    'operations.$push.statuses': { $exists: true }
+  })
+  for (const tx of projectTypePushes) {
+    const status = tx.operations.$push?.statuses as ProjectStatus | undefined
+    if (status?._id === tracker.status.Todo) {
+      await client.update(DOMAIN_MODEL_TX, { _id: tx._id }, {
+        'operations.$push.statuses': { ...status, _id: tracker.status.Backlog }
+      })
+    }
+  }
+}
+
+async function backfillIssueTime (client: MigrationClient): Promise<void> {
+  const classes = client.hierarchy.getDescendants(tracker.class.Issue)
+  const issues = await client.traverse<Issue>(DOMAIN_TASK, {
+    _class: { $in: classes },
+    trackedTimeMs: { $exists: false }
+  })
+
+  try {
+    while (true) {
+      const batch = await issues.next(100)
+      if (batch === null || batch.length === 0) break
+      for (const issue of batch) {
+        const statusTxes = await client.find<TxCUD<Issue>>(DOMAIN_TX, {
+          objectId: issue._id,
+          objectClass: { $in: classes },
+          $or: [
+            { 'attributes.status': { $exists: true } },
+            { 'operations.status': { $exists: true } }
+          ]
+        }, { sort: { modifiedOn: SortingOrder.Ascending } })
+
+        let state: IssueTimeState = { trackedTimeMs: 0, trackingStartedOn: null }
+        let previousStatus: Ref<Status> | undefined
+        for (const tx of statusTxes) {
+          const nextStatus = tx._class === core.class.TxCreateDoc
+            ? (tx as TxCreateDoc<Issue>).attributes.status
+            : tx._class === core.class.TxUpdateDoc
+              ? (tx as TxUpdateDoc<Issue>).operations.status
+              : undefined
+          if (nextStatus === undefined) continue
+          if (previousStatus === undefined) {
+            state.trackingStartedOn = isTimedIssueStatus(nextStatus) ? tx.modifiedOn : null
+          } else {
+            state = transitionIssueTime(state, previousStatus, nextStatus, tx.modifiedOn)
+          }
+          previousStatus = nextStatus
+        }
+
+        if (previousStatus === undefined) {
+          state.trackingStartedOn = isTimedIssueStatus(issue.status) ? issue.createdOn : null
+        } else if (previousStatus !== issue.status) {
+          state = transitionIssueTime(state, previousStatus, issue.status, issue.modifiedOn)
+        }
+
+        const reportedTime = state.trackedTimeMs / 3600000
+        await client.update(DOMAIN_TASK, { _id: issue._id, trackedTimeMs: { $exists: false } }, {
+          ...state,
+          reportedTime,
+          remainingTime: Math.max(0, issue.estimation - reportedTime)
+        })
+        for (const parent of issue.parents ?? []) {
+          const [parentIssue] = await client.find<Issue>(DOMAIN_TASK, { _id: parent.parentId })
+          if (parentIssue === undefined) continue
+          const childInfo = parentIssue.childInfo?.map((child) =>
+            child.childId === issue._id ? { ...child, reportedTime, ...state } : child
+          )
+          if (childInfo !== undefined && childInfo.some((child) => child.childId === issue._id)) {
+            await client.update(DOMAIN_TASK, { _id: parentIssue._id }, { childInfo })
+          }
+        }
+      }
+    }
+  } finally {
+    await issues.close()
+  }
+}
+
+export async function syncChildTimeSnapshots (client: MigrationClient): Promise<void> {
+  const parents = await client.traverse<Issue>(DOMAIN_TASK, { 'childInfo.0': { $exists: true } })
+  try {
+    while (true) {
+      const batch = await parents.next(100)
+      if (batch === null || batch.length === 0) break
+      for (const parent of batch) {
+        const ids = parent.childInfo?.map((child) => child.childId) ?? []
+        if (ids.length === 0) continue
+        const children = await client.find<Issue>(DOMAIN_TASK, { _id: { $in: ids } })
+        const byId = new Map(children.map((child) => [child._id, child]))
+        const childInfo = parent.childInfo.map((entry) => {
+          const child = byId.get(entry.childId)
+          return child === undefined
+            ? entry
+            : {
+                ...entry,
+                reportedTime: child.reportedTime,
+                trackedTimeMs: child.trackedTimeMs,
+                trackingStartedOn: child.trackingStartedOn
+              }
+        })
+        if (JSON.stringify(childInfo) !== JSON.stringify(parent.childInfo)) {
+          await client.update(DOMAIN_TASK, { _id: parent._id }, { childInfo })
+        }
+      }
+    }
+  } finally {
+    await parents.close()
+  }
+}
 
 async function createDefaultProject (tx: TxOperations): Promise<void> {
   const current = await tx.findOne(tracker.class.Project, {
@@ -180,6 +410,17 @@ async function migrateDefaultStatuses (client: MigrationClient, logger: ModelLog
   const statusAttributeOf = tracker.attribute.IssueStatus
   const statusClass = tracker.class.IssueStatus
   const getDefaultStatus = (oldStatus: Status): Ref<Status> | undefined => {
+    const legacyStatuses: Record<string, Ref<Status>> = {
+      backlog: tracker.status.Backlog,
+      todo: tracker.status.Backlog,
+      'in progress': tracker.status.InProgress,
+      'under review': tracker.status.UnderReview,
+      done: tracker.status.Done,
+      canceled: tracker.status.Canceled
+    }
+    const legacyStatus = legacyStatuses[oldStatus.name.trim().toLowerCase()]
+    if (legacyStatus !== undefined) return legacyStatus
+
     const classicCategory = classicIssueTaskStatuses.find((c) => c.category === oldStatus.category)
     if (classicCategory === undefined) {
       return
@@ -374,11 +615,49 @@ export const trackerOperation: MigrateOperation = {
       {
         state: 'migrate-default-statuses',
         func: (client) => migrateDefaultStatuses(client, logger)
+      },
+      {
+        state: 'consolidate-pending-status',
+        func: consolidatePendingStatus
+      },
+      {
+        state: 'backfill-automatic-issue-time',
+        func: backfillIssueTime
+      },
+      {
+        state: 'sync-child-time-snapshots',
+        func: syncChildTimeSnapshots
       }
     ])
   },
   async migrate (client: MigrationClient, mode): Promise<void> {
     await tryMigrate(mode, client, trackerId, [
+      {
+        state: 'template-assignees-list',
+        func: async (client) => {
+          const templates = await client.traverse<IssueTemplate>(DOMAIN_TRACKER, { _class: tracker.class.IssueTemplate })
+          const normalize = (value: any): any => {
+            const result = { ...value, assignees: getTaskAssignees(value) }
+            delete result.assignee
+            if (Array.isArray(result.children)) result.children = result.children.map(normalize)
+            return result
+          }
+          try {
+            while (true) {
+              const batch = await templates.next(500)
+              if (batch === null || batch.length === 0) break
+              for (const item of batch) {
+                await client.update(DOMAIN_TRACKER, { _id: item._id }, {
+                  assignees: getTaskAssignees(item), children: (item.children ?? []).map(normalize)
+                })
+                await client.update(DOMAIN_TRACKER, { _id: item._id }, { $unset: { assignee: true } })
+              }
+            }
+          } finally {
+            await templates.close()
+          }
+        }
+      },
       {
         state: 'identifier',
         mode: 'upgrade',

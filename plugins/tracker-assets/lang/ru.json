@@ -220,7 +220,8 @@
 
     "NewMilestone": "Новый Этап",
     "CreateMilestone": "Создать",
-
+    "DeleteMilestoneConfirm": "Удалить выбранные проекты навсегда? Их задачи сохранятся без проекта.",
+    "DeleteMilestoneTitle": "Удалить {name}?",
     "MoveAndDeleteMilestone": "Переместить Задачи в {newMilestone} и Удалить {deleteMilestone}",
     "MoveAndDeleteMilestoneConfirm": "Вы действительно хотите удалить этап и перенести задачи в другой?",
 
@@ -236,6 +237,13 @@
     "TimeSpendReportDescription": "Описание",
     "TimeSpendDays": "{value} д",
     "TimeSpendHours": "{value} ч",
+    "TimeInputAmount": "e.g. 2",
+    "TimeUnit": "Unit",
+    "TimeUnitHours": "Hours",
+    "TimeUnitDays": "Days",
+    "TimeUnitMinutes": "Minutes",
+    "TimeInputHours": "e.g. 2 hours",
+    "TimeInputMinutes": "e.g. 30 minutes",
     "TimeSpendMinutes": "{value} м",
     "ChildEstimation": "Оценка подзадач",
     "ChildReportedTime": "Время подзадач",
@@ -248,6 +256,8 @@
     "AddedAsBlocking": "Отмечено как блокирующее",
 
     "IssueTemplate": "Шаблон",
+    "DiscardTemplate": "Discard",
+    "TextTemplate": "Text template",
     "IssueTemplates": "Шаблоны",
     "NewProcess": "Новый шаблон",
     "SaveProcess": "Сохранить шаблон",

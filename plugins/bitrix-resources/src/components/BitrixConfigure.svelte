@@ -30,7 +30,6 @@
   import { Button, eventToHTMLElement, IconAdd, showPopup } from '@hcengineering/ui'
 
   import { Data, Doc, Ref } from '@hcengineering/core'
-  import { getEmbeddedLabel } from '@hcengineering/platform'
   import { bitrixQueue } from '../queue'
   import CreateMapping from './CreateMapping.svelte'
   import EntityMapping from './EntityMapping.svelte'
@@ -70,7 +69,7 @@
   }
   const signature = '@#253heyf@'
   const downloadConfig = async () => {
-    const filename = 'bitrix-config_' + new Date().toLocaleDateString() + '.json'
+    const filename = 'bitrix-config_' + new Date().toISOString().slice(0, 10) + '.json'
     const link = document.createElement('a')
     const fields = await client.findAll(bitrix.class.FieldMapping, {})
     link.style.display = 'none'
@@ -162,8 +161,8 @@
     <div class="flex-row-center flex-grow flex-between">
       <Button icon={IconAdd} label={presentation.string.Add} on:click={addMapping} />
       <div class="flex-row-center">
-        <Button label={getEmbeddedLabel('Download...')} on:click={downloadConfig} />
-        <Button label={getEmbeddedLabel('Replace...')} on:click={replaceConfig} />
+        <Button label={bitrix.string.Download} on:click={downloadConfig} />
+        <Button label={bitrix.string.Replace} on:click={replaceConfig} />
         <input bind:this={inputFile} type="file" name="file" id="file" style="display: none" on:change={fileSelected} />
       </div>
     </div>

@@ -19,6 +19,9 @@
   let viewlet: WithLookup<Viewlet> | undefined = undefined
   const viewlets: WithLookup<Viewlet>[] | undefined = undefined
   let viewOptions: ViewOptions | undefined
+  $: if (viewOptions?.groupBy.includes('assignee')) {
+    viewOptions = { ...viewOptions, groupBy: viewOptions.groupBy.map((key) => key === 'assignee' ? 'assignees' : key) }
+  }
 
   let search = ''
   let searchQuery: DocumentQuery<Issue> = { ...query }

@@ -17,7 +17,6 @@
   import { SocialIdentityPresenter } from '@hcengineering/contact-resources'
   import {
     getCurrentAccount,
-    loginSocialTypes,
     pickPrimarySocialId,
     setCurrentAccount,
     SocialId
@@ -42,7 +41,6 @@
   const dispatch = createEventDispatcher()
   let currAcc = getCurrentAccount()
 
-  $: isLogin = loginSocialTypes.includes(socialId.type)
   $: isPrimary = socialId._id === currAcc.primarySocialId
 
   async function doRelease (): Promise<void> {
@@ -125,13 +123,6 @@
   {/if}
 
   <div class="flex-grow" />
-
-  {#if isLogin}
-    {@const color = getPlatformColorDef(PaletteColorIndexes.Turquoise, $themeStore.dark)}
-    <div class="tag flex-center" style:background={color.background} style:border-color={color.color}>
-      <Label label={setting.string.Login} />
-    </div>
-  {/if}
 
   {#if isPrimary}
     {@const color = getPlatformColorDef(PaletteColorIndexes.Ocean, $themeStore.dark)}

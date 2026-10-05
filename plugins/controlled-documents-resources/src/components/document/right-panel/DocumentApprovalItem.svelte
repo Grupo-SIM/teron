@@ -1,7 +1,7 @@
 <script lang="ts">
   import { PersonRefPresenter } from '@hcengineering/contact-resources'
   import { DocumentValidationState } from '@hcengineering/controlled-documents'
-  import { Chevron, Label, tooltip } from '@hcengineering/ui'
+  import { Chevron, Label, themeStore, tooltip } from '@hcengineering/ui'
   import { slide } from 'svelte/transition'
 
   import documentsRes from '../../../plugin'
@@ -16,7 +16,7 @@
 
   let expanded: boolean = initiallyExpanded
 
-  const dtf = new Intl.DateTimeFormat('default', {
+  $: dtf = new Intl.DateTimeFormat($themeStore.language, {
     day: 'numeric',
     month: 'short'
   })

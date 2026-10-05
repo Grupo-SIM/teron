@@ -23,7 +23,7 @@
   import { Panel } from '@hcengineering/panel'
   import { getResource } from '@hcengineering/platform'
   import { ActionContext, MessageViewer, IconWithEmoji, createQuery, getClient } from '@hcengineering/presentation'
-  import { Button, EditBox, IconMixin, IconMoreH, getPlatformColorDef, showPopup, themeStore } from '@hcengineering/ui'
+  import { Button, EditBox, IconMoreH, getPlatformColorDef, showPopup, themeStore } from '@hcengineering/ui'
   import view from '@hcengineering/view'
   import { DocAttributeBar, IconPicker, getDocMixins, showMenu } from '@hcengineering/view-resources'
   import type { Product } from '@hcengineering/products'
@@ -43,7 +43,6 @@
 
   let object: Product | undefined
   let title = ''
-  let showAllMixins = false
 
   let lastId: Ref<Doc> = _id
   $: read(_id)
@@ -117,7 +116,7 @@
       : []
   )
   $: mixins =
-    object !== undefined ? getDocMixins(object, showAllMixins).filter((m) => !otherSpaceTypesMixins.has(m._id)) : []
+    object !== undefined ? getDocMixins(object, false).filter((m) => !otherSpaceTypesMixins.has(m._id)) : []
 </script>
 
 {#if object !== undefined}
@@ -193,15 +192,6 @@
         size={'medium'}
         on:click={(e) => {
           showMenu(e, { object })
-        }}
-      />
-      <Button
-        icon={IconMixin}
-        kind={'icon'}
-        iconProps={{ size: 'medium' }}
-        selected={showAllMixins}
-        on:click={() => {
-          showAllMixins = !showAllMixins
         }}
       />
     </svelte:fragment>

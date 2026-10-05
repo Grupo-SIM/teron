@@ -14,15 +14,22 @@
 -->
 <script lang="ts">
   import task from '@hcengineering/task'
-  import { Issue } from '@hcengineering/tracker'
+  import { Issue, currentChildReportedTime, currentReportedTime } from '@hcengineering/tracker'
   import { floorFractionDigits, Label } from '@hcengineering/ui'
   import { FixedColumn, statusStore } from '@hcengineering/view-resources'
   import tracker from '../../plugin'
   import EstimationProgressCircle from '../issues/timereport/EstimationProgressCircle.svelte'
   import TimePresenter from '../issues/timereport/TimePresenter.svelte'
+  import { onMount } from 'svelte'
   export let docs: Issue[] | undefined = undefined
   export let capacity: number | undefined = undefined
   export let category: string | undefined = undefined
+
+  let now = Date.now()
+  onMount(() => {
+    const timer = setInterval(() => (now = Date.now()), 60000)
+    return () => clearInterval(timer)
+  })
 
   $: ids = new Set(docs?.map((it) => it._id) ?? [])
 
@@ -40,7 +47,7 @@
         let retEst = it.estimation
         if (it.childInfo?.length > 0) {
           const cEstimation = it.childInfo.map((ct) => ct.estimation).reduce((a, b) => a + b, 0)
-          const cReported = it.childInfo.map((ct) => ct.reportedTime).reduce((a, b) => a + b, 0)
+          const cReported = currentChildReportedTime(it.childInfo, now)
           if (cEstimation !== 0) {
             retEst = cEstimation
             if (cat === task.statusCategory.Won || cat === task.statusCategory.Lost) {
@@ -51,8 +58,8 @@
           }
         } else {
           if (cat === task.statusCategory.Won || cat === task.statusCategory.Lost) {
-            if (it.reportedTime < it.estimation) {
-              return it.reportedTime
+            if (currentReportedTime(it, now) < it.estimation) {
+              return currentReportedTime(it, now)
             }
           }
         }
@@ -67,12 +74,12 @@
     (noParents ?? [{ reportedTime: 0, childInfo: [] } as unknown as Issue])
       .map((it) => {
         if (it.childInfo?.length > 0) {
-          const cReported = it.childInfo.map((ct) => ct.reportedTime).reduce((a, b) => a + b, 0)
+          const cReported = currentChildReportedTime(it.childInfo, now)
           if (cReported !== 0) {
-            return cReported + it.reportedTime
+            return cReported + currentReportedTime(it, now)
           }
         }
-        return it.reportedTime
+        return currentReportedTime(it, now)
       })
       .reduce((it, cur) => {
         return it + cur
@@ -81,7 +88,7 @@
   )
 </script>
 
-{#if docs && (category === 'milestone' || category === 'assignee')}
+{#if docs && (category === 'milestone' || (category === 'assignees' || category === 'assignee'))}
   <FixedColumn key="estimation-editor">
     <!-- <Label label={tracker.string.MilestoneDay} value={}/> -->
     <div class="flex-row-center flex-no-shrink h-6" class:showWarning={totalEstimation > (capacity ?? 0)}>

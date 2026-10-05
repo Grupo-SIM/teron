@@ -18,11 +18,11 @@
   import { getClient } from '@hcengineering/presentation'
   import { Issue, IssueDraft } from '@hcengineering/tracker'
   import { Button, ButtonKind, ButtonSize, eventToHTMLElement, showPopup } from '@hcengineering/ui'
-  import { EditBoxPopup, FixedColumn } from '@hcengineering/view-resources'
+  import { FixedColumn } from '@hcengineering/view-resources'
   import { createEventDispatcher } from 'svelte'
   import tracker from '../../../plugin'
-  import EstimationPopup from './EstimationPopup.svelte'
   import EstimationStatsPresenter from './EstimationStatsPresenter.svelte'
+  import TimeInputPopup from './TimeInputPopup.svelte'
   import TimePresenter from './TimePresenter.svelte'
 
   export let value: Issue | AttachedData<Issue> | IssueDraft
@@ -44,15 +44,11 @@
       return
     }
 
-    if (kind === 'list') {
-      showPopup(EstimationPopup, { value: value.estimation, format: 'number', object: value }, 'top')
-    } else {
-      showPopup(EditBoxPopup, { value: value.estimation, format: 'number' }, eventToHTMLElement(event), (res) => {
-        if (res !== undefined) {
-          changeEstimation(res)
-        }
-      })
-    }
+    showPopup(TimeInputPopup, { value: value.estimation }, eventToHTMLElement(event), (res) => {
+      if (typeof res === 'number' && Number.isFinite(res) && res >= 0) {
+        changeEstimation(res)
+      }
+    })
   }
 
   const changeEstimation = async (newEstimation: number | undefined) => {

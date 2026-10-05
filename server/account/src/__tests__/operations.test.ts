@@ -56,11 +56,15 @@ import {
   getSubscriptions,
   getWorkspaceEntitlement,
   getWorkspacePendingInvites,
+  getInviteInfo,
   getWorkspaceSeatQuote,
   changeWorkspaceSeatLimit,
+  cancelWorkspaceSubscription,
+  uncancelWorkspaceSubscription,
   reconcileWorkspaceSeatChanges,
   leaveWorkspace,
-  checkJoin
+  checkJoin,
+  getWorkspaceCreationInfo
 } from '../operations'
 import { accountPlugin } from '../plugin'
 
@@ -141,6 +145,7 @@ describe('account operations', () => {
     updateWorkspaceRoleWithinCapacity: jest.fn(),
     getWorkspaceRole: jest.fn(),
     getWorkspaceMembers: jest.fn(),
+    getAccountWorkspaces: jest.fn(),
     createWorkspace: jest.fn(),
     assignWorkspace: jest.fn(),
     unassignWorkspace: jest.fn(),
@@ -297,6 +302,56 @@ describe('account operations', () => {
     })
   })
 
+  describe('getInviteInfo', () => {
+    const invite = {
+      id: 'invite-id',
+      workspaceUuid: mockWorkspace.uuid,
+      expiresOn: Date.now() + 60_000,
+      email: 'invited@example.com',
+      remainingUses: 1,
+      role: AccountRole.User
+    }
+
+    test('should indicate signup for an invited email without an account', async () => {
+      ;(mockDb.invite.findOne as jest.Mock).mockResolvedValue(invite)
+      ;(mockDb.workspace.findOne as jest.Mock).mockResolvedValue(mockWorkspace)
+      ;(mockDb.socialId.findOne as jest.Mock).mockResolvedValue(null)
+
+      const result = await getInviteInfo(mockCtx, mockDb, mockBranding, mockToken, { inviteId: invite.id })
+
+      expect(result).toEqual({
+        workspaceName: mockWorkspace.name,
+        email: invite.email,
+        accountExists: false
+      })
+    })
+
+    test('should indicate login for an invited email with an account', async () => {
+      ;(mockDb.invite.findOne as jest.Mock).mockResolvedValue(invite)
+      ;(mockDb.workspace.findOne as jest.Mock).mockResolvedValue(mockWorkspace)
+      ;(mockDb.socialId.findOne as jest.Mock).mockResolvedValue({
+        personUuid: mockAccount.uuid,
+        type: SocialIdType.EMAIL,
+        value: invite.email
+      })
+      ;(mockDb.account.findOne as jest.Mock).mockResolvedValue(mockAccount)
+
+      const result = await getInviteInfo(mockCtx, mockDb, mockBranding, mockToken, { inviteId: invite.id })
+
+      expect(result.accountExists).toBe(true)
+    })
+
+    test('should not expose details for an expired invite', async () => {
+      ;(mockDb.invite.findOne as jest.Mock).mockResolvedValue({ ...invite, expiresOn: Date.now() - 1 })
+
+      const result = await getInviteInfo(mockCtx, mockDb, mockBranding, mockToken, { inviteId: invite.id })
+
+      expect(result).toEqual({ workspaceName: null })
+      expect(mockDb.workspace.findOne).not.toHaveBeenCalled()
+      expect(mockDb.socialId.findOne).not.toHaveBeenCalled()
+    })
+  })
+
   describe('createWorkspace free trial', () => {
     beforeEach(() => {
       ;(mockDb.socialId.find as jest.Mock).mockResolvedValue([
@@ -364,6 +419,29 @@ describe('account operations', () => {
     })
   })
 
+  describe('getWorkspaceCreationInfo', () => {
+    test('keeps Free available when the user is only a workspace member', async () => {
+      ;(mockDb.account.findOne as jest.Mock).mockResolvedValue(mockAccount)
+      ;(mockDb.workspace.find as jest.Mock).mockResolvedValue([])
+      ;(mockDb.getAccountWorkspaces as jest.Mock).mockResolvedValue([mockWorkspace])
+
+      const result = await getWorkspaceCreationInfo(mockCtx, mockDb, mockBranding, mockToken)
+
+      expect(result).toEqual({ freeTrialAvailable: true })
+      expect(mockDb.workspace.find).toHaveBeenCalledWith({ createdBy: mockAccount.uuid })
+      expect(mockDb.getAccountWorkspaces).not.toHaveBeenCalled()
+    })
+
+    test('makes Free unavailable after the user creates a workspace', async () => {
+      ;(mockDb.account.findOne as jest.Mock).mockResolvedValue(mockAccount)
+      ;(mockDb.workspace.find as jest.Mock).mockResolvedValue([mockWorkspace])
+
+      const result = await getWorkspaceCreationInfo(mockCtx, mockDb, mockBranding, mockToken)
+
+      expect(result).toEqual({ freeTrialAvailable: false })
+    })
+  })
+
   describe('getWorkspaceEntitlement', () => {
     test('should become read-only exactly at the free trial boundary', async () => {
       const boundary = 2_000_000
@@ -397,7 +475,7 @@ describe('account operations', () => {
       ;(mockDb.getWorkspaceRole as jest.Mock).mockResolvedValue(AccountRole.Owner)
       ;(mockDb.getWorkspaceMembers as jest.Mock).mockResolvedValue([
         { role: AccountRole.Owner },
-        { role: AccountRole.Guest },
+        { role: AccountRole.User },
         { role: AccountRole.ReadOnlyGuest }
       ])
       ;(mockDb.invite.find as jest.Mock).mockResolvedValue([
@@ -427,9 +505,9 @@ describe('account operations', () => {
           accessMode: 'full',
           seatLimit: 5,
           nextSeatLimit: 4,
-          memberSeats: 2,
+          memberSeats: 1,
           pendingInviteSeats: 1,
-          availableSeats: 1
+          availableSeats: 2
         })
       )
       nowSpy.mockRestore()
@@ -506,17 +584,20 @@ describe('account operations', () => {
 
     test('quotes an immediate prorated increase from authoritative contract data', async () => {
       const now = Date.now()
+      const day = 24 * 60 * 60 * 1000
+      const dateNow = jest.spyOn(Date, 'now').mockReturnValue(now)
       jest.spyOn(simintpay, 'getWorkspaceBillingContract').mockResolvedValue({
         id: 'contract', quantity: 1, pendingQuantity: null, version: 2, unitAmount: '10.00',
-        recurringAmount: '10.00', currentPeriodStart: new Date(now - 5000).toISOString(),
-        currentPeriodEnd: new Date(now + 5000).toISOString()
+        recurringAmount: '10.00', currentPeriodStart: new Date(now - 4 * day).toISOString(),
+        currentPeriodEnd: new Date(now + 26 * day).toISOString()
       })
 
       const quote = await getWorkspaceSeatQuote(mockCtx, mockDb, mockBranding, mockToken, { targetSeatLimit: 2 })
+      dateNow.mockRestore()
 
       expect(quote.nextRecurringAmount).toBe('20.00')
-      expect(Number(quote.estimatedProrationAmount)).toBeGreaterThan(4)
-      expect(Number(quote.estimatedProrationAmount)).toBeLessThanOrEqual(5)
+      expect(quote.estimatedProrationAmount).toBe('8.67')
+      expect(quote).toMatchObject({ prorationDays: 26, prorationPeriodDays: 30 })
     })
 
     test('applies paid capacity and stores the idempotent operation', async () => {
@@ -541,6 +622,58 @@ describe('account operations', () => {
       expect(mockDb.subscription.update).toHaveBeenCalledWith(
         { id: 'business-subscription' }, expect.objectContaining({ seatLimit: 2 })
       )
+    })
+
+    test('cancels a Simintpay workspace subscription at the current period end', async () => {
+      const periodStart = new Date('2026-08-16T00:00:00.000Z')
+      const periodEnd = new Date('2026-09-16T00:00:00.000Z')
+      ;(mockDb.subscription.findOne as jest.Mock).mockResolvedValue({
+        id: 'legacy-provider-subscription', workspaceUuid: mockWorkspace.uuid, type: 'tier', provider: 'simintpay',
+        status: 'active', plan: 'business', providerData: { quantity: 1 }
+      })
+      jest.spyOn(simintpay, 'getWorkspaceBillingContract').mockResolvedValue({
+        id: 'billing-contract', quantity: 1, pendingQuantity: null, version: 2, unitAmount: '10.00',
+        recurringAmount: '10.00', currentPeriodStart: periodStart.toISOString(), currentPeriodEnd: periodEnd.toISOString()
+      })
+      jest.spyOn(simintpay, 'cancelWorkspaceBillingContract').mockResolvedValue({
+        id: 'billing-contract', quantity: 1, pendingQuantity: null, version: 2, unitAmount: '10.00',
+        recurringAmount: '10.00', currentPeriodStart: periodStart.toISOString(), currentPeriodEnd: periodEnd.toISOString()
+      })
+
+      const result = await cancelWorkspaceSubscription(mockCtx, mockDb, mockBranding, mockToken)
+
+      expect(simintpay.cancelWorkspaceBillingContract).toHaveBeenCalledWith('billing-contract')
+      expect(mockDb.subscription.update).toHaveBeenCalledWith(
+        { id: 'legacy-provider-subscription' },
+        expect.objectContaining({ willCancelAt: periodEnd.getTime(), providerData: expect.objectContaining({ cancelAtPeriodEnd: true }) })
+      )
+      expect(result.willCancelAt).toBe(periodEnd.getTime())
+    })
+
+    test('reactivates a canceled Simintpay workspace subscription', async () => {
+      const periodStart = new Date('2026-08-16T00:00:00.000Z')
+      const periodEnd = new Date('2026-09-16T00:00:00.000Z')
+      ;(mockDb.subscription.findOne as jest.Mock).mockResolvedValue({
+        id: 'legacy-provider-subscription', workspaceUuid: mockWorkspace.uuid, type: 'tier', provider: 'simintpay',
+        status: 'active', plan: 'business', willCancelAt: periodEnd.getTime(), providerData: { cancelAtPeriodEnd: true }
+      })
+      jest.spyOn(simintpay, 'getWorkspaceBillingContract').mockResolvedValue({
+        id: 'billing-contract', quantity: 1, pendingQuantity: null, version: 3, unitAmount: '10.00',
+        recurringAmount: '10.00', currentPeriodStart: periodStart.toISOString(), currentPeriodEnd: periodEnd.toISOString()
+      })
+      jest.spyOn(simintpay, 'reactivateWorkspaceBillingContract').mockResolvedValue({
+        id: 'billing-contract', quantity: 1, pendingQuantity: null, version: 3, unitAmount: '10.00',
+        recurringAmount: '10.00', currentPeriodStart: periodStart.toISOString(), currentPeriodEnd: periodEnd.toISOString()
+      })
+
+      const result = await uncancelWorkspaceSubscription(mockCtx, mockDb, mockBranding, mockToken)
+
+      expect(simintpay.reactivateWorkspaceBillingContract).toHaveBeenCalledWith('billing-contract')
+      expect(mockDb.subscription.update).toHaveBeenCalledWith(
+        { id: 'legacy-provider-subscription' },
+        expect.objectContaining({ willCancelAt: undefined, providerData: expect.objectContaining({ cancelAtPeriodEnd: false }) })
+      )
+      expect(result.willCancelAt).toBeUndefined()
     })
 
     test('rejects a reduction below members and pending invitations', async () => {
@@ -713,7 +846,7 @@ describe('account operations', () => {
     test('should throw error for insufficient role', async () => {
       ;(mockDb.account.findOne as jest.Mock).mockResolvedValue(mockAccount)
       ;(mockDb.workspace.findOne as jest.Mock).mockResolvedValue(mockWorkspace)
-      ;(mockDb.getWorkspaceRole as jest.Mock).mockResolvedValue(AccountRole.Guest)
+      ;(mockDb.getWorkspaceRole as jest.Mock).mockResolvedValue(AccountRole.DocGuest)
 
       await expect(
         createInviteLink(mockCtx, mockDb, mockBranding, mockToken, {
@@ -781,7 +914,7 @@ describe('account operations', () => {
     test('should throw error if caller has insufficient role', async () => {
       ;(mockDb.account.findOne as jest.Mock).mockResolvedValue(mockAccount)
       ;(mockDb.workspace.findOne as jest.Mock).mockResolvedValue(mockWorkspace)
-      ;(mockDb.getWorkspaceRole as jest.Mock).mockResolvedValue(AccountRole.Guest)
+      ;(mockDb.getWorkspaceRole as jest.Mock).mockResolvedValue(AccountRole.DocGuest)
 
       await expect(
         sendInvite(mockCtx, mockDb, mockBranding, mockToken, {
@@ -1207,7 +1340,7 @@ describe('account operations', () => {
           firstName: grantFirstName,
           lastName: grantLastName
         })
-        ;(mockDb.getWorkspaceRole as jest.Mock).mockResolvedValue(AccountRole.Guest)
+        ;(mockDb.getWorkspaceRole as jest.Mock).mockResolvedValue(AccountRole.User)
 
         const result = await getLoginInfoByToken(mockCtx, mockDb, mockBranding, mockToken)
 
@@ -1220,7 +1353,7 @@ describe('account operations', () => {
           workspace: grantWorkspace.uuid,
           workspaceUrl: grantWorkspace.url,
           endpoint: expect.any(String),
-          role: AccountRole.Guest
+          role: AccountRole.User
         })
       })
 
@@ -1619,7 +1752,7 @@ describe('account operations', () => {
     test('should throw error for insufficient role', async () => {
       ;(mockDb.account.findOne as jest.Mock).mockResolvedValue(mockAccount)
       ;(mockDb.workspace.findOne as jest.Mock).mockResolvedValue(mockWorkspace)
-      ;(mockDb.getWorkspaceRole as jest.Mock).mockResolvedValue(AccountRole.Guest)
+      ;(mockDb.getWorkspaceRole as jest.Mock).mockResolvedValue(AccountRole.DocGuest)
 
       await expect(
         createAccessLink(mockCtx, mockDb, mockBranding, mockToken, {
@@ -2414,6 +2547,8 @@ describe('account operations', () => {
     describe('validateOtp', () => {
       beforeEach(() => {
         jest.spyOn(utils, 'setPassword').mockResolvedValue()
+        ;(mockDb.socialId.find as jest.Mock).mockResolvedValue([])
+        jest.spyOn(utils, 'doReleaseSocialId').mockResolvedValue({} as SocialId)
       })
 
       test('should validate OTP and create account for signup', async () => {
@@ -2501,6 +2636,54 @@ describe('account operations', () => {
 
         expect(mockDb.otp.deleteMany).toHaveBeenCalledWith({ socialId: mockSocialId._id })
         expect(utils.setPassword).not.toHaveBeenCalled()
+        expect(utils.doReleaseSocialId).not.toHaveBeenCalled()
+      })
+
+      test('should replace previous emails only after verifying the new email', async () => {
+        const mockSocialId: SocialId = {
+          _id: 'new-email' as PersonId,
+          personUuid: mockAccountId,
+          type: SocialIdType.EMAIL,
+          value: mockEmail,
+          key: `email:${mockEmail}`
+        }
+        const previousEmails = ['old@example.com', 'legacy@example.com'].map((value) => ({
+          ...mockSocialId,
+          _id: value as PersonId,
+          value
+        }))
+        ;(decodeTokenVerbose as jest.Mock).mockReturnValue({ account: mockAccountId })
+        jest.spyOn(utils, 'getEmailSocialId').mockResolvedValue(mockSocialId)
+        jest.spyOn(utils, 'isOtpValid').mockResolvedValue(true)
+        ;(mockDb.account.findOne as jest.Mock).mockResolvedValue({ uuid: mockAccountId })
+        ;(mockDb.socialId.findOne as jest.Mock).mockResolvedValue({ ...mockSocialId, verifiedOn: Date.now() })
+        ;(mockDb.socialId.find as jest.Mock).mockResolvedValue([...previousEmails, mockSocialId])
+        ;(mockDb.person.findOne as jest.Mock).mockResolvedValue({
+          uuid: mockAccountId,
+          firstName: mockFirstName,
+          lastName: mockLastName
+        })
+
+        await validateOtp(mockCtx, mockDb, mockBranding, mockToken, {
+          email: mockEmail,
+          code: '123456',
+          action: 'verify'
+        })
+
+        expect(mockDb.socialId.find).toHaveBeenCalledWith({
+          personUuid: mockAccountId,
+          type: SocialIdType.EMAIL,
+          isDeleted: { $ne: true }
+        })
+        expect(utils.doReleaseSocialId).toHaveBeenCalledTimes(2)
+        for (const previousEmail of previousEmails) {
+          expect(utils.doReleaseSocialId).toHaveBeenCalledWith(
+            mockDb, mockAccountId, SocialIdType.EMAIL, previousEmail.value, `replaceEmail@${mockAccountId}`, true
+          )
+        }
+        expect((mockDb.socialId.update as jest.Mock).mock.invocationCallOrder[0]).toBeLessThan(
+          (utils.doReleaseSocialId as jest.Mock).mock.invocationCallOrder[0]
+        )
       })
 
       test('should validate OTP for unverified social id belonging to caller', async () => {
@@ -2667,9 +2850,12 @@ describe('account operations', () => {
         await expect(
           validateOtp(mockCtx, mockDb, mockBranding, mockToken, {
             email: mockEmail,
-            code: '123456'
+            code: '123456',
+            action: 'verify'
           })
         ).rejects.toThrow(new PlatformError(new Status(Severity.ERROR, platform.status.InvalidOtp, {})))
+        expect(mockDb.socialId.update).not.toHaveBeenCalled()
+        expect(utils.doReleaseSocialId).not.toHaveBeenCalled()
       })
 
       test('should fail if email not found', async () => {
@@ -2711,6 +2897,7 @@ describe('account operations', () => {
             action: 'verify'
           })
         ).rejects.toThrow(new PlatformError(new Status(Severity.ERROR, platform.status.AccountAlreadyExists, {})))
+        expect(utils.doReleaseSocialId).not.toHaveBeenCalled()
       })
     })
 

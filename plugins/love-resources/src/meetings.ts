@@ -16,6 +16,7 @@ import { getCurrentEmployee, type Person } from '@hcengineering/contact'
 import { getPersonByPersonRef } from '@hcengineering/contact-resources'
 import { getMetadata } from '@hcengineering/platform'
 import { sendJoinRequest, unsubscribeJoinRequests } from './joinRequests'
+import { getDateLocale } from '@hcengineering/ui'
 
 export let currentMeetingRoom: Ref<Room> | undefined
 
@@ -76,7 +77,7 @@ export async function leaveMeeting (): Promise<void> {
 export async function joinMeeting (room: Room): Promise<void> {
   if (room.access === RoomAccess.DND) return
 
-  const isGuest = getCurrentAccount().role === AccountRole.Guest
+  const isGuest = getCurrentAccount().role === AccountRole.DocGuest
   if (room.access === RoomAccess.Knock || isOffice(room) || isGuest) {
     sendJoinRequest(room._id)
     return
@@ -184,12 +185,11 @@ async function createMeetingDocument (room: Room): Promise<void> {
 
 async function getNewMeetingTitle (room: Room): Promise<string> {
   const date = new Date()
-    .toLocaleDateString('en-GB', {
+    .toLocaleDateString(getDateLocale(), {
       day: 'numeric',
       month: 'long',
       year: 'numeric'
     })
-    .replace(',', ' at')
   return `${await getRoomName(room)} ${date}`
 }
 

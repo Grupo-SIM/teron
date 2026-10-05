@@ -1,7 +1,7 @@
 <script lang="ts">
   import { BitrixClient, BitrixEntityMapping, Fields, FieldValue } from '@hcengineering/bitrix'
   import core, { DateRangeMode, Enum, Ref } from '@hcengineering/core'
-  import { getEmbeddedLabel } from '@hcengineering/platform'
+  import bitrix from '../plugin'
   import { createQuery, getClient } from '@hcengineering/presentation'
   import setting from '@hcengineering/setting-resources/src/plugin'
   import {
@@ -54,7 +54,7 @@
         {
           actions: [
             {
-              label: getEmbeddedLabel('New'),
+              label: bitrix.string.New,
               action: (_: any, evt: MouseEvent) => {
                 showPopup(
                   setting.component.EditEnum,
@@ -68,7 +68,7 @@
               }
             },
             {
-              label: 'Modify existing',
+              label: bitrix.string.ModifyExisting,
               component: EnumPopup,
               props: {
                 _class: core.class.Enum,
@@ -98,13 +98,13 @@
 <div class="top-divider">
   <div class="flex gap-2">
     <Button
-      label={getEmbeddedLabel('Load First N values')}
+      label={bitrix.string.LoadFirstValues}
       on:click={() => {
         loadItems(true)
       }}
     />
     <Button
-      label={getEmbeddedLabel('Load Last N values')}
+      label={bitrix.string.LoadLastValues}
       on:click={() => {
         loadItems(false)
       }}

@@ -342,35 +342,27 @@ export function Knowledge({ locale = defaultLocale }: { locale?: Locale }) {
               com a transição.
             */}
             <div className="lp-know-card-txt" data-on={face < 0.5}>
-              <strong>Feito para pessoas</strong>
+              <strong>{"knowledge.people.title"}</strong>
               <span>
-                Uma experiência simples e intuitiva para tornar o trabalho mais
-                leve.
-              </span>
+                {"knowledge.people.description"}</span>
             </div>
 
             <div className="lp-know-card-txt" data-on={face >= 0.5}>
-              <strong>Feito para empresas</strong>
+              <strong>{"knowledge.companies.title"}</strong>
               <span>
-                Com o Teron, sua empresa tem tudo o que precisa para fazer o
-                trabalho fluir.
-              </span>
+                {"knowledge.companies.description"}</span>
             </div>
           </div>
         </div>
 
         <div className="lp-know-col">
           <h2 data-reveal className="lp-know-title">
-            Uma plataforma.
-            <br />
-            Todas as formas de trabalhar.
-            <Pin author="blue" x={46} y={8} />
+            {"knowledge.platform.title"}<br />
+            {"knowledge.platform.titleComplement"}<Pin author="blue" x={46} y={8} />
           </h2>
 
           <p data-reveal className="lp-know-lead">
-            Uma experiência criada para tornar a rotina da sua empresa mais
-            simples, conectada e eficiente.
-          </p>
+            {"knowledge.platform.description"}</p>
 
           <div className="lp-know-doc" data-reveal ref={docRef}>
             <div
@@ -379,7 +371,7 @@ export function Knowledge({ locale = defaultLocale }: { locale?: Locale }) {
               style={{ "--mark": mark } as React.CSSProperties}
             >
               <div className="lp-know-tools" data-on={tools} aria-hidden>
-                <span className="lp-know-tool-link">+ Link</span>
+                <span className="lp-know-tool-link">{"knowledge.linkButton"}</span>
                 {TOOLS.map((tool) => (
                   <span key={tool} className={`lp-know-tool-${tool}`}>
                     {tool}
@@ -389,10 +381,7 @@ export function Knowledge({ locale = defaultLocale }: { locale?: Locale }) {
               </div>
 
               <p className="lp-know-p">
-                <strong>Desenvolvemos</strong> nossa plataforma com um objetivo:
-                reunir em um único ambiente tudo o que as equipes precisam para
-                trabalhar, colaborar e crescer.
-              </p>
+                <strong>{"knowledge.mission.prefix"}</strong> {"knowledge.mission.description"}</p>
             </div>
 
             <figure className="lp-know-fig">
@@ -401,10 +390,7 @@ export function Knowledge({ locale = defaultLocale }: { locale?: Locale }) {
             </figure>
 
             <p className="lp-know-p lp-know-p-pinned">
-              A plataforma está em constante desenvolvimento, recebendo
-              melhorias e novos recursos para acompanhar as necessidades de
-              empresas e equipes.
-              <Pin author="orange" x={52} y={30} />
+              {"knowledge.evolution"}<Pin author="orange" x={52} y={30} />
             </p>
 
             <pre className="lp-know-code">
@@ -418,9 +404,7 @@ export function Knowledge({ locale = defaultLocale }: { locale?: Locale }) {
             </pre>
 
             <p className="lp-know-p">
-              Nossa tecnologia acompanha as novas formas de trabalhar para
-              manter sua empresa preparada para o futuro.
-            </p>
+              {"knowledge.future"}</p>
           </div>
         </div>
       </div>

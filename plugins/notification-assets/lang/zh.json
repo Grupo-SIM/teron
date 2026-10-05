@@ -58,5 +58,9 @@
     "CommonNotificationCollectionRemoved": "{senderName} 移除了 {collection}",
     "NoAccessToObject": "您不再可以访问此对象",
     "ViewIn": "在 {app} 中查看"
+  ,
+    "ReactedToYourMessage": "Reacted to your message",
+    "InboxNotifications": "Inbox notifications",
+    "InboxSettings": "Inbox settings"
   }
 }

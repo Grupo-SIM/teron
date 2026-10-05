@@ -14,7 +14,7 @@
 -->
 <script lang="ts">
   import { Channel } from '@hcengineering/chunter'
-  import core, { AccountRole, setWorkspaceGuestAutoJoinRoles } from '@hcengineering/core'
+  import core from '@hcengineering/core'
   import { getClient } from '@hcengineering/presentation'
   import { Button, Label, Toggle } from '@hcengineering/ui'
   import { createEventDispatcher } from 'svelte'
@@ -26,26 +26,10 @@
 
   const dispatch = createEventDispatcher()
   const client = getClient()
-  const hierarchy = client.getHierarchy()
-
   let autoJoin = channel.autoJoin ?? false
-  let autoJoinForRoles: AccountRole[] =
-    channel.autoJoinForRoles != null ? hierarchy.clone(channel.autoJoinForRoles) : []
-
-  function normalizeAutoJoinForRoles (roles: AccountRole[]): AccountRole[] | undefined {
-    return roles.length > 0 ? [...roles] : undefined
-  }
 
   async function persistAutoJoin (): Promise<void> {
-    await client.diffUpdate(channel, {
-      autoJoin,
-      autoJoinForRoles: normalizeAutoJoinForRoles(autoJoinForRoles)
-    })
-  }
-
-  function setGuestAutoJoin (enabled: boolean): void {
-    autoJoinForRoles = setWorkspaceGuestAutoJoinRoles(autoJoinForRoles, enabled)
-    void persistAutoJoin()
+    await client.diffUpdate(channel, { autoJoin })
   }
 </script>
 
@@ -63,19 +47,6 @@
         />
       </div>
       <span class="text-sm content-dark-color"><Label label={core.string.AutoJoinDescr} /></span>
-    </div>
-    <div class="flex-col gap-1">
-      <div class="flex-row-center gap-2">
-        <Label label={core.string.AutoJoinGuests} />
-        <Toggle
-          data-id="channel-guest-auto-join-toggle"
-          on={autoJoinForRoles.includes(AccountRole.Guest)}
-          on:change={(ev) => {
-            setGuestAutoJoin(ev.detail)
-          }}
-        />
-      </div>
-      <span class="text-sm content-dark-color"><Label label={core.string.AutoJoinGuestsDescr} /></span>
     </div>
   </div>
   <Button

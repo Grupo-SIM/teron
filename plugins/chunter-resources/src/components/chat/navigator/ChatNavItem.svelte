@@ -43,22 +43,27 @@
   const dispatch = createEventDispatcher()
   const notificationClient = InboxNotificationsClientImpl.getClient()
 
-  let notifications: InboxNotification[] = []
+  const notificationsByContextStore = notificationClient.inboxNotificationsByContext
 
   let count: number | null = null
   let actions: Action[] = []
 
-  notificationClient.inboxNotificationsByContext.subscribe((res) => {
+  $: notifications = getContextNotifications(context, $notificationsByContextStore)
+
+  function getContextNotifications (
+    context: DocNotifyContext | undefined,
+    notificationsByContext: Map<DocNotifyContext['_id'], InboxNotification[]>
+  ): InboxNotification[] {
     if (context === undefined) {
-      return
+      return []
     }
 
-    notifications = (res.get(context._id) ?? []).filter((n) => {
+    return (notificationsByContext.get(context._id) ?? []).filter((n) => {
       if (isActivityNotification(n)) return true
 
       return isMentionNotification(n) && hierarchy.isDerived(n.mentionedInClass, chunter.class.ChatMessage)
     })
-  })
+  }
 
   $: void getNotificationsCount(context, notifications).then((res) => {
     count = res === 0 ? null : res

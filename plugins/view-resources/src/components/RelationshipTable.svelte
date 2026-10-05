@@ -302,9 +302,9 @@
     attr: AnyAttribute | undefined,
     permissionsStore: PermissionsStore | undefined
   ): boolean {
-    if (permissionsStore === undefined) return true
+    if (permissionsStore === undefined) return false
     if (attr === undefined) return true
-    return canChangeAttribute(attr, object.space as Ref<TypedSpace>, permissionsStore, object._class)
+    return canChangeAttribute(attr, object.space as Ref<TypedSpace>, permissionsStore, object._class, object)
   }
 
   interface CellModel {

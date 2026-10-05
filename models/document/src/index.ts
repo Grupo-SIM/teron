@@ -28,6 +28,8 @@ import { AccountRole, AccountUuid, IndexKind } from '@hcengineering/core'
 import { type Document, type DocumentSnapshot, type Teamspace, documentId } from '@hcengineering/document'
 import {
   type Builder,
+  ArrOf,
+  TypeBoolean,
   Collection,
   Hidden,
   Index,
@@ -46,7 +48,6 @@ import {
 import attachment from '@hcengineering/model-attachment'
 import chunter from '@hcengineering/model-chunter'
 import core, { TDoc, TTypedSpace } from '@hcengineering/model-core'
-import { createPublicLinkAction } from '@hcengineering/model-guest'
 import { generateClassNotificationTypes } from '@hcengineering/model-notification'
 import presentation from '@hcengineering/model-presentation'
 import tracker from '@hcengineering/model-tracker'
@@ -145,7 +146,27 @@ export class TDocumentSnapshot extends TDoc implements DocumentSnapshot {
 
 @Model(document.class.Teamspace, core.class.TypedSpace)
 @UX(document.string.Teamspace, document.icon.Teamspace, 'Teamspace', 'name')
-export class TTeamspace extends TTypedSpace implements Teamspace {}
+export class TTeamspace extends TTypedSpace implements Teamspace {
+  @Prop(TypeBoolean(), document.string.GuidelineReaders)
+  @Hidden()
+    guidelineAccess?: boolean
+
+  @Prop(ArrOf(TypeAccountUuid()), document.string.GuidelineReaders)
+  @Hidden()
+    guidelineReaders?: AccountUuid[]
+
+  @Prop(ArrOf(TypeAccountUuid()), document.string.GuidelineEditors)
+  @Hidden()
+    guidelineEditors?: AccountUuid[]
+
+  @Prop(ArrOf(TypeRef(tracker.class.Project)), document.string.GuidelineReaderSectors)
+  @Hidden()
+    guidelineReaderSectors?: Ref<TypedSpace>[]
+
+  @Prop(ArrOf(TypeRef(tracker.class.Project)), document.string.GuidelineEditorSectors)
+  @Hidden()
+    guidelineEditorSectors?: Ref<TypedSpace>[]
+}
 
 @Mixin(document.mixin.DefaultTeamspaceTypeData, document.class.Teamspace)
 @UX(getEmbeddedLabel('Default teamspace type'), document.icon.Document)
@@ -184,6 +205,25 @@ function defineTeamspace (builder: Builder): void {
     },
     document.spaceType.DefaultTeamspaceType
   )
+
+  createAction(builder, {
+    secured: true,
+    action: view.actionImpl.Delete,
+    actionProps: {
+      confirmation: document.string.DeleteTeamspaceConfirm,
+      confirmationTitle: document.string.DeleteTeamspaceTitle,
+      confirmationNameField: 'name',
+      richConfirmation: true
+    },
+    label: view.string.Delete,
+    icon: view.icon.Delete,
+    category: view.category.General,
+    input: 'focus',
+    target: document.class.Teamspace,
+    visibilityTester: view.function.CanArchiveSpace,
+    context: { mode: ['context', 'browser'], group: 'remove' },
+    override: [view.action.Archive, view.action.Delete]
+  }, document.action.DeleteTeamspace)
 
   // Navigator
 
@@ -228,6 +268,7 @@ function defineTeamspace (builder: Builder): void {
   createAction(
     builder,
     {
+      secured: true,
       action: document.actionImpl.EditTeamspace,
       label: document.string.EditTeamspace,
       icon: view.icon.Edit,
@@ -248,6 +289,7 @@ function defineTeamspace (builder: Builder): void {
     builder,
     {
       action: document.actionImpl.CreateDocument,
+      visibilityTester: document.function.CanCreateGuidelineDocument,
       label: document.string.CreateDocument,
       icon: document.icon.Add,
       input: 'focus',
@@ -265,8 +307,6 @@ function defineTeamspace (builder: Builder): void {
     },
     document.action.CreateDocument
   )
-
-  createPublicLinkAction(builder, document.class.Document, document.action.PublicLink)
 }
 
 function defineDocument (builder: Builder): void {
@@ -345,6 +385,7 @@ function defineDocument (builder: Builder): void {
     builder,
     {
       action: document.actionImpl.CreateChildDocument,
+      visibilityTester: document.function.CanCreateGuidelineDocument,
       label: document.string.CreateDocument,
       icon: document.icon.Add,
       input: 'focus',
@@ -362,6 +403,7 @@ function defineDocument (builder: Builder): void {
   createAction(
     builder,
     {
+      secured: true,
       action: document.actionImpl.LockContent,
       label: document.string.Lock,
       icon: document.icon.Lock,
@@ -381,6 +423,7 @@ function defineDocument (builder: Builder): void {
   createAction(
     builder,
     {
+      secured: true,
       action: document.actionImpl.UnlockContent,
       label: document.string.Unlock,
       icon: document.icon.Unlock,
@@ -413,6 +456,24 @@ function defineDocument (builder: Builder): void {
   builder.mixin(document.class.Document, core.class.Class, view.mixin.IgnoreActions, {
     actions: [view.action.Open, view.action.OpenInNewTab, tracker.action.NewRelatedIssue]
   })
+
+  createAction(
+    builder,
+    {
+      secured: true,
+      action: view.actionImpl.Delete,
+      actionProps: { confirmation: document.string.DeleteDocumentConfirm },
+      label: view.string.Delete,
+      icon: view.icon.Delete,
+      category: view.category.General,
+      input: 'any',
+      target: document.class.Document,
+      context: { mode: ['context', 'browser'], group: 'remove' },
+      visibilityTester: view.function.CanDeleteObject,
+      override: [view.action.Delete]
+    },
+    document.action.DeleteDocument
+  )
 
   builder.createDoc(
     notification.class.NotificationGroup,
@@ -540,20 +601,6 @@ export function createModel (builder: Builder): void {
   defineDocument(builder)
 
   defineApplication(builder)
-  builder.createDoc(
-    core.class.ModulePermissionGroup,
-    core.space.Model,
-    {
-      application: document.app.Documents,
-      role: AccountRole.Guest,
-      permissions: [],
-      spaceClass: document.class.Teamspace,
-      enabled: true,
-      order: 40
-    },
-    document.ids.ModulePermissionGroup
-  )
-
   builder.createDoc(
     core.class.ModulePermissionGroup,
     core.space.Model,

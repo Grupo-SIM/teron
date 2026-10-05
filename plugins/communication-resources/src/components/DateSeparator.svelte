@@ -33,9 +33,9 @@
     } else if (date.getTime() === yesterday) {
       return await translate(ui.string.Yesterday, {}, lang)
     } else {
-      const dayOfWeek = new Intl.DateTimeFormat('default', { weekday: 'long' }).format(date)
-      const day = new Intl.DateTimeFormat('default', { day: '2-digit' }).format(date)
-      const month = new Intl.DateTimeFormat('default', { month: 'long' }).format(date)
+      const dayOfWeek = new Intl.DateTimeFormat(lang, { weekday: 'long' }).format(date)
+      const day = new Intl.DateTimeFormat(lang, { day: '2-digit' }).format(date)
+      const month = new Intl.DateTimeFormat(lang, { month: 'long' }).format(date)
       return `${dayOfWeek} ${day} ${month}`
     }
   }

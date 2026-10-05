@@ -48,15 +48,16 @@ export class MailClient {
     const from = message.from as string
     const transporter = this.getTransporter(from, password)
     await ctx.with('send', {}, async (ctx) => {
-      transporter.sendMail(message, (err, info) => {
-        const messageInfo = `(from: ${from}, to: ${message.to as string})`
-        if (err !== null) {
-          ctx.error(`Failed to send email ${messageInfo}: ${err.message}`)
-          Analytics.handleError(err)
-        } else {
-          ctx.info(`Email request ${messageInfo} sent: ${info?.response}`)
-        }
-      })
+      const messageInfo = `(from: ${from}, to: ${message.to as string})`
+      try {
+        const info = await transporter.sendMail(message)
+        ctx.info(`Email request ${messageInfo} sent: ${info?.response}`)
+      } catch (err) {
+        const error = err instanceof Error ? err : new Error(String(err))
+        ctx.error(`Failed to send email ${messageInfo}: ${error.message}`)
+        Analytics.handleError(error)
+        throw error
+      }
     })
   }
 

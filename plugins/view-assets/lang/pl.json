@@ -82,6 +82,7 @@
     "FilteredViews": "Filtrowane widoki",
     "NewFilteredView": "Nowy widok filtrowany",
     "FilteredViewName": "Nazwa filtrowanego widoku",
+    "LegacyMyTasks": "Moje zadania",
     "Then": "Następnie po",
     "ShowPreviewOnClick": "Aby wyświetlić podgląd indeksu dokumentu, należy kliknąć...",
     "Shown": "{len, plural, =1 {wyświetlany # wynik} few {wyświetlane # wyniki} other {wyświetlanych # wyników}} {total, plural, =-1 {} =1 {z # przefiltrowanego wyniku} other {z # przefiltrowanych wyników}}",

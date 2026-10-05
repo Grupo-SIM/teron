@@ -15,7 +15,7 @@
 
 import type { Request, Response } from 'express'
 import { MeasureContext, systemAccountUuid, WorkspaceUuid } from '@hcengineering/core'
-import { LiveKitSessionData, BillingDB, LiveKitEgressData, AiUsageData, AiTranscriptData, AiTokensData } from './types'
+import { LiveKitSessionData, BillingDB, LiveKitEgressData, AiUsageData, AiTokensData } from './types'
 import { generateToken } from '@hcengineering/server-token'
 import { StorageConfig } from '@hcengineering/server-core'
 import { createDatalakeClient, DatalakeConfig, WorkspaceStats } from '@hcengineering/datalake'
@@ -79,10 +79,7 @@ export async function handleGetStats (
   const liveKitStats = await db.getLiveKitStats(ctx, workspace, fromDate, toDate)
   const datalakeStats = await collectDatalakeStats(ctx, workspace, storageConfigs)
 
-  const aiStats: AiUsageData = {
-    transcript: await db.getAiTranscriptStats(ctx, workspace, fromDate, toDate),
-    tokens: await db.getAiTokensStats(ctx, workspace, fromDate, toDate)
-  }
+  const aiStats: AiUsageData = { tokens: await db.getAiTokensStats(ctx, workspace, fromDate, toDate) }
   res.status(200).json({ liveKitStats, datalakeStats, aiStats })
 }
 
@@ -119,39 +116,9 @@ export async function handleGetAiStats (
   const workspace = getWorkspaceUuid(req)
   const { fromDate, toDate } = parseDateParameters(req)
 
-  const usage: AiUsageData = {
-    transcript: await db.getAiTranscriptStats(ctx, workspace, fromDate, toDate),
-    tokens: await db.getAiTokensStats(ctx, workspace, fromDate, toDate)
-  }
+  const usage: AiUsageData = { tokens: await db.getAiTokensStats(ctx, workspace, fromDate, toDate) }
 
   res.status(200).json(usage)
-}
-
-export async function handleGetAiTranscriptLastData (
-  ctx: MeasureContext,
-  db: BillingDB,
-  storageConfigs: StorageConfig[],
-  req: Request,
-  res: Response
-): Promise<void> {
-  const last = await db.getAiTranscriptLastData(ctx)
-  if (last === undefined) {
-    res.status(404).send()
-    return
-  }
-  res.status(200).json(last)
-}
-
-export async function handlePushAiTranscriptData (
-  ctx: MeasureContext,
-  db: BillingDB,
-  storageConfigs: StorageConfig[],
-  req: Request,
-  res: Response
-): Promise<void> {
-  const data = (await req.body) as AiTranscriptData[]
-  await db.pushAiTranscriptData(ctx, data)
-  res.status(204).send()
 }
 
 export async function handlePushAiTokensData (

@@ -15,7 +15,7 @@
 <script lang="ts">
   import MonthCalendar from './MonthCalendar.svelte'
   import Scroller from '../Scroller.svelte'
-  import { defaultSP } from '../..'
+  import { defaultSP, deviceOptionsStore as deviceInfo } from '../..'
 
   export let selectedDate: Date = new Date()
   export let currentDate: Date = selectedDate
@@ -23,7 +23,7 @@
   export let minWidth = '18rem'
 
   function getMonthName (date: Date): string {
-    return new Intl.DateTimeFormat('default', { month: 'long' }).format(date)
+    return new Intl.DateTimeFormat($deviceInfo.language, { month: 'long' }).format(date)
   }
   function month (date: Date, m: number): Date {
     date = new Date(date)

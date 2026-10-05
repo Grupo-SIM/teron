@@ -127,6 +127,8 @@ export function transformStripeSubscriptionToData (
     canceledAt = subscription.canceled_at * 1000 // Convert from Unix timestamp to milliseconds
   }
 
+  const willCancelAt = subscription.cancel_at_period_end ? periodEnd : undefined
+
   const subscriptionData: SubscriptionData = {
     id: `stripe_${subscription.id}`, // Composite ID with provider prefix to avoid conflicts
     workspaceUuid,
@@ -142,6 +144,7 @@ export function transformStripeSubscriptionToData (
     periodEnd,
     trialEnd,
     canceledAt,
+    willCancelAt,
     providerData: {
       modifiedAt: subscription.created * 1000, // Convert from Unix timestamp to milliseconds (using created as updated doesn't exist)
       customerId,

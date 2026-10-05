@@ -37,9 +37,14 @@ export async function uploadFile (file: File, options: FileUploadOptions): Promi
 /** @public */
 export function getUploadHandlers (
   client: Client,
-  query?: DocumentQuery<UploadHandlerDefinition>
+  query?: DocumentQuery<UploadHandlerDefinition>,
+  application?: string
 ): UploadHandlerDefinition[] {
-  return client.getModel().findAllSync(uploader.class.UploadHandlerDefinition, query ?? {})
+  const handlers = client.getModel().findAllSync(uploader.class.UploadHandlerDefinition, query ?? {})
+  // Task editors share upload actions with other applications, but do not support recording.
+  return application === 'tracker'
+    ? handlers.filter((handler) => handler.handler !== 'recorder:function:Record')
+    : handlers
 }
 
 /** @public */

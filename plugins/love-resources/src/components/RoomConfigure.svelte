@@ -16,8 +16,8 @@
   import contact, { Contact, Person } from '@hcengineering/contact'
   import { AssigneeBox } from '@hcengineering/contact-resources'
   import { Ref } from '@hcengineering/core'
-  import { getClient } from '@hcengineering/presentation'
-  import { ActionIcon, EditBox, Icon, IconDelete, resizeObserver } from '@hcengineering/ui'
+  import { getClient, MessageBox } from '@hcengineering/presentation'
+  import { ActionIcon, EditBox, Icon, IconDelete, resizeObserver, showPopup, tooltip } from '@hcengineering/ui'
   import { Room, RoomAccess, RoomType, isOffice } from '@hcengineering/love'
   import { createEventDispatcher, onMount } from 'svelte'
   import { cubicOut } from 'svelte/easing'
@@ -40,6 +40,7 @@
   const SHADOW_OFFSET = 3
   const SHADOW_BLUR = 2
   const SHADOW_SPREAD = -1
+  let assigneeVersion = 0
 
   async function updateName (): Promise<void> {
     await client.update(room, { name: room.name })
@@ -49,6 +50,16 @@
     if (isOffice(room)) {
       const value = e.detail
       const prevValue = room.person
+      if (value === prevValue) return
+      if ($infos.some((info) => info.room === room._id || info.person === prevValue)) {
+        assigneeVersion += 1
+        showPopup(MessageBox, {
+          label: love.string.ChangeOfficeAssignee,
+          message: love.string.OfficeCannotBeDeleted,
+          canSubmit: false
+        })
+        return
+      }
       await client.update(room, { person: value })
       if (prevValue != null) {
         const currentInfo = $infos.find((p) => p.room === room._id && p.person === prevValue)
@@ -69,7 +80,9 @@
     await client.remove(room)
   }
 
-  $: removable = $infos.filter((i) => i.room === room._id).length === 0
+  $: roomIsInUse = $infos.some((info) => info.room === room._id)
+  $: assignedPersonOnline = isOffice(room) && room.person !== null && $infos.some((info) => info.person === room.person)
+  $: removable = !roomIsInUse && !assignedPersonOnline
   $: dispatch('cursor', cursor)
   $: zoomOut = cellSize < 40
 
@@ -151,7 +164,7 @@
     shadowColor.set(shadowNormal)
   }
 
-  $: showButtons = room.access === RoomAccess.DND || room.type === RoomType.Video || removable
+  $: showButtons = room.access === RoomAccess.DND || room.type === RoomType.Video || removable || isOffice(room)
   $: updateStyle(top, left, room, roomRect)
 
   const updateStyle = (t: number | undefined, l: number | undefined, r: Room, rect: DOMRect): void => {
@@ -204,19 +217,22 @@
           if (isOffice(room) && rX === 0 && rY === 0) e.stopPropagation()
         }}
       >
-        {#if isOffice(room) && rX === 0 && rY === 0 && !room.person}
+        {#if isOffice(room) && rX === 0 && rY === 0}
+          {#key assigneeVersion}
           <AssigneeBox
             _class={contact.class.Person}
-            excluded={excludedPersons}
+            excluded={excludedPersons.filter((person) => person !== room.person)}
+            docQuery={{ active: true }}
             shouldShowName={false}
             showNavigate={false}
             width={'100%'}
             height={'100%'}
             label={contact.string.Person}
             value={room.person}
-            avatarSize={'full'}
+            avatarSize={'card'}
             on:change={changePerson}
           />
+          {/key}
         {/if}
       </div>
     {/each}
@@ -234,8 +250,18 @@
         {#if room.type === RoomType.Video}
           <Icon icon={love.icon.CamEnabled} size={zoomOut ? 'x-small' : 'small'} />
         {/if}
-        {#if removable}
-          <ActionIcon icon={IconDelete} size={zoomOut ? 'x-small' : 'small'} action={remove} />
+        {#if removable || isOffice(room)}
+          <span
+            class="flex-row-center"
+            use:tooltip={!removable ? { label: love.string.OfficeCannotBeDeleted } : undefined}
+          >
+            <ActionIcon
+              icon={IconDelete}
+              size={zoomOut ? 'x-small' : 'small'}
+              disabled={!removable}
+              action={remove}
+            />
+          </span>
         {/if}
       </div>
     {/if}
@@ -245,9 +271,25 @@
 <style lang="scss">
   .floorGrid-configureRoom__field :global(.employee-presenter),
   .floorGrid-configureRoom__field :global(.employee-presenter .antiPresenter),
-  .floorGrid-configureRoom__field :global(.employee-presenter .ap-icon) {
+  .floorGrid-configureRoom__field :global(.employee-presenter .ap-icon),
+  .floorGrid-configureRoom__field :global(.employee-presenter .flex-presenter),
+  .floorGrid-configureRoom__field :global(.employee-presenter .relative),
+  .floorGrid-configureRoom__field :global(.employee-presenter .noOverflow) {
     width: 100%;
     height: 100%;
+    display: flex;
+    align-items: center;
     justify-content: center;
+  }
+  .floorGrid-configureRoom__field :global(.teronAvatar-container),
+  .floorGrid-configureRoom__field :global(.teronAvatar-container img.ava-image) {
+    width: 100%;
+    height: 100%;
+    max-width: none;
+    max-height: none;
+  }
+  .floorGrid-configureRoom__field :global(.teronAvatar-container img.ava-image) {
+    object-fit: cover;
+    object-position: center;
   }
 </style>

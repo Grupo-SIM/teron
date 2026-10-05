@@ -6,6 +6,7 @@ import { buildSocialIdString, type PersonId, SocialIdType, type Client, type Doc
 import { type Message, type SharedMessage } from '@hcengineering/gmail'
 import { getClient } from '@hcengineering/presentation'
 import type { Integration } from '@hcengineering/account-client'
+import { getDateLocale } from '@hcengineering/ui'
 
 import gmail from './plugin'
 
@@ -26,7 +27,7 @@ export function getTime (time: number): string {
     }
   }
 
-  return new Date(time).toLocaleString('default', options)
+  return new Date(time).toLocaleString(getDateLocale(), options)
 }
 
 export function isToday (time: number): boolean {

@@ -328,6 +328,20 @@
   line-height: 1.4;
 }
 
+.auth-billing-total {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  color: rgb(229, 229, 231) !important;
+  font-size: 14px !important;
+}
+
+.auth-billing-total strong {
+  color: #fff;
+  font-size: 16px;
+}
+
 .auth-check {
   position: relative;
   display: flex;

@@ -13,6 +13,7 @@
 // limitations under the License.
 -->
 <script lang="ts">
+  import { AccountRole, getCurrentAccount, hasAccountRole } from '@hcengineering/core'
   import type { Ref } from '@hcengineering/core'
   import { createQuery } from '@hcengineering/presentation'
   import { recruitId, Vacancy } from '@hcengineering/recruit'
@@ -67,7 +68,9 @@
         bind:loading
       />
       {#if !readonly}
-        <Button id="appls.add" icon={IconAdd} kind={'ghost'} on:click={createApp} />
+        {#if hasAccountRole(getCurrentAccount(), AccountRole.Maintainer)}
+          <Button id="appls.add" icon={IconAdd} kind={'ghost'} on:click={createApp} />
+        {/if}
       {/if}
     </div>
   </div>

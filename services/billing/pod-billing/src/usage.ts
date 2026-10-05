@@ -140,7 +140,9 @@ export class UsageWorker {
     const storageBytes = storageUsage.size
 
     const limits = getTierLimitsBytes(subscription?.plan)
-    const exceeded = storageBytes > limits.storageBytes || livekitTrafficBytes > limits.trafficBytes
+    const storageExceeded = isUsageLimitExceeded(storageBytes, limits.storageBytes)
+    const trafficExceeded = isUsageLimitExceeded(livekitTrafficBytes, limits.trafficBytes)
+    const exceeded = storageExceeded || trafficExceeded
     const limitsExceededSince = computeLimitsExceededSince(prevUsage?.limitsExceededSince, exceeded, now)
 
     const usage: UsageStatus = {
@@ -152,6 +154,10 @@ export class UsageWorker {
 
     await account.updateUsageInfo(usage)
   }
+}
+
+export function isUsageLimitExceeded (used: number, limit: number): boolean {
+  return limit > 0 && used > limit
 }
 
 export function computeLimitsExceededSince (

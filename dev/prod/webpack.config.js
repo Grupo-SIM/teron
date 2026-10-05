@@ -47,6 +47,8 @@ const ForkTsCheckerWebpackPlugin = require('fork-ts-checker-webpack-plugin')
 const doValidate = !prod || process.env.DO_VALIDATE === 'true'
 
 const useCache = process.env.USE_CACHE === 'true'
+const sourceMaps = !prod || process.env.SOURCEMAP === 'true'
+const analyzeBundle = process.env.ANALYZE === 'true'
 
 const BundleAnalyzerPlugin = require('webpack-bundle-analyzer').BundleAnalyzerPlugin
 
@@ -289,7 +291,7 @@ module.exports = [
             target: 'es2021',
             keepNames: true,
             minify: prod,
-            sourcemap: true
+            sourcemap: sourceMaps
           },
           exclude: /node_modules/
         },
@@ -306,7 +308,7 @@ module.exports = [
                 hotReload: !prod,
                 preprocess: require('svelte-preprocess')({
                   postcss: true,
-                  sourceMap: true,
+                  sourceMap: sourceMaps,
                   scss: {
                     implementation: sass
                   }
@@ -425,7 +427,7 @@ module.exports = [
     },
     mode,
     plugins: [
-      ...(prod
+      ...(analyzeBundle
         ? [
             new BundleAnalyzerPlugin({
               analyzerMode: 'static',

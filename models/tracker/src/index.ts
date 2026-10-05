@@ -68,17 +68,19 @@ export { default } from './plugin'
 export const classicIssueTaskStatuses: TaskStatusFactory[] = [
   {
     category: task.statusCategory.UnStarted,
-    statuses: [['Backlog', PaletteColorIndexes.Cloud, pluginState.status.Backlog]]
+    statuses: [['Pendente', PaletteColorIndexes.Cloud, pluginState.status.Backlog]]
   },
-  { category: task.statusCategory.ToDo, statuses: [['Todo', PaletteColorIndexes.Porpoise, pluginState.status.Todo]] },
   {
     category: task.statusCategory.Active,
-    statuses: [['In Progress', PaletteColorIndexes.Cerulean, pluginState.status.InProgress]]
+    statuses: [
+      ['Em andamento', PaletteColorIndexes.Cerulean, pluginState.status.InProgress],
+      ['Revisão', PaletteColorIndexes.Orange, pluginState.status.UnderReview]
+    ]
   },
-  { category: task.statusCategory.Won, statuses: [['Done', PaletteColorIndexes.Grass, pluginState.status.Done]] },
+  { category: task.statusCategory.Won, statuses: [['Finalizado', PaletteColorIndexes.Grass, pluginState.status.Done]] },
   {
     category: task.statusCategory.Lost,
-    statuses: [['Canceled', PaletteColorIndexes.Coin, pluginState.status.Canceled]]
+    statuses: [['Ajustes', PaletteColorIndexes.Firework, pluginState.status.Canceled]]
   }
 ]
 
@@ -146,7 +148,7 @@ function defineNotifications (builder: Builder): void {
       generated: false,
       label: task.string.AssignedToMe,
       group: tracker.ids.TrackerNotificationGroup,
-      field: 'assignee',
+      field: 'assignees',
       txClasses: [core.class.TxCreateDoc, core.class.TxUpdateDoc],
       objectClass: tracker.class.Issue,
       onlyOwn: true,
@@ -165,7 +167,7 @@ function defineNotifications (builder: Builder): void {
     tracker.class.Issue,
     tracker.ids.TrackerNotificationGroup,
     [],
-    ['comments', 'status', 'priority', 'assignee', 'subIssues', 'blockedBy', 'milestone', 'dueDate']
+    ['comments', 'status', 'priority', 'assignees', 'subIssues', 'blockedBy', 'milestone', 'dueDate']
   )
 }
 
@@ -178,18 +180,11 @@ function defineFilters (builder: Builder): void {
   //
   builder.mixin(tracker.class.Issue, core.class.Class, view.mixin.ClassFilters, {
     filters: [
-      'kind',
       'status',
       'priority',
       'space',
       'createdBy',
-      'assignee',
-      {
-        _class: tracker.class.Issue,
-        key: 'component',
-        component: view.component.ObjectFilter,
-        showNested: false
-      },
+      'assignees',
       {
         _class: tracker.class.Issue,
         key: 'milestone',
@@ -307,7 +302,6 @@ function defineApplication (
     myIssuesId: string
     allIssuesId: string
     issuesId: string
-    componentsId: string
     milestonesId: string
     templatesId: string
     labelsId: string
@@ -351,11 +345,6 @@ function defineApplication (
               space: undefined,
               icon: tracker.icon.Issues,
               title: tracker.string.AllIssues,
-              config: [
-                ['all', tracker.string.All, {}],
-                ['active', tracker.string.Active, {}],
-                ['backlog', tracker.string.Backlog, {}]
-              ],
               allProjectsTypes: true
             }
           },
@@ -400,19 +389,8 @@ function defineApplication (
                 component: tracker.component.Issues,
                 componentProps: {
                   icon: tracker.icon.Issues,
-                  title: tracker.string.Issues,
-                  config: [
-                    ['all', tracker.string.All, {}],
-                    ['active', tracker.string.Active, {}],
-                    ['backlog', tracker.string.Backlog, {}]
-                  ]
+                  title: tracker.string.Issues
                 }
-              },
-              {
-                id: opt.componentsId,
-                label: tracker.string.Components,
-                icon: tracker.icon.Components,
-                component: tracker.component.ProjectComponents
               },
               {
                 id: opt.milestonesId,
@@ -499,7 +477,6 @@ export function createModel (builder: Builder): void {
   )
 
   const issuesId = 'issues'
-  const componentsId = 'components'
   const milestonesId = 'milestones'
   const templatesId = 'templates'
   const myIssuesId = 'my-issues'
@@ -521,7 +498,7 @@ export function createModel (builder: Builder): void {
 
   builder.createDoc<ClassCollaborators<Issue>>(core.class.ClassCollaborators, core.space.Model, {
     attachedTo: tracker.class.Issue,
-    fields: ['createdBy', 'assignee']
+    fields: ['createdBy', 'assignees']
   })
 
   builder.mixin(tracker.class.Issue, core.class.Class, setting.mixin.Editable, {
@@ -624,9 +601,9 @@ export function createModel (builder: Builder): void {
     tracker.ids.IssueTemplateUpdatedActivityViewlet
   )
 
-  defineApplication(builder, { myIssuesId, allIssuesId, issuesId, componentsId, milestonesId, templatesId, labelsId })
+  defineApplication(builder, { myIssuesId, allIssuesId, issuesId, milestonesId, templatesId, labelsId })
 
-  defineActions(builder, issuesId, componentsId, myIssuesId)
+  defineActions(builder, issuesId, myIssuesId)
 
   defineFilters(builder)
 
@@ -656,31 +633,6 @@ export function createModel (builder: Builder): void {
     role: AccountRole.Maintainer,
     order: 4000
   })
-
-  builder.createDoc(
-    core.class.ClassPermission,
-    core.space.Model,
-    {
-      label: tracker.string.AllowCreatingIssues,
-      scope: 'space',
-      targetClass: tracker.class.Issue
-    },
-    tracker.ids.GuestIssueClassPermission
-  )
-
-  builder.createDoc(
-    core.class.ModulePermissionGroup,
-    core.space.Model,
-    {
-      application: tracker.app.Tracker,
-      role: AccountRole.Guest,
-      permissions: [tracker.ids.GuestIssueClassPermission],
-      spaceClass: tracker.class.Project,
-      enabled: true,
-      order: 10
-    },
-    tracker.ids.ModulePermissionGroup
-  )
 
   builder.createDoc(
     core.class.ModulePermissionGroup,
@@ -752,7 +704,7 @@ export function createModel (builder: Builder): void {
       { status: 1 },
       { project: 1 },
       { priority: 1 },
-      { assignee: 1 },
+      { assignees: 1 },
       { sprint: 1 },
       { component: 1 },
       { category: 1 },
@@ -831,6 +783,14 @@ function defineSpaceType (builder: Builder): void {
       )
     }
   }
+
+  // Keep the old status available to historical activity until references have been migrated.
+  builder.createDoc(tracker.class.IssueStatus, core.space.Model, {
+    ofAttribute: tracker.attribute.IssueStatus,
+    name: 'Pendente',
+    color: PaletteColorIndexes.Cloud,
+    category: task.statusCategory.UnStarted
+  }, pluginState.status.Todo)
 
   // Create default task type
   builder.createModel(TIssueTypeData)

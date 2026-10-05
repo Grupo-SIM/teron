@@ -19,7 +19,6 @@
   import settingsRes from '../plugin'
 
   let loading = true
-  let defaultStartWithTranscription = false
   let defaultStartWithRecording = false
 
   const client = getClient()
@@ -29,37 +28,15 @@
   $: query.query(setting.class.OfficeSettings, {}, (set) => {
     existingOfficeSettings = set as OfficeSettings[]
     if (existingOfficeSettings !== undefined && existingOfficeSettings.length > 0) {
-      defaultStartWithTranscription = existingOfficeSettings[0].defaultStartWithTranscription ?? false
       defaultStartWithRecording = existingOfficeSettings[0].defaultStartWithRecording ?? false
     }
     loading = false
   })
 
-  async function toggleDefaultTranscription (e: CustomEvent<boolean>): Promise<void> {
-    const enabled = e.detail
-    defaultStartWithTranscription = enabled
-    const newSettings = {
-      defaultStartWithTranscription: enabled,
-      defaultStartWithRecording,
-      enabled: true
-    }
-    if (existingOfficeSettings.length === 0) {
-      await client.createDoc(setting.class.OfficeSettings, core.space.Workspace, newSettings)
-    } else {
-      await client.updateDoc(
-        setting.class.OfficeSettings,
-        core.space.Workspace,
-        existingOfficeSettings[0]._id,
-        newSettings
-      )
-    }
-  }
-
   async function toggleDefaultRecording (e: CustomEvent<boolean>): Promise<void> {
     const enabled = e.detail
     defaultStartWithRecording = enabled
     const newSettings = {
-      defaultStartWithTranscription,
       defaultStartWithRecording: enabled,
       enabled: true
     }
@@ -91,16 +68,6 @@
           <div class="title"><Label label={settingsRes.string.OfficeDefaultSettings} /></div>
 
           <div class="flex-col flex-gap-4 mt-6">
-            <div class="flex-row-center flex-gap-4">
-              <Label label={settingsRes.string.DefaultStartWithTranscription} />
-              <Toggle
-                on={defaultStartWithTranscription}
-                on:change={(e) => {
-                  void toggleDefaultTranscription(e)
-                }}
-              />
-            </div>
-
             <div class="flex-row-center flex-gap-4">
               <Label label={settingsRes.string.DefaultStartWithRecording} />
               <Toggle

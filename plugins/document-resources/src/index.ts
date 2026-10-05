@@ -1,3 +1,4 @@
+import { canCreateGuidelineDocument } from './guideline-access'
 //
 // Copyright © 2022, 2023 Hardcore Engineering Inc.
 //
@@ -14,8 +15,10 @@
 //
 
 import {
+  AccountRole,
   generateId,
   getCurrentAccount,
+  hasAccountRole,
   type Class,
   type Client,
   type DocumentQuery,
@@ -68,7 +71,7 @@ async function queryDocument (
   search: string,
   filter?: { in?: RelatedDocument[], nin?: RelatedDocument[] }
 ): Promise<ObjectSearchResult[]> {
-  const q: DocumentQuery<Document> = { title: { $like: `%${search}%` } }
+  const q: DocumentQuery<Document> = { title: { $contains: search } }
   if (filter?.in !== undefined || filter?.nin !== undefined) {
     q._id = {}
     if (filter.in !== undefined) {
@@ -124,6 +127,7 @@ export async function lockContent (doc: Document | Document[]): Promise<void> {
 }
 
 export async function unlockContent (doc: Document | Document[]): Promise<void> {
+  if (!hasAccountRole(getCurrentAccount(), AccountRole.Maintainer)) return
   const client = getClient()
 
   const arr = Array.isArray(doc) ? doc : [doc]
@@ -138,6 +142,7 @@ export async function canLockDocument (doc: Document | Document[]): Promise<bool
 }
 
 export async function canUnlockDocument (doc: Document | Document[]): Promise<boolean> {
+  if (!hasAccountRole(getCurrentAccount(), AccountRole.Maintainer)) return false
   const arr = Array.isArray(doc) ? doc : [doc]
   return arr.some((p) => p.lockedBy != null)
 }
@@ -174,6 +179,7 @@ export default async (): Promise<Resources> => ({
     UnlockContent: unlockContent
   },
   function: {
+    CanCreateGuidelineDocument: canCreateGuidelineDocument,
     GetObjectLinkFragment: getDocumentLink,
     DocumentTitleProvider: documentTitleProvider,
     CanLockDocument: canLockDocument,

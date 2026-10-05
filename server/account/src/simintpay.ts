@@ -166,6 +166,14 @@ export async function getWorkspaceBillingContract (workspace: WorkspaceUuid): Pr
   return await internalRequest(`/contracts/by-resource/WORKSPACE/${encodeURIComponent(workspace)}`)
 }
 
+export async function cancelWorkspaceBillingContract (contractId: string): Promise<SimintpayBillingContract> {
+  return await internalRequest(`/contracts/${encodeURIComponent(contractId)}/cancel`, { method: 'POST' })
+}
+
+export async function reactivateWorkspaceBillingContract (contractId: string): Promise<SimintpayBillingContract> {
+  return await internalRequest(`/contracts/${encodeURIComponent(contractId)}/uncancel`, { method: 'POST' })
+}
+
 export async function requestWorkspaceQuantityChange (
   contract: SimintpayBillingContract,
   workspace: WorkspaceUuid,

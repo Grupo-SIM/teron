@@ -46,6 +46,8 @@ export default mergeIds(documentId, document, {
     UnlockContent: '' as ViewAction
   },
   action: {
+    DeleteTeamspace: '' as Ref<Action<Doc, any>>,
+    DeleteDocument: '' as Ref<Action<Doc, any>>,
     PublicLink: '' as Ref<Action<Doc, any>>,
     LockContent: '' as Ref<Action<Doc, any>>,
     UnlockContent: '' as Ref<Action<Doc, any>>
@@ -62,10 +64,11 @@ export default mergeIds(documentId, document, {
     Other: '' as Ref<TagCategory>
   },
   ids: {
-    ModulePermissionGroup: '' as Ref<Doc>,
     ModulePermissionGroupReadOnlyGuest: '' as Ref<Doc>
   },
   string: {
+    DeleteTeamspaceConfirm: '' as IntlString,
+    DeleteTeamspaceTitle: '' as IntlString,
     ConfigDescription: '' as IntlString,
     ParentDocument: '' as IntlString,
     ChildDocument: '' as IntlString,

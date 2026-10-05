@@ -14,6 +14,7 @@
 //
 
 import type { IPCMainExposed } from './types'
+import { translateDesktop } from '../i18n'
 
 const DEBOUNCE_MS = 300
 
@@ -78,8 +79,8 @@ export function setupDesktopFindInPageBar (electronApi: IPCMainExposed): void {
   const closeBtn = document.createElement('button')
   closeBtn.type = 'button'
   closeBtn.className = 'icon-btn close-x'
-  closeBtn.setAttribute('aria-label', 'Close')
-  closeBtn.title = 'Close'
+  closeBtn.setAttribute('aria-label', translateDesktop('find.close'))
+  closeBtn.title = translateDesktop('find.close')
 
   root.appendChild(input)
   root.appendChild(matchCount)
@@ -103,10 +104,13 @@ export function setupDesktopFindInPageBar (electronApi: IPCMainExposed): void {
 
   function describeMatchCount (matches: number, activeOrdinal: number): { label: string, title: string } {
     if (matches <= 0) {
-      return { label: '0/0', title: 'No matches' }
+      return { label: '0/0', title: translateDesktop('find.noMatches') }
     }
     const cur = activeOrdinal > 0 ? Math.min(activeOrdinal, matches) : 1
-    return { label: `${cur}/${matches}`, title: `Match ${cur} of ${matches}` }
+    return {
+      label: `${cur}/${matches}`,
+      title: translateDesktop('find.matchOf', { current: cur, total: matches })
+    }
   }
 
   function updateNavState (): void {

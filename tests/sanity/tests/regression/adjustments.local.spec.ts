@@ -1,0 +1,100 @@
+import { expect, test, type Page } from '@playwright/test'
+import { readFileSync } from 'node:fs'
+const localRegression = process.env.TERON_LOCAL_REGRESSION === '1'
+test.skip(!localRegression, 'Requires disposable local regression stack')
+const state = localRegression ? JSON.parse(readFileSync('/tmp/teron-regression-accounts.json', 'utf8')) : { ws: {} }
+const workspace = state.ws.workspaceUrl
+async function login (page: Page, email: string): Promise<void> {
+  await page.context().route('**/*', route => ['localhost', '127.0.0.1'].includes(new URL(route.request().url()).hostname) ? route.continue() : route.abort())
+  await page.goto('/')
+  await page.locator('input[name=email]').fill(email)
+  await page.locator('input[type=password]').fill('Regression123!')
+  await page.getByRole('button', { name: 'Entrar', exact: true }).click()
+  await expect(page).toHaveURL(/mode=workspaces/, { timeout: 30000 })
+  await page.goto(`/workbench/${workspace}/time`, { waitUntil: 'domcontentloaded' })
+  await expect(page.getByText('Minha Agenda', { exact: true })).toBeVisible({ timeout: 120000 })
+}
+test('two accounts keep private agendas busy and own agendas separate', async ({ page, browser }) => {
+  const errors: string[] = []
+  page.on('pageerror', error => errors.push(error.message))
+  await login(page, 'owner@regression.local')
+  await expect(page.getByText('Segredo Owner', { exact: true }).first()).toBeVisible()
+  await expect(page.getByText('Agendas da Equipe', { exact: true })).toBeVisible()
+  await page.screenshot({ path: '/tmp/teron-regression-calendar-owner.png' })
+  const userContext = await browser.newContext({ baseURL: 'http://localhost:30180', timezoneId: 'America/Recife', viewport: { width: 1440, height: 1000 } })
+  try {
+    const user = await userContext.newPage()
+    user.on('pageerror', error => errors.push(error.message))
+    await login(user, 'user@regression.local')
+    await expect(user.getByText('Segredo Owner', { exact: true })).toHaveCount(0)
+    await expect(user.getByText('Reunião pública', { exact: true })).toHaveCount(0)
+    await user.getByText('Agendas da Equipe', { exact: true }).click()
+    await expect(user.getByText('Reunião pública', { exact: true }).first()).toBeVisible()
+    await expect(user.getByText('Ocupado', { exact: true }).first()).toBeVisible()
+    await expect(user.getByText('Compromisso dia inteiro', { exact: true }).first()).toBeVisible()
+    await expect(user.getByText('Compromisso atravessa meia-noite', { exact: true }).first()).toBeVisible()
+    await expect(user.locator('.agenda-event').filter({ hasText: 'Compromisso atravessa meia-noite' })).toContainText('00:00 – 01:00')
+    await expect(user.locator('.agenda-event').filter({ hasText: 'Compromisso dia inteiro' })).toContainText('Todo o dia')
+    await expect(user.getByText('Segredo Owner', { exact: true })).toHaveCount(0)
+    await expect(user.getByText('Segredo agenda', { exact: true })).toHaveCount(0)
+    const privateBlock = user.locator('.calendar-element').filter({ hasText: 'Ocupado' }).first()
+    await expect(privateBlock).toHaveAttribute('draggable', 'false')
+    await expect(privateBlock.locator('.allowed')).toHaveCount(0)
+    await privateBlock.click()
+    await expect(user.locator('.selectPopup')).toHaveCount(0)
+    await privateBlock.click({ button: 'right' })
+    await expect(user.locator('.selectPopup')).toHaveCount(0)
+    await expect(user.getByText('Excluir', { exact: true })).toHaveCount(0)
+    await expect(user.getByText('Editar', { exact: true })).toHaveCount(0)
+    await expect(user.getByText('Abrir numa nova janela', { exact: true })).toHaveCount(0)
+    await privateBlock.locator('.calendar-element-start').click({ button: 'right', force: true })
+    await expect(user.getByText('Excluir', { exact: true })).toHaveCount(0)
+    await user.getByRole('button', { name: 'Calendários', exact: true }).click()
+    await user.getByText('Agenda privada', { exact: true }).last().click()
+    await expect(user.getByText('Reunião pública', { exact: true })).toHaveCount(0)
+    await expect(user.getByText('Ocupado', { exact: true }).first()).toBeVisible()
+    await expect(user.getByText('Segredo agenda', { exact: true })).toHaveCount(0)
+    await user.getByRole('button', { name: /^Calendários/ }).click()
+    await user.getByText('Agenda compartilhada', { exact: true }).last().click()
+    await expect(user.getByText('Reunião pública', { exact: true }).first()).toBeVisible()
+    await user.screenshot({ path: '/tmp/teron-regression-calendar-user.png' })
+  } finally { await userContext.close() }
+  expect(errors).toEqual([])
+})
+test('contacts, guidelines and office expose corrected controls', async ({ page }) => {
+  await login(page, 'owner@regression.local')
+  await page.goto(`/workbench/${workspace}/contact`)
+  await expect(page.getByText('Funcionários', { exact: true }).first()).toBeVisible({ timeout: 120000 })
+  await expect(page.getByText('Externos', { exact: true }).first()).toBeVisible()
+  await expect(page.getByText('Clientes', { exact: true }).first()).toBeVisible()
+  await page.goto(`/workbench/${workspace}/document`)
+  await expect(page.getByText('Espaços de diretrizes', { exact: true }).first()).toBeVisible({ timeout: 120000 })
+  await page.screenshot({ path: '/tmp/teron-regression-guidelines.png' })
+  await page.goto(`/workbench/${workspace}/love`)
+  await expect(page.getByText('Trocar andar', { exact: true })).toBeVisible({ timeout: 120000 })
+  await page.getByText('Trocar andar', { exact: true }).click()
+  await page.screenshot({ path: '/tmp/teron-regression-floor-selector.png' })
+  for (const theme of ['theme-light', 'theme-dark']) {
+    const backgrounds = await page.evaluate((theme) => {
+      const root = document.querySelector('.theme-dark, .theme-light')!
+      root.classList.remove('theme-dark', 'theme-light'); root.classList.add(theme)
+      const preview = document.querySelector('.floor-card.preview')!
+      const probe = document.createElement('div'); probe.style.backgroundColor = 'var(--theme-panel-color)'; root.append(probe)
+      const actual = getComputedStyle(preview).backgroundColor; const expected = getComputedStyle(probe).backgroundColor; probe.remove()
+      return { actual, expected }
+    }, theme)
+    expect(backgrounds.actual).toEqual(backgrounds.expected)
+    await page.screenshot({ path: `/tmp/teron-regression-floor-${theme}.png` })
+  }
+
+  await page.keyboard.press('Escape')
+  await page.getByText('Editar escritório', { exact: true }).click()
+  await page.getByRole('button', { name: 'Andar regressão', exact: true }).first().click()
+  const photo = page.locator('.floorGrid-configureRoom__field img.ava-image').first()
+  await expect(photo).toBeVisible()
+  await expect(photo).toHaveCSS('object-fit', 'cover')
+  const geometry = await photo.evaluate(image => ({ image: image.getBoundingClientRect().width, container: image.closest('.floorGrid-configureRoom__field')!.getBoundingClientRect().width, imageHeight: image.getBoundingClientRect().height, containerHeight: image.closest('.floorGrid-configureRoom__field')!.getBoundingClientRect().height }))
+  expect(Math.abs(geometry.image - geometry.container)).toBeLessThan(1)
+  expect(Math.abs(geometry.imageHeight - geometry.containerHeight)).toBeLessThan(1)
+  await page.screenshot({ path: '/tmp/teron-regression-office-edit.png' })
+})

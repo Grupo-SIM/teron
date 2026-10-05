@@ -14,45 +14,13 @@
 -->
 <script lang="ts">
   import { WithLookup } from '@hcengineering/core'
-  import { getClient } from '@hcengineering/presentation'
-  import { Issue, Project, TimeSpendReport } from '@hcengineering/tracker'
-  import { eventToHTMLElement, showPopup } from '@hcengineering/ui'
+  import { TimeSpendReport } from '@hcengineering/tracker'
   import TimePresenter from './TimePresenter.svelte'
-  import TimeSpendReportPopup from './TimeSpendReportPopup.svelte'
 
   export let value: WithLookup<TimeSpendReport>
-  export let currentProject: Project | undefined
   export let accent = false
-
-  const client = getClient()
-
-  $: issue = value.$lookup?.attachedTo
-  $: if (!issue && value.attachedToClass) {
-    client.findOne(value.attachedToClass, { _id: value.attachedTo }).then((r) => {
-      issue = r as Issue
-    })
-  }
-  $: defaultTimeReportDay = currentProject?.defaultTimeReportDay
-
-  function editSpendReport (event: MouseEvent): void {
-    if (!issue) {
-      return
-    }
-    showPopup(
-      TimeSpendReportPopup,
-      {
-        issue,
-        issueClass: value.attachedToClass,
-        space: value.space,
-        value,
-        assignee: value.employee,
-        defaultTimeReportDay
-      },
-      eventToHTMLElement(event)
-    )
-  }
 </script>
 
 {#if value && value.value}
-  <TimePresenter id="TimeSpendReportValue" kind="link" value={value.value} on:click={editSpendReport} {accent} />
+  <TimePresenter id="TimeSpendReportValue" value={value.value} {accent} />
 {/if}

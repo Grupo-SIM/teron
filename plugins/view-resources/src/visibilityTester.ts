@@ -19,12 +19,14 @@ import core, {
   getCurrentAccount,
   toIdMap,
   AccountRole,
+  hasAccountRole,
   type Doc,
   type Space,
   type TypedSpace
 } from '@hcengineering/core'
 import { getClient } from '@hcengineering/presentation'
 import { get } from 'svelte/store'
+import { canDeleteWorkspaceFolder } from './folder-role-policy'
 import { spaceSpace } from './utils'
 
 function isTypedSpace (space: Space): space is TypedSpace {
@@ -33,10 +35,13 @@ function isTypedSpace (space: Space): space is TypedSpace {
 
 function isSpaceOwner (space: Space): boolean {
   const currentAccount = getCurrentAccount()
-  return currentAccount.role === AccountRole.Owner || (space.owners ?? []).includes(currentAccount.uuid)
+  return hasAccountRole(currentAccount, AccountRole.Maintainer) || (space.owners ?? []).includes(currentAccount.uuid)
 }
 
 export async function canDeleteObject (doc?: Doc | Doc[]): Promise<boolean> {
+  if (!hasAccountRole(getCurrentAccount(), AccountRole.Maintainer) &&
+    (doc === undefined || !(Array.isArray(doc) ? doc : [doc]).every((item) =>
+      canDeleteWorkspaceFolder(getCurrentAccount(), getClient().getHierarchy().getAncestors(item._class))))) return false
   if (doc === undefined) {
     return false
   }
@@ -58,6 +63,7 @@ export async function canDeleteObject (doc?: Doc | Doc[]): Promise<boolean> {
 }
 
 export async function canEditSpace (doc?: Doc | Doc[]): Promise<boolean> {
+  if (!hasAccountRole(getCurrentAccount(), AccountRole.Maintainer)) return false
   if (doc === undefined || Array.isArray(doc)) {
     return false
   }
@@ -84,6 +90,7 @@ export async function canEditSpace (doc?: Doc | Doc[]): Promise<boolean> {
 }
 
 export async function canArchiveSpace (doc?: Doc | Doc[]): Promise<boolean> {
+  if (!hasAccountRole(getCurrentAccount(), AccountRole.Maintainer)) return false
   if (doc === undefined || Array.isArray(doc)) {
     return false
   }
@@ -110,6 +117,7 @@ export async function canArchiveSpace (doc?: Doc | Doc[]): Promise<boolean> {
 }
 
 export async function canDeleteSpace (doc?: Doc | Doc[]): Promise<boolean> {
+  if (!hasAccountRole(getCurrentAccount(), AccountRole.Maintainer)) return false
   if (doc === undefined || Array.isArray(doc)) {
     return false
   }
@@ -132,6 +140,7 @@ export async function canDeleteSpace (doc?: Doc | Doc[]): Promise<boolean> {
 }
 
 export async function canJoinSpace (doc?: Doc | Doc[]): Promise<boolean> {
+  if (!hasAccountRole(getCurrentAccount(), AccountRole.Maintainer)) return false
   if (doc === undefined || Array.isArray(doc)) {
     return false
   }
@@ -142,6 +151,7 @@ export async function canJoinSpace (doc?: Doc | Doc[]): Promise<boolean> {
 }
 
 export async function canLeaveSpace (doc?: Doc | Doc[]): Promise<boolean> {
+  if (!hasAccountRole(getCurrentAccount(), AccountRole.Maintainer)) return false
   if (doc === undefined || Array.isArray(doc)) {
     return false
   }

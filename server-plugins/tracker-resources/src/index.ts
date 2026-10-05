@@ -38,7 +38,9 @@ import tracker, {
   Component,
   Issue,
   IssueParentInfo,
-  TimeSpendReport,
+  isTimedIssueStatus,
+  issueTimeHours,
+  settleIssueTime,
   trackerId,
   type Project
 } from '@hcengineering/tracker'
@@ -116,9 +118,7 @@ export async function getIssueNotificationContent (
     const updateTx = tx as TxUpdateDoc<Issue>
 
     if (
-      updateTx.operations.assignee !== null &&
-      updateTx.operations.assignee !== undefined &&
-      updateTx.operations.assignee === target
+      (updateTx.operations.assignees ?? (updateTx.operations.assignee == null ? [] : [updateTx.operations.assignee])).includes(target as any)
     ) {
       body = tracker.string.IssueAssignedToYou
     } else {
@@ -207,23 +207,20 @@ export async function OnComponentRemove (txes: Tx[], control: TriggerControl): P
 export async function OnIssueUpdate (txes: Tx[], control: TriggerControl): Promise<Tx[]> {
   const result: Tx[] = []
   for (const actualTx of txes) {
-    // Check TimeReport operations
-    if (
-      actualTx._class === core.class.TxCreateDoc ||
-      actualTx._class === core.class.TxUpdateDoc ||
-      actualTx._class === core.class.TxRemoveDoc
-    ) {
-      const cud = actualTx as TxCUD<TimeSpendReport>
-      if (cud.objectClass === tracker.class.TimeSpendReport) {
-        result.push(...(await doTimeReportUpdate(cud, control)))
-      }
-    }
-
     if (actualTx._class === core.class.TxCreateDoc) {
       const createTx = actualTx as TxCreateDoc<Issue>
       if (control.hierarchy.isDerived(createTx.objectClass, tracker.class.Issue)) {
         const issue = TxProcessor.createDoc2Doc(createTx)
-        updateIssueParentEstimations(issue, result, control, [], issue.parents)
+        updateIssueParentEstimations({
+          ...issue,
+          trackedTimeMs: 0,
+          trackingStartedOn: isTimedIssueStatus(issue.status) ? createTx.modifiedOn : null
+        }, result, control, [], issue.parents)
+        result.push(control.txFactory.createTxUpdateDoc(issue._class, issue.space, issue._id, {
+          trackedTimeMs: 0,
+          trackingStartedOn: isTimedIssueStatus(issue.status) ? createTx.modifiedOn : null,
+          reportedTime: 0
+        }))
         continue
       }
     }
@@ -265,111 +262,6 @@ export async function OnIssueUpdate (txes: Tx[], control: TriggerControl): Promi
   return result
 }
 
-async function doTimeReportUpdate (cud: TxCUD<TimeSpendReport>, control: TriggerControl): Promise<Tx[]> {
-  const { attachedTo: attachedToId, attachedToClass } = cud
-  if (attachedToClass === undefined || attachedToId === undefined) {
-    return []
-  }
-  const attachedTo = attachedToId as Ref<Issue>
-  switch (cud._class) {
-    case core.class.TxCreateDoc: {
-      const ccud = cud as TxCreateDoc<TimeSpendReport>
-      const [currentIssue] = await control.findAll(control.ctx, tracker.class.Issue, { _id: attachedTo }, { limit: 1 })
-      const res = [
-        control.txFactory.createTxUpdateDoc<Issue>(
-          attachedToClass,
-          cud.objectSpace,
-          attachedTo,
-          {
-            $inc: { reportedTime: ccud.attributes.value }
-          },
-          false,
-          currentIssue.modifiedOn
-        )
-      ]
-      currentIssue.reportedTime += ccud.attributes.value
-      currentIssue.remainingTime = Math.max(0, currentIssue.estimation - currentIssue.reportedTime)
-      updateIssueParentEstimations(currentIssue, res, control, currentIssue.parents, currentIssue.parents)
-      return res
-    }
-    case core.class.TxUpdateDoc: {
-      const upd = cud as TxUpdateDoc<TimeSpendReport>
-      if (upd.operations.value !== undefined) {
-        const logTxes = Array.from(
-          await control.findAll(control.ctx, core.class.TxCUD, {
-            objectId: cud.objectId
-          })
-        ).filter((it) => it._id !== cud._id)
-        const doc = TxProcessor.buildDoc2Doc<TimeSpendReport>(logTxes)
-
-        const res: Tx[] = []
-        const [currentIssue] = await control.findAll(
-          control.ctx,
-          tracker.class.Issue,
-          { _id: attachedTo },
-          { limit: 1 }
-        )
-        if (doc != null) {
-          res.push(
-            control.txFactory.createTxUpdateDoc<Issue>(
-              attachedToClass,
-              cud.objectSpace,
-              attachedTo,
-              {
-                $inc: { reportedTime: upd.operations.value - doc.value }
-              },
-              false,
-              currentIssue.modifiedOn
-            )
-          )
-          currentIssue.reportedTime -= doc.value
-          currentIssue.reportedTime += upd.operations.value
-          currentIssue.remainingTime = Math.max(0, currentIssue.estimation - currentIssue.reportedTime)
-        }
-
-        updateIssueParentEstimations(currentIssue, res, control, currentIssue.parents, currentIssue.parents)
-        return res
-      }
-      break
-    }
-    case core.class.TxRemoveDoc: {
-      if (!control.removedMap.has(attachedTo)) {
-        const logTxes = Array.from(
-          await control.findAll(control.ctx, core.class.TxCUD, {
-            objectId: cud.objectId
-          })
-        ).filter((it) => it._id !== cud._id)
-        const doc = TxProcessor.buildDoc2Doc<TimeSpendReport>(logTxes)
-        if (doc != null) {
-          const [currentIssue] = await control.findAll(
-            control.ctx,
-            tracker.class.Issue,
-            { _id: attachedTo },
-            { limit: 1 }
-          )
-          const res = [
-            control.txFactory.createTxUpdateDoc<Issue>(
-              attachedToClass,
-              cud.objectSpace,
-              attachedTo,
-              {
-                $inc: { reportedTime: -1 * doc.value }
-              },
-              false,
-              currentIssue.modifiedOn
-            )
-          ]
-          currentIssue.reportedTime -= doc.value
-          currentIssue.remainingTime = Math.max(0, currentIssue.estimation - currentIssue.reportedTime)
-          updateIssueParentEstimations(currentIssue, res, control, currentIssue.parents, currentIssue.parents)
-          return res
-        }
-      }
-    }
-  }
-  return []
-}
-
 async function doIssueUpdate (updateTx: TxUpdateDoc<Issue>, control: TriggerControl): Promise<Tx[]> {
   const res: Tx[] = []
 
@@ -382,6 +274,26 @@ async function doIssueUpdate (updateTx: TxUpdateDoc<Issue>, control: TriggerCont
     // We need to remove estimation information from out parent issue
     ;[currentIssue] = await control.findAll(control.ctx, tracker.class.Issue, { _id: updateTx.objectId }, { limit: 1 })
     return currentIssue
+  }
+
+  if (updateTx.operations.status !== undefined) {
+    const issue = await getCurrentIssue()
+    // Trigger queries see the document after the incoming status update.
+    // The stored interval, rather than issue.status, records whether time was running.
+    const next = settleIssueTime(
+      {
+        trackedTimeMs: issue.trackedTimeMs ?? 0,
+        trackingStartedOn: issue.trackingStartedOn ?? null
+      },
+      updateTx.operations.status,
+      updateTx.modifiedOn
+    )
+    const reportedTime = issueTimeHours(next, updateTx.modifiedOn)
+    res.push(control.txFactory.createTxUpdateDoc(issue._class, issue.space, issue._id, {
+      ...next,
+      reportedTime
+    }, false, issue.modifiedOn))
+    updateIssueParentEstimations({ ...issue, ...next, reportedTime }, res, control, issue.parents, issue.parents)
   }
 
   if (Object.prototype.hasOwnProperty.call(updateTx.operations, 'attachedTo')) {
@@ -470,6 +382,8 @@ function updateIssueParentEstimations (
     space: Ref<Space>
     estimation: number
     reportedTime: number
+    trackedTimeMs?: number
+    trackingStartedOn?: number | null
   },
   res: Tx[],
   control: TriggerControl,
@@ -492,7 +406,9 @@ function updateIssueParentEstimations (
           childInfo: {
             childId: issue._id,
             estimation: issue.estimation,
-            reportedTime: issue.reportedTime
+            reportedTime: issue.reportedTime,
+            trackedTimeMs: issue.trackedTimeMs,
+            trackingStartedOn: issue.trackingStartedOn
           }
         }
       })

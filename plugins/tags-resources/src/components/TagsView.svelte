@@ -13,6 +13,7 @@
 // limitations under the License.
 -->
 <script lang="ts">
+  import { AccountRole, getCurrentAccount, hasAccountRole } from '@hcengineering/core'
   import { Class, Doc, DocumentQuery, FindOptions, Ref } from '@hcengineering/core'
   import { Asset, IntlString, translateCB } from '@hcengineering/platform'
   import { createQuery } from '@hcengineering/presentation'
@@ -50,7 +51,9 @@
   let resultQuery: DocumentQuery<TagElement> = { targetClass }
 
   function updateResultQuery (search: string, category?: Ref<TagCategory>): void {
-    resultQuery = search === '' ? { targetClass } : { $search: search, targetClass }
+    resultQuery = search === ''
+      ? { targetClass }
+      : { targetClass, $or: [{ title: { $contains: search } }, { description: { $contains: search } }] }
     if (category !== undefined) {
       resultQuery.category = category
     }
@@ -111,7 +114,9 @@
   </svelte:fragment>
   <svelte:fragment slot="actions">
     <slot />
-    <Button icon={IconAdd} label={createItemLabel} kind={'primary'} on:click={showCreateDialog} />
+    {#if hasAccountRole(getCurrentAccount(), AccountRole.Maintainer)}
+      <Button icon={IconAdd} label={createItemLabel} kind={'primary'} on:click={showCreateDialog} />
+    {/if}
   </svelte:fragment>
 </Header>
 <CategoryBar

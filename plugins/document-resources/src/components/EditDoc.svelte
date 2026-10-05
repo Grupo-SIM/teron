@@ -17,11 +17,20 @@
 <script lang="ts">
   import { Analytics } from '@hcengineering/analytics'
   import attachment, { Attachment } from '@hcengineering/attachment'
-  import core, { Doc, Ref, WithLookup, generateId, type Blob } from '@hcengineering/core'
+  import core, {
+    AccountRole,
+    Doc,
+    Ref,
+    WithLookup,
+    generateId,
+    getCurrentAccount,
+    hasAccountRole,
+    type Blob
+  } from '@hcengineering/core'
   import { Document, DocumentEvents, Teamspace } from '@hcengineering/document'
   import notification from '@hcengineering/notification'
   import { Panel } from '@hcengineering/panel'
-  import { getResource, setPlatformStatus, unknownError } from '@hcengineering/platform'
+  import { getResource, setPlatformStatus, translate, unknownError } from '@hcengineering/platform'
   import {
     ComponentExtensions,
     IconWithEmoji,
@@ -32,10 +41,14 @@
   import tags from '@hcengineering/tags'
   import { Heading } from '@hcengineering/text-editor'
   import { TableOfContents } from '@hcengineering/text-editor-resources'
+  import { createGuidelineAccessQuery } from '../guideline-access'
   import TeamspacePresenter from './teamspace/TeamspacePresenter.svelte'
 
   import {
     Button,
+    addNotification,
+    NotificationSeverity,
+    NotificationToast,
     ButtonItem,
     Component,
     FocusHandler,
@@ -72,7 +85,7 @@
   export let embedded: boolean = false
 
   $: locked = doc?.lockedBy != null
-  $: effectiveReadonly = readonly || $restrictionStore.readonly || locked
+  $: effectiveReadonly = readonly || $restrictionStore.readonly || locked || !$grantEditable
 
   let useMaxWidth = getUseMaxWidth()
   $: saveUseMaxWidth(useMaxWidth)
@@ -85,6 +98,9 @@
   const query = createQuery()
   const dispatch = createEventDispatcher()
   const client = getClient()
+  const grants = createGuidelineAccessQuery()
+  const grantEditable = grants.editable
+  $: if (doc?.space !== undefined) grants.query(doc.space)
 
   let doc: WithLookup<Document> | undefined
   let title = ''
@@ -169,6 +185,12 @@
     }
   }
 
+  async function removeIcon (): Promise<void> {
+    if (doc === undefined || effectiveReadonly) return
+    await client.update(doc, { $unset: { icon: true, color: true } })
+    addNotification(await translate(document.string.CustomIconRemoved, {}, $themeStore.language), '', NotificationToast, undefined, NotificationSeverity.Info)
+  }
+
   async function chooseIcon (): Promise<void> {
     if (doc !== undefined) {
       const { icon, color } = doc
@@ -178,7 +200,13 @@
           await client.update(doc, { icon: result.icon, color: result.color })
         }
       }
-      showPopup(IconPicker, { icon, color, icons }, 'top', update, update)
+      showPopup(IconPicker, {
+        icon,
+        color,
+        icons,
+        removeLabel: document.string.RemoveCustomIcon,
+        onRemove: !effectiveReadonly && (icon !== undefined || color !== undefined) ? removeIcon : undefined
+      }, 'top', update, update)
     }
   }
 
@@ -285,7 +313,7 @@
       {/if}
       <ParentsNavigator element={doc} />
       <DocumentPresenter value={doc} breadcrumb noUnderline />
-      {#if locked}
+      {#if locked && hasAccountRole(getCurrentAccount(), AccountRole.Maintainer)}
         <div class="ml-2">
           <Button
             icon={document.icon.Lock}

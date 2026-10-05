@@ -72,6 +72,15 @@
     "Inactive": "Pasif",
     "Active": "Aktif",
     "Role": "Rol",
+    "ProfessionalTitle": "Professional title",
+    "ContactSource": "Contact source",
+    "Skills": "Skills",
+    "RemoteDaysPerWeek": "Remote days per week",
+    "RemoteDaysPerWeekShort": "Remote",
+    "OnsiteDaysPerWeek": "On-site days per week",
+    "OnsiteDaysPerWeekShort": "On-site",
+    "WorkDaysPerWeekInvalid": "Use 0 to 7; the total cannot exceed 7 days.",
+    "WorkDaysPerWeekPlaceholder": "E.g. 3",
     "Birthday": "Doğum günü",
     "UseImage": "Ekli fotoğraf",
     "UseGravatar": "Gravatar",
@@ -107,7 +116,6 @@
     "People": "Kişiler",
     "For": "İçin",
     "SelectUsers": "Kullanıcıları seç",
-    "AddGuest": "Misafir ekle",
     "ViewProfile": "Profili görüntüle",
     "Viber": "Viber",
     "ViberPlaceholder": "Viber",
@@ -152,5 +160,7 @@
     "WorkspaceStatusEndOfDay": "Gün sonu",
     "WorkspaceStatusPickDate": "Tarih seç",
     "HideInactive": "Etkin olmayanları gizle"
+  ,
+    "Enabled": "Enabled"
   }
 }

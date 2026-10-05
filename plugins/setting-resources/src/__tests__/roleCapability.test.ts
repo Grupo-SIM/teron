@@ -34,8 +34,8 @@ describe('roleCapability (Generate invite link permission)', () => {
 
     it('uses inviteLinkGeneratorRoles when capability map missing', () => {
       expect(
-        getRolesForCapability(RoleCapability.GenerateInviteLink, undefined, [AccountRole.Guest, AccountRole.User])
-      ).toEqual([AccountRole.Guest, AccountRole.User])
+        getRolesForCapability(RoleCapability.GenerateInviteLink, undefined, [AccountRole.DocGuest, AccountRole.User])
+      ).toEqual([AccountRole.DocGuest, AccountRole.User])
     })
 
     it('falls back to DEFAULT_INVITE_LINK_GENERATOR_ROLES (shared with invite settings)', () => {

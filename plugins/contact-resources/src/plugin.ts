@@ -28,6 +28,7 @@ import {
 
 export default mergeIds(contactId, contact, {
   string: {
+    Enabled: '' as IntlString,
     HideInactive: '' as IntlString,
     Apply: '' as IntlString,
     CreatePerson: '' as IntlString,
@@ -67,6 +68,15 @@ export default mergeIds(contactId, contact, {
     Inactive: '' as IntlString,
     Active: '' as IntlString,
     Role: '' as IntlString,
+    ProfessionalTitle: '' as IntlString,
+    ContactSource: '' as IntlString,
+    Skills: '' as IntlString,
+    RemoteDaysPerWeek: '' as IntlString,
+    RemoteDaysPerWeekShort: '' as IntlString,
+    OnsiteDaysPerWeek: '' as IntlString,
+    OnsiteDaysPerWeekShort: '' as IntlString,
+    WorkDaysPerWeekInvalid: '' as IntlString,
+    WorkDaysPerWeekPlaceholder: '' as IntlString,
     NotSpecified: '' as IntlString,
     MergePersons: '' as IntlString,
     MergePersonsFrom: '' as IntlString,

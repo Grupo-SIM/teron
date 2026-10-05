@@ -50,27 +50,13 @@ export interface LiveKitEgressData {
   duration: number
 }
 
-export interface AiTranscriptUsage {
-  totalDurationSeconds: number
-}
-
 export interface AiTokensUsage {
   reason: string
   totalTokens: number
 }
 
 export interface AiUsageData {
-  transcript: AiTranscriptUsage
   tokens: AiTokensUsage[]
-}
-
-export interface AiTranscriptData {
-  workspace: WorkspaceUuid
-  day: string
-  lastRequestId: string
-  lastStartTime: string
-  durationSeconds: number
-  usd: number
 }
 
 export interface AiTokensData {
@@ -86,15 +72,6 @@ export interface BillingDB {
   listLiveKitEgress: (ctx: MeasureContext, workspace: WorkspaceUuid) => Promise<LiveKitEgressData[] | null>
   setLiveKitSessions: (ctx: MeasureContext, data: LiveKitSessionData[]) => Promise<void>
   setLiveKitEgress: (ctx: MeasureContext, data: LiveKitEgressData[]) => Promise<void>
-
-  pushAiTranscriptData: (ctx: MeasureContext, data: AiTranscriptData[]) => Promise<void>
-  getAiTranscriptLastData: (ctx: MeasureContext) => Promise<AiTranscriptData | undefined>
-  getAiTranscriptStats: (
-    ctx: MeasureContext,
-    workspace: WorkspaceUuid,
-    start?: Date,
-    end?: Date
-  ) => Promise<AiTranscriptUsage>
 
   pushAiTokensData: (ctx: MeasureContext, data: AiTokensData[]) => Promise<void>
   getAiTokensStats: (

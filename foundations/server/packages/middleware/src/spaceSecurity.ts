@@ -209,7 +209,7 @@ export class SpaceSecurityMiddleware extends BaseMiddleware implements Middlewar
       for (const val of ctx.contextData.socialStringsToUsers.values()) {
         if (
           val.accontUuid === collab.collaborator &&
-          [AccountRole.Guest, AccountRole.ReadOnlyGuest].includes(val.role)
+          val.role === AccountRole.ReadOnlyGuest
         ) {
           this.brodcastEvent(ctx, [val.accontUuid])
         }
@@ -466,7 +466,7 @@ export class SpaceSecurityMiddleware extends BaseMiddleware implements Middlewar
         if (collabSec?.provideSecurity === true) {
           const guests = new Set<AccountUuid>()
           for (const val of ctx.contextData.socialStringsToUsers.values()) {
-            if ([AccountRole.Guest, AccountRole.ReadOnlyGuest].includes(val.role)) {
+            if (val.role === AccountRole.ReadOnlyGuest) {
               guests.add(val.accontUuid)
             }
           }
@@ -487,7 +487,7 @@ export class SpaceSecurityMiddleware extends BaseMiddleware implements Middlewar
       const getCollabTargets = async (_id: Ref<Doc>): Promise<AccountUuid[]> => {
         const guests = new Set<AccountUuid>()
         for (const val of ctx.contextData.socialStringsToUsers.values()) {
-          if ([AccountRole.Guest, AccountRole.ReadOnlyGuest].includes(val.role)) {
+          if (val.role === AccountRole.ReadOnlyGuest) {
             guests.add(val.accontUuid)
           }
         }
@@ -533,7 +533,7 @@ export class SpaceSecurityMiddleware extends BaseMiddleware implements Middlewar
   ): Ref<Space>[] {
     const userSpaces = this.allowedSpaces[account.uuid] ?? []
     let res = [...Array.from(userSpaces), account.uuid as unknown as Ref<Space>, ...this.mainSpaces]
-    if (!forSearch || ![AccountRole.Guest, AccountRole.ReadOnlyGuest].includes(account.role)) {
+    if (!forSearch || account.role !== AccountRole.ReadOnlyGuest) {
       res = [...res, ...this.systemSpaces]
     }
     const ignorePublicSpaces = isData || account.role === AccountRole.ReadOnlyGuest
@@ -777,7 +777,7 @@ export class SpaceSecurityMiddleware extends BaseMiddleware implements Middlewar
             )
             const collabSecEnabled =
               collabSec?.provideSecurity === true &&
-              [AccountRole.Guest, AccountRole.ReadOnlyGuest].includes(account.role)
+              account.role === AccountRole.ReadOnlyGuest
             if (!collabSecEnabled) {
               lookup[key] = undefined
             }

@@ -56,8 +56,7 @@
     "LineTool": "Linia",
     "RectangleTool": "Prostokąt",
     "EllipseTool": "Elipsa",
-    "PaletteManagementMenu": "Zarządzaj początkowymi kolorami",
-    "BetaVersion": "Wersja testowa"
+    "PaletteManagementMenu": "Zarządzaj początkowymi kolorami"
   },
   "status": {
     "FileTooLarge": "Plik zbyt duży"

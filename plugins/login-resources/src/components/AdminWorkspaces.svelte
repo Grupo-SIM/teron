@@ -1,6 +1,7 @@
 <script lang="ts">
   import { RegionInfo, AccountAggregatedInfo } from '@hcengineering/account-client'
   import {
+    containsSearch,
     AccountUuid,
     groupByArray,
     isActiveMode,
@@ -14,7 +15,7 @@
     versionToString,
     type WorkspaceInfoWithStatus
   } from '@hcengineering/core'
-  import { getEmbeddedLabel, getMetadata } from '@hcengineering/platform'
+  import { getEmbeddedLabel, getMetadata, type IntlString } from '@hcengineering/platform'
   import presentation, {
     copyTextToClipboard,
     isAdminUser,
@@ -33,6 +34,7 @@
     IconOpen,
     IconStart,
     IconStop,
+    Label,
     locationToUrl,
     Popup,
     Scroller,
@@ -42,6 +44,7 @@
   } from '@hcengineering/ui'
   import { workbenchId } from '@hcengineering/workbench'
   import { getAccountClient, getAllWorkspaces, getRegionInfo, performWorkspaceOperation } from '../utils'
+  import login from '../plugin'
 
   $: now = $ticker
 
@@ -71,11 +74,11 @@
   let sortingRule = SortingRule.Activity
 
   const sortRules = {
-    [SortingRule.Activity]: 'Active users',
-    [SortingRule.Name]: 'Name',
-    [SortingRule.BackupDate]: 'Backup date',
-    [SortingRule.BackupSize]: 'Backup size',
-    [SortingRule.LastVisit]: 'Last visit'
+    [SortingRule.Activity]: login.string.ActiveUsers,
+    [SortingRule.Name]: login.string.Name,
+    [SortingRule.BackupDate]: login.string.BackupDate,
+    [SortingRule.BackupSize]: login.string.BackupSize,
+    [SortingRule.LastVisit]: login.string.LastVisit
   }
 
   const updateWorkspaces = reduceCalls(async (_: number) => {
@@ -122,10 +125,10 @@
   $: sortedWorkspaces = workspaces
     .filter(
       (it) =>
-        ((it.name?.includes(search) ?? false) ||
-          (it.url?.includes(search) ?? false) ||
-          it.uuid?.includes(search) ||
-          it.createdBy?.includes(search)) &&
+        (containsSearch(it.name, search) ||
+          containsSearch(it.url, search) ||
+          containsSearch(it.uuid, search) ||
+          containsSearch(it.createdBy, search)) &&
         (showSelectedRegionOnly ? it.region === filterRegionId : true) &&
         (showInactive ? isWorkspaceInactive(it, statsByWorkspace.get(it.uuid)) : true) &&
         ((showActive && isActiveMode(it.mode)) ||
@@ -255,6 +258,25 @@
     Years: [365, 10000000]
   }
 
+  const dayRangeLabels = {
+    Hour: login.string.LastHour,
+    HalfDay: login.string.LastHalfDay,
+    Day: login.string.LastDay,
+    Week: login.string.LastWeek,
+    Weeks: login.string.LastTwoWeeks,
+    Month: login.string.LastMonth,
+    Months1: login.string.LastTwoMonths,
+    Months2: login.string.LastThreeMonths,
+    Months3: login.string.LastSixMonths,
+    'Six Month': login.string.LastNineMonths,
+    'Nine Months': login.string.LastYear,
+    Years: login.string.MoreThanYear
+  }
+
+  function getDayRangeLabel (key: string): IntlString {
+    return dayRangeLabels[key as keyof typeof dayRangeLabels] ?? login.string.MoreThanYear
+  }
+
   let limit = 50
 
   $: groupped = groupByArray(sortedWorkspaces, (it) => {
@@ -343,21 +365,36 @@
     <div class="flex-column flex-grow p-5">
       <div class="anticrm-panel flex-row flex-grow" style:overflow-y={'auto'}>
         <div class="flex-between">
-          <div class="fs-title p-3">Workspaces administration panel</div>
+          <div class="fs-title p-3"><Label label={login.string.WorkspacesAdministrationPanel} /></div>
           <div class="flex-row-center">
-            <span class="mr-4">Enable deletion</span>
+            <span class="mr-4"><Label label={login.string.EnableDeletion} /></span>
             <CheckBox bind:checked={superAdminMode} />
           </div>
         </div>
         <div class="fs-title p-3">
-          Workspaces: {workspaces.length} active: {workspaces.filter((it) => isActiveMode(it.mode)).length}
-          upgrading: {workspaces.filter((it) => isUpgradingMode(it.mode)).length}
+          <Label
+            label={login.string.WorkspaceStatistics}
+            params={{
+              total: workspaces.length,
+              active: workspaces.filter((it) => isActiveMode(it.mode)).length,
+              upgrading: workspaces.filter((it) => isUpgradingMode(it.mode)).length
+            }}
+          />
           <br />
-          Backupable: {backupable.length} new: {backupable.reduce((p, it) => p + (it.backupInfo == null ? 1 : 0), 0)}
-          Active: {data?.workspaces.length ?? -1}
+          <Label
+            label={login.string.BackupStatistics}
+            params={{
+              backupable: backupable.length,
+              newCount: backupable.reduce((p, it) => p + (it.backupInfo == null ? 1 : 0), 0),
+              active: data?.workspaces.length ?? -1
+            }}
+          />
           <br />
           <span class="mt-2">
-            Users: {data?.usersTotal}/{data?.connectionsTotal}
+            <Label
+              label={login.string.UserConnectionStatistics}
+              params={{ users: data?.usersTotal ?? 0, connections: data?.connectionsTotal ?? 0 }}
+            />
           </span>
 
           <div class="flex-row-center">
@@ -380,44 +417,43 @@
         </div>
 
         <div class="p-3 flex-col">
-          <span class="fs-title mr-2">Filters: </span>
+          <span class="fs-title mr-2"><Label label={login.string.Filters} />:</span>
           <div class="flex-row-center">
-            Show active workspaces:
+            <Label label={login.string.ShowActiveWorkspaces} />:
             <CheckBox bind:checked={showActive} />
           </div>
           <div class="flex-row-center">
-            <span class="mr-2">Show archived workspaces:</span>
+            <span class="mr-2"><Label label={login.string.ShowArchivedWorkspaces} />:</span>
             <CheckBox bind:checked={showArchived} />
           </div>
           <div class="flex-row-center">
-            <span class="mr-2">Show deleted workspaces:</span>
+            <span class="mr-2"><Label label={login.string.ShowDeletedWorkspaces} />:</span>
             <CheckBox bind:checked={showDeleted} />
           </div>
           <div class="flex-row-center">
-            <span class="mr-2">Show other workspaces:</span>
+            <span class="mr-2"><Label label={login.string.ShowOtherWorkspaces} />:</span>
             <CheckBox bind:checked={showOther} />
           </div>
           <div class="flex-row-center">
-            <span class="mr-2">Show attempts >=0 workspaces:</span>
+            <span class="mr-2"><Label label={login.string.ShowAttemptedWorkspaces} />:</span>
             <CheckBox bind:checked={showGrAttempts} />
           </div>
           <div class="flex-row-center">
-            <span class="mr-2">Show selected region only:</span>
+            <span class="mr-2"><Label label={login.string.ShowSelectedRegionOnly} />:</span>
             <CheckBox bind:checked={showSelectedRegionOnly} />
           </div>
           <div class="flex-row-center">
-            <span class="mr-2">Show inactive workspaces:</span>
+            <span class="mr-2"><Label label={login.string.ShowInactiveWorkspaces} />:</span>
             <CheckBox bind:checked={showInactive} />
           </div>
         </div>
 
         <div class="fs-title p-3 flex-row-center">
-          <span class="mr-2"> Sorting order: {sortingRule} </span>
+          <span class="mr-2"><Label label={login.string.SortingOrder} />: {sortingRule}</span>
           <ButtonMenu
             selected={sortingRule}
             autoSelectionIfOne
-            title={sortRules[sortingRule]}
-            items={Object.entries(sortRules).map((it) => ({ id: it[0], label: getEmbeddedLabel(it[1]) }))}
+            items={Object.entries(sortRules).map((it) => ({ id: it[0], label: it[1] }))}
             on:selected={(it) => {
               sortingRule = it.detail
             }}
@@ -425,7 +461,7 @@
         </div>
 
         <div class="fs-title p-3 flex-row-center">
-          <span class="mr-2"> Migration region selector: </span>
+          <span class="mr-2"><Label label={login.string.MigrationRegionSelector} />:</span>
           <ButtonMenu
             selected={selectedRegionId}
             autoSelectionIfOne
@@ -444,7 +480,7 @@
           <div class="mr-2">
             <CheckBox bind:checked={showSelectedRegionOnly} />
           </div>
-          <span class="mr-2"> Filtere region selector: </span>
+          <span class="mr-2"><Label label={login.string.FilterRegionSelector} />:</span>
           <ButtonMenu
             selected={filterRegionId}
             autoSelectionIfOne
@@ -476,14 +512,14 @@
                   <Expandable expandable={true} bordered={true} expanded={search.trim().length > 0}>
                     <svelte:fragment slot="title">
                       <span class="fs-title focused-button flex-row-center">
-                        {k} -
+                        <Label label={getDayRangeLabel(k)} /> -
                         {#if hasMore}
-                          {limit} of {v.length}
+                          <Label label={login.string.VisibleItemsCount} params={{ visible: limit, total: v.length }} />
                         {:else}
                           {v.length}
                         {/if}
                         {#if maintenance > 0}
-                          - maitenance: {maintenance}
+                          - <Label label={login.string.MaintenanceCount} params={{ count: maintenance }} />
                         {/if}
                         {#if grByRegion.size > 1}
                           {#each grByRegion.entries() as [k, v]}
@@ -498,7 +534,7 @@
                       {#if hasMore}
                         <div class="ml-4">
                           <Button
-                            label={getEmbeddedLabel('More items')}
+                            label={login.string.MoreItems}
                             kind={'link'}
                             on:click={() => {
                               limit += 50
@@ -511,12 +547,15 @@
                       {#if activeAll.length > 0}
                         <Button
                           icon={IconStop}
-                          label={getEmbeddedLabel(`Mass Archive ${activeAll.length}`)}
+                          label={login.string.MassArchive}
+                          labelParams={{ count: activeAll.length }}
                           kind={'ghost'}
                           on:click={() => {
                             showPopup(MessageBox, {
-                              label: getEmbeddedLabel(`Mass Archive ${activeAll.length}`),
-                              message: getEmbeddedLabel(`Please confirm archive ${activeAll.length} workspaces`),
+                              label: login.string.MassArchive,
+                              labelProps: { count: activeAll.length },
+                              message: login.string.ConfirmArchiveWorkspaces,
+                              params: { count: activeAll.length },
                               action: async () => {
                                 void performWorkspaceOperation(
                                   activeAll.map((it) => it.uuid),
@@ -532,11 +571,14 @@
                         <Button
                           icon={IconArrowRight}
                           kind={'positive'}
-                          label={getEmbeddedLabel(`Mass Migrate ${activeV.length} to ${selectedRegionName ?? ''}`)}
+                          label={login.string.MassMigrateTo}
+                          labelParams={{ count: activeV.length, region: selectedRegionName ?? '' }}
                           on:click={() => {
                             showPopup(MessageBox, {
-                              label: getEmbeddedLabel(`Mass Migrate ${activeV.length}`),
-                              message: getEmbeddedLabel(`Please confirm migrate ${activeV.length} workspaces`),
+                              label: login.string.MassMigrate,
+                              labelProps: { count: activeV.length },
+                              message: login.string.ConfirmMigrateWorkspaces,
+                              params: { count: activeV.length },
                               action: async () => {
                                 await performWorkspaceOperation(
                                   activeV.map((it) => it.uuid),
@@ -575,13 +617,13 @@
                               icon={IconOpen}
                               size={'small'}
                               on:click={() => select(workspace.url)}
-                              showTooltip={{ label: getEmbeddedLabel('Open Workspace URL') }}
+                              showTooltip={{ label: login.string.OpenWorkspaceUrl }}
                             />
                             <Button
                               icon={IconCopy}
                               size={'small'}
                               on:click={() => copyTextToClipboard(workspace.uuid)}
-                              showTooltip={{ label: getEmbeddedLabel('Copy UUID') }}
+                              showTooltip={{ label: login.string.CopyUuid }}
                             />
                           </div>
                         </div>
@@ -589,7 +631,7 @@
                           {workspace.region ?? ''}
                         </div>
                         <div class="label overflow-label p-1 flex flex-row-center" style:width={'5rem'}>
-                          {lastUsageDays} days
+                          <Label label={login.string.DaysCount} params={{ count: lastUsageDays }} />
                         </div>
                         <div class="label overflow-label p-1 flex flex-row-center" style:width={'10rem'}>
                           {workspace.mode ?? '-'}
@@ -600,8 +642,9 @@
                             <Button
                               on:click={() => {
                                 showPopup(MessageBox, {
-                                  label: getEmbeddedLabel(`Reset attempts ${workspace.url}`),
-                                  message: getEmbeddedLabel('Please confirm'),
+                                  label: login.string.ResetAttempts,
+                                  labelProps: { workspace: workspace.url },
+                                  message: login.string.PleaseConfirm,
                                   action: async () => {
                                     await performWorkspaceOperation(workspace.uuid, 'reset-attempts')
                                   }
@@ -640,9 +683,9 @@
                             {@const hours = Math.round((now - workspace.backupInfo.lastBackup) / (1000 * 3600))}
 
                             {#if hours > 24}
-                              {Math.round(hours / 24)} days
+                              <Label label={login.string.DaysCount} params={{ count: Math.round(hours / 24) }} />
                             {:else}
-                              {hours} hours
+                              <Label label={login.string.HoursCount} params={{ count: hours }} />
                             {/if}
                           {/if}
                         </div>
@@ -651,12 +694,13 @@
                             <Button
                               icon={IconStop}
                               size={'small'}
-                              label={getEmbeddedLabel('Archive')}
+                              label={login.string.Archive}
                               kind={'ghost'}
                               on:click={() => {
                                 showPopup(MessageBox, {
-                                  label: getEmbeddedLabel(`Archive ${workspace.url}`),
-                                  message: getEmbeddedLabel('Please confirm'),
+                                  label: login.string.ArchiveWorkspace,
+                                  labelProps: { workspace: workspace.url },
+                                  message: login.string.PleaseConfirm,
                                   action: async () => {
                                     await performWorkspaceOperation(workspace.uuid, 'archive')
                                   }
@@ -670,11 +714,12 @@
                               icon={IconStart}
                               size={'small'}
                               kind={'ghost'}
-                              label={getEmbeddedLabel('Unarchive')}
+                              label={login.string.Unarchive}
                               on:click={() => {
                                 showPopup(MessageBox, {
-                                  label: getEmbeddedLabel(`Unarchive ${workspace.url}`),
-                                  message: getEmbeddedLabel('Please confirm'),
+                                  label: login.string.UnarchiveWorkspace,
+                                  labelProps: { workspace: workspace.url },
+                                  message: login.string.PleaseConfirm,
                                   action: async () => {
                                     await performWorkspaceOperation(workspace.uuid, 'unarchive')
                                   }
@@ -687,11 +732,12 @@
                               icon={IconArrowRight}
                               size={'small'}
                               kind={'positive'}
-                              label={getEmbeddedLabel('Migrate')}
+                              label={login.string.Migrate}
                               on:click={() => {
                                 showPopup(MessageBox, {
-                                  label: getEmbeddedLabel(`Migrate ${workspace.url}`),
-                                  message: getEmbeddedLabel('Please confirm'),
+                                  label: login.string.MigrateWorkspace,
+                                  labelProps: { workspace: workspace.url },
+                                  message: login.string.PleaseConfirm,
                                   action: async () => {
                                     await performWorkspaceOperation(workspace.uuid, 'migrate-to', selectedRegionId)
                                   }
@@ -705,11 +751,12 @@
                               icon={IconStop}
                               size={'small'}
                               kind={'dangerous'}
-                              label={getEmbeddedLabel('Delete')}
+                              label={login.string.Delete}
                               on:click={() => {
                                 showPopup(MessageBox, {
-                                  label: getEmbeddedLabel(`Delete ${workspace.url}`),
-                                  message: getEmbeddedLabel('Please confirm'),
+                                  label: login.string.DeleteWorkspace,
+                                  labelProps: { workspace: workspace.url },
+                                  message: login.string.PleaseConfirm,
                                   action: async () => {
                                     await performWorkspaceOperation(workspace.uuid, 'delete')
                                   }
@@ -729,9 +776,9 @@
       </div>
 
       <div class="flex-between">
-        <div class="fs-title p-3">Accounts administration panel</div>
+          <div class="fs-title p-3"><Label label={login.string.AccountsAdministrationPanel} /></div>
         <div class="flex-row-center">
-          <span class="mr-4">Enable deletion</span>
+          <span class="mr-4"><Label label={login.string.EnableDeletion} /></span>
           <CheckBox bind:checked={accountSuperAdminMode} />
         </div>
       </div>
@@ -741,16 +788,16 @@
 
       <div class="flex-row-center p-3">
         <Button
-          label={getEmbeddedLabel('Previous')}
+          label={login.string.Previous}
           disabled={accountSkip === 0}
           on:click={async () => {
             accountSkip = Math.max(0, accountSkip - accountLimit)
             await loadAccounts(accountSearch, accountSkip, accountLimit)
           }}
         />
-        <span class="mx-2">Page {Math.floor(accountSkip / accountLimit) + 1}</span>
+        <span class="mx-2"><Label label={login.string.PageNumber} params={{ page: Math.floor(accountSkip / accountLimit) + 1 }} /></span>
         <Button
-          label={getEmbeddedLabel('Next')}
+          label={login.string.Next}
           disabled={accounts.length < accountLimit}
           on:click={async () => {
             accountSkip += accountLimit
@@ -773,13 +820,13 @@
                 </div>
 
                 <div class="p-1 flex flex-col" style:width={'24rem'}>
-                  <div class="label">Social IDs: {account.socialIds.length}</div>
+                  <div class="label"><Label label={login.string.SocialIdsCount} params={{ count: account.socialIds.length }} /></div>
                   {#each account.socialIds as socialId}
                     <div class="mr-2">{socialId.type}:{socialId.value}</div>
                   {/each}
                 </div>
                 <div class="p-1 flex flex-col">
-                  <div class="label">Workspaces: {account.workspaces.length}</div>
+                  <div class="label"><Label label={login.string.WorkspacesCount} params={{ count: account.workspaces.length }} /></div>
                   {#each account.workspaces as workspace}
                     <div>{workspace.name} {workspace.url} {workspace.uuid} {workspace.dataId}</div>
                   {/each}
@@ -790,11 +837,12 @@
                       icon={IconStop}
                       size={'small'}
                       kind={'dangerous'}
-                      label={getEmbeddedLabel('Delete')}
+                      label={login.string.Delete}
                       on:click={() => {
                         showPopup(MessageBox, {
-                          label: getEmbeddedLabel(`Delete account ${account.firstName} ${account.lastName}`),
-                          message: getEmbeddedLabel('Please confirm account deletion. This action cannot be undone.'),
+                          label: login.string.DeleteAccount,
+                          labelProps: { name: `${account.firstName} ${account.lastName}` },
+                          message: login.string.ConfirmAccountDeletion,
                           action: async () => {
                             await deleteAccount(account.uuid)
                             await loadAccounts(accountSearch, accountSkip, accountLimit)

@@ -500,8 +500,6 @@ export interface Space extends Doc {
   archived: boolean
   owners?: AccountUuid[]
   autoJoin?: boolean
-  /** If it includes {@link AccountRole.Guest}, that guest is auto-added to members on activation (see OnEmployeeCreate). */
-  autoJoinForRoles?: AccountRole[]
 }
 
 /**
@@ -605,7 +603,6 @@ export interface ModulePermissionGroup extends Doc {
 export enum AccountRole {
   ReadOnlyGuest = 'READONLYGUEST',
   DocGuest = 'DocGuest',
-  Guest = 'GUEST',
   User = 'USER',
   Maintainer = 'MAINTAINER',
   Owner = 'OWNER',
@@ -618,7 +615,6 @@ export enum AccountRole {
 export const roleOrder: Record<AccountRole, number> = {
   [AccountRole.ReadOnlyGuest]: 5,
   [AccountRole.DocGuest]: 10,
-  [AccountRole.Guest]: 20,
   [AccountRole.User]: 30,
   [AccountRole.Maintainer]: 40,
   [AccountRole.Owner]: 50,
@@ -930,7 +926,6 @@ export interface WorkspaceInfo {
   createdBy?: PersonUuid // Should always be set for NEW workspaces
   billingAccount?: PersonUuid // Should always be set for NEW workspaces
   allowReadOnlyGuest?: boolean // Should always be set for NEW workspaces
-  allowGuestSignUp?: boolean // Should always be set for NEW workspaces
   passwordAgingRule?: number | null // in days
   // Initial-state configuration set by the user at workspace creation. Read once
   // by workspace-service after model init, then cleared back to `null`.

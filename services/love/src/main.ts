@@ -19,7 +19,7 @@ import {
 } from '@hcengineering/account-client'
 import { createOpenTelemetryMetricsContext, SplitLogger } from '@hcengineering/analytics-service'
 import { MeasureContext, newMetrics, Ref, WorkspaceIds } from '@hcengineering/core'
-import { MeetingMinutes, RoomMetadata, TranscriptionStatus } from '@hcengineering/love'
+import { MeetingMinutes, RoomMetadata } from '@hcengineering/love'
 import { setMetadata } from '@hcengineering/platform'
 import serverClient from '@hcengineering/server-client'
 import { initStatisticsContext, StorageConfig, StorageConfiguration } from '@hcengineering/server-core'
@@ -223,31 +223,6 @@ export const main = async (): Promise<void> => {
     res.send()
   })
 
-  // eslint-disable-next-line @typescript-eslint/no-misused-promises
-  app.post('/transcription', async (req, res) => {
-    const roomName = req.body.roomName
-    const language = req.body.language
-    const transcription = req.body.transcription as TranscriptionStatus
-
-    if (typeof roomName !== 'string') {
-      res.status(400).send()
-      return
-    }
-
-    if (!hasWorkspaceAccess(roomName, req)) {
-      res.status(401).send()
-      return
-    }
-
-    const metadata = language != null ? { transcription, language } : { transcription }
-    try {
-      await updateMetadata(roomClient, roomName, metadata)
-      res.status(200).send()
-    } catch (e) {
-      console.error(e)
-      res.status(500).send()
-    }
-  })
 
   // eslint-disable-next-line @typescript-eslint/no-misused-promises
   app.post('/language', async (req, res) => {

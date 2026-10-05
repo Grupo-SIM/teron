@@ -19,6 +19,7 @@
   import { NavLink } from '@hcengineering/view-resources'
   import { getEmbeddedLabel } from '@hcengineering/platform'
   import { ObjectPresenterType } from '@hcengineering/view'
+  import { getChannelDisplayName } from '../channel-title'
 
   export let value: Channel
   export let inline: boolean = false
@@ -28,6 +29,7 @@
   const client = getClient()
 
   $: icon = client.getHierarchy().getClass(value._class).icon
+  $: displayName = getChannelDisplayName(value)
 </script>
 
 {#if value}
@@ -41,10 +43,10 @@
             {/if}
           </div>
         {/if}
-        <span class="label">{value.name}</span>
+        <span class="label">{displayName}</span>
       </div>
     </NavLink>
   {:else}
-    <span class="overflow-label" use:tooltip={{ label: getEmbeddedLabel(value.name) }}>{value.name}</span>
+    <span class="overflow-label" use:tooltip={{ label: getEmbeddedLabel(displayName) }}>{displayName}</span>
   {/if}
 {/if}

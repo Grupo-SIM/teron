@@ -98,9 +98,7 @@ export function getViewOptions (
 }
 
 export function migrateViewOpttions (): void {
-  for (let index = 0; index < localStorage.length; index++) {
-    const key = localStorage.key(index)
-    if (key === null) continue
+  for (const key of Object.keys(localStorage)) {
     if (!key.startsWith('viewOptions:')) continue
     const options = localStorage.getItem(key)
     if (options === null) continue

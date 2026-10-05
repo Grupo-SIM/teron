@@ -14,7 +14,7 @@
 -->
 <script lang="ts">
   import { type Ref } from '@hcengineering/core'
-  import { Label, Scroller } from '@hcengineering/ui'
+  import { Label, Scroller, themeStore } from '@hcengineering/ui'
   import { getClient } from '@hcengineering/presentation'
   import documents, { type ChangeControl } from '@hcengineering/controlled-documents'
   import { getCurrentEmployee } from '@hcengineering/contact'
@@ -79,7 +79,7 @@
               </div>
               {#if version.effectiveDate !== undefined}
                 <div class="date">
-                  {new Date(version.effectiveDate).toLocaleDateString('default', {
+                  {new Date(version.effectiveDate).toLocaleDateString($themeStore.language, {
                     year: 'numeric',
                     month: 'short',
                     day: 'numeric'

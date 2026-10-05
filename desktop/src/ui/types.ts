@@ -107,7 +107,6 @@ export const CommandOpenPlanner = 'open-planner' as const
 export const CommandSelectWorkspace = 'select-workspace' as const
 export const CommandLogout = 'logout' as const
 export const CommandOpenApplication = 'open-application' as const
-export const CommandCloseTab = 'close-tab' as const
 
 export type Command =
   typeof CommandOpenSettings |
@@ -116,8 +115,7 @@ export type Command =
   typeof CommandOpenPlanner |
   typeof CommandSelectWorkspace |
   typeof CommandLogout |
-  typeof CommandOpenApplication |
-  typeof CommandCloseTab
+  typeof CommandOpenApplication
 
 export interface NotificationParams {
   title: string

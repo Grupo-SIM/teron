@@ -96,12 +96,12 @@
           }
 
     if (attribute.collectionAttr || attribute.attribute?.type?._class === core.class.TypeIdentifier) {
-      return { object, ...attribute.props, ...readonlyParams }
+      return { object, _class: object._class, key: attribute.key, ...attribute.props, ...readonlyParams }
     }
     if (attribute.attribute?.type._class === core.class.EnumOf) {
       return { ...attribute.props, type: attribute.attribute.type, ...readonlyParams }
     }
-    return { ...attribute.props, space: object.space, ...readonlyParams }
+    return { object, _class: object._class, key: attribute.key, ...attribute.props, space: object.space, ...readonlyParams }
   }
 
   function getValue (attribute: AttributeModel, object: Doc): any {
@@ -174,8 +174,8 @@
     permissionsStore: PermissionsStore | undefined
   ): boolean {
     if (attr === undefined) return true
-    if (permissionsStore === undefined) return true
-    return canChangeAttribute(attr, object.space as Ref<TypedSpace>, permissionsStore, object._class)
+    if (permissionsStore === undefined) return false
+    return canChangeAttribute(attr, object.space as Ref<TypedSpace>, permissionsStore, object._class, object)
   }
 
   async function canEdit (object: Doc): Promise<boolean> {

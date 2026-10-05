@@ -39,6 +39,8 @@ const love = plugin(loveId, {
     ToggleVideo: '' as Ref<Action>
   },
   string: {
+    ChangeOfficeAssignee: '' as IntlString,
+    OfficeCannotBeDeleted: '' as IntlString,
     Office: '' as IntlString,
     MyOffice: '' as IntlString,
     Room: '' as IntlString,
@@ -50,11 +52,7 @@ const love = plugin(loveId, {
     Knock: '' as IntlString,
     Open: '' as IntlString,
     DND: '' as IntlString,
-    StartTranscription: '' as IntlString,
-    StopTranscription: '' as IntlString,
     Meeting: '' as IntlString,
-    Transcription: '' as IntlString,
-    StartWithTranscription: '' as IntlString,
     MeetingMinutes: '' as IntlString,
     MeetingsMinutes: '' as IntlString,
     StartMeeting: '' as IntlString,

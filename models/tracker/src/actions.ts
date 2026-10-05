@@ -42,11 +42,10 @@ function createGotoSpecialAction (
     query
   })
 }
-export function createActions (builder: Builder, issuesId: string, componentsId: string, myIssuesId: string): void {
+export function createActions (builder: Builder, issuesId: string, myIssuesId: string): void {
   createGotoSpecialAction(builder, issuesId, 'keyG->keyE', tracker.string.GotoIssues)
   createGotoSpecialAction(builder, issuesId, 'keyG->keyA', tracker.string.GotoActive, { mode: 'active' })
   createGotoSpecialAction(builder, issuesId, 'keyG->keyB', tracker.string.GotoBacklog, { mode: 'backlog' })
-  createGotoSpecialAction(builder, componentsId, 'keyG->keyC', tracker.string.GotoComponents)
   createNavigateAction(builder, 'keyG->keyM', tracker.string.GotoMyIssues, tracker.app.Tracker, {
     application: trackerId,
     mode: 'special',
@@ -72,6 +71,7 @@ export function createActions (builder: Builder, issuesId: string, componentsId:
   createAction(
     builder,
     {
+      secured: true,
       action: tracker.actionImpl.EditWorkflowStatuses,
       label: tracker.string.EditWorkflowStatuses,
       icon: view.icon.Statuses,
@@ -91,6 +91,7 @@ export function createActions (builder: Builder, issuesId: string, componentsId:
   createAction(
     builder,
     {
+      secured: true,
       action: tracker.actionImpl.EditProject,
       label: tracker.string.EditProject,
       icon: contact.icon.Edit,
@@ -110,6 +111,7 @@ export function createActions (builder: Builder, issuesId: string, componentsId:
   createAction(
     builder,
     {
+      secured: true,
       action: tracker.actionImpl.DeleteProject,
       label: workbench.string.Archive,
       icon: view.icon.Archive,
@@ -132,6 +134,7 @@ export function createActions (builder: Builder, issuesId: string, componentsId:
   createAction(
     builder,
     {
+      secured: true,
       action: tracker.actionImpl.DeleteProject,
       label: workbench.string.Delete,
       icon: view.icon.Delete,
@@ -155,6 +158,7 @@ export function createActions (builder: Builder, issuesId: string, componentsId:
   createAction(
     builder,
     {
+      secured: true,
       action: tracker.actionImpl.DeleteIssue,
       label: workbench.string.Delete,
       icon: view.icon.Delete,
@@ -182,6 +186,7 @@ export function createActions (builder: Builder, issuesId: string, componentsId:
   createAction(
     builder,
     {
+      secured: true,
       action: view.actionImpl.ShowPopup,
       actionProps: {
         component: tracker.component.CreateIssue,
@@ -207,6 +212,7 @@ export function createActions (builder: Builder, issuesId: string, componentsId:
   createAction(
     builder,
     {
+      secured: true,
       action: view.actionImpl.ShowPopup,
       actionProps: {
         component: tracker.component.CreateIssue,
@@ -229,6 +235,7 @@ export function createActions (builder: Builder, issuesId: string, componentsId:
   createAction(
     builder,
     {
+      secured: true,
       action: view.actionImpl.ShowPopup,
       actionProps: {
         component: tracker.component.CreateIssue,
@@ -255,6 +262,7 @@ export function createActions (builder: Builder, issuesId: string, componentsId:
   createAction(
     builder,
     {
+      secured: true,
       action: view.actionImpl.ShowPopup,
       actionProps: {
         component: tracker.component.SetParentIssueActionPopup,
@@ -279,6 +287,7 @@ export function createActions (builder: Builder, issuesId: string, componentsId:
   createAction(
     builder,
     {
+      secured: true,
       action: view.actionImpl.UpdateDocument,
       actionProps: {
         key: 'attachedTo',
@@ -301,32 +310,10 @@ export function createActions (builder: Builder, issuesId: string, componentsId:
     tracker.action.UnsetParent
   )
 
-  createAction(
-    builder,
-    {
-      action: view.actionImpl.ShowPopup,
-      actionProps: {
-        component: tracker.component.CreateIssue,
-        element: 'top',
-        fillProps: {
-          _object: 'relatedTo',
-          space: 'space'
-        }
-      },
-      label: tracker.string.NewRelatedIssue,
-      icon: tracker.icon.NewIssue,
-      input: 'focus',
-      category: tracker.category.Tracker,
-      target: core.class.Doc,
-      context: {
-        mode: ['context', 'browser', 'editor'],
-        group: 'associate'
-      }
-    },
-    tracker.action.NewRelatedIssue
-  )
+
 
   createAction(builder, {
+    secured: true,
     action: view.actionImpl.ShowPopup,
     actionPopup: tracker.component.SetParentIssueActionPopup,
     actionProps: {
@@ -375,27 +362,6 @@ export function createActions (builder: Builder, issuesId: string, componentsId:
     override: [view.action.Open]
   })
 
-  createAction(builder, {
-    action: view.actionImpl.ShowPopup,
-    actionProps: {
-      component: tracker.component.TimeSpendReportPopup,
-      fillProps: {
-        _object: 'issue'
-      }
-    },
-    label: tracker.string.TimeSpendReportAdd,
-    icon: tracker.icon.TimeReport,
-    input: 'focus',
-    keyBinding: ['keyT'],
-    category: tracker.category.Tracker,
-    target: tracker.class.Issue,
-    context: {
-      mode: ['context', 'browser'],
-      application: tracker.app.Tracker,
-      group: 'edit'
-    }
-  })
-
   createAction(
     builder,
     {
@@ -424,6 +390,7 @@ export function createActions (builder: Builder, issuesId: string, componentsId:
   createAction(
     builder,
     {
+      secured: true,
       action: view.actionImpl.ValueSelector,
       actionPopup: view.component.ValueSelector,
       actionProps: {
@@ -448,10 +415,11 @@ export function createActions (builder: Builder, issuesId: string, componentsId:
   createAction(
     builder,
     {
+      secured: true,
       action: view.actionImpl.AttributeSelector,
       actionPopup: tracker.component.AssigneeEditor,
       actionProps: {
-        attribute: 'assignee',
+        attribute: 'assignees',
         isAction: true,
         valueKey: 'object'
         // _class: contact.mixin.Employee,
@@ -476,30 +444,7 @@ export function createActions (builder: Builder, issuesId: string, componentsId:
   createAction(
     builder,
     {
-      action: view.actionImpl.AttributeSelector,
-      actionPopup: tracker.component.ComponentEditor,
-      actionProps: {
-        attribute: 'component',
-        isAction: true
-      },
-      label: tracker.string.Component,
-      icon: tracker.icon.Component,
-      keyBinding: ['keyM->keyT'],
-      input: 'any',
-      category: tracker.category.Tracker,
-      target: tracker.class.Issue,
-      context: {
-        mode: ['context', 'browser'],
-        application: tracker.app.Tracker,
-        group: 'edit'
-      }
-    },
-    tracker.action.SetComponent
-  )
-
-  createAction(
-    builder,
-    {
+      secured: true,
       action: view.actionImpl.AttributeSelector,
       actionPopup: tracker.component.MilestoneEditor,
       actionProps: {
@@ -524,6 +469,7 @@ export function createActions (builder: Builder, issuesId: string, componentsId:
   createAction(
     builder,
     {
+      secured: true,
       action: view.actionImpl.ShowPopup,
       actionProps: {
         component: tags.component.ObjectsTagsEditorPopup,
@@ -550,6 +496,7 @@ export function createActions (builder: Builder, issuesId: string, componentsId:
   createAction(
     builder,
     {
+      secured: true,
       action: view.actionImpl.ShowPopup,
       actionProps: {
         component: tracker.component.SetDueDateActionPopup,
@@ -595,52 +542,12 @@ export function createActions (builder: Builder, issuesId: string, componentsId:
     },
     tracker.action.CopyIssueId
   )
+
+
   createAction(
     builder,
     {
-      action: view.actionImpl.CopyTextToClipboard,
-      actionProps: {
-        textProvider: tracker.function.GetIssueTitle
-      },
-      label: tracker.string.CopyIssueTitle,
-      icon: tracker.icon.CopyBranch,
-      input: 'focus',
-      category: tracker.category.Tracker,
-      target: tracker.class.Issue,
-      visibilityTester: view.function.IsClipboardAvailable,
-      context: {
-        mode: ['context', 'browser'],
-        application: tracker.app.Tracker,
-        group: 'copy'
-      }
-    },
-    tracker.action.CopyIssueTitle
-  )
-  createAction(
-    builder,
-    {
-      action: view.actionImpl.CopyTextToClipboard,
-      actionProps: {
-        textProvider: tracker.function.GetIssueLink
-      },
-      label: tracker.string.CopyIssueUrl,
-      icon: view.icon.CopyLink,
-      input: 'focus',
-      category: tracker.category.Tracker,
-      target: tracker.class.Issue,
-      visibilityTester: view.function.IsClipboardAvailable,
-      context: {
-        mode: ['context', 'browser'],
-        application: tracker.app.Tracker,
-        group: 'copy'
-      },
-      override: [view.action.CopyLink]
-    },
-    tracker.action.CopyIssueLink
-  )
-  createAction(
-    builder,
-    {
+      secured: true,
       action: tracker.actionImpl.Move,
       label: tracker.string.MoveToProject,
       icon: view.icon.Move,
@@ -659,6 +566,7 @@ export function createActions (builder: Builder, issuesId: string, componentsId:
   createAction(
     builder,
     {
+      secured: true,
       action: view.actionImpl.ValueSelector,
       actionPopup: tracker.component.RelationsPopup,
       actionProps: {
@@ -670,7 +578,7 @@ export function createActions (builder: Builder, issuesId: string, componentsId:
       category: tracker.category.Tracker,
       target: tracker.class.Issue,
       context: {
-        mode: ['context', 'browser'],
+        mode: [],
         application: tracker.app.Tracker,
         group: 'associate'
       }
@@ -680,6 +588,7 @@ export function createActions (builder: Builder, issuesId: string, componentsId:
   createAction(
     builder,
     {
+      secured: true,
       action: view.actionImpl.ShowPopup,
       actionProps: {
         component: tracker.component.CreateIssue,
@@ -706,6 +615,7 @@ export function createActions (builder: Builder, issuesId: string, componentsId:
   createAction(
     builder,
     {
+      secured: true,
       action: tracker.actionImpl.DeleteMilestone,
       label: view.string.Delete,
       icon: view.icon.Delete,
@@ -742,31 +652,5 @@ export function createActions (builder: Builder, issuesId: string, componentsId:
     tracker.action.CopyAsMarkdownTable
   )
 
-  createAction(
-    builder,
-    {
-      action: view.actionImpl.ShowPopup,
-      actionProps: {
-        component: tracker.component.EditRelatedTargetsPopup,
-        element: 'top',
-        fillProps: {
-          _objects: 'value'
-        }
-      },
-      label: tracker.string.MapRelatedIssues,
-      icon: tracker.icon.Relations,
-      input: 'none',
-      category: tracker.category.Tracker,
-      target: core.class.Space,
-      query: {
-        _class: { $ne: tracker.class.Project }
-      },
-      context: {
-        mode: ['context'],
-        application: tracker.app.Tracker,
-        group: 'associate'
-      }
-    },
-    tracker.action.EditRelatedTargets
-  )
+
 }

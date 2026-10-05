@@ -18,6 +18,8 @@ import { type BrandingMap, type MeasureContext, type Tx, type WorkspaceIds } fro
 import { buildStorageFromConfig } from '@hcengineering/server-storage'
 
 import { startSessionManager } from '@hcengineering/server'
+import { getClient as getAccountClient } from '@hcengineering/account-client'
+import { generateToken } from '@hcengineering/server-token'
 import {
   type CommunicationCallbacks,
   type PlatformQueue,
@@ -146,7 +148,13 @@ export function start (
     metrics,
     dbUrl,
     model,
-    { ...opt, externalStorage, adapterSecurity: isAdapterSecurity(dbUrl), queue: opt.queue, communicationApiFactory },
+    {
+      ...opt, externalStorage, adapterSecurity: isAdapterSecurity(dbUrl), queue: opt.queue, communicationApiFactory,
+      pipelineContextVars: {
+        getVerifiedSocialIds: async (account: Parameters<typeof generateToken>[0]) =>
+          await getAccountClient(opt.accountsUrl, generateToken(account)).getSocialIds(true)
+      }
+    },
     {}
   )
 

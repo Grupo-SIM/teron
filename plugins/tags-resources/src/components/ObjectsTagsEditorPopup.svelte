@@ -24,7 +24,7 @@
   let selected: Ref<TagElement>[] = []
   let tagRefs: TagReference[] = []
   const query = createQuery()
-  $: query.query(tags.class.TagReference, { attachedTo: { $in: objects.map((p) => p._id) } }, (result) => {
+  $: query.query(tags.class.TagReference, { attachedTo: { $in: objects.map((p) => p._id) }, collection: 'labels' }, (result) => {
     tagRefs = result
     const res: Record<Ref<TagElement>, TagReference> = {}
     for (const value of result) {
@@ -58,7 +58,11 @@
   async function removeTag (tag: TagElement): Promise<void> {
     await Promise.all(
       objects.map(async (object) => {
-        const tagRef = await client.findOne(tags.class.TagReference, { attachedTo: object._id, tag: tag._id })
+        const tagRef = await client.findOne(tags.class.TagReference, {
+          attachedTo: object._id,
+          tag: tag._id,
+          collection: 'labels'
+        })
         if (tagRef) await client.remove(tagRef)
       })
     )

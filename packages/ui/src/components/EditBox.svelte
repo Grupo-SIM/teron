@@ -24,6 +24,8 @@
   import Label from './Label.svelte'
   import { resizeObserver } from '../resize'
 
+  export let name: string | undefined = undefined
+  export let autocomplete: string | undefined = undefined
   export let id: string | undefined = undefined
   export let label: IntlString | undefined = undefined
   export let maxWidth: string = '100%'
@@ -253,6 +255,8 @@
         style:width={maxWidth}
         bind:this={input}
         type="text"
+        {name}
+        {autocomplete}
         bind:value
         placeholder={phTranslate}
         on:input={handleInput}

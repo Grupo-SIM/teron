@@ -1,7 +1,7 @@
 {
   "status": {
     "LoadingPlugin": "Načítání pluginu {plugin}...",
-    "UnknownError": "Neznámá chyba: {message}",
+    "UnknownError": "Neznámá chyba",
     "InvalidId": "Neplatné ID: {id}",
     "BadRequest": "Špatný požadavek",
     "Forbidden": "Zakázáno",

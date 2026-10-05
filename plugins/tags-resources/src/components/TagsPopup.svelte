@@ -35,6 +35,7 @@
   import tags from '../plugin'
   import { createTagElement } from '../utils'
   import CreateTagElement from './CreateTagElement.svelte'
+  import DeleteTagButton from './DeleteTagButton.svelte'
   import IconView from './icons/View.svelte'
   import IconViewHide from './icons/ViewHide.svelte'
 
@@ -65,7 +66,7 @@
   })
 
   // TODO: Add $not: {$in: []} query
-  $: query.query(tags.class.TagElement, { title: { $like: '%' + search + '%' }, targetClass }, (result) => {
+  $: query.query(tags.class.TagElement, { title: { $contains: search }, targetClass }, (result) => {
     objects = newElements.concat(result)
   })
 
@@ -202,24 +203,32 @@
             <div class="menu-group">
               {#each catObjects.slice(0, 50) as element}
                 {@const color = getPlatformColorDef(element.color, $themeStore.dark)}
-                <button
-                  class="menu-item no-focus flex-row-center"
-                  class:selected={isSelected(selected, element)}
-                  on:click={() => {
-                    checkSelected(selected, element)
-                  }}
-                >
-                  <div class="tag" style:background-color={color.color} />
-                  <span class="lines-limit-2 flex-grow">{element.title}</span>
-                  <span class="ml-2 text-xs">
-                    ({element.refCount ?? 0})
-                  </span>
-                  <div class="check ml-3">
-                    {#if isSelected(selected, element)}
-                      <Icon icon={IconCheck} size={'small'} />
-                    {/if}
-                  </div>
-                </button>
+                <div class="flex-row-center">
+                  <button
+                    class="menu-item no-focus flex-row-center flex-grow"
+                    class:selected={isSelected(selected, element)}
+                    on:click={() => {
+                      checkSelected(selected, element)
+                    }}
+                  >
+                    <div class="tag" style:background-color={color.color} />
+                    <span class="lines-limit-2 flex-grow">{element.title}</span>
+                    <span class="ml-2 text-xs">
+                      ({element.refCount ?? 0})
+                    </span>
+                    <div class="check ml-3">
+                      {#if isSelected(selected, element)}
+                        <Icon icon={IconCheck} size={'small'} />
+                      {/if}
+                    </div>
+                  </button>
+                  {#if !hideAdd && !newElements.some((tag) => tag._id === element._id)}
+                    <DeleteTagButton {element} on:deleted={() => {
+                      selected = selected.filter((id) => id !== element._id)
+                      dispatch('update', { action: 'selected', selected })
+                    }} />
+                  {/if}
+                </div>
               {/each}
             </div>
           </div>

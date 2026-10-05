@@ -15,11 +15,13 @@
 <script lang="ts">
   import QRCode from 'qrcode'
   import { getCurrentAccount } from '@hcengineering/core'
-  import { OK, unknownError, getEmbeddedLabel } from '@hcengineering/platform'
+  import { OK, unknownError, getEmbeddedLabel, translate } from '@hcengineering/platform'
   import setting from '@hcengineering/setting'
-  import { Breadcrumb, Button, EditBox, Header, Label, Spinner, Status } from '@hcengineering/ui'
+  import { addNotification, Breadcrumb, Button, EditBox, Header, Label, Spinner, Status } from '@hcengineering/ui'
   import { getAccountClient } from '../utils'
-  import presentation from '@hcengineering/presentation'
+  import presentation, { copyTextToClipboard } from '@hcengineering/presentation'
+  import view from '@hcengineering/view'
+  import { SimpleNotification } from '@hcengineering/view-resources'
 
   let tfaEnabled: boolean | undefined = undefined
   let showSetup = false
@@ -86,6 +88,21 @@
     }
   }
 
+  async function copySecret (): Promise<void> {
+    if (secret === '') return
+    try {
+      await copyTextToClipboard(secret)
+      addNotification(
+        await translate(view.string.Copied),
+        await translate(setting.string.TwoFactorSecretCopied),
+        SimpleNotification
+      )
+      status = OK
+    } catch (err: any) {
+      status = err.status ?? unknownError(err)
+    }
+  }
+
   let qrCodeUrl = ''
 
   $: if (otpauthUrl) {
@@ -101,7 +118,7 @@
   </Header>
 
   <div class="flex-col p-6 gap-8 max-w-2xl">
-    <div class="flex flex-between">
+    <div class="flex-col flex-gap-4 items-start">
       <Label label={setting.string.TwoFactorAuthDescription} />
       {#if tfaEnabled === undefined}
         <Spinner />
@@ -122,9 +139,17 @@
             <div style="width: 200px; height: 200px">
               <img src={qrCodeUrl} alt="2FA QR Code" width="200" height="200" />
             </div>
-            <div class="font-mono break-all">
-              {secret}
+            <Label label={setting.string.TwoFactorSecret} />
+            <div class="flex items-center flex-gap-2">
+              <div class="font-mono break-all" style="user-select: all">{secret}</div>
+              <Button
+                label={view.string.CopyToClipboard}
+                icon={view.icon.Copy}
+                on:click={copySecret}
+                disabled={secret === ''}
+              />
             </div>
+            <Label label={setting.string.TwoFactorSetupInstructions} />
           </div>
         {/if}
 

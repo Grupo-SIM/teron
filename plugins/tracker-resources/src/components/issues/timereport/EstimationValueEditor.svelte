@@ -16,11 +16,13 @@
 <script lang="ts">
   import type { IntlString } from '@hcengineering/platform'
   import type { ButtonSize } from '@hcengineering/ui'
-  import { EditBox, Label, showPopup, eventToHTMLElement, Button } from '@hcengineering/ui'
-  import { EditBoxPopup } from '@hcengineering/view-resources'
+  import { Label, showPopup, eventToHTMLElement, Button } from '@hcengineering/ui'
+  import TimeInputPopup from './TimeInputPopup.svelte'
+  import TimeInput from './TimeInput.svelte'
   import TimePresenter from './TimePresenter.svelte'
 
   // export let label: IntlString
+  export let unit: 'minutes' | 'hours' = 'minutes'
   export let placeholder: IntlString
   export let value: number | undefined
   export let autoFocus: boolean = false
@@ -34,12 +36,7 @@
 
   let shown: boolean = false
 
-  function _onchange (ev: Event) {
-    const value = (ev.target as HTMLInputElement).valueAsNumber
-    if (Number.isFinite(value)) {
-      onChange(value)
-    }
-  }
+
 </script>
 
 {#if kind === 'button' || kind === 'link'}
@@ -51,7 +48,8 @@
     disabled={readonly}
     on:click={(ev) => {
       if (!shown && !readonly) {
-        showPopup(EditBoxPopup, { value, format: 'number' }, eventToHTMLElement(ev), (res) => {
+        shown = true
+        showPopup(TimeInputPopup, { value, unit }, eventToHTMLElement(ev), (res) => {
           if (Number.isFinite(res)) {
             value = res
             onChange(value)
@@ -76,5 +74,5 @@
     <span class="content-dark-color"><Label label={placeholder} /></span>
   {/if}
 {:else}
-  <EditBox {placeholder} bind:value format={'number'} {autoFocus} on:change={_onchange} />
+  <TimeInput {value} {unit} {autoFocus} {onChange} />
 {/if}

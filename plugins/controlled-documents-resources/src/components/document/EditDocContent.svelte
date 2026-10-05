@@ -285,7 +285,7 @@
               is={activity.component.Activity}
               props={{
                 object: $controlledDocument,
-                showCommenInput: true,
+                showCommenInput: false,
                 boundary: boundary ?? undefined,
                 focusIndex: 1000,
                 shouldScroll: false

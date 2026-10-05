@@ -28,7 +28,7 @@
   export let _id: Ref<ChunterSpace>
   export let _class: Ref<Class<ChunterSpace>>
 
-  let channel: ChunterSpace
+  let channel: ChunterSpace | undefined
 
   const dispatch = createEventDispatcher()
 
@@ -64,7 +64,7 @@
   </svelte:fragment>
 
   <svelte:fragment slot="aside">
-    {#if _class === chunter.class.Channel}
+    {#if _class === chunter.class.Channel && channel}
       <div class="flex-col-center">
         <span class="fs-title text-xl overflow-label mt-4 mb-2"><Label label={chunter.string.Settings} /></span>
         {#key channel._id}

@@ -18,10 +18,7 @@ import express, { type Express, type NextFunction, type Request, type Response }
 import { type Server } from 'http'
 import {
   TranslateRequest,
-  ConnectMeetingRequest,
-  DisconnectMeetingRequest,
   AIEventRequest,
-  PostTranscriptRequest,
   SummarizeMessagesRequest
 } from '@hcengineering/ai-bot'
 import { extractToken } from '@hcengineering/server-client'
@@ -112,73 +109,6 @@ export function createServer (controller: AIControl, ctx: MeasureContext): Expre
       const events = Array.isArray(req.body) ? req.body : [req.body]
 
       await controller.processEvent(token.workspace, events as AIEventRequest[])
-    })
-  )
-
-  app.post(
-    '/love/transcript',
-    wrapRequest(async (req, res, token) => {
-      if (req.body == null || Array.isArray(req.body) || typeof req.body !== 'object') {
-        throw new ApiError(400)
-      }
-
-      if (token.account !== controller.personUuid) {
-        throw new ApiError(401)
-      }
-
-      await controller.processLoveTranscript(req.body as PostTranscriptRequest)
-
-      res.status(200)
-      res.json({})
-    })
-  )
-
-  app.post(
-    '/love/connect',
-    wrapRequest(async (req, res, token) => {
-      if (req.body == null || Array.isArray(req.body) || typeof req.body !== 'object') {
-        throw new ApiError(400)
-      }
-
-      const request: ConnectMeetingRequest = req.body
-      await controller.loveConnect(token.workspace, request)
-
-      res.status(200)
-      res.json({})
-    })
-  )
-
-  app.post(
-    '/love/disconnect',
-    wrapRequest(async (req, res, token) => {
-      if (req.body == null || Array.isArray(req.body) || typeof req.body !== 'object') {
-        throw new ApiError(400)
-      }
-
-      const request: DisconnectMeetingRequest = req.body
-      await controller.loveDisconnect(token.workspace, request)
-
-      res.status(200)
-      res.json({})
-    })
-  )
-
-  app.get(
-    '/love/:roomName/identity',
-    wrapRequest(async (req, res, token) => {
-      if (token.account !== controller.personUuid) {
-        throw new ApiError(401)
-      }
-
-      const roomName = req.params.roomName
-      const resp = await controller.getLoveIdentity(roomName)
-
-      if (resp === undefined) {
-        throw new ApiError(404)
-      }
-
-      res.status(200)
-      res.json(resp)
     })
   )
 

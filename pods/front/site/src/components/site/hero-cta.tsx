@@ -13,7 +13,7 @@ type HeroCtaProps = {
 
 export function HeroCta({
   href = "/cadastro",
-  label = "Começar agora",
+  label = "common.getStarted",
 }: HeroCtaProps) {
   const wrapRef = usePillGlow<HTMLSpanElement>();
 

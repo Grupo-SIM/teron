@@ -12,6 +12,7 @@
 // limitations under the License.
 
 import { type IntlString, translate } from '@hcengineering/platform'
+import { getDateLocale } from '@hcengineering/ui'
 import { DefaultVideoRes } from './const'
 import { type CameraPosition, type CameraSize } from './types'
 
@@ -64,8 +65,9 @@ export function formatElapsedTime (elapsed: number): string {
 }
 
 export async function formatRecordingName (label: IntlString, date: Date): Promise<string> {
-  const timeStr = date.toLocaleTimeString()
-  const dateStr = date.toLocaleDateString(undefined, {
+  const locale = getDateLocale()
+  const timeStr = date.toLocaleTimeString(locale)
+  const dateStr = date.toLocaleDateString(locale, {
     day: 'numeric',
     month: 'long',
     year: 'numeric'

@@ -40,6 +40,7 @@ export default mergeIds(communicationId, communication, {
     UserVotesPresenter: '' as AnyComponent
   },
   string: {
+    Attachments: '' as IntlString,
     Added: '' as IntlString,
     All: '' as IntlString,
     Attach: '' as IntlString,
@@ -77,6 +78,7 @@ export default mergeIds(communicationId, communication, {
     JoinedThe: '' as IntlString,
     LeftThe: '' as IntlString,
     Translating: '' as IntlString,
+    Title: '' as IntlString,
     ShowOriginal: '' as IntlString,
     Translate: '' as IntlString,
     AddReaction: '' as IntlString,

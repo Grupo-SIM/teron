@@ -94,5 +94,8 @@
     "WriteMessageEllipsis": "メッセージを書く...",
     "EditMessageEllipsis": "メッセージを編集...",
     "ArrowDownMessages": "↓ 最新のメッセージ"
+  ,
+    "Attachments": "Attachments",
+    "Title": "Title"
   }
 }

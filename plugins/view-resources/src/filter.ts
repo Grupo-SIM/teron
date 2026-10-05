@@ -43,6 +43,14 @@ export function removeFilter (i: number): void {
 export function updateFilter (filter: Filter): void {
   const old = get(filterStore)
   const index = old.findIndex((p) => p.index === filter.index)
+  if (filter.value.length === 0 && [
+    view.filter.FilterArrayAll, view.filter.FilterArrayAny,
+    view.filter.FilterObjectIn, view.filter.FilterObjectNin,
+    view.filter.FilterValueIn, view.filter.FilterValueNin
+  ].includes(filter.mode)) {
+    if (index !== -1) removeFilter(index)
+    return
+  }
   if (index === -1) {
     old.push(filter)
   } else {
@@ -88,7 +96,7 @@ export async function afterResult (filter: Filter): Promise<ObjQueryType<any>> {
 export async function containsResult (filter: Filter): Promise<ObjQueryType<any>> {
   const [value] = filter.value
 
-  return typeof value === 'string' ? { $like: `%${value}%` } : {}
+  return typeof value === 'string' ? { $contains: value } : {}
 }
 
 export async function nestedMatchResult (filter: Filter, onUpdate: () => void): Promise<ObjQueryType<any>> {

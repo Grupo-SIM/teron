@@ -1,9 +1,10 @@
 <script lang="ts">
   import { FixedColumn } from '@hcengineering/view-resources'
-  import { getEmbeddedLabel, getMetadata } from '@hcengineering/platform'
+  import { getMetadata } from '@hcengineering/platform'
   import presentation, { type OverviewStatistics } from '@hcengineering/presentation'
-  import { Button, DropdownLabels, Expandable, IconArrowRight, ticker } from '@hcengineering/ui'
+  import { Button, DropdownLabelsIntl, Expandable, IconArrowRight, Label, ticker } from '@hcengineering/ui'
   import MetricsStats from './MetricsStats.svelte'
+  import workbench from '../plugin'
 
   const token: string = getMetadata(presentation.metadata.Token) ?? ''
 
@@ -26,17 +27,19 @@
 
   export let sortingOrder: 'avg' | 'ops' | 'total' = 'ops'
   const sortOrder = [
-    { id: 'avg', label: 'Average' },
-    { id: 'ops', label: 'Operations' },
-    { id: 'total', label: 'Total' }
+    { id: 'avg', label: workbench.string.Average },
+    { id: 'ops', label: workbench.string.Operations },
+    { id: 'total', label: workbench.string.Total }
   ]
 </script>
 
 {#if data}
   <div class="flex-col p-4">
     <span>
-      Connections: {data.connectionsTotal}
-      Users: {data.usersTotal}
+      <Label
+        label={workbench.string.ConnectionStatistics}
+        params={{ connections: data.connectionsTotal, users: data.usersTotal }}
+      />
     </span>
     <span> </span>
   </div>
@@ -48,7 +51,7 @@
       <div class="p-3">1.</div>
       <Button
         icon={IconArrowRight}
-        label={getEmbeddedLabel('Wipe statistics')}
+        label={workbench.string.WipeStatistics}
         on:click={() => {
           void fetch(endpoint + `/api/v1/manage?token=${token}&operation=wipe-statistics`, {
             method: 'PUT'
@@ -62,7 +65,7 @@
 {/if}
 {#if data}
   <div class="p-1 flex flex-grow flex-reverse">
-    <DropdownLabels bind:selected={sortingOrder} items={sortOrder}></DropdownLabels>
+    <DropdownLabelsIntl bind:selected={sortingOrder} items={sortOrder}></DropdownLabelsIntl>
   </div>
   <div class="flex-column p-3 h-full" style:overflow="auto">
     {#each Object.entries(data.data).sort((a, b) => a[1].serviceName.localeCompare(b[1].serviceName)) as kv}

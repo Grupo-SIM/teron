@@ -13,6 +13,7 @@
 // limitations under the License.
 -->
 <script lang="ts">
+  import { getTaskAssignees } from '@hcengineering/task'
   import attachment from '@hcengineering/attachment'
   import { AttachmentDocList } from '@hcengineering/attachment-resources'
   import { ChatMessagePopup } from '@hcengineering/chunter-resources'
@@ -84,7 +85,7 @@
     <div class="flex-row-center gap-2 mb-2">
       <StatusEditor value={issue} shouldShowLabel kind={'regular'} />
       <PriorityEditor value={issue} shouldShowLabel kind={'regular'} />
-      {#if issue.assignee}
+      {#if getTaskAssignees(issue).length > 0}
         <AssigneeEditor object={issue} kind={'regular'} />
       {/if}
     </div>

@@ -510,9 +510,7 @@ export async function configurePlatform (onWorkbenchConnect?: () => Promise<void
     () => import(/* webpackChunkName: "communication" */ '@hcengineering/communication-resources')
   )
   addLocation(emojiId, () => import(/* webpackChunkName: "achievement" */ '@hcengineering/emoji-resources'))
-  if ((config.BILLING_URL ?? '') !== '') {
-    addLocation(billingId, () => import(/* webpackChunkName: "billing" */ '@hcengineering/billing-resources'))
-  }
+  addLocation(billingId, () => import(/* webpackChunkName: "billing" */ '@hcengineering/billing-resources'))
   addLocation(teronMailId, () => import(/* webpackChunkName: "teron-mail" */ '@hcengineering/teron-mail-resources'))
   addLocation(
     aiAssistantId,

@@ -75,7 +75,6 @@ import ContactRefPresenter from './components/ContactRefPresenter.svelte'
 import Contacts from './components/Contacts.svelte'
 import ContactsTabs from './components/ContactsTabs.svelte'
 import CreateEmployee from './components/CreateEmployee.svelte'
-import CreateGuest from './components/CreateGuest.svelte'
 import CreateOrganization from './components/CreateOrganization.svelte'
 import CreatePerson from './components/CreatePerson.svelte'
 import DeleteConfirmationPopup from './components/DeleteConfirmationPopup.svelte'
@@ -112,6 +111,7 @@ import SocialEditor from './components/SocialEditor.svelte'
 import SpaceMembers from './components/SpaceMembers.svelte'
 import WorkspaceMemberStatusEditor from './components/WorkspaceMemberStatusEditor.svelte'
 import SpaceMembersEditor from './components/SpaceMembersEditor.svelte'
+import WorkModeDays from './components/WorkModeDays.svelte'
 import SystemAvatar from './components/SystemAvatar.svelte'
 import UserBox from './components/UserBox.svelte'
 import UserBoxItems from './components/UserBoxItems.svelte'
@@ -176,7 +176,6 @@ export {
   CombineAvatars,
   ContactPresenter,
   ContactRefPresenter,
-  CreateGuest,
   CreateOrganization,
   DeleteConfirmationPopup,
   EditPerson,
@@ -230,7 +229,7 @@ async function queryContact (
   search: string,
   filter?: { in?: RelatedDocument[], nin?: RelatedDocument[] }
 ): Promise<ObjectSearchResult[]> {
-  const q: DocumentQuery<Contact> = { name: { $like: `%${search}%` } }
+  const q: DocumentQuery<Contact> = { name: { $contains: search } }
   return await doContactQuery(_class, q, filter, client)
 }
 
@@ -241,13 +240,13 @@ async function queryEmployee (
 ): Promise<ObjectSearchResult[]> {
   const q1 = await doContactQuery(
     contact.mixin.Employee,
-    { name: { $like: `%${search}%` }, active: true },
+    { name: { $contains: search }, active: true },
     filter,
     client
   )
   const q2 = await doContactQuery(
     contact.mixin.Employee,
-    { displayName: { $like: `%${search}%` }, active: true },
+    { displayName: { $contains: search }, active: true },
     {
       in: filter?.in,
       nin: [...(filter?.nin ?? []), ...Array.from(q1.map((it) => ({ _id: it.doc._id, _class: it.doc._class })))]
@@ -355,7 +354,6 @@ export default async (): Promise<Resources> => ({
     NameChangedActivityMessage
   },
   component: {
-    CreateGuest,
     ContactArrayEditor,
     PersonEditor,
     OrganizationEditor,
@@ -403,6 +401,7 @@ export default async (): Promise<Resources> => ({
     EditOrganizationPanel,
     ChannelIcon,
     SpaceMembersEditor,
+    WorkModeDays,
     ContactNamePresenter,
     PersonIdFilter,
     AssigneePopup,

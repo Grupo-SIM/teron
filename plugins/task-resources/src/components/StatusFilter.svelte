@@ -13,7 +13,7 @@
 // limitations under the License.
 -->
 <script lang="ts">
-  import core, { Doc, FindResult, IdMap, Ref, RefTo, Space, Status, toIdMap } from '@hcengineering/core'
+  import core, { Doc, FindResult, IdMap, Ref, RefTo, Space, Status, containsSearch, toIdMap } from '@hcengineering/core'
   import { translate } from '@hcengineering/platform'
   import presentation, { getClient } from '@hcengineering/presentation'
   import { ProjectStatus, ProjectType, TaskType } from '@hcengineering/task'
@@ -84,9 +84,6 @@
       for (const value of values) {
         targets.add(value?._id)
       }
-      if (search !== '') {
-        values = values.filter((p) => p?.name.includes(search))
-      }
     } else {
       let statuses: Status[] = []
       const projectTypesNeeded = joinedSpacesTypes
@@ -136,6 +133,9 @@
           }
         )
       }
+    }
+    if (search !== '') {
+      values = values.filter((p) => containsSearch(p?.name, search))
     }
     values = sortFilterValues(values, (v) => isSelected(v, filter.value))
     objectsPromise = undefined

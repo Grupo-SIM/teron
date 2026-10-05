@@ -74,20 +74,6 @@ export function createModel (builder: Builder): void {
     core.space.Model,
     {
       application: chunter.app.Chunter,
-      role: AccountRole.Guest,
-      permissions: [],
-      spaceClass: chunter.class.Channel,
-      enabled: true,
-      order: 30
-    },
-    chunter.ids.ModulePermissionGroup
-  )
-
-  builder.createDoc(
-    core.class.ModulePermissionGroup,
-    core.space.Model,
-    {
-      application: chunter.app.Chunter,
       role: AccountRole.ReadOnlyGuest,
       permissions: [],
       spaceClass: chunter.class.Channel,
@@ -115,18 +101,6 @@ export function createModel (builder: Builder): void {
   builder.createDoc(presentation.class.ComponentPointExtension, core.space.Model, {
     extension: workbench.extensions.WorkbenchTabExtensions,
     component: chunter.component.WorkbenchTabExtension
-  })
-
-  builder.mixin(chunter.class.DirectMessage, core.class.Class, core.mixin.TxAccessLevel, {
-    createAccessLevel: AccountRole.Guest
-  })
-
-  builder.mixin(chunter.class.ChatMessage, core.class.Class, core.mixin.TxAccessLevel, {
-    createAccessLevel: AccountRole.Guest
-  })
-
-  builder.mixin(chunter.class.ThreadMessage, core.class.Class, core.mixin.TxAccessLevel, {
-    createAccessLevel: AccountRole.Guest
   })
 
   const spaceClasses = [chunter.class.Channel, chunter.class.DirectMessage]
@@ -250,8 +224,7 @@ export function createModel (builder: Builder): void {
       'description',
       'members',
       'owners',
-      'autoJoin',
-      'autoJoinForRoles'
+      'autoJoin'
     ]
   })
 

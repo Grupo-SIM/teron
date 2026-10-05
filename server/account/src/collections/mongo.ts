@@ -650,7 +650,7 @@ export class MongoAccountDB implements AccountDB {
               remainingUses: { $gt: 0 }
             })
             const memberSeats = members.filter((it) =>
-              [AccountRole.Owner, AccountRole.Maintainer, AccountRole.User, AccountRole.Guest].includes(it.role)
+              [AccountRole.Owner, AccountRole.Maintainer, AccountRole.User].includes(it.role)
             ).length
             const occupied =
               memberSeats +
@@ -814,7 +814,7 @@ export class MongoAccountDB implements AccountDB {
         })
         const now = Date.now()
         const memberSeats = members.filter((it) =>
-          [AccountRole.Owner, AccountRole.Maintainer, AccountRole.User, AccountRole.Guest].includes(it.role)
+          [AccountRole.Owner, AccountRole.Maintainer, AccountRole.User].includes(it.role)
         ).length
         const used =
           memberSeats +
@@ -919,7 +919,7 @@ export class MongoAccountDB implements AccountDB {
     const invites = await this.invite.find({ workspaceUuid: workspaceId, remainingUses: { $gt: 0 } })
     const now = Date.now()
     const used = members.filter((it) =>
-      [AccountRole.Owner, AccountRole.Maintainer, AccountRole.User, AccountRole.Guest].includes(it.role)
+      [AccountRole.Owner, AccountRole.Maintainer, AccountRole.User].includes(it.role)
     ).length + invites.filter((it) =>
       (it.expiresOn === -1 || it.expiresOn > now) && it.email != null && it.email !== ''
     ).length
@@ -943,12 +943,18 @@ export class MongoAccountDB implements AccountDB {
     accountId: AccountUuid,
     workspaceId: WorkspaceUuid,
     role: AccountRole,
-    capacity: number
+    capacity: number,
+    expectedRole?: AccountRole
   ): Promise<boolean> {
     return (await this.withSeatReservation(workspaceId, async () => {
+      const current = await this.getWorkspaceRole(accountId, workspaceId)
+      if (current == null || (expectedRole !== undefined && current !== expectedRole)) return false
       if (!(await this.hasSeatCapacity(workspaceId, capacity))) return false
-      await this.updateWorkspaceRole(accountId, workspaceId, role)
-      return true
+      const result = await this.workspaceMembers.collection.updateOne(
+        { workspaceUuid: workspaceId, accountUuid: accountId, role: current },
+        { $set: { role } }
+      )
+      return result.modifiedCount === 1
     })) ?? false
   }
 
@@ -993,15 +999,6 @@ export class MongoAccountDB implements AccountDB {
         uuid: workspaceId
       },
       { allowReadOnlyGuest: readOnlyGuestsAllowed }
-    )
-  }
-
-  async updateAllowGuestSignUp (workspaceId: WorkspaceUuid, guestSignUpAllowed: boolean): Promise<void> {
-    await this.workspace.update(
-      {
-        uuid: workspaceId
-      },
-      { allowGuestSignUp: guestSignUpAllowed }
     )
   }
 

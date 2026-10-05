@@ -127,7 +127,6 @@ export class TRoleCapabilitySettings extends TConfiguration implements RoleCapab
 @Model(setting.class.OfficeSettings, core.class.Configuration, DOMAIN_SETTING)
 @UX(setting.string.OfficeSettings)
 export class TOfficeSettings extends TConfiguration implements OfficeSettings {
-  defaultStartWithTranscription!: boolean
   defaultStartWithRecording!: boolean
 }
 
@@ -189,7 +188,7 @@ export function createModel (builder: Builder): void {
       icon: setting.icon.AccountSettings,
       component: setting.component.Profile,
       group: 'settings-account',
-      role: AccountRole.Guest,
+      role: AccountRole.User,
       order: 0
     },
     setting.ids.Profile
@@ -204,7 +203,7 @@ export function createModel (builder: Builder): void {
       icon: setting.icon.Password,
       component: setting.component.Password,
       group: 'settings-account',
-      role: AccountRole.Guest,
+      role: AccountRole.User,
       order: 1000
     },
     setting.ids.Password
@@ -219,7 +218,7 @@ export function createModel (builder: Builder): void {
       icon: setting.icon.Password,
       component: setting.component.TwoFactorSettings,
       group: 'settings-account',
-      role: AccountRole.Guest,
+      role: AccountRole.User,
       order: 1200
     },
     setting.ids.Security
@@ -237,7 +236,7 @@ export function createModel (builder: Builder): void {
         navigation: setting.component.WorkspaceSettings
       },
       group: 'settings',
-      role: AccountRole.User,
+      role: AccountRole.Maintainer,
       order: 2000
     },
     setting.ids.Setting
@@ -303,7 +302,7 @@ export function createModel (builder: Builder): void {
     setting.class.WorkspaceSettingCategory,
     core.space.Model,
     {
-      name: 'owners',
+      name: 'members',
       label: setting.string.Members,
       icon: setting.icon.Members,
       component: setting.component.Members,
@@ -312,19 +311,7 @@ export function createModel (builder: Builder): void {
     },
     setting.ids.Members
   )
-  builder.createDoc(
-    setting.class.WorkspaceSettingCategory,
-    core.space.Model,
-    {
-      name: 'guestPermissions',
-      label: setting.string.GuestPermissionsSettings,
-      icon: setting.icon.GuestPermissions,
-      component: setting.component.GuestPermissionsSettings,
-      role: AccountRole.Owner,
-      order: 1050
-    },
-    'setting:ids:AccountPermissionsSettings' as Ref<any>
-  )
+
   builder.createDoc(
     setting.class.WorkspaceSettingCategory,
     core.space.Model,
@@ -398,21 +385,6 @@ export function createModel (builder: Builder): void {
     setting.class.WorkspaceSettingCategory,
     core.space.Model,
     {
-      name: 'invites',
-      label: setting.string.InviteSettings,
-      icon: setting.icon.InviteSettings,
-      component: setting.component.InviteSetting,
-      group: 'settings-editor',
-      feature: 'invites',
-      role: AccountRole.Maintainer,
-      order: 4700
-    },
-    setting.ids.InviteSettings
-  )
-  builder.createDoc(
-    setting.class.WorkspaceSettingCategory,
-    core.space.Model,
-    {
       name: 'export',
       label: exportPlugin.string.Export,
       icon: exportPlugin.icon.Export,
@@ -424,22 +396,6 @@ export function createModel (builder: Builder): void {
     },
     setting.ids.Export
   )
-  builder.createDoc(
-    setting.class.WorkspaceSettingCategory,
-    core.space.Model,
-    {
-      name: 'office',
-      label: setting.string.OfficeSettings,
-      icon: setting.icon.OfficeSettings,
-      component: setting.component.OfficeSettings,
-      group: 'settings-editor',
-      feature: 'love',
-      role: AccountRole.Maintainer,
-      order: 4900
-    },
-    setting.ids.OfficeSettings
-  )
-
   // Currently remove Support item from settings
   // builder.createDoc(
   //   setting.class.SettingsCategory,

@@ -14,8 +14,10 @@
 -->
 <script lang="ts">
   import { IntlString } from '@hcengineering/platform'
+  import type { Calendar } from '@hcengineering/calendar'
 
   import { CalendarMode } from '../index'
+  import CalendarFilter from './CalendarFilter.svelte'
   import CalendarNavigation from './CalendarNavigation.svelte'
 
   export let currentDate: Date
@@ -30,6 +32,8 @@
   export let onToday: () => void
   export let onBack: () => void
   export let onForward: () => void
+  export let calendars: Calendar[] = []
+  export let selectedCalendar = 'all'
 </script>
 
 <div class="calendar-header">
@@ -37,7 +41,10 @@
     {monthName}
     <span>{currentDate.getFullYear()}</span>
   </div>
-  <CalendarNavigation {ddItems} bind:mode {onToday} {onBack} {onForward} />
+  <div class="calendar-controls">
+    <CalendarFilter {calendars} bind:selectedCalendar />
+    <CalendarNavigation {ddItems} bind:mode {onToday} {onBack} {onForward} />
+  </div>
 </div>
 
 <style lang="scss">
@@ -61,5 +68,12 @@
         opacity: 0.4;
       }
     }
+  }
+
+  .calendar-controls {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    flex-wrap: wrap;
   }
 </style>

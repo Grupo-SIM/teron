@@ -50,7 +50,6 @@ export default mergeIds(testManagementId, testManganement, {
     RunTestPlanButton: '' as AnyComponent
   },
   ids: {
-    ModulePermissionGroup: '' as Ref<Doc>,
     ModulePermissionGroupReadOnlyGuest: '' as Ref<Doc>
   }
 })

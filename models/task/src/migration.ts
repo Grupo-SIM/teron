@@ -46,6 +46,7 @@ import { DOMAIN_ACTIVITY } from '@hcengineering/model-activity'
 import core, { DOMAIN_SPACE } from '@hcengineering/model-core'
 import tags from '@hcengineering/model-tags'
 import {
+  getTaskAssignees,
   taskId,
   type Project,
   type ProjectStatus,
@@ -517,6 +518,27 @@ function areSameArrays (arr1: any[] | undefined, arr2: any[] | undefined): boole
 export const taskOperation: MigrateOperation = {
   async migrate (client: MigrationClient, mode): Promise<void> {
     await tryMigrate(mode, client, taskId, [
+      {
+        state: 'task-assignees-list',
+        func: async (client) => {
+          const classes = client.hierarchy.getDescendants(task.class.Task)
+          for (const domain of new Set(classes.map((cls) => client.hierarchy.getDomain(cls)))) {
+            const tasks = await client.traverse<Task>(domain, { _class: { $in: classes } })
+            try {
+              while (true) {
+                const batch = await tasks.next(500)
+                if (batch === null || batch.length === 0) break
+                for (const item of batch) {
+                  await client.update(domain, { _id: item._id }, { assignees: getTaskAssignees(item) })
+                  await client.update(domain, { _id: item._id }, { $unset: { assignee: true } })
+                }
+              }
+            } finally {
+              await tasks.close()
+            }
+          }
+        }
+      },
       {
         state: 'migrate-tt-model-states',
         mode: 'upgrade',

@@ -88,12 +88,13 @@ describe('handleSendMail', () => {
     expect(res.send).toHaveBeenCalledWith({ err: "'to' is missing" })
   })
 
-  it('handles errors thrown by MailClient', async () => {
+  it('returns an error when MailClient fails', async () => {
     sendMailMock.mockRejectedValue(new Error('Email service error'))
 
-    await handleSendMail(new MailClient(), req, res, mockCtx)
+    await handleSendMail(mailClient, req, res, mockCtx)
 
-    expect(res.send).toHaveBeenCalled() // Check that a response is still sent
+    expect(res.status).toHaveBeenCalledWith(500)
+    expect(res.send).toHaveBeenCalledWith({ err: 'Failed to send email' })
   })
 
   it('should use source from config if from is not provided', async () => {

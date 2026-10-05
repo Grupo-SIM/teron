@@ -1,7 +1,7 @@
 {
   "status": {
     "LoadingPlugin": "{plugin} eklentisi yükleniyor...",
-    "UnknownError": "Bilinmeyen hata: {message}",
+    "UnknownError": "Bilinmeyen hata",
     "InvalidId": "Geçersiz Id: {id}",
     "BadRequest": "Hatalı istek",
     "Forbidden": "Yasak",

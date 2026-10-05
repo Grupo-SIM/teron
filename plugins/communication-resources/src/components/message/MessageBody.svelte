@@ -18,7 +18,7 @@
   import { formatName, Person } from '@hcengineering/contact'
   import { Message } from '@hcengineering/communication-types'
   import { Card } from '@hcengineering/card'
-  import { Label } from '@hcengineering/ui'
+  import { Label, themeStore } from '@hcengineering/ui'
 
   import communication from '../../plugin'
   import MessageInput from '../input/MessageInput.svelte'
@@ -50,7 +50,7 @@
   let isShowMoreActive: boolean = false
 
   function formatDate (date: Date): string {
-    return date.toLocaleTimeString('default', {
+    return date.toLocaleTimeString($themeStore.language, {
       hour: 'numeric',
       minute: 'numeric'
     })

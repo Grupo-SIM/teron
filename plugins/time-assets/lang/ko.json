@@ -1,5 +1,7 @@
 {
     "string": {
+        "MyCalendars": "My Calendars",
+        "TeamCalendars": "Team Calendars",
         "Planner": "플래너",
         "Calendar": "캘린더",
         "Agenda": "일정",

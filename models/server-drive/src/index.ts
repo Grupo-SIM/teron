@@ -23,6 +23,11 @@ import serverDrive from '@hcengineering/server-drive'
 export { serverDriveId } from '@hcengineering/server-drive'
 
 export function createModel (builder: Builder): void {
+  builder.mixin<Class<Doc>, ObjectDDParticipant>(
+    drive.class.Drive, core.class.Class, serverCore.mixin.ObjectDDParticipant,
+    { collectDocs: serverDrive.function.FindDriveResources }
+  )
+
   builder.createDoc(serverCore.class.Trigger, core.space.Model, {
     trigger: serverDrive.trigger.OnFileVersionDelete,
     txMatch: {

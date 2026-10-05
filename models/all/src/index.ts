@@ -61,7 +61,6 @@ import { serverHrId, createModel as serverHrModel } from '@hcengineering/model-s
 import { serverInventoryId, createModel as serverInventoryModel } from '@hcengineering/model-server-inventory'
 import { serverLeadId, createModel as serverLeadModel } from '@hcengineering/model-server-lead'
 import { serverNotificationId, createModel as serverNotificationModel } from '@hcengineering/model-server-notification'
-import { serverRecruitId, createModel as serverRecruitModel } from '@hcengineering/model-server-recruit'
 import { serverRequestId, createModel as serverRequestModel } from '@hcengineering/model-server-request'
 import { serverSettingId, createModel as serveSettingModel } from '@hcengineering/model-server-setting'
 import { serverTagsId, createModel as serverTagsModel } from '@hcengineering/model-server-tags'
@@ -225,18 +224,7 @@ export default function buildModel (): Builder {
         classFilter: defaultFilter
       }
     ],
-    [
-      recruitModel,
-      recruitId,
-      {
-        label: recruit.string.ConfigLabel,
-        description: recruit.string.ConfigDescription,
-        enabled: true,
-        beta: false,
-        icon: recruit.icon.RecruitApplication,
-        classFilter: defaultFilter
-      }
-    ],
+    [recruitModel, recruitId],
     [settingModel, settingId],
     [
       telegramModel,
@@ -548,7 +536,6 @@ export default function buildModel (): Builder {
     [serverTrackerModel, serverTrackerId],
     [serverCardModel, serverCardId],
     [serverCalendarModel, serverCalendarId],
-    [serverRecruitModel, serverRecruitId],
     [serverGmailModel, serverGmailId],
     [serverTemplatesModel, serverTemplatesId],
     [serverTelegramModel, serverTelegramId],

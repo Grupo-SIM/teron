@@ -46,8 +46,8 @@ const FEATURES = [
         <path d="M7 13h18a2 2 0 0 1 2 2v13a2 2 0 0 1-2 2H7a2 2 0 0 1-2-2V15a2 2 0 0 1 2-2Zm9 5.5a2.6 2.6 0 0 0-1.3 4.85V26h2.6v-2.65A2.6 2.6 0 0 0 16 18.5Z" opacity=".7" />
       </Icon>
     ),
-    title: ["Segurança", "e privacidade"],
-    text: "Suas informações são privadas e acessíveis somente por quem sua empresa autorizar.",
+    title: ["integrations.features.security.title", "integrations.features.security.titleComplement"],
+    text: "integrations.cards.privacy",
   },
   {
     id: "gh-belonging",
@@ -57,8 +57,8 @@ const FEATURES = [
         <path d="M16 9.5c-2.6-2.6-6.6-.9-6.6 2.4 0 3.2 3.6 5.9 6.6 8.1 3-2.2 6.6-4.9 6.6-8.1 0-3.3-4-5-6.6-2.4Z" />
       </Icon>
     ),
-    title: ["Pertencimento", ""],
-    text: "Sua empresa tem seu próprio jeito. O Teron acompanha essa identidade.",
+    title: ["integrations.features.belonging.title", ""],
+    text: "integrations.cards.identity",
   },
   {
     id: "gh-trust",
@@ -68,8 +68,8 @@ const FEATURES = [
         <path d="m14.5 20.7-4.3-4.3 2.1-2.1 2.2 2.2 6.6-6.6 2.1 2.1-8.7 8.7Z" />
       </Icon>
     ),
-    title: ["Confiança", ""],
-    text: "Seu trabalho merece uma plataforma na qual você possa confiar.",
+    title: ["integrations.features.trust.title", ""],
+    text: "integrations.cards.trust",
   },
   {
     id: "gh-transparency",
@@ -79,8 +79,8 @@ const FEATURES = [
         <circle cx="16" cy="16" r="4.2" />
       </Icon>
     ),
-    title: ["Transparência", ""],
-    text: "Clareza em tudo o que você contrata, utiliza e recebe.",
+    title: ["integrations.features.transparency.title", ""],
+    text: "integrations.cards.transparency",
   },
   {
     id: "gh-support",
@@ -90,8 +90,8 @@ const FEATURES = [
         <path d="M13.5 26h5a2.5 2.5 0 0 1 0 5h-5a2.5 2.5 0 0 1 0-5ZM6 14h4v10H6V14Zm16 0h4v10h-4V14Z" />
       </Icon>
     ),
-    title: ["Suporte", ""],
-    text: "Conte com nosso time para tirar dúvidas e resolver o que precisar.",
+    title: ["integrations.features.support.title", ""],
+    text: "integrations.cards.support",
   },
   {
     id: "gh-commitment",
@@ -101,8 +101,8 @@ const FEATURES = [
         <path d="M30 11.5 24 9l-6.9 3.6-3 2.4 2.5 2.2 3.5-2.3 6.3 5.4a1.9 1.9 0 0 1-2.4 2.9l.6.5a1.9 1.9 0 0 1-2.5 2.8 1.9 1.9 0 0 1-2.6 2.6 1.9 1.9 0 0 1-3 .5l-3.1-2.7V14l6.6 4.6L30 20.8V11.5Z" />
       </Icon>
     ),
-    title: ["Compromisso", ""],
-    text: "Mais do que oferecer uma plataforma, queremos construir uma relação de longo prazo com sua empresa.",
+    title: ["integrations.features.commitment.title", ""],
+    text: "integrations.cards.relationship",
   },
 ];
 
@@ -111,15 +111,11 @@ export function GithubSync({ locale = defaultLocale }: { locale?: Locale }) {
     <Localized locale={locale}><section id="github" className="lp-gh">
       <div className="lp-gh-inner">
         <h2 data-reveal className="lp-gh-title">
-          O Teron se conecta ao
-          <br />
-          que sua empresa já usa.
-        </h2>
+          {"integrations.title"}<br />
+          {"integrations.titleComplement"}</h2>
 
         <p data-reveal className="lp-gh-lead">
-          GitHub, e-mail, Telegram e outras ferramentas que fazem parte do dia a
-          dia da sua empresa. Tudo conectado para simplificar sua rotina.
-        </p>
+          {"integrations.description"}</p>
 
         <div className="lp-gh-shot" data-reveal>
           {/*
@@ -170,7 +166,7 @@ export function GithubSync({ locale = defaultLocale }: { locale?: Locale }) {
         {/* Última parada antes do fechamento da página: quem leu até aqui já
             sabe o que a plataforma faz e a pergunta que sobra é o preço. */}
         <p data-reveal className="lp-gh-actions">
-          <HeroCta href="/precos" label="Conheça nossos planos" />
+          <HeroCta href="/precos" label="integrations.cta" />
         </p>
       </div>
     </section></Localized>

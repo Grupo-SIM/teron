@@ -14,8 +14,12 @@
 -->
 <script lang="ts">
   import { resizeObserver } from '@hcengineering/ui'
+  import { translateCB, type IntlString } from '@hcengineering/platform'
+  import { themeStore } from '@hcengineering/theme'
   export let label: string | undefined = undefined
   export let title: string | undefined = undefined
+  export let titleIntl: IntlString | undefined = undefined
+  export let titleParams: Record<string, unknown> = {}
   export let position: 'start' | 'middle' | 'end' | undefined = undefined
   export let selected = false
   export let color = 'var(--theme-bg-color)'
@@ -23,6 +27,15 @@
   export let fontColor: string | undefined = undefined
 
   let clientWidth = 0
+  let translatedTitle: string | undefined
+
+  $: if (titleIntl !== undefined) {
+    translateCB(titleIntl, titleParams, $themeStore.language, (value) => {
+      translatedTitle = value
+    })
+  } else {
+    translatedTitle = title
+  }
 
   $: lenght = clientWidth + 32 > 300 ? 300 : clientWidth + 32
 </script>
@@ -48,7 +61,7 @@
     class:noGap
     class:cursor-pointer={!selected && !$$slots.default}
     class:cursor-default={selected || $$slots.default}
-    {title}
+    title={translatedTitle}
     on:click
   >
     <svg

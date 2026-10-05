@@ -1,6 +1,6 @@
 <script lang="ts">
   import calendar, { AccessLevel, Calendar, Event, generateEventId, getAllEvents } from '@hcengineering/calendar'
-  import { DayCalendar, calendarByIdStore, hidePrivateEvents } from '@hcengineering/calendar-resources'
+  import { CalendarFilter, DayCalendar, calendarByIdStore, hidePrivateEvents } from '@hcengineering/calendar-resources'
   import { getCurrentEmployee } from '@hcengineering/contact'
   import { Ref, SortingOrder, Timestamp, getCurrentAccount } from '@hcengineering/core'
   import { IntlString, getEmbeddedLabel } from '@hcengineering/platform'
@@ -24,6 +24,8 @@
   import time from '../plugin'
   import IconSun from './icons/Sun.svelte'
 
+  export let calendarIds: Ref<Calendar>[] | undefined = undefined
+
   export let dragItem: ToDo | null = null
   export let currentDate: Date = new Date()
   export let displayedDaysCount = 1
@@ -37,7 +39,9 @@
   }
 
   function getTo (date: Date, days: number = 3): Timestamp {
-    return new Date(date).setDate(date.getDate() + days)
+    const end = new Date(date)
+    end.setHours(0, 0, 0, 0)
+    return end.setDate(end.getDate() + days)
   }
 
   let dayCalendar: DayCalendar
@@ -48,25 +52,29 @@
   const rem = (n: number): number => n * $deviceInfo.fontSize
 
   const myAcc = getCurrentAccount()
-  const socialStrings = myAcc.socialIds
   const personalCalendar = `${myAcc.uuid}_calendar` as Ref<Calendar>
 
   const calendarsQ = createQuery()
 
   let calendars: Calendar[] = []
+  let selectedCalendar = 'all'
+  $: displayedCalendars = calendarIds ?? (selectedCalendar === 'all'
+    ? [personalCalendar, ...calendars.map((item) => item._id)]
+    : [selectedCalendar as Ref<Calendar>])
   let todayDate = new Date()
 
-  $: calendarsQ.query(calendar.class.Calendar, { createdBy: { $in: socialStrings }, hidden: false }, (res) => {
+  calendarsQ.query(calendar.class.Calendar, { hidden: false }, (res) => {
     calendars = res
+    if (selectedCalendar !== 'all' && !res.some((item) => item._id === selectedCalendar)) selectedCalendar = 'all'
   })
 
   $: from = getFrom(currentDate)
   $: to = getTo(currentDate, displayedDaysCount)
 
-  function update (calendars: Calendar[]): void {
+  function update (calendarIds: Ref<Calendar>[]): void {
     q.query<Event>(
       calendar.class.Event,
-      { calendar: { $in: [personalCalendar, ...calendars.map((p) => p._id)] } },
+      { calendar: { $in: calendarIds } },
       (result) => {
         raw = result
       },
@@ -74,7 +82,7 @@
     )
   }
 
-  $: update(calendars)
+  $: update(displayedCalendars)
   $: all = getAllEvents(raw, from, to)
   $: objects = hidePrivateEvents(all, $calendarByIdStore)
 
@@ -97,7 +105,7 @@
     if (areDatesEqual(day, tomorrow)) return time.string.Tomorrow
     const isCurrentYear = day.getFullYear() === new Date().getFullYear()
     return getEmbeddedLabel(
-      day.toLocaleDateString('default', {
+      day.toLocaleDateString($deviceInfo.language, {
         month: 'long',
         day: 'numeric',
         year: isCurrentYear ? undefined : 'numeric'
@@ -188,6 +196,7 @@
       <Label label={time.string.Schedule} />: <Label label={getTitle(currentDate, $ticker)} />
     </div>
     <svelte:fragment slot="actions">
+      {#if calendarIds === undefined}<CalendarFilter {calendars} bind:selectedCalendar />{/if}
       <ButtonIcon
         icon={IconChevronLeft}
         kind={'secondary'}
@@ -199,7 +208,9 @@
       <ButtonBase
         icon={IconSun}
         label={showLabel ? time.string.TodayColon : undefined}
-        title={showLabel ? getFormattedDate(todayDate.getTime(), { weekday: 'short', day: 'numeric' }) : undefined}
+        title={showLabel
+          ? getFormattedDate(todayDate.getTime(), { weekday: 'short', day: 'numeric' }, $deviceInfo.language)
+          : undefined}
         type={showLabel ? 'type-button' : 'type-button-icon'}
         kind={'secondary'}
         size={'small'}

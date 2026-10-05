@@ -17,15 +17,14 @@
   import { createEventDispatcher } from 'svelte'
   import core, { Data, generateId, Ref, Markup, notEmpty, getCurrentAccount } from '@hcengineering/core'
   import { getResource, translate, getEmbeddedLabel } from '@hcengineering/platform'
-  import { Label, Modal, ModernEditbox, languageStore, showPopup, Component } from '@hcengineering/ui'
+  import { Label, Modal, ModernEditbox, languageStore, Component } from '@hcengineering/ui'
   import { AttachmentStyledBox } from '@hcengineering/attachment-resources'
   import { EmptyMarkup } from '@hcengineering/text'
   import { Employee, getCurrentEmployee } from '@hcengineering/contact'
-  import { SelectUsersPopup, employeeByIdStore, permissionsStore } from '@hcengineering/contact-resources'
+  import { employeeByIdStore, permissionsStore } from '@hcengineering/contact-resources'
   import view from '@hcengineering/view'
 
   import { createCard, isBaseTypeWithSubtypes } from '../utils'
-  import CardCollaborators from './CardCollaborators.svelte'
   import { TypeSelector } from '../index'
   import { canCreateObject } from '@hcengineering/view-resources'
 
@@ -111,26 +110,6 @@
     label = `${createString} ${typeString}`
   }
 
-  function openSelectUsersPopup (): void {
-    showPopup(
-      SelectUsersPopup,
-      {
-        okLabel: presentation.string.Ok,
-        disableDeselectFor: [me],
-        skipCurrentAccount: false,
-        skipInactive: true,
-        selected: collaborators,
-        showStatus: true
-      },
-      'top',
-      (result?: Ref<Employee>[]) => {
-        if (result != null) {
-          collaborators = result
-        }
-      }
-    )
-  }
-
   function handleChange (event: CustomEvent<{ data: Partial<Data<Card>>, space?: Ref<CardSpace> }>): void {
     data = {
       ...data,
@@ -208,15 +187,6 @@
         />
       </div>
     {/if}
-
-    <CardCollaborators
-      ids={collaborators}
-      disableRemoveFor={[me]}
-      on:add={openSelectUsersPopup}
-      on:remove={(ev) => {
-        collaborators = collaborators.filter((id) => id !== ev.detail)
-      }}
-    />
 
     {#if extension?.component}
       <Component is={extension.component} props={{ collaborators, data, space: _space }} on:change={handleChange} />

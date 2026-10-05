@@ -16,11 +16,7 @@
 import { isWorkspaceLoginInfo } from '@hcengineering/account-client'
 import {
   AIEventRequest,
-  ConnectMeetingRequest,
-  DisconnectMeetingRequest,
-  IdentityResponse,
   PersonMessage,
-  PostTranscriptRequest,
   SummarizeMessagesRequest,
   SummarizeMessagesResponse,
   TranslateRequest,
@@ -37,7 +33,6 @@ import core, {
   type WorkspaceIds,
   type WorkspaceUuid
 } from '@hcengineering/core'
-import { Room } from '@hcengineering/love'
 import { WorkspaceInfoRecord } from '@hcengineering/server-ai-bot'
 import { getAccountClient } from '@hcengineering/server-client'
 import { generateToken } from '@hcengineering/server-token'
@@ -254,7 +249,7 @@ export class AIControl {
       chunter.class.ChatMessage,
       {
         attachedTo: target._id,
-        collection: { $in: ['messages', 'transcription'] }
+        collection: 'messages'
       },
       {
         sort: { createdOn: SortingOrder.Ascending },
@@ -291,7 +286,7 @@ export class AIControl {
 
       const lastPiece = messagesToSummarize[messagesToSummarize.length - 1]
       if (lastPiece?.personRef === contact._id) {
-        lastPiece.text += (m.collection === 'transcription' ? ' ' : '\n') + text
+        lastPiece.text += '\n' + text
       } else {
         messagesToSummarize.push({
           personRef: contact._id,
@@ -311,7 +306,7 @@ export class AIControl {
       chunter.class.ChatMessage,
       {
         attachedTo: target._id,
-        collection: { $in: ['messages', 'transcription', 'summary'] }
+        collection: { $in: ['messages', 'summary'] }
       },
       {
         sort: { createdOn: SortingOrder.Descending },
@@ -350,45 +345,4 @@ export class AIControl {
     await this.initWorkspaceClient(workspace)
   }
 
-  async loveConnect (workspace: WorkspaceUuid, request: ConnectMeetingRequest): Promise<void> {
-    const wsClient = await this.getWorkspaceClient(workspace)
-    if (wsClient === undefined) return
-
-    await wsClient.loveConnect(request)
-  }
-
-  async loveDisconnect (workspace: WorkspaceUuid, request: DisconnectMeetingRequest): Promise<void> {
-    const wsClient = await this.getWorkspaceClient(workspace)
-    if (wsClient === undefined) return
-
-    await wsClient.loveDisconnect(request)
-  }
-
-  async getLoveIdentity (roomName: string): Promise<IdentityResponse | undefined> {
-    const parsed = roomName.split('_')
-    const workspace = parsed[0] as WorkspaceUuid
-
-    if (workspace === null) return
-
-    const wsClient = await this.getWorkspaceClient(workspace)
-    if (wsClient === undefined) {
-      this.ctx.error('Workspace not found', { workspace })
-      return
-    }
-
-    return await wsClient.getLoveIdentity()
-  }
-
-  async processLoveTranscript (request: PostTranscriptRequest): Promise<void> {
-    const parsed = request.roomName.split('_')
-    const workspace = parsed[0] as WorkspaceUuid | undefined
-    const roomId = parsed[parsed.length - 1] as Ref<Room> | undefined
-
-    if (workspace == null || roomId == null) return
-
-    const wsClient = await this.getWorkspaceClient(workspace)
-    if (wsClient === undefined) return
-
-    await wsClient.processLoveTranscript(request.transcript, request.participant, roomId)
-  }
 }

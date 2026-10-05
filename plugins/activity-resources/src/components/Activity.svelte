@@ -175,6 +175,7 @@
   let isNewestFirst = getActivityNewestFirst()
 
   $: extensions = getExtensions(object._class)
+  $: canShowCommentInput = showCommenInput && hierarchy.isDerived(object._class, 'tracker:class:Issue' as Ref<Class<Doc>>)
 
   function getExtensions (_class: Ref<Class<Doc>>): ActivityExtension[] {
     try {
@@ -306,7 +307,7 @@
   </svelte:fragment>
 
   <svelte:fragment slot="content">
-    {#if isNewestFirst && showCommenInput}
+    {#if isNewestFirst && canShowCommentInput}
       <div class="ref-input newest-first">
         <ActivityExtensionComponent
           kind="input"
@@ -350,7 +351,7 @@
         </Grid>
       {/if}
     </div>
-    {#if showCommenInput && !isNewestFirst}
+    {#if canShowCommentInput && !isNewestFirst}
       <div class="ref-input oldest-first">
         <ActivityExtensionComponent
           kind="input"

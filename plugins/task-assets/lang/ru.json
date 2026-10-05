@@ -97,5 +97,9 @@
     "UpdateTasksStatusRequest": "Статус сейчас используется в {total} задачах, потребуется обновление всех задач. Пожалуйста подтвердите.",
     "TaskTypes": "Типы задач",
     "Collections": "Коллекции"
+  ,
+    "AllowedParents": "Allowed parents",
+    "ParentTypeRestrictions": "Parent type restrictions",
+    "StatusCategory": "Status category"
   }
 }

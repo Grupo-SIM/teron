@@ -7,7 +7,7 @@
     "_phase:package": "rushx package",
     "_phase:validate": "rm -rf ./types && compile validate",
     "package": "rm -rf ./dist && cross-env NODE_ENV=production webpack --stats-error-details && echo 'done'",
-    "analyze": "rm -rf ./dist && cross-env NODE_ENV=production webpack --profile --json > stats.json",
+    "analyze": "rm -rf ./dist && cross-env NODE_ENV=production ANALYZE=true SOURCEMAP=true webpack --profile --json > stats.json",
     "show": "webpack-bundle-analyzer stats.json dist",
     "dev-server": "cross-env USE_CACHE=false CLIENT_TYPE=dev-server webpack serve",
     "dev-server-test": "cross-env USE_CACHE=false CLIENT_TYPE=dev-server-test webpack serve",

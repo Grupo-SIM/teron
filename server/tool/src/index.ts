@@ -16,6 +16,7 @@
 import { type AccountClient } from '@hcengineering/account-client'
 import core, {
   type Branding,
+  type Class,
   type Client,
   coreId,
   DOMAIN_BENCHMARK,
@@ -23,6 +24,7 @@ import core, {
   DOMAIN_MODEL,
   DOMAIN_TRANSIENT,
   DOMAIN_TX,
+  type Doc,
   groupByArray,
   Hierarchy,
   type MeasureContext,
@@ -62,6 +64,31 @@ import fs from 'fs'
 import * as yaml from 'js-yaml'
 import path from 'path'
 import { sendTransactorEvent } from './utils'
+
+type ExampleIssue = Doc & { title: string }
+type ExampleProject = Doc & { identifier: string, name: string }
+
+const trackerIssueClass = 'tracker:class:Issue' as Ref<Class<ExampleIssue>>
+const trackerProjectClass = 'tracker:class:Project' as Ref<Class<ExampleProject>>
+
+const localizedExampleIssueTitles = new Map<string, string>([
+  ['Welcome to Huly! 🌟', 'Boas-vindas ao Teron! 🌟'],
+  ['Schedule your first Action Item 📅', 'Agende seu primeiro item de ação 📅'],
+  ['Assign yourself an issue 📝', 'Atribua uma tarefa a você 📝'],
+  ['Check out your first project 📌', 'Conheça seu primeiro projeto 📌'],
+  ['Explore Cards 🗂️', 'Explore os cartões 🗂️'],
+  ['Welcome to Teron! 🌟', 'Boas-vindas ao Teron! 🌟'],
+  ['Create your first Project 📌', 'Crie seu primeiro projeto 📌'],
+  ['Create your first Issue 📝', 'Crie sua primeira tarefa 📝'],
+  ['Schedule your first Todo 📆', 'Agende sua primeira atividade 📆'],
+  ['Explore all Teron has to offer', 'Explore tudo o que o Teron oferece']
+])
+
+const localizedExampleProjects = new Map<string, { identifier?: string, name: string }>([
+  ['WELCOME TO HULY!', { identifier: 'TERON', name: 'BOAS-VINDAS AO TERON!' }],
+  ['Welcome to Huly!', { identifier: 'TERON', name: 'Boas-vindas ao Teron!' }],
+  ['GAME DESIGN (EXAMPLE)', { name: 'DESIGN DE JOGOS (EXEMPLO)' }]
+])
 
 export * from './connect'
 export * from './plugin'
@@ -240,10 +267,42 @@ export async function initializeWorkspace (
 
     const initializer = new WorkspaceInitializer(ctx, storageAdapter, wsIds, client, initRepoDir, personInfo)
     await initializer.processScript(script, logger, progress)
+    await localizeExampleIssues(client)
+    await localizeExampleProjects(client)
   } catch (err: any) {
     ctx.error('Failed to initialize workspace', { error: err })
     throw err
   }
+}
+
+async function localizeExampleIssues (client: TxOperations): Promise<void> {
+  const issues = await client.findAll<ExampleIssue>(trackerIssueClass, {
+    title: { $in: Array.from(localizedExampleIssueTitles.keys()) }
+  })
+
+  const ops = client.apply()
+  for (const issue of issues) {
+    const localizedTitle = localizedExampleIssueTitles.get(issue.title)
+    if (localizedTitle !== undefined) {
+      await ops.updateDoc(issue._class, issue.space, issue._id, { title: localizedTitle })
+    }
+  }
+  await ops.commit()
+}
+
+async function localizeExampleProjects (client: TxOperations): Promise<void> {
+  const projects = await client.findAll<ExampleProject>(trackerProjectClass, {
+    name: { $in: Array.from(localizedExampleProjects.keys()) }
+  })
+
+  const ops = client.apply()
+  for (const project of projects) {
+    const localizedProject = localizedExampleProjects.get(project.name)
+    if (localizedProject !== undefined) {
+      await ops.updateDoc(project._class, project.space, project._id, localizedProject)
+    }
+  }
+  await ops.commit()
 }
 
 /**

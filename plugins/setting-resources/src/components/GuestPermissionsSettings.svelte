@@ -49,7 +49,6 @@
   import setting from '@hcengineering/setting'
   import { onMount } from 'svelte'
   import AnonymousGuestSpaceInput from './AnonymousGuestSpaceInput.svelte'
-  import AvailableSpacesInput from './AvailableSpacesInput.svelte'
   import settingsRes from '../plugin'
 
   let loadingSettings = true
@@ -58,7 +57,6 @@
   let loadingWorkspaceGuest = true
 
   let allowReadOnlyGuests = false
-  let allowGuestSignUp = false
   let existingGuestChatSettings: GuestCommunicationSettings | undefined = undefined
 
   const accountClient = getAccountClient()
@@ -69,8 +67,6 @@
 
   const excludedApplicationIds = getMetadata(workbench.metadata.ExcludedApplications) ?? []
   const communicationApiEnabled = getMetadata(communication.metadata.Enabled) === true
-
-  let guestPermissionsTab: 'guest' | 'anonymous' = 'guest'
 
   const client = getClient()
   const moduleGroupsQuery = createQuery()
@@ -83,7 +79,6 @@
       try {
         const res = await accountClient.getWorkspaceInfo()
         allowReadOnlyGuests = res.allowReadOnlyGuest ?? false
-        allowGuestSignUp = res.allowGuestSignUp ?? false
       } finally {
         loadingWorkspaceGuest = false
       }
@@ -128,9 +123,9 @@
 
   $: loading = loadingSettings || loadingPermissions || !workspaceAppsReady || loadingWorkspaceGuest
 
-  $: modulePermissionsRole = guestPermissionsTab === 'guest' ? AccountRole.Guest : AccountRole.ReadOnlyGuest
+  $: modulePermissionsRole = AccountRole.ReadOnlyGuest
 
-  /** Module permission groups for the selected tab (Guest vs anonymous read-only). */
+  /** Module permission groups for anonymous read-only visitors. */
   $: visibleModuleGroups = moduleGroups.filter(
     (group) => applicationsMap.has(group.application) && group.role === modulePermissionsRole
   )
@@ -138,7 +133,7 @@
   $: sortedVisibleModuleGroups = [...visibleModuleGroups].sort((a, b) => (a.order ?? Infinity) - (b.order ?? Infinity))
 
   /** Anonymous (read-only guest) module rows are view-only until workspace allows anonymous guests. */
-  $: anonymousModulePermissionsReadOnly = guestPermissionsTab === 'anonymous' && !allowReadOnlyGuests
+  $: anonymousModulePermissionsReadOnly = !allowReadOnlyGuests
 
   function getApplicationLabel (applicationId: Ref<Doc>): IntlString {
     return applicationsMap.get(applicationId)?.label ?? getEmbeddedLabel(applicationId)
@@ -241,17 +236,8 @@
     }
   }
 
-  async function handleToggleGuestSignUp (e: CustomEvent<boolean>): Promise<void> {
-    await accountClient.updateAllowGuestSignUp(e.detail)
-    allowGuestSignUp = e.detail
-  }
-
   function onReadonlyGuestsToggle (e: CustomEvent<boolean>): void {
     void handleToggleReadonlyAccess(e)
-  }
-
-  function onGuestSignUpToggle (e: CustomEvent<boolean>): void {
-    void handleToggleGuestSignUp(e)
   }
 
   async function onAllowedCardsChange (value: Ref<Card>[]): Promise<void> {
@@ -286,20 +272,9 @@
     <div class="teronComponent-content__column navigation py-2">
       <Scroller shrink>
         <NavItem
-          icon={contact.icon.Person}
-          label={setting.string.GuestPermissionsTabGuest}
-          selected={guestPermissionsTab === 'guest'}
-          on:click={() => {
-            guestPermissionsTab = 'guest'
-          }}
-        />
-        <NavItem
           icon={contact.icon.Persona}
           label={setting.string.GuestPermissionsTabAnonymousGuest}
-          selected={guestPermissionsTab === 'anonymous'}
-          on:click={() => {
-            guestPermissionsTab = 'anonymous'
-          }}
+          selected
         />
       </Scroller>
     </div>
@@ -314,8 +289,7 @@
       {:else}
         <Scroller align={'center'} padding={'var(--spacing-3)'} bottomPadding={'var(--spacing-3)'}>
           <div class="teronComponent-content guestPermissionsRoot flex-col">
-            {#if guestPermissionsTab === 'anonymous'}
-              <section class="section">
+            <section class="section">
                 <div class="sectionHeader">
                   <div class="sectionTitle">
                     <Label label={settingsRes.string.GuestAccess} />
@@ -328,14 +302,6 @@
                     </div>
                     <div class="guestAccessRow-toggleCell">
                       <Toggle on={allowReadOnlyGuests} on:change={onReadonlyGuestsToggle} />
-                    </div>
-                  </div>
-                  <div class="guestAccessRow">
-                    <div class="guestAccessRow-label">
-                      <Label label={settingsRes.string.GuestSignUpDescription} />
-                    </div>
-                    <div class="guestAccessRow-toggleCell">
-                      <Toggle disabled={!allowReadOnlyGuests} on={allowGuestSignUp} on:change={onGuestSignUpToggle} />
                     </div>
                   </div>
                   {#if communicationApiEnabled}
@@ -360,8 +326,7 @@
                     </div>
                   {/if}
                 </div>
-              </section>
-            {/if}
+            </section>
 
             <section class="section">
               <div class="sectionHeader">
@@ -369,24 +334,11 @@
                   <Label label={setting.string.GuestPermissionsApplicationPermissions} />
                 </div>
                 <div class="sectionHint">
-                  {#if guestPermissionsTab === 'anonymous'}
-                    <Label label={setting.string.GuestPermissionsAnonymousApplicationHint} />
-                  {:else}
-                    <Label label={setting.string.GuestPermissionsApplicationPermissionsHint} />
-                  {/if}
+                  <Label label={setting.string.GuestPermissionsAnonymousApplicationHint} />
                 </div>
-                {#if guestPermissionsTab === 'guest'}
-                  <div class="sectionHint">
-                    <Label label={core.string.AutoJoinGuestsDescr} />
-                  </div>
-                  <div class="sectionHint">
-                    <Label label={settingsRes.string.GuestAutoJoinAvailableSpacesHint} />
-                  </div>
-                {:else if guestPermissionsTab === 'anonymous'}
-                  <div class="sectionHint">
-                    <Label label={settingsRes.string.GuestAnonymousVisibleSpacesHint} />
-                  </div>
-                {/if}
+                <div class="sectionHint">
+                  <Label label={settingsRes.string.GuestAnonymousVisibleSpacesHint} />
+                </div>
               </div>
 
               <div class="cardStack" class:cardStack-readonly={anonymousModulePermissionsReadOnly}>
@@ -394,16 +346,9 @@
                   {@const app = getApplication(group.application)}
                   {@const moduleOn = isModuleEnabled(group)}
                   {@const permissionCount = (group.permissions ?? []).length}
-                  {@const hasGuestAutoJoinRow =
-                    guestPermissionsTab === 'guest' &&
-                    group.role === AccountRole.Guest &&
-                    group.spaceClass !== undefined}
                   {@const hasAnonymousGuestSpacesRow =
-                    guestPermissionsTab === 'anonymous' &&
-                    group.role === AccountRole.ReadOnlyGuest &&
-                    group.spaceClass !== undefined}
-                  {@const hasPermissionRowsBlock =
-                    permissionCount > 0 || hasGuestAutoJoinRow || hasAnonymousGuestSpacesRow}
+                    group.role === AccountRole.ReadOnlyGuest && group.spaceClass !== undefined}
+                  {@const hasPermissionRowsBlock = permissionCount > 0 || hasAnonymousGuestSpacesRow}
                   <div class="permissionModuleCard" class:permissionModuleCard-off={!moduleOn}>
                     <div
                       class="permissionModuleCard-header"
@@ -450,19 +395,7 @@
                             </div>
                           {/each}
                         {/if}
-                        {#if hasGuestAutoJoinRow}
-                          <div class="permissionRow permissionRow--guestSpaces">
-                            <div class="permissionRow-label">
-                              <Label label={settingsRes.string.GuestAutoJoinAvailableSpaces} />
-                            </div>
-                            <div class="permissionRow-editorCell">
-                              <AvailableSpacesInput
-                                {group}
-                                disabled={!moduleOn || anonymousModulePermissionsReadOnly}
-                              />
-                            </div>
-                          </div>
-                        {:else if hasAnonymousGuestSpacesRow}
+                        {#if hasAnonymousGuestSpacesRow}
                           <div class="permissionRow permissionRow--guestSpaces">
                             <div class="permissionRow-label">
                               <Label label={settingsRes.string.GuestAnonymousVisibleSpaces} />

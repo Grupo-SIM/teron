@@ -14,9 +14,13 @@
 //
 
 import textEditor from '@hcengineering/text-editor'
+import textEditorResources from '../plugin'
+import { translate } from '@hcengineering/platform'
+import { themeStore } from '@hcengineering/theme'
 import { IconScribble } from '@hcengineering/ui'
 import view from '@hcengineering/view'
 import { type Editor, type Range } from '@tiptap/core'
+import { get } from 'svelte/store'
 
 import { type InlineCommandsOptions } from './extension/inlineCommands'
 import type { SuggestionKeyDownProps, SuggestionProps } from './extension/suggestion'
@@ -25,61 +29,71 @@ import { SvelteRenderer } from './node-view'
 
 export const mInsertTable = [
   {
-    label: '2x2',
+    id: '2x2',
+    label: textEditorResources.string.Table2x2,
     rows: 2,
     cols: 2,
     header: false
   },
   {
-    label: '3x3',
+    id: '3x3',
+    label: textEditorResources.string.Table3x3,
     rows: 3,
     cols: 3,
     header: false
   },
   {
-    label: '2x1',
+    id: '2x1',
+    label: textEditorResources.string.Table2x1,
     rows: 2,
     cols: 1,
     header: false
   },
   {
-    label: '5x5',
+    id: '5x5',
+    label: textEditorResources.string.Table5x5,
     rows: 5,
     cols: 5,
     header: false
   },
   {
-    label: '1x2',
+    id: '1x2',
+    label: textEditorResources.string.Table1x2,
     rows: 1,
     cols: 2,
     header: false
   },
   {
-    label: 'Headed 2x2',
+    id: 'headed-2x2',
+    label: textEditorResources.string.HeadedTable2x2,
     rows: 2,
     cols: 2,
     header: true
   },
   {
-    label: 'Headed 3x3',
+    id: 'headed-3x3',
+    label: textEditorResources.string.HeadedTable3x3,
     rows: 3,
     cols: 3,
     header: true
   },
   {
-    label: 'Headed 2x1',
+    id: 'headed-2x1',
+    label: textEditorResources.string.HeadedTable2x1,
     rows: 2,
     cols: 1,
     header: true
   },
   {
-    label: 'Headed 5x5',
+    id: 'headed-5x5',
+    label: textEditorResources.string.HeadedTable5x5,
     rows: 5,
     cols: 5,
     header: true
   },
   {
-    label: 'Headed 1x2',
+    id: 'headed-1x2',
+    label: textEditorResources.string.HeadedTable1x2,
     rows: 1,
     cols: 2,
     header: true
@@ -106,8 +120,8 @@ export function inlineCommandsConfig (
 ): Partial<InlineCommandsOptions> {
   return {
     suggestion: {
-      items: () => {
-        return [
+      items: async () => {
+        const commands = [
           { id: 'image', label: textEditor.string.Image, icon: view.icon.Image },
           { id: 'table', label: textEditor.string.Table, icon: view.icon.Table2 },
           { id: 'code-block', label: textEditor.string.CodeBlock, icon: view.icon.CodeBlock },
@@ -116,6 +130,11 @@ export function inlineCommandsConfig (
           { id: 'drawing-board', label: textEditor.string.DrawingBoard, icon: IconScribble as any },
           { id: 'mermaid', label: textEditor.string.MermaidDiargram, icon: view.icon.Model }
         ].filter(({ id }) => !excludedCommands.includes(id as InlineCommandId))
+
+        return await Promise.all(commands.map(async ({ label, ...command }) => ({
+          ...command,
+          text: await translate(label, {}, get(themeStore).language)
+        })))
       },
       command: ({ editor, range, props }: { editor: Editor, range: Range, props: any }) => {
         editor.commands.deleteRange(range)

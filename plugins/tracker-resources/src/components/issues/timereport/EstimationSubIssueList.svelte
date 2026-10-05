@@ -13,8 +13,7 @@
 // limitations under the License.
 -->
 <script lang="ts">
-  import contact from '@hcengineering/contact'
-  import { AssigneeBox } from '@hcengineering/contact-resources'
+  import AssigneeEditor from '../AssigneeEditor.svelte'
   import { Issue } from '@hcengineering/tracker'
   import { ListView, deviceOptionsStore as deviceInfo } from '@hcengineering/ui'
   import { FixedColumn, ListSelectionProvider, showMenu } from '@hcengineering/view-resources'
@@ -54,15 +53,7 @@
 
       <div class="flex-row-center clear-mins gap-2 self-end flex-no-shrink" class:p-text={twoRows}>
         <FixedColumn key={'estimation_issue_assignee'} justify={'right'}>
-          <AssigneeBox
-            width={'100%'}
-            kind={'ghost'}
-            label={tracker.string.Assignee}
-            _class={contact.mixin.Employee}
-            value={issue.assignee}
-            readonly
-            showNavigate={false}
-          />
+          <AssigneeEditor object={issue} width="100%" readonly />
         </FixedColumn>
         <FixedColumn key={'estimation'} justify={'left'}>
           <EstimationEditor value={issue} kind={'list'} />

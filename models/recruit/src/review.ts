@@ -44,6 +44,7 @@ export function createReviewModel (builder: Builder): void {
   createAction(
     builder,
     {
+      secured: true,
       label: recruit.string.CreateOpinion,
       icon: recruit.icon.Create,
       action: recruit.actionImpl.CreateOpinion,
@@ -71,6 +72,7 @@ export function createReviewModel (builder: Builder): void {
   })
 
   createAction(builder, {
+    secured: true,
     action: view.actionImpl.ShowPopup,
     actionProps: {
       component: recruit.component.CreateReview,

@@ -15,6 +15,7 @@
 <script lang="ts">
   import { BreadcrumbsElement } from '@hcengineering/presentation'
   import { ScrollerBar } from '@hcengineering/ui'
+  import testManagement from '../../plugin'
 
   import { type TestRunStats } from '../../testRunUtils'
 
@@ -31,7 +32,7 @@
     position={'start'}
     color={'#4CA6EE'}
     fontColor="white"
-    title="Untested"
+    titleIntl={testManagement.string.StatusNonTested}
     selected
   />
   <BreadcrumbsElement
@@ -41,7 +42,7 @@
     color={'#D27540'}
     selected
     fontColor="white"
-    title="Failed"
+    titleIntl={testManagement.string.StatusFailed}
   />
   <BreadcrumbsElement
     label={value.failed.toString()}
@@ -50,7 +51,7 @@
     color={'#D15045'}
     selected
     fontColor="white"
-    title="Failed"
+    titleIntl={testManagement.string.StatusFailed}
   />
   <BreadcrumbsElement
     noGap
@@ -58,7 +59,7 @@
     position={'end'}
     color={'#46A44F'}
     fontColor="white"
-    title="Passed"
+    titleIntl={testManagement.string.StatusPassed}
     selected
   />
 </ScrollerBar>

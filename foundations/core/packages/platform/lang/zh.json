@@ -1,7 +1,7 @@
 {
   "status": {
     "LoadingPlugin": "正在加载插件 {plugin}...",
-    "UnknownError": "未知错误: {message}",
+    "UnknownError": "未知错误",
     "InvalidId": "无效的 Id: {id}",
     "BadRequest": "错误的请求",
     "Forbidden": "禁止访问",

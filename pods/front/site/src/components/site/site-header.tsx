@@ -1,9 +1,10 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useEffect, useState, type MouseEvent } from "react";
 import { DocumentLocale } from "@/i18n/document-locale";
 import { Localized, defaultLocale, type Locale } from "@/i18n/site";
+import { AuthApi, loadAuthConfig } from "../auth/auth-api";
 import { Asset } from "./asset";
 
 type SiteSession =
@@ -22,9 +23,9 @@ type SiteSession =
  * rolagem suave continua valendo.
  */
 const LINKS = [
-  { href: "/#plataforma", label: "Recursos" },
-  { href: "/#github", label: "Integrações" },
-  { href: "/precos", label: "Preços" },
+  { href: "/#plataforma", label: "header.resources" },
+  { href: "/#github", label: "header.integrations" },
+  { href: "/precos", label: "header.pricing" },
 ];
 
 export function SiteHeader({ locale = defaultLocale }: { locale?: Locale }) {
@@ -90,11 +91,11 @@ export function SiteHeader({ locale = defaultLocale }: { locale?: Locale }) {
           gap: 34,
         }}
       >
-        <Link href="/" aria-label="Teron — início" style={{ display: "block" }}>
+        <Link href="/" aria-label="common.brandHomeLabel" style={{ display: "block" }}>
           <Asset
-            src="/assets/teronwhite.svg"
+            src="/assets/brand/logo-horizontal-light.svg"
             alt="Teron"
-            ratio="595 / 550"
+            ratio="1694 / 479"
             style={{ height: 30, width: "auto", display: "block" }}
           />
         </Link>
@@ -114,7 +115,7 @@ export function SiteHeader({ locale = defaultLocale }: { locale?: Locale }) {
           style={{ alignItems: "center", gap: 18 }}
         >
           {session?.authenticated ? (
-            <WorkspaceLink href="/entrar?mode=workspaces" />
+            <WorkspaceLink locale={locale} />
           ) : session === null ? null : (
             <>
               <a
@@ -122,8 +123,7 @@ export function SiteHeader({ locale = defaultLocale }: { locale?: Locale }) {
                 className="lp-link-plain"
                 style={{ fontSize: 14, fontWeight: 600 }}
               >
-                Entrar
-              </a>
+                {"common.signIn"}</a>
               <a
                 href="/cadastro"
                 className="lp-btn-white"
@@ -134,15 +134,14 @@ export function SiteHeader({ locale = defaultLocale }: { locale?: Locale }) {
                   borderRadius: 8,
                 }}
               >
-                Cadastre-se
-              </a>
+                {"common.signUp"}</a>
             </>
           )}
         </div>
         <button
           type="button"
           onClick={() => setMenuOpen(true)}
-          aria-label="Menu"
+          aria-label="common.menu"
           aria-expanded={menuOpen}
           className="lp-burger"
           style={{
@@ -161,25 +160,25 @@ export function SiteHeader({ locale = defaultLocale }: { locale?: Locale }) {
       </div>
 
       {menuOpen && (
-        <div className="lp-menu" role="dialog" aria-modal="true" aria-label="Menu">
+        <div className="lp-menu" role="dialog" aria-modal="true" aria-label="common.menu">
           <div className="lp-menu-top">
             <Link
               href="/"
-              aria-label="Teron — início"
+              aria-label="common.brandHomeLabel"
               onClick={() => setMenuOpen(false)}
               style={{ display: "block" }}
             >
               <Asset
-                src="/assets/teronwhite.svg"
+                src="/assets/brand/logo-horizontal-light.svg"
                 alt="Teron"
-                ratio="595 / 550"
+                ratio="1694 / 479"
                 style={{ height: 30, width: "auto", display: "block" }}
               />
             </Link>
             <button
               type="button"
               onClick={() => setMenuOpen(false)}
-              aria-label="Fechar menu"
+              aria-label="common.closeMenu"
               className="lp-menu-close"
             >
               ✕
@@ -201,13 +200,11 @@ export function SiteHeader({ locale = defaultLocale }: { locale?: Locale }) {
 
           <div className="lp-menu-actions">
             {session?.authenticated ? (
-              <a
-                href="/entrar?mode=workspaces"
-                onClick={() => setMenuOpen(false)}
+              <WorkspaceLink
                 className="lp-menu-btn"
-              >
-                Ir para o workspace
-              </a>
+                locale={locale}
+                onNavigate={() => setMenuOpen(false)}
+              />
             ) : session === null ? null : (
               <>
                 <a
@@ -215,15 +212,13 @@ export function SiteHeader({ locale = defaultLocale }: { locale?: Locale }) {
                   onClick={() => setMenuOpen(false)}
                   className="lp-menu-btn"
                 >
-                  Entrar
-                </a>
+                  {"common.signIn"}</a>
                 <a
                   href="/cadastro"
                   onClick={() => setMenuOpen(false)}
                   className="lp-menu-btn"
                 >
-                  Começar agora
-                </a>
+                  {"common.getStarted"}</a>
               </>
             )}
           </div>
@@ -233,19 +228,60 @@ export function SiteHeader({ locale = defaultLocale }: { locale?: Locale }) {
   );
 }
 
-function WorkspaceLink({ href, locale = defaultLocale }: { href: string; locale?: Locale }) {
+function WorkspaceLink({
+  className = "lp-btn-white",
+  locale = defaultLocale,
+  onNavigate,
+}: {
+  className?: string;
+  locale?: Locale;
+  onNavigate?: () => void;
+}) {
+  const [isOpening, setIsOpening] = useState(false);
+
+  const openLastWorkspace = async (event: MouseEvent<HTMLAnchorElement>) => {
+    event.preventDefault();
+    if (isOpening) return;
+
+    setIsOpening(true);
+    try {
+      const api = new AuthApi(await loadAuthConfig(locale), locale);
+      const workspace = (await api.getWorkspaces())
+        .filter((item) => item.mode !== "archived" && !item.mode?.startsWith("archiving-"))
+        .toSorted((left, right) => (right.lastVisit ?? 0) - (left.lastVisit ?? 0))[0];
+
+      if (!workspace) throw new Error("No active workspace available");
+
+      const login = await api.selectWorkspace(workspace.url);
+      await api.setCookie(login.token);
+      onNavigate?.();
+      window.location.assign(`/workbench/${encodeURIComponent(login.workspaceUrl)}`);
+    } catch {
+      onNavigate?.();
+      window.location.assign("/entrar?mode=workspaces");
+    }
+  };
+
   return (
-    <Localized locale={locale}><a
-      href={href}
-      className="lp-btn-white"
+    <Localized locale={locale}>
+      <a
+      href="/entrar?mode=workspaces"
+      onClick={openLastWorkspace}
+      aria-busy={isOpening}
+      className={className}
       style={{
-        fontSize: 14,
-        fontWeight: 700,
-        padding: "8px 16px",
-        borderRadius: 8,
+        ...(className === "lp-btn-white"
+          ? {
+              fontSize: 14,
+              fontWeight: 700,
+              padding: "8px 16px",
+              borderRadius: 8,
+            }
+          : {}),
       }}
     >
-      Ir para o workspace
-    </a></Localized>
+      {"common.workspace"}
+      </a>
+    </Localized>
   );
 }

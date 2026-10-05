@@ -14,7 +14,7 @@
 //
 
 import type { ActivityMessage } from '@hcengineering/activity'
-import { chunterId, type Channel } from '@hcengineering/chunter'
+import { chunterId } from '@hcengineering/chunter'
 import chunter from '@hcengineering/chunter-resources/src/plugin'
 import { type Client, type Doc, type Ref } from '@hcengineering/core'
 import { type NotificationGroup } from '@hcengineering/notification'
@@ -95,12 +95,7 @@ export default mergeIds(chunterId, chunter, {
   },
   ids: {
     ChunterNotificationGroup: '' as Ref<NotificationGroup>,
-    ModulePermissionGroup: '' as Ref<Doc>,
     ModulePermissionGroupReadOnlyGuest: '' as Ref<Doc>
-  },
-  space: {
-    General: '' as Ref<Channel>,
-    Random: '' as Ref<Channel>
   },
   function: {
     GetLink: '' as Resource<(doc: Doc, props: Record<string, any>) => Promise<string>>,

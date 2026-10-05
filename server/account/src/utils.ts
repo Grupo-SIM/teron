@@ -162,7 +162,7 @@ export async function getAccountDB (
   }
 }
 
-export const assignableRoles = [AccountRole.Guest, AccountRole.User, AccountRole.Maintainer, AccountRole.Owner]
+export const assignableRoles = [AccountRole.User, AccountRole.Maintainer, AccountRole.Owner]
 
 export function getRolePower (role: AccountRole): number {
   return roleOrder[role]
@@ -639,7 +639,8 @@ export async function sendOtpEmail (
       text,
       html,
       subject,
-      to
+      to,
+      ...(mailAuth != null ? { apiKey: mailAuth } : {})
     })
   })
   if (!response.ok) {
@@ -948,7 +949,6 @@ export async function selectWorkspace (
     workspace: workspace.uuid,
     workspaceUrl: workspace.url,
     workspaceDataId: workspace.dataId,
-    ...(workspace.allowReadOnlyGuest && workspace.allowGuestSignUp ? { allowGuestSignUp: true } : {}),
     ...(extra?.readonly === 'true' ? { readOnly: true } : {}),
     ...(subscriptionReadOnlyAfter != null ? { readOnlyAfter: subscriptionReadOnlyAfter } : {}),
     role
@@ -1061,31 +1061,6 @@ export async function checkPasswordAging (
   return res
 }
 
-export async function updateAllowGuestSignUp (
-  ctx: MeasureContext,
-  db: AccountDB,
-  branding: Branding | null,
-  token: string,
-  params: {
-    guestSignUpAllowed: boolean
-  }
-): Promise<void> {
-  const { guestSignUpAllowed } = params
-  const { account, workspace } = decodeTokenVerbose(ctx, token)
-
-  if (workspace === null) {
-    throw new PlatformError(new Status(Severity.ERROR, platform.status.WorkspaceNotFound, { workspaceUuid: workspace }))
-  }
-
-  const accRole = account === systemAccountUuid ? AccountRole.Owner : await db.getWorkspaceRole(account, workspace)
-  if (accRole == null || getRolePower(accRole) < getRolePower(AccountRole.Owner)) {
-    throw new PlatformError(new Status(Severity.ERROR, platform.status.Forbidden, {}))
-  }
-  if (account !== systemAccountUuid) await verifySubscriptionWritable(db, workspace)
-
-  await db.updateAllowGuestSignUp(workspace, guestSignUpAllowed)
-}
-
 export async function updateWorkspaceRole (
   ctx: MeasureContext,
   db: AccountDB,
@@ -1136,7 +1111,7 @@ export async function updateWorkspaceRole (
     }
   }
 
-  const billableRoles = [AccountRole.Owner, AccountRole.Maintainer, AccountRole.User, AccountRole.Guest]
+  const billableRoles = [AccountRole.Owner, AccountRole.Maintainer, AccountRole.User]
   if (!billableRoles.includes(currentRole) && billableRoles.includes(targetRole)) {
     const tier = selectTierSubscription(await findTierSubscriptions(db, workspace))
     const business = tier?.plan === 'business' || ['rare', 'epic', 'legendary'].includes(tier?.plan ?? '')
@@ -1246,7 +1221,6 @@ export async function createWorkspaceRecord (
           createdBy: account,
           billingAccount: account,
           allowReadOnlyGuest: false,
-          allowGuestSignUp: false,
           region,
           ...(pendingConfiguration !== undefined ? { pendingConfiguration } : {})
         },
@@ -1358,7 +1332,8 @@ export async function sendEmailConfirmation (
       text,
       html,
       subject,
-      to: email
+      to: email,
+      ...(mailAuth != null ? { apiKey: mailAuth } : {})
     })
   })
   if (!response.ok) {
@@ -1555,14 +1530,7 @@ export async function getWorkspaceJoinInfo (
     }
   }
   if (workspaceUrl !== undefined && workspaceUrl !== '' && workspaceUrl !== null) {
-    const workspace = await getWorkspaceByUrl(db, workspaceUrl)
-    if (workspace == null || !workspace.allowReadOnlyGuest || !workspace.allowGuestSignUp) {
-      throw new PlatformError(new Status(Severity.ERROR, platform.status.Forbidden, {}))
-    }
-    return {
-      email,
-      workspace
-    }
+    throw new PlatformError(new Status(Severity.ERROR, platform.status.Forbidden, {}))
   }
   throw new PlatformError(new Status(Severity.ERROR, platform.status.BadRequest, {}))
 }
@@ -1603,7 +1571,7 @@ export async function doJoinByInvite (
     })
     const now = Date.now()
     const memberSeats = members.filter((it) =>
-      [AccountRole.Owner, AccountRole.Maintainer, AccountRole.User, AccountRole.Guest].includes(it.role)
+      [AccountRole.Owner, AccountRole.Maintainer, AccountRole.User].includes(it.role)
     ).length
     const used =
       memberSeats +
@@ -1629,17 +1597,6 @@ export async function doJoinByInvite (
       await db.updateWorkspaceRole(account, workspace.uuid, invite.role)
     }
     if (!isBusiness || role != null) await useInvite(db, invite.id)
-  } else if (workspace.allowReadOnlyGuest && workspace.allowGuestSignUp) {
-    if (role == null) {
-      if (isBusiness) {
-        const capacity = Math.min(tier?.seatLimit ?? 0, tier?.nextSeatLimit ?? tier?.seatLimit ?? 0)
-        if (!(await db.assignWorkspaceWithinCapacity(account, workspace.uuid, AccountRole.Guest, capacity))) {
-          throw new PlatformError(new Status(Severity.ERROR, platform.status.WorkspaceLimitReached, { workspace: workspace.uuid }))
-        }
-      } else {
-        await db.assignWorkspace(account, workspace.uuid, AccountRole.Guest)
-      }
-    }
   } else {
     throw new PlatformError(new Status(Severity.ERROR, platform.status.Forbidden, {}))
   }
@@ -1911,11 +1868,13 @@ export async function sendEmail (info: EmailInfo, ctx: MeasureContext): Promise<
       text,
       html,
       subject,
-      to
+      to,
+      ...(mailAuth != null ? { apiKey: mailAuth } : {})
     })
   })
   if (!response.ok) {
     ctx.error(`Failed to send mail: ${response.statusText}`, { to })
+    throw new Error(`Mail service rejected email: ${response.status} ${response.statusText}`)
   }
 }
 
@@ -2133,7 +2092,7 @@ export async function setTimezone (
 export const integrationServices = [
   'github',
   'telegram-bot',
-  'terongram',
+  'telegram',
   'mailbox',
   'caldav',
   'gmail',

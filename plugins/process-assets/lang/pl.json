@@ -184,6 +184,8 @@
     "AskSubclass": "Poproś o podklasę",
     "TextFromIdentifier": "Tekst z identyfikatora",
     "AskRequired": "Poproś o wymagane pola"
+  ,
+    "NoSlotsDefined": "No slots defined for this process"
   },
   "error": {
     "MethodNotFound": "Nie odnaleziono metody: {methodId}",

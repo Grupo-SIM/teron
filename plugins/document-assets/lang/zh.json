@@ -1,6 +1,15 @@
 {
   "string": {
+    "DeleteTeamspaceTitle": "Delete guideline space",
+    "DeleteTeamspaceConfirm": "Delete <b>permanently</b> the space \"{name}\" and all its documents, versions and attachments?",
+    "GuidelineEditors": "People with Editor access",
+    "GuidelineEditorSectors": "Sectors with Editor access",
+    "GuidelineReaders": "People with Reader access",
+    "GuidelineReaderSectors": "Sectors with Reader access",
+    "RemoveCustomIcon": "Remove custom icon",
+    "CustomIconRemoved": "Default icon restored",
     "Document": "文档",
+    "DeleteDocumentConfirm": "Delete {count, plural, =1 {this document} other {these # documents}}?",
     "ParentDocument": "父文档",
     "ChildDocument": "子文档",
     "CreateDocument": "创建文档",

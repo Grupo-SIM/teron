@@ -148,6 +148,12 @@ export interface Contact extends Doc, AvatarInfo {
  */
 export interface Person extends Contact, BasePerson {
   birthday?: Timestamp | null
+  functions?: number
+  skills?: number
+  professionalTitle?: string
+  contactSource?: string
+  remoteDaysPerWeek?: number | null
+  onsiteDaysPerWeek?: number | null
   socialIds?: Collection<SocialIdentity>
   profile?: Ref<Card>
 }
@@ -186,7 +192,7 @@ export interface Status extends AttachedDoc {
  */
 export interface Employee extends Person {
   active: boolean
-  role?: 'USER' | 'GUEST' // Informational only
+  role?: 'USER' // Informational only
   statuses?: number
   position?: string | null
   personUuid?: AccountUuid
@@ -271,8 +277,8 @@ export const contactPlugin = plugin(contactId, {
     PersonIcon: '' as AnyComponent,
     EditOrganizationPanel: '' as AnyComponent,
     CollaborationUserAvatar: '' as AnyComponent,
-    CreateGuest: '' as AnyComponent,
     SpaceMembersEditor: '' as AnyComponent,
+    WorkModeDays: '' as AnyComponent,
     ContactNamePresenter: '' as AnyComponent,
     PersonFilterValuePresenter: '' as AnyComponent,
     PersonIdFilter: '' as AnyComponent,
@@ -360,6 +366,8 @@ export const contactPlugin = plugin(contactId, {
     LastNameFirst: '' as Metadata<boolean>
   },
   string: {
+    RemoteDaysPerWeekShort: '' as IntlString,
+    OnsiteDaysPerWeekShort: '' as IntlString,
     PersonAlreadyExists: '' as IntlString,
     Person: '' as IntlString,
     Employee: '' as IntlString,
@@ -373,7 +381,6 @@ export const contactPlugin = plugin(contactId, {
     Position: '' as IntlString,
     For: '' as IntlString,
     SelectUsers: '' as IntlString,
-    AddGuest: '' as IntlString,
     Members: '' as IntlString,
     Contacts: '' as IntlString,
     Employees: '' as IntlString,

@@ -20,7 +20,6 @@ export function isOffice (room: Data<Room>): room is Office {
 
 export function createDefaultRooms (
   employees: Ref<Employee>[],
-  defaultTranscription: boolean = false,
   defaultRecording: boolean = false
 ): (Data<Room | Office> & { _id: Ref<Room> })[] {
   const res: (Data<Room | Office> & { _id: Ref<Room> })[] = []
@@ -39,7 +38,6 @@ export function createDefaultRooms (
       y: index - (index % 2),
       person: employees[index] ?? null,
       language: 'en',
-      startWithTranscription: false,
       startWithRecording: false,
       description: null
     }
@@ -49,7 +47,7 @@ export function createDefaultRooms (
 
   res.push({
     _id: allHands,
-    name: 'All hands',
+    name: 'Reunião geral',
     type: RoomType.Video,
     access: RoomAccess.Open,
     floor: love.ids.MainFloor,
@@ -58,7 +56,6 @@ export function createDefaultRooms (
     x: 6,
     y: 0,
     language: 'en',
-    startWithTranscription: defaultTranscription,
     startWithRecording: defaultRecording,
     description: null
   })
@@ -66,7 +63,7 @@ export function createDefaultRooms (
   const meetingRoom1 = generateId<Room>()
   res.push({
     _id: meetingRoom1,
-    name: 'Meeting Room 1',
+    name: 'Sala de reunião 1',
     type: RoomType.Video,
     access: RoomAccess.Open,
     floor: love.ids.MainFloor,
@@ -75,14 +72,13 @@ export function createDefaultRooms (
     x: 6,
     y: 4,
     language: 'en',
-    startWithTranscription: defaultTranscription,
     startWithRecording: defaultRecording,
     description: null
   })
   const meetingRoom2 = generateId<Room>()
   res.push({
     _id: meetingRoom2,
-    name: 'Meeting Room 2',
+    name: 'Sala de reunião 2',
     type: RoomType.Video,
     access: RoomAccess.Open,
     floor: love.ids.MainFloor,
@@ -91,14 +87,13 @@ export function createDefaultRooms (
     x: 11,
     y: 4,
     language: 'en',
-    startWithTranscription: defaultTranscription,
     startWithRecording: defaultRecording,
     description: null
   })
   const voiceRoom1 = generateId<Room>()
   res.push({
     _id: voiceRoom1,
-    name: 'Voice Room 1',
+    name: 'Sala de áudio 1',
     type: RoomType.Audio,
     access: RoomAccess.Open,
     floor: love.ids.MainFloor,
@@ -107,14 +102,13 @@ export function createDefaultRooms (
     x: 6,
     y: 8,
     language: 'en',
-    startWithTranscription: false,
     startWithRecording: false,
     description: null
   })
   const voiceRoom2 = generateId<Room>()
   res.push({
     _id: voiceRoom2,
-    name: 'Voice Room 2',
+    name: 'Sala de áudio 2',
     type: RoomType.Audio,
     access: RoomAccess.Open,
     floor: love.ids.MainFloor,
@@ -123,7 +117,6 @@ export function createDefaultRooms (
     x: 11,
     y: 8,
     language: 'en',
-    startWithTranscription: false,
     startWithRecording: false,
     description: null
   })

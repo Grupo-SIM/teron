@@ -16,15 +16,7 @@
   import { RecurringRule } from '@hcengineering/calendar'
   import {
     Button,
-    CheckBox,
-    Icon,
-    Label,
-    TimeZone,
-    TimeZonesPopup,
-    convertTimeZone,
-    eventToHTMLElement,
-    getUserTimezone,
-    showPopup
+    Icon
   } from '@hcengineering/ui'
   import { createEventDispatcher } from 'svelte'
   import calendar from '../plugin'
@@ -37,96 +29,33 @@
   export let timeZone: string
   export let readOnly: boolean = false
 
-  const myTimezone = getUserTimezone()
-
   const dispatch = createEventDispatcher()
-
-  function showTimezoneSelector (e: MouseEvent) {
-    const timeZones: TimeZone[] = []
-    const tzs: string[] = []
-    if (!Intl.supportedValuesOf) console.log('Your browser does not support Intl.supportedValuesOf().')
-    else for (const timeZone of Intl.supportedValuesOf('timeZone')) tzs.push(timeZone)
-
-    if (tzs.length > 0) tzs.forEach((tz) => timeZones.push(convertTimeZone(tz)))
-    showPopup(
-      TimeZonesPopup,
-      {
-        timeZones,
-        withAdd: false,
-        selected: timeZone,
-        count: 1,
-        reset: null
-      },
-      eventToHTMLElement(e),
-      (result) => {
-        if (result !== undefined) {
-          timeZone = result
-        }
-      }
-    )
-  }
 </script>
 
-{#if !allDay && rules.length === 0 && myTimezone === timeZone}
-  {#if !readOnly}
-    <div class="antiButton ghost x-small sh-no-shape text-11px pl-1 pr-2 pt-1 pb-1 mt-1 ml-5-5 gap-3 w-min">
-      <!-- svelte-ignore a11y-click-events-have-key-events -->
-      <!-- svelte-ignore a11y-no-static-element-interactions -->
-      <div class="overflow-label cursor-pointer" on:click={() => (allDay = true)}>
-        <Label label={calendar.string.AllDay} />
-      </div>
-      <!-- svelte-ignore a11y-click-events-have-key-events -->
-      <!-- svelte-ignore a11y-no-static-element-interactions -->
-      <div class="overflow-label cursor-default" on:click={showTimezoneSelector}>
-        <Label label={calendar.string.TimeZone} />
-      </div>
-      {#if !noRepeat}
-        <!-- svelte-ignore a11y-click-events-have-key-events -->
-        <!-- svelte-ignore a11y-no-static-element-interactions -->
-        <div class="overflow-label cursor-pointer" on:click={() => dispatch('repeat')}>
-          <Label label={calendar.string.Repeat} />
-        </div>
-      {/if}
-    </div>
-  {/if}
-{:else}
-  <div class="flex-row-center gap-1-5 mt-1">
-    <CheckBox bind:checked={allDay} kind={'primary'} on:value={() => dispatch('allday')} readonly={readOnly} />
-    <Button
-      label={calendar.string.AllDay}
-      kind={'ghost'}
-      padding={'0 .5rem'}
-      justify={'left'}
-      disabled={readOnly}
-      on:click={() => {
-        if (!readOnly) {
-          allDay = !allDay
-          dispatch('allday')
-        }
-      }}
-    />
-  </div>
-  <div class="flex-row-center gap-1 mt-1">
-    <Icon icon={calendar.icon.Globe} size={'small'} fill={'var(--theme-dark-color)'} />
-    <TimeZoneSelector bind:timeZone disabled={readOnly} />
-  </div>
+<div class="flex-row-center gap-1 mt-1">
+  <Button
+    label={calendar.string.AllDay}
+    kind={allDay ? 'primary' : 'secondary'}
+    disabled={readOnly}
+    on:click={() => {
+      allDay = !allDay
+      dispatch('allday')
+    }}
+  />
+  <TimeZoneSelector bind:timeZone disabled={readOnly} />
   {#if !noRepeat}
-    <div class="flex-row-center gap-1 mt-1">
-      <Icon icon={calendar.icon.Repeat} size={'small'} fill={'var(--theme-dark-color)'} />
-      <Button
-        label={rules.length > 0 ? undefined : calendar.string.Repeat}
-        kind={'ghost'}
-        padding={'0 .5rem'}
-        justify={'left'}
-        disabled={readOnly}
-        on:click={() => dispatch('repeat')}
-      >
-        <svelte:fragment slot="content">
-          {#if rules.length > 0}
-            <RRulePresenter {rules} />
-          {/if}
-        </svelte:fragment>
-      </Button>
-    </div>
+    <Button
+      label={rules.length > 0 ? undefined : calendar.string.Repeat}
+      kind={rules.length > 0 ? 'primary' : 'secondary'}
+      disabled={readOnly}
+      on:click={() => dispatch('repeat')}
+    >
+      <svelte:fragment slot="content">
+        {#if rules.length > 0}
+          <Icon icon={calendar.icon.Repeat} size={'small'} />
+          <RRulePresenter {rules} />
+        {/if}
+      </svelte:fragment>
+    </Button>
   {/if}
-{/if}
+</div>

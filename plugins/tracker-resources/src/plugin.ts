@@ -159,6 +159,8 @@ export default mergeIds(trackerId, tracker, {
     ModificationDate: '' as IntlString,
     SubIssue: '' as IntlString,
     IssueTemplate: '' as IntlString,
+    DiscardTemplate: '' as IntlString,
+    TextTemplate: '' as IntlString,
     Document: '' as IntlString,
     DocumentIcon: '' as IntlString,
     DocumentColor: '' as IntlString,
@@ -258,6 +260,9 @@ export default mergeIds(trackerId, tracker, {
     MoveToMilestone: '' as IntlString,
     NoMilestone: '' as IntlString,
 
+    DeleteMilestoneTitle: '' as IntlString,
+    DeleteMilestoneConfirm: '' as IntlString,
+
     MoveAndDeleteMilestone: '' as IntlString,
     MoveAndDeleteMilestoneConfirm: '' as IntlString,
 
@@ -272,6 +277,13 @@ export default mergeIds(trackerId, tracker, {
     TimeSpendReportDescription: '' as IntlString,
     TimeSpendDays: '' as IntlString,
     TimeSpendHours: '' as IntlString,
+    TimeInputAmount: '' as IntlString,
+    TimeUnit: '' as IntlString,
+    TimeUnitHours: '' as IntlString,
+    TimeUnitDays: '' as IntlString,
+    TimeUnitMinutes: '' as IntlString,
+    TimeInputHours: '' as IntlString,
+    TimeInputMinutes: '' as IntlString,
     TimeSpendMinutes: '' as IntlString,
 
     ChildEstimation: '' as IntlString,
@@ -360,6 +372,7 @@ export default mergeIds(trackerId, tracker, {
     EditMilestone: '' as AnyComponent,
     ReportedTimeEditor: '' as AnyComponent,
     TimePresenter: '' as AnyComponent,
+    HoursEstimationValueEditor: '' as AnyComponent,
     EstimationValueEditor: '' as AnyComponent,
     TimeSpendReport: '' as AnyComponent,
     EstimationEditor: '' as AnyComponent,

@@ -94,5 +94,8 @@
     "WriteMessageEllipsis": "Mesaj yaz...",
     "EditMessageEllipsis": "Mesajı düzenle...",
     "ArrowDownMessages": "↓ Son mesajlar"
+  ,
+    "Attachments": "Attachments",
+    "Title": "Title"
   }
 }

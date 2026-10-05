@@ -125,6 +125,12 @@
     "SwapFirstAndLastNames": "Zamień imię i nazwisko",
     "ForbidCreateVacancyPermission": "Zabroń tworzenia wolnych stanowisk",
     "ForbidCreateVacancyPermissionDescription": "Zabroń użytkownikom tworzenia nowych stanowisk"
+  ,
+    "Analyse": "Analyze",
+    "ExportExpertSkills": "Export expert skills",
+    "ExportPlan": "Export plan",
+    "Optimize": "Optimize",
+    "SkillsOptimizer": "Skills optimizer"
   },
   "status": {
     "ApplicationExists": "Aplikacja już istnieje",

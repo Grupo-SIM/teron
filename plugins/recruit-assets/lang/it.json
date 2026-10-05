@@ -123,6 +123,12 @@
     "SwapFirstAndLastNames": "Scambia nome e cognome",
     "ForbidCreateVacancyPermission": "Vieta creazione posizione aperta",
     "ForbidCreateVacancyPermissionDescription": "Vieta agli utenti di creare nuove posizioni aperte"
+  ,
+    "Analyse": "Analyze",
+    "ExportExpertSkills": "Export expert skills",
+    "ExportPlan": "Export plan",
+    "Optimize": "Optimize",
+    "SkillsOptimizer": "Skills optimizer"
   },
   "status": {
     "ApplicationExists": "La candidatura esiste già",

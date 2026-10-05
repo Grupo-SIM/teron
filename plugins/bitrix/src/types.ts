@@ -116,9 +116,9 @@ export interface BitrixOwnerType {
  * @public
  */
 export const mappingTypes = [
-  { label: 'Leads', id: BitrixEntityType.Lead },
-  { label: 'Company', id: BitrixEntityType.Company },
-  { label: 'Contacts', id: BitrixEntityType.Contact }
+  { id: BitrixEntityType.Lead },
+  { id: BitrixEntityType.Company },
+  { id: BitrixEntityType.Contact }
 ]
 
 /**

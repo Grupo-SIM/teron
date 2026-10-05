@@ -16,17 +16,13 @@
   import contact from '@hcengineering/contact'
   import { FindOptions } from '@hcengineering/core'
   import presentation, { Card } from '@hcengineering/presentation'
-  import { Issue, Project, TimeSpendReport } from '@hcengineering/tracker'
-  import { Button, eventToHTMLElement, IconAdd, Scroller, showPopup, tableSP } from '@hcengineering/ui'
+  import { Issue, TimeSpendReport } from '@hcengineering/tracker'
+  import { Scroller, tableSP } from '@hcengineering/ui'
   import { TableBrowser } from '@hcengineering/view-resources'
   import tracker from '../../../plugin'
   import IssuePresenter from '../IssuePresenter.svelte'
   import ParentNamesPresenter from '../ParentNamesPresenter.svelte'
-  import TimeSpendReportPopup from './TimeSpendReportPopup.svelte'
   export let issue: Issue
-  export let currentProject: Project | undefined
-
-  $: defaultTimeReportDay = currentProject?.defaultTimeReportDay
 
   export function canClose (): boolean {
     return true
@@ -36,20 +32,6 @@
       attachedTo: tracker.class.Issue,
       employee: contact.mixin.Employee
     }
-  }
-  function addReport (event: MouseEvent): void {
-    showPopup(
-      TimeSpendReportPopup,
-      {
-        issue,
-        issueId: issue._id,
-        issueClass: issue._class,
-        space: issue.space,
-        assignee: issue.assignee,
-        defaultTimeReportDay
-      },
-      eventToHTMLElement(event)
-    )
   }
 </script>
 
@@ -86,7 +68,4 @@
       />
     </Scroller>
   </div>
-  <svelte:fragment slot="buttons">
-    <Button id="ReportsPopupAddButton" icon={IconAdd} size={'large'} on:click={addReport} />
-  </svelte:fragment>
 </Card>

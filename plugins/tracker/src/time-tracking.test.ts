@@ -1,0 +1,50 @@
+import tracker, { currentChildReportedTime, currentReportedTime, issueTimeHours, settleIssueTime, transitionIssueTime } from './index'
+
+describe('automatic issue time', () => {
+  it('settles persisted status changes and restarts a paused interval without recounting it', () => {
+    const paused = settleIssueTime({ trackedTimeMs: 0, trackingStartedOn: 1000 }, tracker.status.Done, 3601000)
+    expect(paused).toEqual({ trackedTimeMs: 3600000, trackingStartedOn: null })
+    expect(settleIssueTime(paused, tracker.status.Done, 7201000)).toEqual(paused)
+    expect(settleIssueTime(paused, tracker.status.UnderReview, 7201000)).toEqual({
+      trackedTimeMs: 3600000,
+      trackingStartedOn: 7201000
+    })
+  })
+  it('counts pending, active and review intervals, including reopened work', () => {
+    let state = { trackedTimeMs: 0, trackingStartedOn: 0 as number | null }
+    state = transitionIssueTime(state, tracker.status.Backlog, tracker.status.InProgress, 3600000)
+    state = transitionIssueTime(state, tracker.status.InProgress, tracker.status.UnderReview, 7200000)
+    state = transitionIssueTime(state, tracker.status.UnderReview, tracker.status.Done, 10800000)
+    expect(issueTimeHours(state, 14400000)).toBe(3)
+    state = transitionIssueTime(state, tracker.status.Done, tracker.status.Backlog, 18000000)
+    state = transitionIssueTime(state, tracker.status.Backlog, tracker.status.Canceled, 21600000)
+    expect(issueTimeHours(state, 25200000)).toBe(4)
+  })
+
+  it('does not count finished or adjustment time', () => {
+    const state = { trackedTimeMs: 3600000, trackingStartedOn: null }
+    expect(issueTimeHours(transitionIssueTime(state, tracker.status.Done, tracker.status.Canceled, 7200000), 10800000)).toBe(1)
+  })
+
+  it('ignores repeated status updates and negative clock intervals', () => {
+    const state = { trackedTimeMs: 3600000, trackingStartedOn: 5000 }
+    expect(transitionIssueTime(state, tracker.status.InProgress, tracker.status.InProgress, 8000)).toEqual(state)
+    expect(transitionIssueTime(state, tracker.status.InProgress, tracker.status.Done, 4000)).toEqual({
+      trackedTimeMs: 3600000,
+      trackingStartedOn: null
+    })
+  })
+
+  it('shows current elapsed hours and preserves legacy values', () => {
+    expect(currentReportedTime({ reportedTime: 1, trackedTimeMs: 3600000, trackingStartedOn: 3600000 }, 7200000)).toBe(2)
+    expect(currentReportedTime({ reportedTime: 3 }, 7200000)).toBe(3)
+  })
+
+  it('includes active child intervals in parent totals', () => {
+    expect(currentChildReportedTime([
+      { reportedTime: 1, trackedTimeMs: 3600000, trackingStartedOn: 3600000 },
+      { reportedTime: 2, trackedTimeMs: 7200000, trackingStartedOn: null },
+      { reportedTime: 3 }
+    ], 7200000)).toBe(7)
+  })
+})

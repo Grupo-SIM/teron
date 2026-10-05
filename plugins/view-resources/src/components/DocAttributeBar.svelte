@@ -13,12 +13,12 @@
 // limitations under the License.
 -->
 <script lang="ts">
+  import contact from '@hcengineering/contact'
   import { Doc, Mixin } from '@hcengineering/core'
   import { getClient } from '@hcengineering/presentation'
   import setting from '@hcengineering/setting'
 
   import ClassAttributeBar from './ClassAttributeBar.svelte'
-  import notification from '@hcengineering/notification'
 
   export let object: Doc
   export let mixins: Array<Mixin<Doc>> = []
@@ -30,10 +30,9 @@
   const client = getClient()
   const hierarchy = client.getHierarchy()
 
-  $: _allowedCollections = [...allowedCollections, 'collaborators']
-  $: _mixins = mixins.find((p) => p._id === notification.mixin.Collaborators)
-    ? mixins
-    : [...mixins, hierarchy.getClass(notification.mixin.Collaborators)]
+  $: _allowedCollections = allowedCollections.filter((key) => key !== 'collaborators')
+  $: isContact = hierarchy.isDerived(object._class, contact.class.Contact)
+  $: isPerson = hierarchy.isDerived(object._class, contact.class.Person)
 </script>
 
 <ClassAttributeBar
@@ -47,9 +46,9 @@
   isMainClass
   on:update
 />
-{#each _mixins as mixin}
+{#each mixins as mixin}
   {@const to = !hierarchy.hasMixin(mixin, setting.mixin.UserMixin) ? object._class : mixin.extends}
-  {#if !hierarchy.hasMixin(mixin, setting.mixin.Editable) || hierarchy.as(mixin, setting.mixin.Editable).value}
+  {#if (!hierarchy.hasMixin(mixin, setting.mixin.Editable) || hierarchy.as(mixin, setting.mixin.Editable).value) && (!isContact || mixin._id !== 'lead:mixin:Customer') && (!isPerson || mixin._id !== 'recruit:mixin:Candidate')}
     {#key mixin._id}
       <ClassAttributeBar
         _class={mixin._id}

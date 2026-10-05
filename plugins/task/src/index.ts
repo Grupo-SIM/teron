@@ -37,6 +37,7 @@ import type { AnyComponent, ComponentExtensionId } from '@hcengineering/ui'
 import { Action, IconProps, ViewletDescriptor } from '@hcengineering/view'
 
 export * from './utils'
+export * from './assignees'
 export type { Rank } from '@hcengineering/rank'
 
 /** @public */
@@ -56,7 +57,8 @@ export interface Task extends AttachedDoc {
   status: Ref<Status>
   isDone?: boolean
   number: number
-  assignee: Ref<Person> | null
+  assignees?: Ref<Person>[]
+  assignee?: Ref<Person> | null
   dueDate: Timestamp | null
   comments?: number
   attachments?: number

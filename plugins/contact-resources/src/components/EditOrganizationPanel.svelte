@@ -5,7 +5,7 @@
   import { Panel } from '@hcengineering/panel'
   import { getResource } from '@hcengineering/platform'
   import presentation, { createQuery, getClient, type KeyedAttribute } from '@hcengineering/presentation'
-  import { type AnyComponent, Button, Component, IconMixin, IconMoreH, Label } from '@hcengineering/ui'
+  import { type AnyComponent, Button, Component, IconMoreH, Label } from '@hcengineering/ui'
   import view, { AttributeCategory } from '@hcengineering/view'
   import {
     DocAttributeBar,
@@ -40,10 +40,9 @@
   let mixins: Mixin<Doc>[] = []
   let editors: Array<{ key: KeyedAttribute, editor: AnyComponent, category: AttributeCategory }> = []
 
-  let showAllMixins = false
   let saved = false
 
-  $: mixins = object ? getDocMixins(object, showAllMixins) : []
+  $: mixins = object ? getDocMixins(object, false) : []
 
   $: descriptionKey = client.getHierarchy().getAttribute(contact.class.Organization, 'description')
 
@@ -128,15 +127,6 @@
           }}
         />
       {/if}
-      <Button
-        icon={IconMixin}
-        kind={'icon'}
-        iconProps={{ size: 'medium' }}
-        selected={showAllMixins}
-        on:click={() => {
-          showAllMixins = !showAllMixins
-        }}
-      />
     </svelte:fragment>
 
     <div class="flex-col flex-grow flex-no-shrink step-tb-6">

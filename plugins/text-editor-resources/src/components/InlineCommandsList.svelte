@@ -131,7 +131,8 @@
     position: absolute;
     display: flex;
     flex-direction: column;
-    min-width: 0;
+    width: 17rem;
+    max-width: calc(100vw - 2rem);
     min-height: 0;
     z-index: 10001;
   }

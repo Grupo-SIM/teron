@@ -7,8 +7,7 @@ export enum ButtonType {
   TextTemplate,
   RelatedIssues,
   Classes,
-  Enums,
-  InviteSettings
+  Enums
 }
 
 export class WorkspaceSettingsPage {
@@ -25,7 +24,6 @@ export class WorkspaceSettingsPage {
   relatedIssues = (): Locator => this.page.getByRole('button', { name: 'Related issues' })
   classes = (): Locator => this.page.locator('#navGroup-setting').getByRole('button', { name: 'Classes' })
   enums = (): Locator => this.page.getByRole('button', { name: 'Enums' })
-  inviteSettings = (): Locator => this.page.getByRole('button', { name: 'Invite settings' })
 
   async selectWorkspaceSettingsTab (button: ButtonType): Promise<void> {
     switch (button) {
@@ -49,9 +47,6 @@ export class WorkspaceSettingsPage {
         break
       case ButtonType.Enums:
         await this.enums().click()
-        break
-      case ButtonType.InviteSettings:
-        await this.inviteSettings().click()
         break
       default:
         throw new Error('Unknown button type')

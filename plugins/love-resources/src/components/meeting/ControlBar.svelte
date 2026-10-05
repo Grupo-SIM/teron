@@ -27,7 +27,6 @@
   import RoomAccessButton from './controls/RoomAccessButton.svelte'
   import LeaveRoomButton from './controls/LeaveRoomButton.svelte'
   import RecordingButton from './controls/RecordingButton.svelte'
-  import TranscriptionButton from './controls/TranscriptionButton.svelte'
   import MicrophoneButton from './controls/MicrophoneButton.svelte'
   import CameraButton from './controls/CameraButton.svelte'
   import ShareScreenButton from './controls/ShareScreenButton.svelte'
@@ -68,7 +67,6 @@
         <CameraButton />
         <ShareScreenButton />
         <RecordingButton {room} />
-        <TranscriptionButton {room} />
       {:else}
         <RoomAccessButton {room} />
       {/if}

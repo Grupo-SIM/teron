@@ -128,7 +128,7 @@
                   >
                     {day.getDate()}
                   </div>
-                  <div class="timeline-day-header__weekday">{getWeekDayName(day, 'short')}</div>
+                  <div class="timeline-day-header__weekday">{getWeekDayName(day, 'short', $deviceInfo.language)}</div>
                 {/if}
                 <slot name="day-header" {day} width={columnWidthRem} />
               </div>

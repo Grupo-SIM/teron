@@ -13,6 +13,7 @@
 // limitations under the License.
 -->
 <script lang="ts">
+  import { getTaskAssignees, withTaskAssignees } from '@hcengineering/task'
   import activity from '@hcengineering/activity'
   import { Analytics } from '@hcengineering/analytics'
   import { Attachment } from '@hcengineering/attachment'
@@ -50,8 +51,8 @@
     SpaceSelector
   } from '@hcengineering/presentation'
   import tags, { type TagElement, TagReference } from '@hcengineering/tags'
-  import { TaskType } from '@hcengineering/task'
-  import { TaskKindSelector } from '@hcengineering/task-resources'
+  import task, { TaskType } from '@hcengineering/task'
+  import { taskTypeStore } from '@hcengineering/task-resources'
   import { EmptyMarkup, isEmptyMarkup } from '@hcengineering/text'
   import {
     Component as ComponentType,
@@ -83,11 +84,10 @@
   import { ObjectBox } from '@hcengineering/view-resources'
   import { createEventDispatcher, onDestroy } from 'svelte'
 
-  import { activeComponent, activeMilestone, generateIssueShortLink, updateIssueRelation } from '../issues'
+  import { activeMilestone, generateIssueShortLink, updateIssueRelation } from '../issues'
   import tracker from '../plugin'
   import SetParentIssueActionPopup from './SetParentIssueActionPopup.svelte'
   import SubIssues from './SubIssues.svelte'
-  import ComponentSelector from './components/ComponentSelector.svelte'
   import AssigneeEditor from './issues/AssigneeEditor.svelte'
   import IssueNotification from './issues/IssueNotification.svelte'
   import ParentIssue from './issues/ParentIssue.svelte'
@@ -101,6 +101,7 @@
   export let status: Ref<IssueStatus> | undefined = undefined
   export let priority: IssuePriority | undefined = undefined
   export let assignee: Ref<Employee> | null = null
+  export let assignees: Ref<Employee>[] | undefined = undefined
   export let component: Ref<ComponentType> | null = null
   export let milestone: Ref<Milestone> | null = null
   export let relatedTo: Doc | undefined
@@ -133,6 +134,18 @@
   let isAssigneeTouched = false
   let kind: Ref<TaskType> | undefined = undefined
 
+  $: if (currentProject?.type !== undefined) {
+    const descriptors = toIdMap(client.getModel().findAllSync(task.class.TaskTypeDescriptor, {}))
+    const available = Array.from($taskTypeStore.values()).filter(
+      (type) => type.parent === currentProject.type &&
+        (descriptors.get(type.descriptor)?.allowCreate ?? false) &&
+        hierarchy.isDerived(type.targetClass, tracker.class.Issue)
+    )
+    if (available.length > 0 && !available.some((type) => type._id === kind)) {
+      kind = available[0]._id
+    }
+  }
+
   let templateId: Ref<IssueTemplate> | undefined = draft?.template?.template
   let appliedTemplateId: Ref<IssueTemplate> | undefined = draft?.template?.template
 
@@ -141,7 +154,7 @@
 
   function objectChange (object: IssueDraft, empty: any): void {
     if (shouldSaveDraft) {
-      draftController.save(object, empty)
+      draftController.save(withTaskAssignees(object), empty)
     }
   }
 
@@ -168,10 +181,10 @@
     const _parentIssue = parentIssue
     return {
       ...draft,
+      assignees: getTaskAssignees(draft),
       ...(status != null ? { status } : {}),
       ...(priority != null ? { priority } : {}),
-      ...(assignee != null ? { assignee } : {}),
-      ...(component != null ? { component } : {}),
+      ...(assignees !== undefined ? { assignees } : assignee != null ? { assignee: null, assignees: [assignee] } : {}),
       ...(milestone != null ? { milestone } : {}),
       ...(_parentIssue !== undefined ? { parentIssue: _parentIssue._id } : {})
     }
@@ -185,13 +198,14 @@
       kind: '' as Ref<TaskType>,
       priority: priority ?? IssuePriority.NoPriority,
       space: _space as Ref<Project>,
-      component: component ?? $activeComponent ?? null,
+      component: null,
       dueDate: null,
       attachments: 0,
       estimation: 0,
       milestone: milestone ?? $activeMilestone ?? null,
       status,
       assignee,
+      assignees,
       labels: [],
       parentIssue: parentIssue?._id,
       subIssues: []
@@ -201,9 +215,8 @@
         ...base,
         status: originalIssue.status,
         priority: originalIssue.priority,
-        component: originalIssue.component,
         dueDate: originalIssue.dueDate,
-        assignee: originalIssue.assignee,
+        assignees: getTaskAssignees(originalIssue),
         estimation: originalIssue.estimation,
         parentIssue: originalIssue.parents[0]?.parentId,
         title: `${originalIssue.title} (copy)`
@@ -241,10 +254,10 @@
 
   $: empty = {
     assignee: assignee ?? currentProject?.defaultAssignee,
+    assignees,
     status: status ?? currentProject?.defaultIssueStatus,
     parentIssue: parentIssue?._id,
     description: EmptyMarkup,
-    component: component ?? $activeComponent ?? null,
     milestone: milestone ?? $activeMilestone ?? null,
     priority: priority ?? IssuePriority.NoPriority,
     space: _space
@@ -308,6 +321,7 @@
     object.subIssues = template.children.map((p) => {
       return {
         ...p,
+        assignees: getTaskAssignees(p),
         kind: p.kind ?? kind ?? ('' as Ref<TaskType>),
         _id: generateId(),
         space: _space as Ref<Project>,
@@ -330,10 +344,12 @@
       ...object,
       description: description ?? EmptyMarkup,
       ...templBase,
+      assignees: getTaskAssignees(template),
       template: {
         template: template._id
       }
     }
+    isAssigneeTouched = true
     appliedTemplateId = templateId
     object.labels =
       labels !== undefined
@@ -381,18 +397,16 @@
   }
 
   function resetDefaultAssigneeId (): void {
-    if (!isAssigneeTouched && !(object.assignee == null) && object.assignee === currentProject?.defaultAssignee) {
-      object = { ...object, assignee: assignee ?? null }
+    const selected = getTaskAssignees(object)
+    if (!isAssigneeTouched && selected.length === 1 && selected[0] === currentProject?.defaultAssignee) {
+      object = { ...object, assignee: null, assignees: getTaskAssignees({ assignee, assignees }) }
     }
   }
 
   function updateAssigneeId (object: IssueDraft, currentProject: Project | undefined): void {
-    if (!isAssigneeTouched && object.assignee == null && currentProject !== undefined) {
-      if (currentProject.defaultAssignee !== undefined) {
-        object.assignee = currentProject.defaultAssignee
-      } else {
-        object.assignee = null
-      }
+    if (!isAssigneeTouched && getTaskAssignees(object).length === 0 && currentProject !== undefined) {
+      object.assignees = getTaskAssignees({ assignee: currentProject.defaultAssignee })
+      object.assignee = null
     }
   }
   function clearParentIssue (): void {
@@ -413,7 +427,7 @@
 
   export function onOutsideClick (): void {
     if (shouldSaveDraft) {
-      draftController.save(object, empty)
+      draftController.save(withTaskAssignees(object), empty)
     }
   }
 
@@ -424,7 +438,7 @@
   })
 
   async function updateCurrentProjectPref (currentProject: Ref<Project>): Promise<void> {
-    if (me?.role === AccountRole.ReadOnlyGuest || me?.role === AccountRole.Guest) return
+    if (me?.role === AccountRole.ReadOnlyGuest) return
     const spacePreferences = await client.findOne(tracker.class.ProjectTargetPreference, { attachedTo: currentProject })
     if (spacePreferences === undefined) {
       await client.createDoc(tracker.class.ProjectTargetPreference, currentProject, {
@@ -479,8 +493,8 @@
       const value: DocData<Issue> = {
         title: getTitle(object.title),
         description: null,
-        assignee: object.assignee,
-        component: object.component,
+        assignees: getTaskAssignees(object),
+        component: null,
         milestone: object.milestone,
         number,
         status: object.status,
@@ -612,14 +626,6 @@
     )
   }
 
-  const handleComponentIdChanged = (componentId: Ref<ComponentType> | null | undefined): void => {
-    if (componentId === undefined) {
-      return
-    }
-
-    object.component = componentId
-  }
-
   const handleMilestoneIdChanged = (milestoneId: Ref<Milestone> | null | undefined): void => {
     if (milestoneId === undefined) {
       return
@@ -659,7 +665,7 @@
   }
 
   async function showConfirmationDialog (): Promise<void> {
-    draftController.save(object, empty)
+    draftController.save(withTaskAssignees(object), empty)
     const isFormEmpty = draft === undefined
 
     if (isFormEmpty) {
@@ -754,8 +760,7 @@
   $: extraProps = {
     status: object.status,
     priority: object.priority,
-    assignee: object.assignee,
-    component: object.component,
+    assignees: getTaskAssignees(object),
     milestone: object.milestone,
     relatedTo,
     parentIssue,
@@ -822,12 +827,6 @@
       <span class="overflow-label">
         <Label {label} />
       </span>
-      <TaskKindSelector
-        projectType={currentProject?.type}
-        bind:value={kind}
-        baseClass={tracker.class.Issue}
-        size={'small'}
-      />
       {#if relatedTo}
         <div class="lower mr-2">
           <Label label={tracker.string.RelatedTo} />
@@ -901,7 +900,7 @@
       projectId={_space}
       project={currentProject}
       milestone={object.milestone}
-      component={object.component}
+      component={null}
       bind:subIssues={object.subIssues}
     />
   {/if}
@@ -952,7 +951,7 @@
         short
         on:change={({ detail }) => {
           isAssigneeTouched = true
-          object.assignee = detail
+          object.assignees = detail
           manager.setFocusPos(5)
         }}
       />
@@ -974,15 +973,6 @@
       on:delete={(evt) => {
         object.labels = object.labels.filter((it) => it.tag !== evt.detail._id)
       }}
-    />
-    <ComponentSelector
-      focusIndex={7}
-      value={object.component}
-      space={_space}
-      onChange={handleComponentIdChanged}
-      isEditable={true}
-      kind={'regular'}
-      size={'large'}
     />
     <div id="estimation-editor" class="new-line">
       <EstimationEditor focusIndex={8} kind={'regular'} size={'large'} value={object} />

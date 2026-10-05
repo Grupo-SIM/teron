@@ -22,7 +22,7 @@ import { ProgressInfo, UpdateInfo } from 'electron-updater'
 import WinBadge from 'electron-windows-badge'
 import * as path from 'path'
 
-import { Config, MenuBarAction, NotificationParams, JumpListSpares, CommandCloseTab } from '../ui/types'
+import { Config, MenuBarAction, NotificationParams, JumpListSpares } from '../ui/types'
 import { getOptions } from './args'
 import { addMenus } from './standardMenu'
 import { dispatchMenuBarAction } from './customMenu'
@@ -83,7 +83,7 @@ function runTheApp (): void {
   const containerPageFileName = isWindows ? 'index.windows.html' : 'index.html'
   const containerPagePath = path.join('dist', 'ui', containerPageFileName)
 
-  const CloseTabHotKey = 'CommandOrControl+W'
+  const CloseWindowHotKey = 'CommandOrControl+W'
 
   // Note: using electron-store here as local storage is not available in the main process
   // before the window is created
@@ -317,16 +317,16 @@ function runTheApp (): void {
     }
 
     mainWindow.on('focus', () => {
-      const registered = globalShortcut.register(CloseTabHotKey, () => {
-        sendCommand(CommandCloseTab)
+      const registered = globalShortcut.register(CloseWindowHotKey, () => {
+        mainWindow?.close()
       })
       if (!registered) {
-        console.log(`failed to register global shortcut on ${CloseTabHotKey}`)
+        console.log(`failed to register global shortcut on ${CloseWindowHotKey}`)
       }
     })
 
     mainWindow.on('blur', () => {
-      globalShortcut.unregister(CloseTabHotKey)
+      globalShortcut.unregister(CloseWindowHotKey)
       mainWindow?.webContents.send(IpcMessage.WindowFocusLoss)
     })
 
@@ -557,11 +557,11 @@ function runTheApp (): void {
   })
 
   app.on('will-quit', () => {
-    globalShortcut.unregister(CloseTabHotKey)
+    globalShortcut.unregister(CloseWindowHotKey)
   })
 
   app.on('window-all-closed', () => {
-    globalShortcut.unregister(CloseTabHotKey)
+    globalShortcut.unregister(CloseWindowHotKey)
     if (process.platform !== 'darwin') {
       app.quit()
     }

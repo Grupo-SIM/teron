@@ -86,7 +86,7 @@ export function createModel (builder: Builder): void {
     {
       label: billing.string.Unlimited,
       description: billing.string.UnlimitedDescription,
-      storageLimitGB: 1_000_000_000,
+      storageLimitGB: 0,
       trafficLimitGB: 1_000_000_000,
       priceMonthly: 0,
       index: 2,

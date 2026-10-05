@@ -31,7 +31,7 @@
   import { deepEqual } from 'fast-equals'
   import { createEventDispatcher } from 'svelte'
   import view from '../plugin'
-  import { buildConfigLookup, canResolveAttribute, getKeyLabel } from '../utils'
+  import { buildConfigLookup, canResolveAttribute, getKeyLabel, getTableAttributeLabel } from '../utils'
   import ViewletClassSettings from './ViewletClassSettings.svelte'
 
   export let viewlet: Viewlet
@@ -370,6 +370,13 @@
 
   async function getConfig (viewlet: Viewlet, preference: ViewletPreference | undefined): Promise<Config[]> {
     const result = getBaseConfig(viewlet)
+
+    for (const key of viewlet.configOptions?.optionalKeys ?? []) {
+      const attribute = hierarchy.getAllAttributes(viewlet.attachTo).get(key)
+      if (attribute !== undefined) {
+        processAttribute({ ...attribute, label: getTableAttributeLabel(attribute, hierarchy) }, result)
+      }
+    }
 
     if (viewlet.configOptions?.strict !== true) {
       const allAttributes = hierarchy.getAllAttributes(viewlet.attachTo)

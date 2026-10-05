@@ -44,6 +44,7 @@ import { decodeToken, decodeTokenVerbose, generateToken, type PermissionsGrant }
 import { isAdminEmail } from './admin'
 import { renderBrandedEmail } from './email'
 import { accountPlugin } from './plugin'
+import { getProrationDays } from './proration'
 import { type AccountServiceMethods, getServiceMethods } from './serviceOperations'
 import {
   AccountEventType,
@@ -79,8 +80,10 @@ import {
   type InviteInfo
 } from './types'
 import {
+  cancelWorkspaceBillingContract,
   getWorkspaceBillingContract,
   getWorkspaceQuantityChange,
+  reactivateWorkspaceBillingContract,
   requestWorkspaceQuantityChange,
   type SimintpayQuantityChange
 } from './simintpay'
@@ -129,7 +132,6 @@ import {
   verifyPassword,
   wrap,
   updateAllowReadOnlyGuests,
-  updateAllowGuestSignUp,
   getWorkspaceByDataId,
   assignableRoles,
   getWorkspacesInfoWithStatusByIds,
@@ -158,14 +160,14 @@ const workspaceLimitPerUser =
 
 const FREE_TRIAL_MS = 30 * 24 * 60 * 60 * 1000
 const LEGACY_BUSINESS_PLANS = new Set(['rare', 'epic', 'legendary'])
-const BILLABLE_ROLES = new Set([AccountRole.Owner, AccountRole.Maintainer, AccountRole.User, AccountRole.Guest])
+const BILLABLE_ROLES = new Set([AccountRole.Owner, AccountRole.Maintainer, AccountRole.User])
 
 function effectivePlan (plan: string): WorkspaceSubscriptionPlan {
   if (plan === 'unlimited') return 'unlimited'
   return plan === 'business' || LEGACY_BUSINESS_PLANS.has(plan) ? 'business' : 'free'
 }
 
-async function getEntitlement (
+export async function getEntitlement (
   db: AccountDB,
   workspaceUuid: WorkspaceUuid,
   now: number = Date.now()
@@ -212,7 +214,7 @@ async function getEntitlement (
     periodEnd: subscription?.periodEnd,
     readOnlyAfter,
     seatLimit,
-    nextSeatLimit: subscription?.nextSeatLimit,
+    nextSeatLimit: subscription?.nextSeatLimit ?? undefined,
     memberSeats,
     pendingInviteSeats,
     availableSeats: capacity == null ? undefined : Math.max(0, capacity - usedSeats)
@@ -679,6 +681,25 @@ export async function validateOtp (
       emailSocialId = await db.socialId.findOne({ _id: emailSocialId._id })
       if (emailSocialId == null) {
         throw new PlatformError(new Status(Severity.ERROR, platform.status.InternalServerError, {}))
+      }
+
+      // Keep the previous email usable until its replacement has been verified.
+      const previousEmails = await db.socialId.find({
+        personUuid: callerAccountUuid,
+        type: SocialIdType.EMAIL,
+        isDeleted: { $ne: true }
+      })
+      for (const previousEmail of previousEmails) {
+        if (previousEmail._id !== emailSocialId._id) {
+          await doReleaseSocialId(
+            db,
+            callerAccountUuid,
+            SocialIdType.EMAIL,
+            previousEmail.value,
+            `replaceEmail@${callerAccountUuid}`,
+            true
+          )
+        }
       }
 
       // We've already checked calledAccount is not null previously
@@ -1353,12 +1374,30 @@ export async function getInviteInfo (
     return { workspaceName: null }
   }
 
+  if (invite.remainingUses === 0 || (invite.expiresOn > 0 && invite.expiresOn < Date.now())) {
+    return { workspaceName: null }
+  }
+
   const workspace = await getWorkspaceById(db, invite.workspaceUuid)
   if (workspace === null) {
     return { workspaceName: null }
   }
 
-  return { workspaceName: workspace.name }
+  if (invite.email == null || invite.email === '') {
+    return { workspaceName: workspace.name }
+  }
+
+  const email = cleanEmail(invite.email)
+  const socialId = await getEmailSocialId(db, email)
+  const account = socialId == null
+    ? null
+    : await getAccount(db, socialId.personUuid as AccountUuid)
+
+  return {
+    workspaceName: workspace.name,
+    email,
+    accountExists: account != null
+  }
 }
 
 /**
@@ -1478,8 +1517,8 @@ export async function checkAutoJoin (
     throw new PlatformError(new Status(Severity.ERROR, platform.status.BadRequest, {}))
   }
 
-  if (invite.role !== AccountRole.Guest) {
-    ctx.warn('Auto-join not for guest role is forbidden', invite)
+  if (!assignableRoles.includes(invite.role)) {
+    ctx.warn('Auto-join for a non-assignable role is forbidden', invite)
     throw new PlatformError(new Status(Severity.ERROR, platform.status.Forbidden, {}))
   }
 
@@ -1844,7 +1883,8 @@ export async function requestPasswordReset (
       text,
       html,
       subject,
-      to: normalizedEmail
+      to: normalizedEmail,
+      ...(mailAuth != null ? { apiKey: mailAuth } : {})
     })
   })
   if (response.ok) {
@@ -1914,7 +1954,8 @@ export async function requestPasswordSetup (
       text,
       html,
       subject,
-      to: emailSocialId.value
+      to: emailSocialId.value,
+      ...(mailAuth != null ? { apiKey: mailAuth } : {})
     })
   })
   if (response.ok) {
@@ -2259,7 +2300,9 @@ export async function getWorkspaceCreationInfo (
 ): Promise<{ freeTrialAvailable: boolean }> {
   const { account } = decodeTokenVerbose(ctx, token)
   const accountInfo = await db.account.findOne({ uuid: account })
-  const owned = await db.workspace.find({ createdBy: account })
+  // Membership does not consume the Free workspace entitlement. Only
+  // workspaces created by this person do.
+  const owned = await db.workspace.find({ createdBy: account as PersonUuid })
   return { freeTrialAvailable: accountInfo?.freeTrialUsedOn == null && owned.length === 0 }
 }
 
@@ -2884,7 +2927,7 @@ export async function ensurePerson (
 ): Promise<{ uuid: PersonUuid, socialId: PersonId }> {
   const { account, workspace, extra } = decodeTokenVerbose(ctx, token)
   const allowedService = verifyAllowedServices(
-    ['tool', 'workspace', 'schedule', 'mail', 'github', 'terongram'],
+    ['tool', 'workspace', 'schedule', 'mail', 'github', 'telegram'],
     extra,
     false
   )
@@ -3080,7 +3123,10 @@ async function addEmailSocialId (
     throw new PlatformError(new Status(Severity.ERROR, platform.status.AccountNotFound, { account }))
   }
 
-  const normalizedEmail = normalizeValue(email)
+  const normalizedEmail = cleanEmail(email)
+  if (!isEmail(normalizedEmail)) {
+    throw new PlatformError(new Status(Severity.ERROR, platform.status.BadRequest, {}))
+  }
   const existing = await db.socialId.findOne({ type: SocialIdType.EMAIL, value: normalizedEmail })
 
   // This schema should be applied to all types in general, they should only differ by the verification process.
@@ -3488,6 +3534,74 @@ export async function getWorkspaceEntitlement (
   return await getEntitlement(db, workspaceUuid)
 }
 
+export async function cancelWorkspaceSubscription (
+  ctx: MeasureContext,
+  db: AccountDB,
+  branding: Branding | null,
+  token: string
+): Promise<Subscription> {
+  const { workspace } = await requireSeatBillingOwner(ctx, db, token)
+  const subscription = await db.subscription.findOne({
+    workspaceUuid: workspace,
+    type: SubscriptionType.Tier,
+    provider: 'simintpay'
+  })
+  if (subscription == null) {
+    throw new PlatformError(new Status(Severity.ERROR, platform.status.BadRequest, {}))
+  }
+  if (subscription.willCancelAt != null) return subscription
+
+  // Older workspace subscriptions stored the gateway subscription ID here,
+  // while SimintPay expects its billing contract ID. Resolve the contract from
+  // the workspace so cancel and uncancel work for both record shapes.
+  const currentContract = await getWorkspaceBillingContract(workspace)
+  const contract = await cancelWorkspaceBillingContract(currentContract.id)
+  const periodStart = Date.parse(contract.currentPeriodStart)
+  const periodEnd = Date.parse(contract.currentPeriodEnd)
+  const providerData = {
+    ...subscription.providerData,
+    cancelAtPeriodEnd: true,
+    contractId: contract.id,
+    willCancelAt: contract.currentPeriodEnd
+  }
+  const update = { periodStart, periodEnd, willCancelAt: periodEnd, providerData, updatedOn: Date.now() }
+  await db.subscription.update({ id: subscription.id }, update)
+  return { ...subscription, ...update }
+}
+
+export async function uncancelWorkspaceSubscription (
+  ctx: MeasureContext,
+  db: AccountDB,
+  branding: Branding | null,
+  token: string
+): Promise<Subscription> {
+  const { workspace } = await requireSeatBillingOwner(ctx, db, token)
+  const subscription = await db.subscription.findOne({
+    workspaceUuid: workspace,
+    type: SubscriptionType.Tier,
+    provider: 'simintpay'
+  })
+  if (subscription == null || subscription.willCancelAt == null) {
+    throw new PlatformError(new Status(Severity.ERROR, platform.status.BadRequest, {}))
+  }
+
+  // See cancellation above: the persisted subscription ID is not a reliable
+  // SimintPay contract ID for subscriptions created before contract billing.
+  const currentContract = await getWorkspaceBillingContract(workspace)
+  const contract = await reactivateWorkspaceBillingContract(currentContract.id)
+  const periodStart = Date.parse(contract.currentPeriodStart)
+  const periodEnd = Date.parse(contract.currentPeriodEnd)
+  const providerData = {
+    ...subscription.providerData,
+    cancelAtPeriodEnd: false,
+    contractId: contract.id,
+    willCancelAt: null
+  }
+  const update = { periodStart, periodEnd, willCancelAt: undefined, providerData, updatedOn: Date.now() }
+  await db.subscription.update({ id: subscription.id }, update)
+  return { ...subscription, ...update }
+}
+
 export async function getWorkspacePendingInvites (
   ctx: MeasureContext,
   db: AccountDB,
@@ -3539,8 +3653,7 @@ export async function getWorkspaceSeatQuote (
   const contract = await getWorkspaceBillingContract(workspace)
   const periodStart = Date.parse(contract.currentPeriodStart)
   const periodEnd = Date.parse(contract.currentPeriodEnd)
-  const duration = Math.max(1, periodEnd - periodStart)
-  const remainingRatio = Math.max(0, Math.min(1, (periodEnd - Date.now()) / duration))
+  const proration = getProrationDays(periodStart, periodEnd, Date.now())
   const unit = Number(contract.unitAmount)
   const delta = target - contract.quantity
   return {
@@ -3550,7 +3663,9 @@ export async function getWorkspaceSeatQuote (
     unitAmount: unit.toFixed(2),
     currentRecurringAmount: contract.recurringAmount,
     nextRecurringAmount: (Number(contract.recurringAmount) + unit * delta).toFixed(2),
-    estimatedProrationAmount: (delta > 0 ? unit * delta * remainingRatio : 0).toFixed(2),
+    estimatedProrationAmount: (delta > 0 ? unit * delta * proration.remainingRatio : 0).toFixed(2),
+    prorationDays: proration.days,
+    prorationPeriodDays: proration.periodDays,
     currency: 'BRL',
     periodEnd
   }
@@ -3877,7 +3992,6 @@ export type AccountMethods =
   | 'getWorkspaceMembers'
   | 'updateWorkspaceRole'
   | 'updateAllowReadOnlyGuests'
-  | 'updateAllowGuestSignUp'
   | 'findPersonBySocialId'
   | 'findSocialIdBySocialKey'
   | 'ensurePerson'
@@ -3900,6 +4014,8 @@ export type AccountMethods =
   | 'getUserProfile'
   | 'getSubscriptions'
   | 'getWorkspaceEntitlement'
+  | 'cancelWorkspaceSubscription'
+  | 'uncancelWorkspaceSubscription'
   | 'getWorkspacePendingInvites'
   | 'getWorkspaceSeatQuote'
   | 'changeWorkspaceSeatLimit'
@@ -3956,7 +4072,6 @@ export function getMethods (hasSignUp: boolean = true): Partial<Record<AccountMe
     verify2fa: wrap(verify2fa),
     updateWorkspaceRole: wrap(updateWorkspaceRole),
     updateAllowReadOnlyGuests: wrap(updateAllowReadOnlyGuests),
-    updateAllowGuestSignUp: wrap(updateAllowGuestSignUp),
     updatePasswordAgingRule: wrap(updatePasswordAgingRule),
     checkPasswordAging: wrap(checkPasswordAging),
     createMailbox: wrap(createMailbox),
@@ -3975,6 +4090,8 @@ export function getMethods (hasSignUp: boolean = true): Partial<Record<AccountMe
     getUserProfile: wrap(getUserProfile),
     getSubscriptions: wrap(getSubscriptions),
     getWorkspaceEntitlement: wrap(getWorkspaceEntitlement),
+    cancelWorkspaceSubscription: wrap(cancelWorkspaceSubscription),
+    uncancelWorkspaceSubscription: wrap(uncancelWorkspaceSubscription),
     getWorkspacePendingInvites: wrap(getWorkspacePendingInvites),
     getWorkspaceSeatQuote: wrap(getWorkspaceSeatQuote),
     changeWorkspaceSeatLimit: wrap(changeWorkspaceSeatLimit),

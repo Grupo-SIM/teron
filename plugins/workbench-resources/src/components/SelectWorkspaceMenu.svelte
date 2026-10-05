@@ -14,7 +14,7 @@
 -->
 <script lang="ts">
   import contact from '@hcengineering/contact'
-  import { isArchivingMode, systemAccountUuid, WorkspaceInfoWithStatus } from '@hcengineering/core'
+  import { containsSearch, isArchivingMode, systemAccountUuid, WorkspaceInfoWithStatus } from '@hcengineering/core'
   import login from '@hcengineering/login'
   import { getMetadata, getResource } from '@hcengineering/platform'
   import presentation, { createQuery, decodeTokenPayload, hasResource, isAdminUser } from '@hcengineering/presentation'
@@ -195,7 +195,7 @@
     <div class="ap-scroll">
       <div class="ap-box">
         {#each $workspacesStore
-          .filter((it) => search === '' || (it.name?.includes(search) ?? false) || it.url.includes(search))
+          .filter((it) => search === '' || containsSearch(it.name, search) || containsSearch(it.url, search))
           .slice(0, 500) as ws, i}
           {@const wsName = ws.name ?? ws.url}
           {@const _activeSession = activeSessions[ws.uuid]}

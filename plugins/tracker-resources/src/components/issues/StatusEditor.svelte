@@ -13,7 +13,8 @@
 // limitations under the License.
 -->
 <script lang="ts">
-  import { AttachedData, Ref, WithLookup } from '@hcengineering/core'
+  import { AttachedData, Ref, WithLookup, AccountRole, getCurrentAccount, hasAccountRole } from '@hcengineering/core'
+  import { getCurrentEmployee } from '@hcengineering/contact'
   import { getClient } from '@hcengineering/presentation'
   import { getTaskTypeStates } from '@hcengineering/task'
   import { taskTypeStore } from '@hcengineering/task-resources'
@@ -55,11 +56,14 @@
   export let focusIndex: number | undefined = undefined
   export let short: boolean = false
 
+  $: canChangeStatus = isEditable && (hasAccountRole(getCurrentAccount(), AccountRole.Maintainer) ||
+    ((value as Issue & { assignees?: string[] }).assignees ?? (value.assignee == null ? [] : [value.assignee])).includes(getCurrentEmployee()))
+
   const client = getClient()
   const dispatch = createEventDispatcher()
 
   const changeStatus = async (newStatus: Ref<IssueStatus> | undefined, refocus: boolean = true) => {
-    if (!isEditable || newStatus == null || value.status === newStatus) {
+    if (!canChangeStatus || newStatus == null || value.status === newStatus) {
       return
     }
 
@@ -78,7 +82,7 @@
   }
 
   const handleStatusEditorOpened = (event: MouseEvent) => {
-    if (!isEditable) {
+    if (!canChangeStatus) {
       return
     }
 
@@ -137,7 +141,7 @@
     <div
       class="flex-row-center flex-no-shrink"
       class:fix-margin={kind === 'list'}
-      class:cursor-pointer={isEditable}
+      class:cursor-pointer={canChangeStatus}
       on:click={handleStatusEditorOpened}
     >
       <div class="flex-center flex-no-shrink square-4">
@@ -159,8 +163,8 @@
     </div>
   {:else}
     <Button
-      showTooltip={isEditable ? { label: tracker.string.SetStatus, direction: tooltipAlignment } : undefined}
-      disabled={!isEditable}
+      showTooltip={canChangeStatus ? { label: tracker.string.SetStatus, direction: tooltipAlignment } : undefined}
+      disabled={!canChangeStatus}
       {justify}
       {size}
       {kind}

@@ -46,7 +46,7 @@
     CalendarGrid
   } from '..'
   import calendar from '../plugin'
-  import { isReadOnly, updateReccuringInstance } from '../utils'
+  import { calendarByIdStore, isReadOnly, isVisible, updateReccuringInstance } from '../utils'
   import EventElement from './EventElement.svelte'
   import TimeDuration from './TimeDuration.svelte'
 
@@ -76,7 +76,7 @@
     }
   }
 
-  const ampm = new Intl.DateTimeFormat([], { hour: 'numeric' }).resolvedOptions().hour12
+  $: ampm = new Intl.DateTimeFormat($deviceInfo.language, { hour: 'numeric' }).resolvedOptions().hour12
   const getTimeFormat = (hour: number, min: number = 0): string => {
     if (min === 0) {
       return ampm
@@ -498,7 +498,7 @@
   }
 
   const getTimeZone = (): string => {
-    return new Intl.DateTimeFormat([], { timeZoneName: 'short' }).format(Date.now()).split(' ')[1]
+    return new Intl.DateTimeFormat($deviceInfo.language, { timeZoneName: 'short' }).format(Date.now()).split(' ')[1]
   }
 
   const getTopOffset = (date: Date): number => {
@@ -669,7 +669,7 @@
     resizeId = directionResize = null
   }
   function mouseDownElement (e: MouseEvent, event: Event, direction: 'top' | 'bottom'): void {
-    if (e.buttons !== 1) return
+    if (e.buttons !== 1 || !isVisible(event, $calendarByIdStore) || isReadOnly(event)) return
     e.stopPropagation()
     closeTooltip()
     resizeId = event._id
@@ -720,7 +720,7 @@
   transparentImage.src = 'data:image/gif;base64,R0lGODlhAQABAIAAAAAAAP///yH5BAEAAAAALAAAAAABAAEAAAIBRAA7'
 
   function dragStartElement (e: DragEvent & { currentTarget: EventTarget & HTMLDivElement }, event: Event): void {
-    if (isReadOnly(event) || event.allDay) return
+    if (!isVisible(event, $calendarByIdStore) || isReadOnly(event) || event.allDay) return
     if (e.dataTransfer) {
       e.dataTransfer.setDragImage(transparentImage, 0, 0)
       e.dataTransfer.effectAllowed = 'move'
@@ -868,10 +868,10 @@
           {#if tday}
             <div class="flex-col">
               <span class="today"><Label label={calendar.string.Today} /></span>
-              <span class="weekday">{getWeekDayName(day, weekFormat)}</span>
+              <span class="weekday">{getWeekDayName(day, weekFormat, $deviceInfo.language)}</span>
             </div>
           {:else}
-            <span class="weekday">{getWeekDayName(day, weekFormat)}</span>
+            <span class="weekday">{getWeekDayName(day, weekFormat, $deviceInfo.language)}</span>
           {/if}
           {#if tEvents !== 0}
             <div class="header-time">
@@ -1074,7 +1074,7 @@
             style:left={`${rect.left}px`}
             style:right={`${rect.right}px`}
             style:--mask-image={'none'}
-            draggable={!ev.allDay && !resizeId}
+            draggable={isVisible(ev, $calendarByIdStore) && !isReadOnly(ev) && !ev.allDay && !resizeId}
             tabindex={1000 + i}
             on:dragstart={(e) => {
               dragStartElement(e, ev)
@@ -1084,25 +1084,27 @@
             <div
               class="calendar-element-start"
               class:pointer-events-none={pointerEventsNone}
-              class:allowed={!resizeId && !dragId && !clearCells}
+              class:allowed={isVisible(ev, $calendarByIdStore) && !isReadOnly(ev) && !resizeId && !dragId && !clearCells}
               class:hovered={resizeId === ev._id && directionResize === 'top'}
               on:mousedown={(e) => {
                 mouseDownElement(e, ev, 'top')
               }}
               on:contextmenu={(e) => {
-                showMenu(e, { object: ev })
+                e.preventDefault()
+                if (isVisible(ev, $calendarByIdStore)) showMenu(e, { object: ev })
               }}
             />
             <div
               class="calendar-element-end"
               class:pointer-events-none={pointerEventsNone}
-              class:allowed={!resizeId && !dragId && !clearCells}
+              class:allowed={isVisible(ev, $calendarByIdStore) && !isReadOnly(ev) && !resizeId && !dragId && !clearCells}
               class:hovered={resizeId === ev._id && directionResize === 'bottom'}
               on:mousedown={(e) => {
                 mouseDownElement(e, ev, 'bottom')
               }}
               on:contextmenu={(e) => {
-                showMenu(e, { object: ev })
+                e.preventDefault()
+                if (isVisible(ev, $calendarByIdStore)) showMenu(e, { object: ev })
               }}
             />
             <EventElement

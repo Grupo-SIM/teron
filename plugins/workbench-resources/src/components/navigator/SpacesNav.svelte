@@ -103,7 +103,7 @@
   function getParentActions (): Action[] {
     const result = hasSpaceBrowser ? [browseSpaces] : []
     if (
-      hasAccountRole(getCurrentAccount(), AccountRole.User) &&
+      hasAccountRole(getCurrentAccount(), AccountRole.Maintainer) &&
       model.addSpaceLabel !== undefined &&
       model.createComponent !== undefined
     ) {

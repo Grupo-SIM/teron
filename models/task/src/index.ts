@@ -53,7 +53,6 @@ import core, {
   TSpaceTypeDescriptor,
   TTypedSpace
 } from '@hcengineering/model-core'
-import { createPublicLinkAction } from '@hcengineering/model-guest'
 import view, {
   classPresenter,
   createAction,
@@ -108,7 +107,11 @@ export class TTask extends TAttachedDoc implements Task {
   @Hidden()
     number!: number
 
+  @Prop(ArrOf(TypeRef(contact.mixin.Employee)), task.string.TaskAssignee)
+    assignees?: Ref<Person>[]
+
   @Prop(TypeRef(contact.mixin.Employee), task.string.TaskAssignee)
+  @Hidden()
     assignee!: Ref<Person> | null
 
   @Prop(TypeDate(), task.string.DueDate, { editor: task.component.DueDateEditor })
@@ -298,6 +301,7 @@ export function createModel (builder: Builder): void {
   createAction(
     builder,
     {
+      secured: true,
       ...actionTemplates.editStatus,
       target: task.class.Project,
       query: {
@@ -362,6 +366,7 @@ export function createModel (builder: Builder): void {
   createAction(
     builder,
     {
+      secured: true,
       ...viewTemplates.move,
       target: task.class.Task,
       context: {
@@ -522,7 +527,6 @@ export function createModel (builder: Builder): void {
     }
   })
 
-  createPublicLinkAction(builder, task.class.Task, task.action.PublicLink)
 
   builder.createDoc(core.class.DomainIndexConfiguration, core.space.Model, {
     domain: DOMAIN_TASK,

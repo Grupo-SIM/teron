@@ -23,7 +23,7 @@
   import { Panel } from '@hcengineering/panel'
   import { getResource } from '@hcengineering/platform'
   import { ActionContext, MessageViewer, createQuery, getClient } from '@hcengineering/presentation'
-  import { Button, IconMixin, IconMoreH } from '@hcengineering/ui'
+  import { Button, IconMoreH } from '@hcengineering/ui'
   import { DocAttributeBar, getDocMixins, showMenu } from '@hcengineering/view-resources'
   import type { ProductVersion } from '@hcengineering/products'
   import { createEventDispatcher, onDestroy, onMount } from 'svelte'
@@ -73,8 +73,7 @@
       }
     )
 
-  let showAllMixins = false
-  $: mixins = object !== undefined ? getDocMixins(object, showAllMixins) : []
+  $: mixins = object !== undefined ? getDocMixins(object, false) : []
 
   onMount(() => {
     dispatch('open', { ignoreKeys: ['description'] })
@@ -140,15 +139,6 @@
         size={'medium'}
         on:click={(e) => {
           showMenu(e, { object })
-        }}
-      />
-      <Button
-        icon={IconMixin}
-        kind={'icon'}
-        iconProps={{ size: 'medium' }}
-        selected={showAllMixins}
-        on:click={() => {
-          showAllMixins = !showAllMixins
         }}
       />
     </svelte:fragment>

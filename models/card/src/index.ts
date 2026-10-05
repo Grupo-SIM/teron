@@ -869,15 +869,6 @@ export function createModel (builder: Builder): void {
     card.viewlet.CardGrid
   )
 
-  builder.createDoc(
-    presentation.class.ComponentPointExtension,
-    core.space.Model,
-    {
-      extension: converter.extensions.CopyAsMarkdownAction,
-      component: converter.component.CopyAsMarkdownButton
-    },
-    converter.extensions.CopyAsMarkdownButton
-  )
 
   builder.createDoc(
     view.class.ViewletViewAction,
@@ -1012,31 +1003,6 @@ export function createModel (builder: Builder): void {
       expandable: true
     },
     card.ids.ManageMasterTags
-  )
-
-  builder.createDoc(
-    core.class.ClassPermission,
-    core.space.Model,
-    {
-      label: card.string.AllowCreatingCards,
-      scope: 'space',
-      targetClass: card.class.Card
-    },
-    card.ids.GuestCardClassPermission
-  )
-
-  builder.createDoc(
-    core.class.ModulePermissionGroup,
-    core.space.Model,
-    {
-      application: card.app.Card,
-      role: AccountRole.Guest,
-      permissions: [card.ids.GuestCardClassPermission],
-      spaceClass: card.class.CardSpace,
-      enabled: true,
-      order: 20
-    },
-    card.ids.ModulePermissionGroup
   )
 
   builder.createDoc(

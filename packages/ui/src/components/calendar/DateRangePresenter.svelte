@@ -25,6 +25,7 @@
   import DPCalendar from './icons/DPCalendar.svelte'
   import DPCalendarOver from './icons/DPCalendarOver.svelte'
   import { daysInMonth, getMonthName } from './internal/DateUtils'
+  import { themeStore } from '@hcengineering/theme'
 
   export let value: number | null | undefined = null
   export let mode: DateRangeMode = DateRangeMode.DATE
@@ -313,7 +314,7 @@
     {#if value !== undefined && value !== null && value.toString() !== ''}
       {#if withDate}
         {new Date(value).getDate()}
-        {getMonthName(new Date(value), 'short')}
+        {getMonthName(new Date(value), 'short', $themeStore.language)}
         {#if new Date(value).getFullYear() !== today.getFullYear()}
           {new Date(value).getFullYear()}
         {/if}
@@ -488,7 +489,7 @@
       {#if value !== undefined && value !== null && value.toString() !== ''}
         {#if withDate}
           {new Date(value).getDate()}
-          {getMonthName(new Date(value), 'short')}
+          {getMonthName(new Date(value), 'short', $themeStore.language)}
           {#if new Date(value).getFullYear() !== today.getFullYear()}
             {new Date(value).getFullYear()}
           {/if}

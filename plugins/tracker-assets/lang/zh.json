@@ -220,7 +220,8 @@
 
     "NewMilestone": "新里程碑",
     "CreateMilestone": "创建",
-
+    "DeleteMilestoneConfirm": "永久删除所选项目？其任务将保留，但不属于任何项目。",
+    "DeleteMilestoneTitle": "删除{name}？",
     "MoveAndDeleteMilestone": "将问题移动到 {newMilestone} 并删除 {deleteMilestone}",
     "MoveAndDeleteMilestoneConfirm": "您想要删除里程碑并将问题移动到其他里程碑吗？",
 
@@ -236,6 +237,13 @@
     "TimeSpendReportDescription": "描述",
     "TimeSpendDays": "{value} 天",
     "TimeSpendHours": "{value} 小时",
+    "TimeInputAmount": "e.g. 2",
+    "TimeUnit": "Unit",
+    "TimeUnitHours": "Hours",
+    "TimeUnitDays": "Days",
+    "TimeUnitMinutes": "Minutes",
+    "TimeInputHours": "e.g. 2 hours",
+    "TimeInputMinutes": "e.g. 30 minutes",
     "TimeSpendMinutes": "{value} 分钟",
     "ChildEstimation": "子问题估算",
     "ChildReportedTime": "子问题时间",
@@ -248,6 +256,8 @@
     "AddedAsBlocking": "标记为阻塞",
 
     "IssueTemplate": "模板",
+    "DiscardTemplate": "Discard",
+    "TextTemplate": "Text template",
     "IssueTemplates": "模板",
     "NewProcess": "新模板",
     "SaveProcess": "保存模板",

@@ -13,7 +13,8 @@
 // limitations under the License.
 -->
 <script lang="ts">
-  import { Class, Doc, DocumentQuery, FindOptions, Ref, Space, WithLookup, mergeQueries } from '@hcengineering/core'
+  import contact from '@hcengineering/contact'
+  import { Class, Doc, DocumentQuery, FindOptions, Ref, Space, WithLookup, mergeQueries, AccountRole, getCurrentAccount, hasAccountRole } from '@hcengineering/core'
   import { Asset, getResource, IntlString, Resource } from '@hcengineering/platform'
   import { getClient, ComponentExtensions } from '@hcengineering/presentation'
   import {
@@ -68,6 +69,8 @@
   const client = getClient()
   const hierarchy = client.getHierarchy()
 
+  $: canCreate = hasAccountRole(getCurrentAccount(), AccountRole.Maintainer)
+
   let search = ''
   let viewlet: WithLookup<Viewlet> | undefined
   let filterVisible: boolean = false
@@ -81,7 +84,14 @@
 
   $: _baseQuery = mergeQueries(mergeQueries(baseQuery ?? {}, baseQueryMixin?.baseQuery ?? {}), viewlet?.baseQuery ?? {})
   $: query = { ..._baseQuery }
-  $: searchQuery = search === '' ? query : { ...query, $search: search }
+  $: searchQuery = search.trim() === ''
+    ? query
+    : {
+        ...query,
+        ...(hierarchy.isDerived(_class, contact.class.Contact)
+          ? { name: { $contains: search.trim() } }
+          : { $search: search })
+      }
   $: resultQuery = isQueryLoaded ? searchQuery : undefined
 
   let options = viewlet?.options
@@ -130,15 +140,15 @@
   }
 
   function showCreateDialog (): void {
-    if (createComponent === undefined) return
+    if (createComponent === undefined || !canCreate) return
     showPopup(createComponent, { ...createComponentProps, space }, 'top')
   }
 </script>
 
 <Header
   adaptive={modes !== undefined ? 'doubleRow' : filterVisible ? 'freezeActions' : 'disabled'}
-  hideActions={!(createLabel && createComponent) &&
-    createButton === undefined &&
+  hideActions={!(canCreate && createLabel && createComponent) &&
+    (!canCreate || createButton === undefined) &&
     (viewletActions == null || viewletActions.length === 0)}
   hideExtra={modes === undefined}
   freezeBefore
@@ -178,7 +188,7 @@
         />
       {/each}
     {/if}
-    {#if createLabel && createComponent}
+    {#if canCreate && createLabel && createComponent}
       <Button
         icon={IconAdd}
         label={createLabel}
@@ -189,7 +199,7 @@
           showCreateDialog()
         }}
       />
-    {:else if createButton !== undefined}
+    {:else if canCreate && createButton !== undefined}
       <Component
         is={createButton}
         props={{
@@ -229,7 +239,7 @@
         viewlet,
         viewOptions,
         viewOptionsConfig: viewlet.viewOptions?.other,
-        createItemDialog: createComponent,
+        createItemDialog: canCreate ? createComponent : undefined,
         createItemLabel: createLabel,
         query: resultQuery,
         totalQuery: query,
@@ -249,7 +259,7 @@
         viewlet,
         viewOptions,
         viewOptionsConfig: viewlet.viewOptions?.other,
-        createItemDialog: createComponent,
+        createItemDialog: canCreate ? createComponent : undefined,
         createItemLabel: createLabel,
         query: resultQuery,
         totalQuery: query,

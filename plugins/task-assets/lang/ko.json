@@ -97,5 +97,9 @@
         "UpdateTasksStatusRequest": "이 상태는 작업 {total}개에서 사용 중이며, 모두 업데이트해야 합니다. 승인해 주세요.",
         "TaskTypes": "작업 유형",
         "Collections": "컬렉션"
+    ,
+      "AllowedParents": "Allowed parents",
+      "ParentTypeRestrictions": "Parent type restrictions",
+      "StatusCategory": "Status category"
     }
 }

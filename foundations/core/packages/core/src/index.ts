@@ -15,7 +15,6 @@
 import core from './component'
 
 export * from './classes'
-export * from './autoJoinRoles'
 export * from './client'
 export * from './collaboration'
 export {
@@ -35,6 +34,7 @@ export * from './operator'
 export * from './query'
 export * from './server'
 export * from './storage'
+export * from './search'
 export * from './tx'
 export * from './utils'
 export * from './backup'

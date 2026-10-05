@@ -78,6 +78,7 @@
     "@hcengineering/core": "workspace:^0.7.426",
     "@hcengineering/controlled-documents": "workspace:^0.7.426",
     "@hcengineering/document": "workspace:^0.7.426",
+    "@hcengineering/drive": "workspace:^0.7.426",
     "@hcengineering/elastic": "workspace:^0.7.426",
     "@hcengineering/lead": "workspace:^0.7.426",
     "@hcengineering/minio": "workspace:^0.7.426",

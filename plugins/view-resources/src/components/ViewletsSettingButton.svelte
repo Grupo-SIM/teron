@@ -15,13 +15,11 @@
 <script lang="ts">
   import core, { DocumentQuery, WithLookup } from '@hcengineering/core'
   import { createQuery } from '@hcengineering/presentation'
-  import { ButtonIcon, showPopup, closeTooltip } from '@hcengineering/ui'
   import { ViewOptions, Viewlet, ViewletPreference } from '@hcengineering/view'
   import { createEventDispatcher } from 'svelte'
   import view from '../plugin'
   import { getViewOptions, viewOptionStore } from '../viewOptions'
   import ViewOptionsButton from './ViewOptionsButton.svelte'
-  import ViewletSetting from './ViewletSetting.svelte'
   import { restrictionStore } from '../utils'
 
   export let viewletQuery: DocumentQuery<Viewlet> = {}
@@ -35,17 +33,6 @@
   export let disabled: boolean = false
 
   const dispatch = createEventDispatcher()
-
-  let btn: HTMLButtonElement
-  let pressed: boolean = false
-
-  function clickHandler (event: MouseEvent) {
-    pressed = true
-    closeTooltip()
-    showPopup(ViewletSetting, { viewlet }, btn, () => {
-      pressed = false
-    })
-  }
 
   $: viewOptions = getViewOptions(viewlet, $viewOptionStore)
 
@@ -93,16 +80,5 @@
     {#if viewOptions}
       <ViewOptionsButton {viewlet} {kind} {viewOptions} {disabled} />
     {/if}
-    <ButtonIcon
-      icon={view.icon.Configure}
-      {kind}
-      size={'small'}
-      iconSize={'small'}
-      {disabled}
-      {pressed}
-      tooltip={{ label: view.string.CustomizeView, direction: 'bottom' }}
-      bind:element={btn}
-      on:click={clickHandler}
-    />
   </div>
 {/if}

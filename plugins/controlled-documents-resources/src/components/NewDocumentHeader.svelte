@@ -13,6 +13,7 @@
 // limitations under the License.
 -->
 <script lang="ts">
+  import { AccountRole, getCurrentAccount, hasAccountRole } from '@hcengineering/core'
   import { Button, ButtonWithDropdown, IconAdd, IconDropdown, SelectPopupValueType, showPopup } from '@hcengineering/ui'
   import { checkMyPermission, permissionsStore } from '@hcengineering/contact-resources'
 
@@ -62,6 +63,7 @@
   }
 </script>
 
+{#if hasAccountRole(getCurrentAccount(), AccountRole.Maintainer)}
 <div class="antiNav-subheader">
   {#if dropdownItems.length > 0}
     <ButtonWithDropdown
@@ -87,3 +89,4 @@
     />
   {/if}
 </div>
+{/if}

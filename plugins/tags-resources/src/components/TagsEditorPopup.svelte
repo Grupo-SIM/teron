@@ -26,7 +26,7 @@
 
   let selected: Ref<TagElement>[] = []
   const query = createQuery()
-  $: query.query(tags.class.TagReference, { attachedTo: object._id }, (result) => {
+  $: query.query(tags.class.TagReference, { attachedTo: object._id, collection: 'labels' }, (result) => {
     selected = result.map(({ tag }) => tag)
   })
   const client = getClient()
@@ -50,10 +50,15 @@
   }
 
   async function removeTag (tag: TagElement): Promise<void> {
-    const tagRef = await client.findOne(tags.class.TagReference, { tag: tag._id, attachedTo: object._id })
+    const tagRef = await client.findOne(tags.class.TagReference, {
+      tag: tag._id,
+      attachedTo: object._id,
+      collection: 'labels'
+    })
     if (tagRef) {
       await client.remove(tagRef)
-      selected.splice(selected.indexOf(tag._id), 1)
+      const selectedIndex = selected.indexOf(tag._id)
+      if (selectedIndex !== -1) selected.splice(selectedIndex, 1)
       const id = await getObjectId(object, hierarchy)
       Analytics.handleEvent(TagsEvents.TagRemoved, { objectId: id, objectClass: object._class })
     }

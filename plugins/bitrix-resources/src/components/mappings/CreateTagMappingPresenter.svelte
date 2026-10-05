@@ -1,6 +1,6 @@
 <script lang="ts">
   import { BitrixEntityMapping, BitrixFieldMapping, CreateTagOperation } from '@hcengineering/bitrix'
-  import { getEmbeddedLabel } from '@hcengineering/platform'
+  import bitrix from '../../plugin'
   import tags from '@hcengineering/tags'
   import { Button } from '@hcengineering/ui'
 
@@ -10,7 +10,7 @@
   $: op = value.operation as CreateTagOperation
 
   const tagLevel = [tags.icon.Level1, tags.icon.Level2, tags.icon.Level3]
-  const labels = [getEmbeddedLabel('Initial'), getEmbeddedLabel('Meaningfull'), getEmbeddedLabel('Expert')]
+  const labels = [bitrix.string.Initial, bitrix.string.Meaningful, bitrix.string.Expert]
 </script>
 
 <div class="flex flex-wrap">

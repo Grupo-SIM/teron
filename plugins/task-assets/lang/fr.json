@@ -97,5 +97,9 @@
     "UpdateTasksStatusRequest": "Le statut est utilisé avec {total} tâches, cela nécessitera la mise à jour de toutes. Veuillez approuver.",
     "TaskTypes": "Types de tâches",
     "Collections": "Collections"
+  ,
+    "AllowedParents": "Allowed parents",
+    "ParentTypeRestrictions": "Parent type restrictions",
+    "StatusCategory": "Status category"
   }
 }

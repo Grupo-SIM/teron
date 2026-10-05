@@ -78,8 +78,6 @@
     <div class="mt-2">
       <Html value={label} />
     </div>
-
-    <img class="image" src={getMetadata(calendar.image.Permissions)} alt="" />
   </div>
   <div class="footer">
     <Button label={calendar.string.Connect} kind={'primary'} disabled={connecting} on:click={sendRequest} />
@@ -125,12 +123,6 @@
       color: var(--theme-content-color);
       margin: 0 1.75rem;
       padding-bottom: 0.5rem;
-    }
-
-    .image {
-      width: 100%;
-      height: auto;
-      margin-top: 2rem;
     }
 
     .footer {

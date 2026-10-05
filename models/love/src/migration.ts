@@ -47,7 +47,7 @@ async function createDefaultFloor (tx: TxOperations): Promise<void> {
       love.class.Floor,
       core.space.Workspace,
       {
-        name: 'Main'
+        name: 'Principal'
       },
       love.ids.MainFloor
     )
@@ -62,11 +62,7 @@ async function createRooms (client: MigrationUpgradeClient): Promise<void> {
   }
   const employees = await client.findAll(contact.mixin.Employee, { active: true })
 
-  const data = createDefaultRooms(
-    employees.map((p) => p._id),
-    true,
-    true
-  )
+  const data = createDefaultRooms(employees.map((p) => p._id), true)
   for (const room of data) {
     const _class = isOffice(room) ? love.class.Office : love.class.Room
     await tx.createDoc(_class, core.space.Workspace, room, room._id)
@@ -83,7 +79,7 @@ async function createReception (client: MigrationUpgradeClient): Promise<void> {
     love.class.Room,
     core.space.Workspace,
     {
-      name: 'Reception',
+      name: 'Recepção',
       type: RoomType.Reception,
       access: RoomAccess.Open,
       floor: '' as Ref<Floor>,
@@ -92,7 +88,6 @@ async function createReception (client: MigrationUpgradeClient): Promise<void> {
       x: 0,
       y: 0,
       language: 'en',
-      startWithTranscription: false,
       startWithRecording: false,
       description: null
     },
@@ -126,21 +121,6 @@ export const loveOperation: MigrateOperation = {
           )
           await client.update(
             DOMAIN_LOVE,
-            { _class: love.class.Room, type: RoomType.Video, startWithTranscription: { $exists: false } },
-            { startWithTranscription: true }
-          )
-          await client.update(
-            DOMAIN_LOVE,
-            { _class: love.class.Room, startWithTranscription: { $exists: false } },
-            { startWithTranscription: false }
-          )
-          await client.update(
-            DOMAIN_LOVE,
-            { _class: love.class.Office, startWithTranscription: { $exists: false } },
-            { startWithTranscription: false }
-          )
-          await client.update(
-            DOMAIN_LOVE,
             { _class: love.class.Room, type: RoomType.Video, startWithRecording: { $exists: false } },
             { startWithRecording: true }
           )
@@ -154,6 +134,15 @@ export const loveOperation: MigrateOperation = {
             { _class: love.class.Office, startWithRecording: { $exists: false } },
             { startWithRecording: false }
           )
+        }
+      },
+      {
+        state: 'remove-call-transcription',
+        mode: 'upgrade',
+        func: async (client: MigrationClient) => {
+          await client.update(DOMAIN_LOVE, { _class: love.class.Room }, { $unset: { startWithTranscription: true } })
+          await client.update(DOMAIN_LOVE, { _class: love.class.Office }, { $unset: { startWithTranscription: true } })
+          await client.update(DOMAIN_LOVE, { _class: love.class.MeetingMinutes }, { $unset: { transcription: true } })
         }
       },
       {
@@ -178,6 +167,24 @@ export const loveOperation: MigrateOperation = {
         state: 'meeting-minutes-reindex-v1',
         func: async (client) => {
           await client.reindex(DOMAIN_MEETING_MINUTES, [love.class.MeetingMinutes])
+        }
+      },
+      {
+        state: 'translate-default-rooms-v1',
+        mode: 'upgrade',
+        func: async (client) => {
+          const names = new Map([
+            ['All hands', 'Reunião geral'],
+            ['Meeting Room 1', 'Sala de reunião 1'],
+            ['Meeting Room 2', 'Sala de reunião 2'],
+            ['Voice Room 1', 'Sala de áudio 1'],
+            ['Voice Room 2', 'Sala de áudio 2'],
+            ['Reception', 'Recepção']
+          ])
+          for (const [name, translated] of names) {
+            await client.update(DOMAIN_LOVE, { _class: love.class.Room, name }, { name: translated })
+          }
+          await client.update(DOMAIN_LOVE, { _class: love.class.Floor, name: 'Main' }, { name: 'Principal' })
         }
       }
     ])
@@ -209,8 +216,8 @@ export const loveOperation: MigrateOperation = {
             client,
             love.space.Drive,
             {
-              name: 'Records',
-              description: 'Office records',
+              name: 'Gravações',
+              description: 'Gravações do escritório',
               type: drive.spaceType.DefaultDrive,
               autoJoin: true
             },

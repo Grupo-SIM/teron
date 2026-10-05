@@ -21,8 +21,7 @@
     Ref,
     RolesAssignment,
     getCurrentAccount,
-    notEmpty,
-    setWorkspaceGuestAutoJoinRoles
+    notEmpty
   } from '@hcengineering/core'
   import presentation, { Card, getClient } from '@hcengineering/presentation'
   import { EditBox, Label, Toggle } from '@hcengineering/ui'
@@ -32,7 +31,6 @@
   import card from '../../plugin'
   import TypesSelector from './TypesSelector.svelte'
   import view from '@hcengineering/view'
-  import { deepEqual } from 'fast-equals'
 
   export let space: CardSpace | undefined = undefined
 
@@ -109,16 +107,6 @@
     }
   }
 
-  function normalizeAutoJoinForRoles (roles: AccountRole[]): AccountRole[] | undefined {
-    return roles.length > 0 ? [...roles] : undefined
-  }
-
-  let autoJoinForRoles: AccountRole[] = space?.autoJoinForRoles != null ? hierarchy.clone(space.autoJoinForRoles) : []
-
-  function setGuestAutoJoin (enabled: boolean): void {
-    autoJoinForRoles = setWorkspaceGuestAutoJoinRoles(autoJoinForRoles, enabled)
-  }
-
   function getData (): Data<CardSpace> {
     return {
       name,
@@ -127,7 +115,6 @@
       members,
       owners,
       autoJoin,
-      autoJoinForRoles: normalizeAutoJoinForRoles(autoJoinForRoles),
       archived: false,
       type: card.spaceType.SpaceType,
       types,
@@ -263,7 +250,6 @@
       </div>
       <AccountArrayEditor
         value={members}
-        allowGuests
         label={core.string.Members}
         onChange={handleMembersChanged}
         kind={'regular'}
@@ -279,18 +265,6 @@
       <Toggle id={'space-autoJoin'} bind:on={autoJoin} />
     </div>
 
-    <div class="antiGrid-row">
-      <div class="antiGrid-row__header withDesciption">
-        <Label label={core.string.AutoJoinGuests} />
-        <span><Label label={core.string.AutoJoinGuestsDescr} /></span>
-      </div>
-      <Toggle
-        on={autoJoinForRoles.includes(AccountRole.Guest)}
-        on:change={(ev) => {
-          setGuestAutoJoin(ev.detail)
-        }}
-      />
-    </div>
 
     <div class="antiGrid-row">
       <div class="antiGrid-row__header withDesciption">

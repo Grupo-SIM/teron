@@ -48,6 +48,7 @@ export type QuerySelector<T> = {
   $lt?: T extends number ? number : never
   $lte?: T extends number ? number : never
   $exists?: boolean
+  $contains?: string
   $like?: string
   $regex?: string
   $options?: string
@@ -66,6 +67,8 @@ export type DocumentQuery<T extends Doc> = {
   [P in keyof T]?: ObjQueryType<T[P]>
 } & {
   $search?: string
+  $and?: DocumentQuery<T>[]
+  $or?: DocumentQuery<T>[]
   // support nested queries e.g. 'user.friends.name'
   // this will mark all unrecognized properties as any (including nested queries)
   [key: string]: any
@@ -239,6 +242,8 @@ export interface TxResult {}
  */
 export interface SearchQuery {
   query: string
+  /** Server privacy exclusions applied before ranking, limits and totals. */
+  excludeDocIds?: Ref<Doc>[]
   classes?: Ref<Class<Doc>>[]
   spaces?: Ref<Space>[]
 }

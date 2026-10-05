@@ -122,6 +122,12 @@
     "SwapFirstAndLastNames": "Permuter le prénom et le nom",
     "ForbidCreateVacancyPermission": "Interdire la création de poste vacant",
     "ForbidCreateVacancyPermissionDescription": "Interdit aux utilisateurs de créer de nouveaux postes vacants"
+  ,
+    "Analyse": "Analyze",
+    "ExportExpertSkills": "Export expert skills",
+    "ExportPlan": "Export plan",
+    "Optimize": "Optimize",
+    "SkillsOptimizer": "Skills optimizer"
   },
   "status": {
     "ApplicationExists": "La candidature existe déjà",

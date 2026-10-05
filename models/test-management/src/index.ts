@@ -207,20 +207,6 @@ export function createModel (builder: Builder): void {
     core.space.Model,
     {
       application: testManagement.app.TestManagement,
-      role: AccountRole.Guest,
-      permissions: [],
-      spaceClass: testManagement.class.TestProject,
-      enabled: false,
-      order: 70
-    },
-    testManagement.ids.ModulePermissionGroup
-  )
-
-  builder.createDoc(
-    core.class.ModulePermissionGroup,
-    core.space.Model,
-    {
-      application: testManagement.app.TestManagement,
       role: AccountRole.ReadOnlyGuest,
       permissions: [],
       spaceClass: testManagement.class.TestProject,

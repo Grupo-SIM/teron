@@ -1,12 +1,13 @@
 <script lang="ts">
   import contact from '@hcengineering/contact'
   import { groupByArray, systemAccountUuid } from '@hcengineering/core'
-  import { getEmbeddedLabel, getMetadata } from '@hcengineering/platform'
+  import { getMetadata } from '@hcengineering/platform'
   import presentation, { isAdminUser, type OverviewStatistics } from '@hcengineering/presentation'
-  import { Button, CheckBox, ticker, Expandable } from '@hcengineering/ui'
+  import { Button, CheckBox, ticker, Expandable, Label } from '@hcengineering/ui'
   import { FixedColumn, ObjectPresenter } from '@hcengineering/view-resources'
   import { employeeByPersonIdStore } from '@hcengineering/contact-resources'
   import { workspacesStore } from '../utils'
+  import workbench from '../plugin'
 
   const token: string = getMetadata(presentation.metadata.Token) ?? ''
   const endpoint = getMetadata(presentation.metadata.StatsUrl)
@@ -36,15 +37,18 @@
 
 <div class="p-6">
   <div class="flex-row-center">
-    Uniq users: {data?.usersTotal} of {data?.connectionsTotal} connections
+    <Label
+      label={workbench.string.UniqueUsers}
+      params={{ users: data?.usersTotal ?? 0, connections: data?.connectionsTotal ?? 0 }}
+    />
   </div>
   <div class="flex-row-center">
     <CheckBox bind:checked={realUsers} />
-    <div class="ml-1">Show only users</div>
+    <div class="ml-1"><Label label={workbench.string.ShowOnlyUsers} /></div>
   </div>
   <div class="flex-row-center">
     <CheckBox bind:checked={showActive5} />
-    <div class="ml-1">Show active in 5mins</div>
+    <div class="ml-1"><Label label={workbench.string.ShowActiveFiveMinutes} /></div>
   </div>
 </div>
 <div class="flex-column p-3 h-full" style:overflow="auto">
@@ -55,22 +59,33 @@
         <div class="flex-row-center p-1">
           <FixedColumn key="service">
             <span class="p-1">
-              Service: {s}
+              <Label label={workbench.string.ServiceName} params={{ service: s }} />
             </span>
           </FixedColumn>
           <span class="p-1">
-            Workspaces: {ss.length}
+            <Label label={workbench.string.WorkspacesCount} params={{ count: ss.length }} />
           </span>
 
           <span class="p-1">
-            Connections: {ss.reduce((it, itm) => it + itm.sessions.length, 0)}
+            <Label
+              label={workbench.string.ConnectionsCount}
+              params={{ count: ss.reduce((it, itm) => it + itm.sessions.length, 0) }}
+            />
           </span>
           <span class="p-1">
-            Users: {ss.reduce((it, itm) => it + itm.sessions.filter((it) => !isSystemAccount(it.userId)).length, 0)}
+            <Label
+              label={workbench.string.UsersCount}
+              params={{ count: ss.reduce((it, itm) => it + itm.sessions.filter((it) => !isSystemAccount(it.userId)).length, 0) }}
+            />
           </span>
           <span class="p-1">
-            Active {ss.reduce((it, itm) => it + itm.sessions.filter((it) => it.current.tx > 0).length, 0)} /
-            {ss.reduce((it, itm) => it + itm.sessions.filter((it) => it.mins5.tx > 0 || it.current.tx > 0).length, 0)}
+            <Label
+              label={workbench.string.ActiveConnections}
+              params={{
+                current: ss.reduce((it, itm) => it + itm.sessions.filter((it) => it.current.tx > 0).length, 0),
+                recent: ss.reduce((it, itm) => it + itm.sessions.filter((it) => it.mins5.tx > 0 || it.current.tx > 0).length, 0)
+              }}
+            />
           </span>
         </div>
       </svelte:fragment>
@@ -94,12 +109,21 @@
                 <svelte:fragment slot="title">
                   <div class="flex flex-row-center flex-between flex-grow p-1">
                     <div class="fs-title" class:greyed={realGroup.length === 0}>
-                      Workspace: {wsInstance?.name ?? act.wsId}: {employeeGroups.length} current 5 mins => {currentFind}/{currentTx},
-                      total => {totalFind}/{totalTx}
+                      <Label
+                        label={workbench.string.WorkspaceConnectionSummary}
+                        params={{
+                          workspace: wsInstance?.name ?? act.wsId,
+                          users: employeeGroups.length,
+                          currentFind,
+                          currentTx,
+                          totalFind,
+                          totalTx
+                        }}
+                      />
                     </div>
                     {#if isAdminUser()}
                       <Button
-                        label={getEmbeddedLabel('Force close')}
+                        label={workbench.string.ForceClose}
                         size={'small'}
                         kind={'ghost'}
                         on:click={() => {
@@ -145,13 +169,22 @@
                             #{i}
                             {user.userId}
                             <div class="p-1">
-                              Total: {user.total.find} rx/{user.total.tx} tx
+                              <Label
+                                label={workbench.string.TotalTransactions}
+                                params={{ find: user.total.find, transactions: user.total.tx }}
+                              />
                             </div>
                             <div class="p-1">
-                              Previous 5 mins: {user.mins5.find} rx/{user.mins5.tx} tx
+                              <Label
+                                label={workbench.string.PreviousFiveMinutesTransactions}
+                                params={{ find: user.mins5.find, transactions: user.mins5.tx }}
+                              />
                             </div>
                             <div class="p-1">
-                              Current 5 mins: {user.current.find} tx/{user.current.tx} tx
+                              <Label
+                                label={workbench.string.CurrentFiveMinutesTransactions}
+                                params={{ find: user.current.find, transactions: user.current.tx }}
+                              />
                             </div>
                           </div>
                           <div class="p-1 flex-col ml-10">

@@ -53,7 +53,6 @@
   import EventTimeExtraButton from './EventTimeExtraButton.svelte'
   import LocationEditor from './LocationEditor.svelte'
   import ReccurancePopup from './ReccurancePopup.svelte'
-  import VisibilityEditor from './VisibilityEditor.svelte'
 
   const acc = getCurrentAccount()
   const currentUser = getCurrentEmployee()
@@ -83,7 +82,7 @@
   let reminders = [30 * 60 * 1000]
 
   let description: Markup = EmptyMarkup
-  let visibility: Visibility = 'private'
+  const visibility: Visibility = 'private'
   let _calendar: Ref<Calendar> | undefined = undefined
 
   const spaceQ = createQuery()
@@ -133,7 +132,7 @@
           visibility,
           title,
           location,
-          blockTime: !allDay,
+          blockTime: true,
           allDay,
           access: AccessLevel.Owner,
           originalStartTime: allDay ? saveUTC(date) : date,
@@ -161,7 +160,7 @@
           reminders,
           title,
           location,
-          blockTime: !allDay,
+          blockTime: true,
           allDay,
           timeZone,
           access: AccessLevel.Owner,
@@ -256,11 +255,7 @@
       />
     </div>
     <div class="block rightCropPadding">
-      <CalendarSelector bind:value={_calendar} focusIndex={10101} />
-      <div class="flex-row-center flex-gap-1">
-        <Icon icon={calendar.icon.Hidden} size={'small'} />
-        <VisibilityEditor bind:value={visibility} kind="inline" size="medium" focusIndex={10102} withoutIcon />
-      </div>
+      <CalendarSelector bind:value={_calendar} focusIndex={10101} showSelector={false} />
       <EventReminders bind:reminders focusIndex={10103} />
     </div>
   </Scroller>

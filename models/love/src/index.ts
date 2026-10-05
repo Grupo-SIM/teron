@@ -113,9 +113,6 @@ export class TRoom extends TDoc implements Room {
   @Hidden()
     language!: RoomLanguage
 
-  @Prop(TypeBoolean(), love.string.StartWithTranscription)
-    startWithTranscription!: boolean
-
   @Prop(TypeBoolean(), love.string.StartWithRecording)
     startWithRecording!: boolean
 
@@ -140,6 +137,7 @@ export class TOffice extends TRoom implements Office {
 
 @Model(love.class.Floor, core.class.Doc, DOMAIN_LOVE)
 export class TFloor extends TDoc implements Floor {
+  sortOrder?: number
   name!: string
 }
 
@@ -212,9 +210,6 @@ export class TMeetingMinutes extends TAttachedDoc implements MeetingMinutes, Tod
   @Prop(Collection(attachment.class.Attachment), attachment.string.Attachments, { shortLabel: attachment.string.Files })
     attachments?: number
 
-  @Prop(PropCollection(chunter.class.ChatMessage), love.string.Transcription)
-    transcription?: number
-
   @Prop(PropCollection(chunter.class.ChatMessage), activity.string.Messages)
     messages?: number
 
@@ -271,7 +266,7 @@ export function createModel (builder: Builder): void {
     core.space.Model,
     {
       application: love.app.Love,
-      role: AccountRole.Guest,
+    role: AccountRole.User,
       permissions: [],
       enabled: true,
       order: 50
@@ -368,7 +363,7 @@ export function createModel (builder: Builder): void {
       icon: love.icon.Love,
       component: love.component.Settings,
       group: 'settings-account',
-      role: AccountRole.Guest,
+      role: AccountRole.User,
       feature: 'love',
       order: 1600
     },
@@ -481,11 +476,6 @@ export function createModel (builder: Builder): void {
     components: { input: { component: chunter.component.ChatMessageInput, props: { collection: 'messages' } } }
   })
 
-  builder.mixin(love.class.ParticipantInfo, core.class.Class, core.mixin.TxAccessLevel, {
-    createAccessLevel: AccountRole.Guest,
-    updateAccessLevel: AccountRole.Guest
-  })
-
   builder.mixin(love.class.MeetingMinutes, core.class.Class, activity.mixin.ActivityDoc, {})
 
   builder.mixin(love.class.Room, core.class.Class, activity.mixin.ActivityDoc, {})
@@ -528,7 +518,6 @@ export function createModel (builder: Builder): void {
         '',
         { key: 'status', presenter: love.component.MeetingMinutesStatusPresenter, label: love.string.Status },
         { key: 'messages', displayProps: { key: 'messages', suffix: true } },
-        { key: 'transcription', displayProps: { key: 'transcription', suffix: true } },
         'createdOn',
         'meetingEnd'
       ],
@@ -551,7 +540,6 @@ export function createModel (builder: Builder): void {
         '',
         { key: 'status', presenter: love.component.MeetingMinutesStatusPresenter, label: love.string.Status },
         { key: 'messages', displayProps: { key: 'messages', suffix: true } },
-        { key: 'transcription', displayProps: { key: 'transcription', suffix: true } },
         'createdOn',
         'meetingEnd'
       ],

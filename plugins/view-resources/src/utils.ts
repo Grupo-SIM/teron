@@ -14,9 +14,11 @@
 // limitations under the License.
 //
 
+import { canDeleteWorkspaceFolder } from './folder-role-policy'
 import { Analytics } from '@hcengineering/analytics'
 import core, {
   AccountRole,
+  hasAccountRole,
   ClassifierKind,
   DocManager,
   Hierarchy,
@@ -319,7 +321,8 @@ export function findAttributePresenter (
 
   const attribute = hierarchy.findAttribute(_class, key)
   if (attribute === undefined) return
-  const { attrClass, category } = getAttributePresenterClass(hierarchy, attribute.type)
+  const { attrClass, category: attributeCategory } = getAttributePresenterClass(hierarchy, attribute.type)
+  const category = _category ?? attributeCategory
   let overridedPresenter = model.findAllSync(view.class.AttrPresenter, {
     objectClass: _class,
     attribute: attribute._id,
@@ -353,6 +356,14 @@ export function findAttributePresenter (
     const typeAny = attribute.type as TypeAny
     return typeAny.presenter
   }
+}
+
+export function getTableAttributeLabel (attribute: AnyAttribute, hierarchy: Hierarchy): IntlString {
+  if (hierarchy.isDerived(attribute.attributeOf, contact.class.Person)) {
+    if (attribute.name === 'onsiteDaysPerWeek') return contact.string.OnsiteDaysPerWeekShort
+    if (attribute.name === 'remoteDaysPerWeek') return contact.string.RemoteDaysPerWeekShort
+  }
+  return attribute.shortLabel ?? attribute.label
 }
 
 export async function getAttributePresenter (
@@ -400,7 +411,7 @@ export async function getAttributePresenter (
     key: preserveKey.key,
     sortingKey,
     _class: attrClass,
-    label: preserveKey.label ?? attribute.shortLabel ?? attribute.label,
+    label: preserveKey.label ?? getTableAttributeLabel(attribute, hierarchy),
     presenter: await getResource(presenterRef),
     props: preserveKey.props,
     displayProps: preserveKey.displayProps,
@@ -729,7 +740,7 @@ async function getRelationPresenter (client: Client, key: BuildModelKey): Promis
 export async function deleteObject (client: TxOperations, object: Doc): Promise<void> {
   const currentAcc = getCurrentAccount()
   const socialStrings = new Set(await getAllSocialStringsByPersonRef(client, getCurrentEmployee()))
-  if (currentAcc.role !== AccountRole.Owner && !socialStrings.has(object.createdBy as PersonId)) return
+  if (!hasAccountRole(currentAcc, AccountRole.Maintainer) && !canDeleteWorkspaceFolder(currentAcc, client.getHierarchy().getAncestors(object._class)) && !socialStrings.has(object.createdBy as PersonId)) return
   if (client.getHierarchy().isDerived(object._class, core.class.AttachedDoc)) {
     const adoc = object as AttachedDoc
     await client
@@ -756,15 +767,15 @@ export async function deleteObjects (client: TxOperations, objects: Doc[], skipC
     const adminUser = isAdminUser()
     for (const [cl, docs] of byClass.entries()) {
       const realDocs = await client.findAll(cl, { _id: { $in: docs.map((it: Doc) => it._id) } })
-      const notAllowed = realDocs.filter((p) => !socialStrings.has(p.createdBy as PersonId))
+      const notAllowed = realDocs.filter((p) => !socialStrings.has(p.createdBy as PersonId) && !canDeleteWorkspaceFolder(currentAcc, client.getHierarchy().getAncestors(p._class)))
 
       if (notAllowed.length > 0) {
         console.error('You are not allowed to delete this object', notAllowed)
       }
-      if (currentAcc.role === AccountRole.Owner || adminUser) {
+      if (hasAccountRole(currentAcc, AccountRole.Maintainer) || adminUser) {
         realObjects.push(...realDocs)
       } else {
-        realObjects.push(...realDocs.filter((p) => socialStrings.has(p.createdBy as PersonId)))
+        realObjects.push(...realDocs.filter((p) => socialStrings.has(p.createdBy as PersonId) || canDeleteWorkspaceFolder(currentAcc, client.getHierarchy().getAncestors(p._class))))
       }
     }
   } else {
@@ -1838,7 +1849,6 @@ function getAttrEditor (key: KeyedAttribute, hierarchy: Hierarchy): AnyComponent
   }
 }
 
-export const allowGuestSignUpStore = writable<boolean>(false)
 export const accessDeniedStore = writable<boolean>(false)
 
 const spaceSpaceQuery = createQuery(true)

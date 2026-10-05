@@ -125,6 +125,12 @@
     "SwapFirstAndLastNames": "Поменять местами имя и фамилию",
     "ForbidCreateVacancyPermission": "Запретить создание вакансии",
     "ForbidCreateVacancyPermissionDescription": "Запрещает пользователям создавать новые вакансии"
+  ,
+    "Analyse": "Analyze",
+    "ExportExpertSkills": "Export expert skills",
+    "ExportPlan": "Export plan",
+    "Optimize": "Optimize",
+    "SkillsOptimizer": "Skills optimizer"
   },
   "status": {
     "ApplicationExists": "Кандидат уже существует",

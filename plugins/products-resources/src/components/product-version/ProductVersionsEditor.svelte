@@ -13,6 +13,7 @@
 // limitations under the License.
 -->
 <script lang="ts">
+  import { AccountRole, getCurrentAccount, hasAccountRole } from '@hcengineering/core'
   import { Product } from '@hcengineering/products'
   import { type Ref } from '@hcengineering/core'
   import { createQuery } from '@hcengineering/presentation'
@@ -55,12 +56,14 @@
   <svelte:fragment slot="header">
     {#if !readonly}
       <div class="buttons-group xsmall-gap">
-        <Button
-          id={products.string.CreateProductVersion}
-          icon={IconAdd}
-          kind={'ghost'}
-          on:click={createProductVersion}
-        />
+        {#if hasAccountRole(getCurrentAccount(), AccountRole.Maintainer)}
+          <Button
+            id={products.string.CreateProductVersion}
+            icon={IconAdd}
+            kind={'ghost'}
+            on:click={createProductVersion}
+          />
+        {/if}
       </div>
     {/if}
   </svelte:fragment>

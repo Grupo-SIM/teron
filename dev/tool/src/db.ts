@@ -1546,7 +1546,7 @@ async function migrateWorkspace (
 
     if (!dryRun) {
       // Actual roles are being set in workspace migration
-      await accountDB.assignWorkspace(accountUuid, workspaceUuid, AccountRole.Guest)
+      await accountDB.assignWorkspace(accountUuid, workspaceUuid, AccountRole.User)
     } else {
       console.log('Assigning account', member, accountUuid, 'to workspace', workspaceUuid)
     }

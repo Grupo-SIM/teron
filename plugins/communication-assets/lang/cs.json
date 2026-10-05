@@ -94,5 +94,8 @@
     "WriteMessageEllipsis": "Napište zprávu...",
     "EditMessageEllipsis": "Upravit zprávu...",
     "ArrowDownMessages": "↓ Poslední zprávy"
+  ,
+    "Attachments": "Attachments",
+    "Title": "Title"
   }
 }

@@ -1,17 +1,12 @@
 <script lang="ts">
-  import { openAuthRoute } from '@hcengineering/login'
   import { getMetadata } from '@hcengineering/platform'
   import { Button, Notification, NotificationToast } from '@hcengineering/ui'
   import view from '@hcengineering/view'
-  import presentation, { getCurrentWorkspaceUrl } from '@hcengineering/presentation'
-  import { allowGuestSignUpStore } from '../utils'
+  import presentation from '@hcengineering/presentation'
 
   export let onRemove: () => void
   export let notification: Notification
 
-  function joinWorkspace (e: MouseEvent): void {
-    openAuthRoute('join', { workspace: getCurrentWorkspaceUrl() })
-  }
 </script>
 
 <NotificationToast title={notification.title} severity={notification.severity} onClose={onRemove}>
@@ -21,9 +16,6 @@
   <svelte:fragment slot="buttons">
     <div style="width: auto" />
     <div class="flex-between gap-2">
-      {#if $allowGuestSignUpStore}
-        <Button label={view.string.ReadOnlyJoinWorkspace} stopPropagation={false} on:click={joinWorkspace} />
-      {/if}
       <a href={getMetadata(presentation.metadata.SignupUrl)} target="_blank">
         <Button label={view.string.ReadOnlySignUp} stopPropagation={false} kind="primary" />
       </a>

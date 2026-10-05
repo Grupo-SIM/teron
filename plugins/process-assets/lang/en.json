@@ -184,6 +184,8 @@
     "AskSubclass": "Ask subclass",
     "AskRequired": "Ask all required fields",
     "TextFromIdentifier": "Text from identifier"
+  ,
+    "NoSlotsDefined": "No slots defined for this process"
   },
   "error": {
     "MethodNotFound": "Method not found: {methodId}",

@@ -16,16 +16,13 @@
 <script lang="ts">
   import presentation, { Card, createQuery, getClient } from '@hcengineering/presentation'
   import { Issue, Project } from '@hcengineering/tracker'
-  import { Button, EditStyle, eventToHTMLElement, IconAdd, Label, showPopup } from '@hcengineering/ui'
+  import { EditStyle, eventToHTMLElement, Label, showPopup } from '@hcengineering/ui'
   import { EditBoxPopup } from '@hcengineering/view-resources'
   import { createEventDispatcher } from 'svelte'
   import tracker from '../../../plugin'
   import IssuePresenter from '../IssuePresenter.svelte'
   import EstimationStatsPresenter from './EstimationStatsPresenter.svelte'
   import SubIssuesEstimations from './SubIssuesEstimations.svelte'
-  import TimeSpendReportPopup from './TimeSpendReportPopup.svelte'
-  import TimeSpendReports from './TimeSpendReports.svelte'
-  import TimePresenter from './TimePresenter.svelte'
 
   export let format: 'text' | 'password' | 'number'
   export let kind: EditStyle = 'search-style'
@@ -36,7 +33,6 @@
   const dispatch = createEventDispatcher()
   const client = getClient()
 
-  $: childIds = Array.from((object.childInfo ?? []).map((it) => it.childId))
 
   const query = createQuery()
 
@@ -58,7 +54,6 @@
       }
     }
   )
-  $: defaultTimeReportDay = currentProject?.defaultTimeReportDay
 </script>
 
 <!-- svelte-ignore a11y-click-events-have-key-events -->
@@ -106,10 +101,6 @@
       >
         <EstimationStatsPresenter value={object} estimation={_value} />
       </div>
-      <Label label={tracker.string.RemainingTime} />
-      <div class="ml-2 mr-4">
-        <TimePresenter value={object.remainingTime} />
-      </div>
     </div>
   </svelte:fragment>
 
@@ -121,28 +112,4 @@
     <SubIssuesEstimations issue={object} />
   {/if}
 
-  {#if currentProject}
-    <TimeSpendReports issue={object} query={{ attachedTo: { $in: [object._id, ...childIds] } }} />
-  {/if}
-  <svelte:fragment slot="buttons">
-    <Button
-      icon={IconAdd}
-      size={'large'}
-      on:click={() => {
-        showPopup(
-          TimeSpendReportPopup,
-          {
-            issue: object,
-            issueId: object._id,
-            issueClass: object._class,
-            space: object.space,
-            assignee: object.assignee,
-            defaultTimeReportDay
-          },
-          'top'
-        )
-      }}
-      label={tracker.string.TimeSpendReportAdd}
-    />
-  </svelte:fragment>
 </Card>

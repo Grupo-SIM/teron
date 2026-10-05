@@ -17,7 +17,7 @@
   import contact, { getCurrentEmployee, SocialIdentityProvider, SocialIdentityRef } from '@hcengineering/contact'
   import { EditBox, Label, Button, CodeForm, TimeLeft, Status as StatusControl } from '@hcengineering/ui'
   import { OtpInfo } from '@hcengineering/account-client'
-  import { buildSocialIdString, getCurrentAccount, setCurrentAccount, SocialId, Timestamp } from '@hcengineering/core'
+  import { buildSocialIdString, getCurrentAccount, pickPrimarySocialId, setCurrentAccount, SocialId, SocialIdType, Timestamp } from '@hcengineering/core'
   import { OK, PlatformError, Severity, Status, unknownError } from '@hcengineering/platform'
   import { getClient } from '@hcengineering/presentation'
 
@@ -29,7 +29,11 @@
   export let provider: SocialIdentityProvider
   export let onAdded: (socialId: SocialId) => void | Promise<void>
 
-  let email: string
+  const currentEmail = getCurrentAccount().fullSocialIds.find(
+    (it) => it.type === SocialIdType.EMAIL && it.isDeleted !== true && it.verifiedOn != null
+  )
+  let email: string = ''
+  let submitting = false
   let otpInfo: OtpInfo | null = null
 
   const dispatch = createEventDispatcher()
@@ -44,7 +48,8 @@
     { id: 'code-6', name: 'code-6', optional: false }
   ]
 
-  $: canSend = getCleanEmail(email) !== ''
+  $: canSend = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(getCleanEmail(email)) &&
+    getCleanEmail(email) !== getCleanEmail(currentEmail?.value) && !submitting
 
   let status: Status = OK
   let retryOn: Timestamp = 0
@@ -58,6 +63,7 @@
 
   async function sendConfirmation (): Promise<void> {
     try {
+      submitting = true
       status = OK
       otpInfo = await accountClient.addEmailSocialId(getCleanEmail(email))
       retryOn = otpInfo.retryOn
@@ -69,11 +75,13 @@
       } else {
         status = unknownError(err)
       }
+    } finally {
+      submitting = false
     }
   }
 
   async function handleSendConfirmation (): Promise<void> {
-    if (otpInfo != null) return
+    if (otpInfo != null || !canSend) return
 
     await sendConfirmation()
   }
@@ -87,14 +95,15 @@
 
   async function handleCode (event: CustomEvent): Promise<void> {
     const code = event.detail
-    if (code == null) return
+    if (code == null || submitting) return
+    submitting = true
     status = OK
 
     try {
-      const newSocialIdLoginInfo = await accountClient.validateOtp(email, code, undefined, 'verify')
+      const newSocialIdLoginInfo = await accountClient.validateOtp(getCleanEmail(email), code, undefined, 'verify')
       const currPerson = getCurrentEmployee()
       const currAcc = getCurrentAccount()
-      const socialIds = await accountClient.getSocialIds()
+      const socialIds = await accountClient.getSocialIds(true)
 
       const newSocialId = socialIds.find((it) => it._id === newSocialIdLoginInfo.socialId)
       if (newSocialId == null) {
@@ -109,13 +118,11 @@
         _id: newSocialIdLoginInfo.socialId as SocialIdentityRef
       })
       if (existing != null) {
-        // It can only exist if it were attached to an existing person and now this person was merged into the current account
-        if (existing.attachedTo !== currPerson) {
-          await client.updateDoc(contact.class.SocialIdentity, contact.space.Contacts, existing._id, {
-            attachedTo: currPerson,
-            verifiedOn: newSocialId.verifiedOn
-          })
-        }
+        await client.updateDoc(contact.class.SocialIdentity, contact.space.Contacts, existing._id, {
+          attachedTo: currPerson,
+          verifiedOn: newSocialId.verifiedOn,
+          isDeleted: false
+        })
       } else {
         await client.addCollection(
           contact.class.SocialIdentity,
@@ -134,14 +141,26 @@
         )
       }
 
+      for (const released of socialIds.filter(
+        (socialId) => socialId.type === SocialIdType.EMAIL && socialId._id !== newSocialId._id && socialId.isDeleted === true
+      )) {
+        const oldIdentity = await client.findOne(contact.class.SocialIdentity, { _id: released._id as SocialIdentityRef })
+        if (oldIdentity !== undefined) {
+          await client.updateDoc(contact.class.SocialIdentity, contact.space.Contacts, oldIdentity._id, {
+            key: released.key,
+            value: released.value,
+            isDeleted: released.isDeleted
+          })
+        }
+      }
       setCurrentAccount({
         ...currAcc,
         fullSocialIds: socialIds,
-        socialIds: socialIds.map((si) => si._id)
+        socialIds: socialIds.map((si) => si._id),
+        primarySocialId: pickPrimarySocialId(socialIds)._id
       })
       if (onAdded != null) {
-        console.log('Callback onAdded')
-        void onAdded(newSocialId)
+        await onAdded(newSocialId)
       }
       dispatch('close')
     } catch (err: any) {
@@ -151,19 +170,30 @@
       } else {
         status = unknownError(err)
       }
+    } finally {
+      submitting = false
     }
   }
 </script>
 
-<AddSocialId {provider} on:close>
+<AddSocialId {provider} label={currentEmail != null ? setting.string.ChangeEmail : setting.string.SetEmail} on:close>
   <div class="flex-col flex-gap-2">
+    {#if currentEmail != null}
+      <Label label={setting.string.EmailReplacementHint} />
+      <div class="flex-row-center flex-gap-4">
+        <Label label={setting.string.CurrentEmail} />
+        <span>{currentEmail.value}</span>
+      </div>
+    {/if}
     <div class="flex-row-center flex-gap-4">
       <span class="newEmail"><Label label={setting.string.NewEmail} /></span>
       <EditBox
-        maxWidth="10rem"
-        placeholder={contact.string.Email}
+        maxWidth="20rem"
+        name="email"
+        autocomplete="email"
+        placeholder={setting.string.EmailPlaceholder}
         bind:value={email}
-        disabled={otpInfo != null}
+        disabled={otpInfo != null || submitting}
         focusIndex={0}
       />
 
@@ -189,7 +219,7 @@
 
         {#if canResend}
           <div class="ml-1">
-            <Button label={setting.string.SendAgain} kind="ghost" size="small" on:click={handleResend} />
+            <Button label={setting.string.SendAgain} kind="ghost" size="small" disabled={submitting} on:click={handleResend} />
           </div>
         {/if}
       </div>

@@ -36,7 +36,6 @@
   import IntegrationErrorNotification from './IntegrationErrorNotification.svelte'
   import { getAccountClient } from '../../utils'
   import { Analytics } from '@hcengineering/analytics'
-  import { IntegrationKind } from '@hcengineering/core'
 
   const typeQuery = createQuery()
 
@@ -59,7 +58,7 @@
   ]
   let mode: 'all' | 'connected' | 'available' = 'all'
 
-  typeQuery.query(setting.class.IntegrationType, { kind: { $ne: 'teron-mail' as IntegrationKind } }, (res) => {
+  typeQuery.query(setting.class.IntegrationType, { kind: 'telegram' }, (res) => {
     integrationTypes = res
   })
 

@@ -26,6 +26,7 @@ import core, {
 import { translate, type IntlString } from '@hcengineering/platform'
 import { markupToJSON } from '@hcengineering/text'
 import { markupToMarkdown } from '@hcengineering/text-markdown'
+import { getDateLocale } from '@hcengineering/ui'
 import { loadPersonNameByRef } from '../data/personLoader'
 
 export enum DocumentAttributeKey {
@@ -48,7 +49,7 @@ export function formatDateValue (
   language: string | undefined
 ): string | undefined {
   if (!isDateOnly && typeof value === 'number') {
-    return getDisplayTime(value)
+    return getDisplayTime(value, getDateLocale(language))
   }
 
   const parsedDate = value instanceof Date ? value : new Date(value)
@@ -62,7 +63,7 @@ export function formatDateValue (
     day: DateFormatOption.Numeric
   }
 
-  return parsedDate.toLocaleDateString(language ?? 'default', options)
+  return parsedDate.toLocaleDateString(getDateLocale(language), options)
 }
 
 /**

@@ -21,6 +21,7 @@ import { type ObjectSearchCategory, type ObjectSearchFactory } from '@hcengineer
 import { type NotificationGroup } from '@hcengineering/notification'
 import { type IntlString, mergeIds, type Resource } from '@hcengineering/platform'
 import { type TemplateFieldFunc } from '@hcengineering/templates'
+import { type TagCategory } from '@hcengineering/tags'
 import { type AnyComponent, type Location } from '@hcengineering/ui/src/types'
 import { type Action, type ActionCategory, type ViewAction } from '@hcengineering/view'
 import { type ChatMessageViewlet } from '@hcengineering/chunter'
@@ -111,7 +112,8 @@ export default mergeIds(contactId, contact, {
   },
   category: {
     Contact: '' as Ref<ActionCategory>,
-    Channel: '' as Ref<ActionCategory>
+    Channel: '' as Ref<ActionCategory>,
+    Function: '' as Ref<TagCategory>
   },
   ids: {
     OrganizationNotificationGroup: '' as Ref<NotificationGroup>,

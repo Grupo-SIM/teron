@@ -13,12 +13,12 @@
 // limitations under the License.
 -->
 <script lang="ts">
-  import { ButtonIcon, showPopup, closeTooltip } from '@hcengineering/ui'
   import { ViewOptionModel, ViewOptions, Viewlet, type ViewOptionsModel, BuildModelKey } from '@hcengineering/view'
-  import view from '../plugin'
   import { getViewOptions, viewOptionStore, defaultOptions } from '../viewOptions'
-  import ViewOptionsButton from './ViewOptionsButton.svelte'
+  import { ButtonIcon, IconSettings, showPopup } from '@hcengineering/ui'
+  import view from '../plugin'
   import ViewletSetting from './ViewletSetting.svelte'
+  import ViewOptionsButton from './ViewOptionsButton.svelte'
   import { restrictionStore } from '../utils'
 
   export let kind: 'primary' | 'secondary' | 'tertiary' | 'negative' = 'secondary'
@@ -29,16 +29,7 @@
   export let defaultViewOptions: ViewOptions | undefined = undefined
   export let defaultConfig: (BuildModelKey | string)[] | undefined = undefined
 
-  let btn: HTMLButtonElement
-  let pressed: boolean = false
-
-  function clickHandler () {
-    pressed = true
-    closeTooltip()
-    showPopup(ViewletSetting, { viewlet, defaultConfig }, btn, () => {
-      pressed = false
-    })
-  }
+  let columnsButton: HTMLButtonElement
 
   function getDefaults (viewOptions: ViewOptionsModel): ViewOptions {
     const res: ViewOptions = {
@@ -63,18 +54,20 @@
 </script>
 
 {#if viewlet}
-  {#if viewOptions}
-    <ViewOptionsButton {viewlet} {kind} {viewOptions} {viewOptionsConfig} />
+  {#if viewlet.configOptions?.optionalKeys !== undefined}
+    <ButtonIcon
+      icon={IconSettings}
+      {disabled}
+      {kind}
+      size={'small'}
+      hasMenu
+      tooltip={{ label: view.string.CustomizeView, direction: 'bottom' }}
+      dataId={'btn-columnSettings'}
+      bind:element={columnsButton}
+      on:click={() => showPopup(ViewletSetting, { viewlet, defaultConfig }, columnsButton)}
+    />
   {/if}
-  <ButtonIcon
-    icon={view.icon.Configure}
-    {disabled}
-    {kind}
-    size={'small'}
-    {pressed}
-    tooltip={{ label: view.string.CustomizeView, direction: 'bottom' }}
-    dataId={'btn-viewSetting'}
-    bind:element={btn}
-    on:click={clickHandler}
-  />
+  {#if viewOptions}
+    <ViewOptionsButton {viewlet} {kind} {viewOptions} {viewOptionsConfig} {disabled} />
+  {/if}
 {/if}

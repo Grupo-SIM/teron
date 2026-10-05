@@ -5,13 +5,13 @@
     BitrixFieldMapping,
     Fields,
     FindReferenceOperation,
-    MappingOperation,
-    mappingTypes
+    MappingOperation
   } from '@hcengineering/bitrix'
   import core, { AnyAttribute } from '@hcengineering/core'
   import { getClient } from '@hcengineering/presentation'
-  import { DropdownLabels, DropdownTextItem } from '@hcengineering/ui'
+  import { DropdownLabels, DropdownLabelsIntl, DropdownTextItem } from '@hcengineering/ui'
   import bitrix from '../../plugin'
+  import { localizedMappingTypes } from '../../localized-mapping-types'
 
   export let mapping: BitrixEntityMapping
   export let fields: Fields = {}
@@ -69,10 +69,10 @@
   <div class="pattern flex-row-center gap-2">
     <DropdownLabels minW0={false} label={bitrix.string.FieldMapping} {items} bind:selected={findField} />
 
-    <DropdownLabels
+    <DropdownLabelsIntl
       minW0={false}
       label={bitrix.string.FieldMapping}
-      items={[...mappingTypes, { id: '#', label: 'None' }]}
+      items={[...localizedMappingTypes, { id: '#', label: bitrix.string.None }]}
       bind:selected={referenceType}
     />
 

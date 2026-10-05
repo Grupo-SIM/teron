@@ -78,6 +78,7 @@
         "FilteredViews": "필터링된 뷰",
         "NewFilteredView": "새 필터링된 뷰",
         "FilteredViewName": "필터링된 뷰 이름",
+        "LegacyMyTasks": "내 작업",
         "Then": "다음",
         "ShowPreviewOnClick": "클릭하면 문서 인덱스 미리보기가 표시됩니다...",
         "Shown": "{total, plural, =-1 {} other {필터링된 #개 항목 중}} {len}개 결과 표시 중",

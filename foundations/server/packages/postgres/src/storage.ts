@@ -13,6 +13,8 @@
 // limitations under the License.
 //
 
+import { normalizeSearchSql } from './search'
+
 import core, {
   AccountRole,
   type AnyAttribute,
@@ -37,6 +39,7 @@ import core, {
   groupByArray,
   type Hierarchy,
   isOperator,
+  normalizeSearch,
   type Iterator,
   type Lookup,
   type MeasureContext,
@@ -342,6 +345,12 @@ abstract class PostgresAdapterBase implements DbAdapter {
     res.push(`"workspaceId" = ${vars.add(this.workspaceId, '::uuid')}`)
     for (const key in query) {
       const value = query[key]
+      if (key === '$and' || key === '$or') {
+        if (!Array.isArray(value) || value.some((branch) => branch == null || typeof branch !== 'object' || Array.isArray(branch))) throw new Error('Invalid logical query.')
+        const clauses = value.map((branch) => `(${this.buildRawQuery(vars, domain, branch, options)})`)
+        res.push(clauses.length === 0 ? (key === '$and' ? 'TRUE' : 'FALSE') : `(${clauses.join(key === '$and' ? ' AND ' : ' OR ')})`)
+        continue
+      }
       const tkey = this.transformKey(domain, core.class.Doc, key, false)
       const translated = this.translateQueryValue(vars, tkey, value, 'common')
       if (translated !== undefined) {
@@ -639,7 +648,7 @@ abstract class PostgresAdapterBase implements DbAdapter {
 
         const collabSec = getClassCollaborators(this.modelDb, this.hierarchy, _class)
         let collabRes = ''
-        if ([AccountRole.Guest, AccountRole.ReadOnlyGuest].includes(acc.role)) {
+        if (acc.role === AccountRole.ReadOnlyGuest) {
           if (collabSec?.provideSecurity === true) {
             collabRes += ` OR EXISTS (SELECT 1 FROM ${translateDomain(DOMAIN_COLLABORATOR)} collab_sec WHERE collab_sec."workspaceId" = ${vars.add(this.workspaceId, '::uuid')} AND collab_sec."attachedTo" = ${domain}._id AND collab_sec.collaborator = '${acc.uuid}')`
           }
@@ -1109,6 +1118,12 @@ abstract class PostgresAdapterBase implements DbAdapter {
       }
       const value = query[_key]
       if (value === undefined) continue
+      if (_key === '$and' || _key === '$or') {
+        if (!Array.isArray(value) || value.some((branch) => branch == null || typeof branch !== 'object' || Array.isArray(branch))) throw new Error('Invalid logical query.')
+        const clauses = value.map((branch) => `(${this.buildQuery(vars, _class, baseDomain, branch, joins, options)})`)
+        res.push(clauses.length === 0 ? (_key === '$and' ? 'TRUE' : 'FALSE') : `(${clauses.join(_key === '$and' ? ' AND ' : ' OR ')})`)
+        continue
+      }
       const key = escape(_key)
       const valueType = this.getValueType(_class, key)
       const tkey = this.getKey(_class, baseDomain, key, joins, valueType === 'dataArray')
@@ -1359,6 +1374,9 @@ abstract class PostgresAdapterBase implements DbAdapter {
             } else if (Array.isArray(val) && val.length > 0) {
               res.push(`${tlkey} != ALL(${vars.addArray(val, valType)})`)
             }
+            break
+          case '$contains':
+            res.push(`strpos(${normalizeSearchSql(tlkey)}, ${vars.add(normalizeSearch(String(val)), valType)}) > 0`)
             break
           case '$like':
             res.push(`${tlkey} ILIKE ${vars.add(val, valType)}`)

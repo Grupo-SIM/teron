@@ -72,6 +72,9 @@
     "AddRelation": "関係を追加",
     "PersonId": "人物",
     "AccountId": "アカウント",
-    "Version": "バージョン"
+    "Version": "バージョン",
+    "Body": "Body",
+    "Content": "Content",
+    "ObjectId": "Object ID"
   }
 }

@@ -13,13 +13,16 @@
 // limitations under the License.
 -->
 <script lang="ts">
-  import { tooltip } from '@hcengineering/ui'
+  import { themeStore, tooltip } from '@hcengineering/ui'
   import tracker from '../../plugin'
 
   export let value: number
 
-  $: shortModificationDate = new Date(value).toLocaleString('default', { month: 'short', day: 'numeric' })
-  $: fullModificationDate = new Date(value).toLocaleString('default', {
+  $: shortModificationDate = new Date(value).toLocaleString($themeStore.language, {
+    month: 'short',
+    day: 'numeric'
+  })
+  $: fullModificationDate = new Date(value).toLocaleString($themeStore.language, {
     minute: '2-digit',
     hour: 'numeric',
     day: '2-digit',

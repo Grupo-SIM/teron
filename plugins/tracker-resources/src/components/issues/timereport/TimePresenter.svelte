@@ -16,20 +16,16 @@
   import { getEmbeddedLabel, translate } from '@hcengineering/platform'
   import { themeStore, tooltip } from '@hcengineering/ui'
   import tracker from '../../../plugin'
+  import { durationParts } from './time-input'
 
   export let id: string | undefined = undefined
   export let kind: 'link' | undefined = undefined
   export let value: number
   export let accent: boolean = false
 
-  // TODO: Make configurable?
-  const hoursInWorkingDay = 8
-
   let label = ''
 
-  $: days = Math.floor(value / hoursInWorkingDay)
-  $: hours = Math.floor(value % hoursInWorkingDay)
-  $: minutes = Math.round((value % 1) * 60)
+  $: ({ days, hours, minutes } = durationParts(value))
 
   $: void getLabel(days, hours, minutes, $themeStore.language)
 

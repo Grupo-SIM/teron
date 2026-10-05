@@ -68,7 +68,6 @@ export interface WorkspaceLoginInfo extends LoginInfo {
   endpoint: string
   token: string
   role: AccountRole
-  allowGuestSignUp?: boolean
   readOnly?: boolean
   readOnlyAfter?: Timestamp
 }
@@ -91,6 +90,8 @@ export interface WorkspaceInviteInfo {
 /** Public invite details from getInviteInfo (no auth required). */
 export interface InviteInfo {
   workspaceName: string | null
+  email?: string
+  accountExists?: boolean
 }
 
 export interface OtpInfo {
@@ -158,7 +159,7 @@ export interface AccountAggregatedInfo extends AccountInfo, Person {
   uuid: AccountUuid
   integrations: Omit<Integration, 'data'>[]
   socialIds: SocialId[]
-  workspaces: Omit<WorkspaceInfo, 'allowReadOnlyGuest' | 'allowGuestSignUp'>[]
+  workspaces: Omit<WorkspaceInfo, 'allowReadOnlyGuest'>[]
 }
 
 /**
@@ -238,6 +239,7 @@ export interface Subscription {
 
   // Cancellation tracking (optional)
   canceledAt?: Timestamp
+  willCancelAt?: Timestamp // Scheduled cancellation date (cancel at period end)
 
   // Provider-specific data stored as JSONB (optional)
   providerData?: Record<string, any>
@@ -286,6 +288,8 @@ export interface WorkspaceSeatQuote {
   currentRecurringAmount: string
   nextRecurringAmount: string
   estimatedProrationAmount: string
+  prorationDays: number
+  prorationPeriodDays: number
   currency: 'BRL'
   periodEnd: Timestamp
 }

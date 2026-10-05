@@ -17,7 +17,6 @@
   import { PermissionsStore } from '@hcengineering/contact'
   import { permissionsStore } from '@hcengineering/contact-resources'
   import core, { AnyAttribute, Class, Doc, Ref, toRank, TypedSpace } from '@hcengineering/core'
-  import notification from '@hcengineering/notification'
   import {
     AttributeBarEditor,
     createQuery,
@@ -34,7 +33,6 @@
   export let readonly = false
   export let showHeader: boolean = true
   export let fourRows: boolean = false
-  export let showCollaborators: boolean = false
 
   const client = getClient()
   const hierarchy = client.getHierarchy()
@@ -67,7 +65,7 @@
   })
 
   function canChange (attr: AnyAttribute, permissionsStore: PermissionsStore): boolean {
-    return canChangeAttribute(attr, object.space as Ref<TypedSpace>, permissionsStore, _class)
+    return canChangeAttribute(attr, object.space as Ref<TypedSpace>, permissionsStore, _class, object)
   }
 </script>
 
@@ -83,17 +81,6 @@
       on:update
     />
   {/each}
-  {#if showCollaborators}
-    <AttributeBarEditor
-      key={'collaborators'}
-      _class={notification.mixin.Collaborators}
-      {object}
-      {showHeader}
-      {readonly}
-      withIcon
-      on:update
-    />
-  {/if}
 </div>
 
 <style lang="scss">

@@ -33,7 +33,6 @@ import type {
   WorkbenchTab
 } from '@hcengineering/workbench'
 import { type AnyComponent } from '@hcengineering/ui/src/types'
-import presentation from '@hcengineering/model-presentation'
 
 import workbench from './plugin'
 
@@ -116,12 +115,6 @@ export function createModel (builder: Builder): void {
     TWorkbenchTab
   )
 
-  builder.mixin(workbench.class.WorkbenchTab, core.class.Class, core.mixin.TxAccessLevel, {
-    createAccessLevel: AccountRole.Guest,
-    removeAccessLevel: AccountRole.Guest,
-    updateAccessLevel: AccountRole.Guest
-  })
-
   builder.mixin(workbench.class.Application, core.class.Class, view.mixin.ObjectPresenter, {
     presenter: workbench.component.ApplicationPresenter
   })
@@ -146,67 +139,6 @@ export function createModel (builder: Builder): void {
       mode: ['workbench']
     }
   })
-
-  createAction(builder, {
-    action: workbench.actionImpl.PinTab,
-    label: view.string.Pin,
-    icon: view.icon.Pin,
-    input: 'focus',
-    category: workbench.category.Workbench,
-    target: workbench.class.WorkbenchTab,
-    query: {
-      isPinned: false
-    },
-    context: {
-      mode: 'context',
-      group: 'edit'
-    }
-  })
-
-  createAction(builder, {
-    action: workbench.actionImpl.UnpinTab,
-    label: view.string.Unpin,
-    icon: view.icon.Pin,
-    input: 'focus',
-    category: workbench.category.Workbench,
-    target: workbench.class.WorkbenchTab,
-    query: {
-      isPinned: true
-    },
-    context: {
-      mode: 'context',
-      group: 'edit'
-    }
-  })
-
-  createAction(builder, {
-    action: workbench.actionImpl.CloseTab,
-    label: presentation.string.Close,
-    icon: view.icon.Delete,
-    input: 'focus',
-    category: workbench.category.Workbench,
-    target: workbench.class.WorkbenchTab,
-    visibilityTester: workbench.function.CanCloseTab,
-    context: {
-      mode: 'context',
-      group: 'edit'
-    }
-  })
-
-  createAction(
-    builder,
-    {
-      action: workbench.actionImpl.CloseCurrentTab,
-      label: presentation.string.Close,
-      icon: view.icon.Delete,
-      input: 'none',
-      category: workbench.category.Workbench,
-      allowedForEditableContent: 'always',
-      target: core.class.Doc,
-      context: { mode: ['workbench', 'browser', 'panel', 'editor', 'input'] }
-    },
-    workbench.action.CloseCurrentTab
-  )
 }
 
 export default workbench

@@ -54,7 +54,6 @@ import tracker from '@hcengineering/model-tracker'
 import view, { createAction } from '@hcengineering/model-view'
 import workbench from '@hcengineering/model-workbench'
 import notification, { type NotificationGroup } from '@hcengineering/notification'
-import recruit from '@hcengineering/recruit'
 import tags from '@hcengineering/tags'
 import {
   timeId,
@@ -176,10 +175,6 @@ export function createModel (builder: Builder): void {
     presenter: time.component.LeadPresenter
   })
 
-  builder.mixin(recruit.class.Applicant, core.class.Class, time.mixin.ItemPresenter, {
-    presenter: time.component.ApplicantPresenter
-  })
-
   builder.mixin(board.class.Card, core.class.Class, time.mixin.ItemPresenter, {
     presenter: time.component.CardPresenter
   })
@@ -212,21 +207,6 @@ export function createModel (builder: Builder): void {
   )
 
   // Module permissions for guests/anonymous guests.
-  // Planner is allowed for guests, but disabled for anonymous guests, and placed after modules enabled by default.
-  builder.createDoc(
-    core.class.ModulePermissionGroup,
-    core.space.Model,
-    {
-      application: time.app.Me,
-      role: AccountRole.Guest,
-      permissions: [],
-      spaceClass: tracker.class.Project,
-      enabled: true,
-      order: 55
-    },
-    time.ids.ModulePermissionGroup
-  )
-
   builder.createDoc(
     core.class.ModulePermissionGroup,
     core.space.Model,
@@ -239,20 +219,6 @@ export function createModel (builder: Builder): void {
       order: 55
     },
     time.ids.ModulePermissionGroupReadOnlyGuest
-  )
-
-  builder.createDoc(
-    workbench.class.Application,
-    core.space.Model,
-    {
-      label: time.string.Team,
-      icon: time.icon.Team,
-      accessLevel: AccountRole.User,
-      alias: 'team',
-      hidden: false,
-      component: time.component.Team
-    },
-    time.app.Team
   )
 
   builder.mixin(time.class.ToDo, core.class.Class, view.mixin.IgnoreActions, {
@@ -369,22 +335,6 @@ export function createModel (builder: Builder): void {
       mode: ['workbench', 'browser', 'editor', 'panel', 'popup']
     }
   })
-  createAction(builder, {
-    action: workbench.actionImpl.Navigate,
-    actionProps: {
-      mode: 'app',
-      application: 'team'
-    },
-    label: time.string.GotoTimeTeamPlaning,
-    icon: view.icon.ArrowRight,
-    input: 'none',
-    category: view.category.Navigation,
-    target: core.class.Doc,
-    context: {
-      mode: ['workbench', 'browser', 'editor', 'panel', 'popup']
-    }
-  })
-
   builder.createDoc(
     notification.class.NotificationGroup,
     core.space.Model,

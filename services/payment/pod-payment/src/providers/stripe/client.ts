@@ -139,12 +139,14 @@ export class StripeClient {
 
   /**
    * Cancel a subscription
-   * Stripe subscriptions are canceled via cancel endpoint
-   * Documentation: https://stripe.com/docs/api/subscriptions/cancel
+   * Keeps it active until the current billing period ends so it can be reactivated.
+   * Documentation: https://stripe.com/docs/api/subscriptions/update
    */
   async cancelSubscription (ctx: MeasureContext, subscriptionId: string): Promise<Stripe.Subscription> {
     return await ctx.with('stripe-cancel-subscription', {}, async () => {
-      return await this.stripe.subscriptions.cancel(subscriptionId)
+      return await this.stripe.subscriptions.update(subscriptionId, {
+        cancel_at_period_end: true
+      })
     })
   }
 

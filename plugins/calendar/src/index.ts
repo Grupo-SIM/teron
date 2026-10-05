@@ -316,6 +316,7 @@ const calendarPlugin = plugin(calendarId, {
     NoAttached: '' as Ref<Event>
   },
   function: {
+    CanDeleteOwnEvent: '' as Resource<(doc?: Doc | Doc[]) => Promise<boolean>>,
     ConfigureCalDavAccess: '' as Resource<() => Promise<void>>,
     EventTitleProvider: '' as Resource<(client: Client, ref: Ref<Doc>, doc?: Doc) => Promise<string>>
   }

@@ -71,7 +71,7 @@
       currentIssue.attachedTo,
       currentIssue.attachedToClass,
       currentIssue.collection,
-      { assignee: newAssignee }
+      { assignees: newAssignee == null ? [] : [newAssignee] }
     )
   }
 

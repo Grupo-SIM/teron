@@ -29,15 +29,15 @@ export interface TierLimitsBytes {
 }
 
 /**
- * Plan-level resource limits, expressed in GB.
+ * Plan-level resource limits, expressed in GB. Zero means unlimited.
  *
  * @public
  */
 export const TIER_LIMITS_GB: Record<TierPlan, TierLimitsGB> = {
-  common: { storageGB: 10, trafficGB: 10 },
-  rare: { storageGB: 100, trafficGB: 100 },
-  epic: { storageGB: 1000, trafficGB: 500 },
-  legendary: { storageGB: 10000, trafficGB: 2000 }
+  common: { storageGB: 0, trafficGB: 10 },
+  rare: { storageGB: 0, trafficGB: 100 },
+  epic: { storageGB: 0, trafficGB: 500 },
+  legendary: { storageGB: 0, trafficGB: 2000 }
 }
 
 /**

@@ -26,7 +26,6 @@
   const dispatch = createEventDispatcher()
 
   const allInviteRoleItems: DropdownIntlItem[] = [
-    { id: AccountRole.Guest, label: settingRes.string.Guest },
     { id: AccountRole.User, label: settingRes.string.User },
     { id: AccountRole.Maintainer, label: settingRes.string.Maintainer },
     { id: AccountRole.Owner, label: settingRes.string.Owner }

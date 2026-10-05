@@ -23,6 +23,7 @@
   import { AnySvelteComponent } from '@hcengineering/ui'
   import { getCollaborationUser } from '@hcengineering/view-resources'
   import { FocusPosition } from '@tiptap/core'
+  import { createGuidelineAccessQuery } from '../guideline-access'
   import { createEventDispatcher } from 'svelte'
 
   export let object: Document
@@ -35,6 +36,10 @@
   export let requestSideSpace: ((width: number) => void) | undefined = undefined
 
   const client = getClient()
+  const grants = createGuidelineAccessQuery()
+  const grantEditable = grants.editable
+  $: grants.query(object.space)
+  $: effectiveReadonly = readonly || object.lockedBy != null || !$grantEditable
   const dispatch = createEventDispatcher()
 
   const user = getCollaborationUser()
@@ -61,7 +66,7 @@
   {user}
   {userComponent}
   {focusIndex}
-  {readonly}
+  readonly={effectiveReadonly}
   {attachFile}
   {boundary}
   {overflow}

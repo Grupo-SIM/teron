@@ -184,6 +184,8 @@
     "RequiredSlots": "Slots requeridos",
     "Bindings": "Bindings",
     "AskRequired": "Preguntar por campos requeridos"
+  ,
+    "NoSlotsDefined": "No slots defined for this process"
   },
   "error": {
     "MethodNotFound": "Método no encontrado: {methodId}",

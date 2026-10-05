@@ -13,7 +13,7 @@
 
   const dispatch = createEventDispatcher()
 
-  type TypeIds = 'meetingRoom' | 'teamRoom' | 'office'
+  type TypeIds = 'meetingRoom' | 'office'
 
   interface Item extends DropdownIntlItem {
     id: TypeIds
@@ -27,13 +27,6 @@
       id: 'meetingRoom',
       label: love.string.MeetingRoom,
       type: RoomType.Video,
-      _class: love.class.Room,
-      access: RoomAccess.Open
-    },
-    {
-      id: 'teamRoom',
-      label: love.string.TeamRoom,
-      type: RoomType.Audio,
       _class: love.class.Room,
       access: RoomAccess.Open
     },
@@ -54,13 +47,10 @@
     const pos = getFreePosition(floorRooms, 2, 1)
     const _id = generateId<Room>()
 
-    // Get workspace settings for Video rooms
-    let defaultTranscription = false
     let defaultRecording = false
     if (val.type === RoomType.Video && val._class !== love.class.Office) {
       const officeSettings = await client.findAll<OfficeSettings>(setting.class.OfficeSettings, {})
       if (officeSettings !== undefined && officeSettings.length > 0) {
-        defaultTranscription = officeSettings[0].defaultStartWithTranscription ?? false
         defaultRecording = officeSettings[0].defaultStartWithRecording ?? false
       }
     }
@@ -74,7 +64,6 @@
       type: val.type,
       access: val.access,
       language: 'en',
-      startWithTranscription: defaultTranscription,
       startWithRecording: defaultRecording,
       description: null
     }

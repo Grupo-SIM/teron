@@ -1,5 +1,3 @@
-import aiBot from '@hcengineering/ai-bot'
-import { connectMeeting, disconnectMeeting } from '@hcengineering/ai-bot-resources'
 import { Analytics } from '@hcengineering/analytics'
 import calendar, { type Event, type Schedule } from '@hcengineering/calendar'
 import chunter from '@hcengineering/chunter'
@@ -28,7 +26,6 @@ import {
   type MeetingSchedule,
   type Room,
   type RoomMetadata,
-  TranscriptionStatus,
   MeetingStatus
 } from '@hcengineering/love'
 import { getEmbeddedLabel, getMetadata, getResource, type IntlString } from '@hcengineering/platform'
@@ -75,7 +72,6 @@ export function setCustomCreateScreenTracks (value: () => Promise<Array<LocalTra
 }
 
 export const isRecording = writable<boolean>(false)
-export const isTranscription = writable<boolean>(false)
 export const isRecordingAvailable = writable<boolean>(false)
 export const isFullScreen = writable<boolean>(false)
 export const isShareWithSound = writable<boolean>(false)
@@ -186,9 +182,6 @@ lk.on(RoomEvent.RoomMetadataChanged, (metadata) => {
   if (data.recording !== undefined) {
     isRecording.set(data.recording)
   }
-  if (data.transcription !== undefined) {
-    isTranscription.set(data.transcription === TranscriptionStatus.InProgress)
-  }
 })
 
 lk.on(RoomEvent.Connected, () => {
@@ -200,15 +193,6 @@ lk.on(RoomEvent.Connected, () => {
 async function initRoomMetadata (metadata: string | undefined): Promise<void> {
   const room = get(currentRoom)
   const data: RoomMetadata = parseMetadata(metadata)
-
-  isTranscription.set(data.transcription === TranscriptionStatus.InProgress)
-
-  if (
-    (data.transcription == null || data.transcription === TranscriptionStatus.Idle) &&
-    room?.startWithTranscription === true
-  ) {
-    await startTranscription(room)
-  }
 
   if (get(isRecordingAvailable) && data.recording == null && room?.startWithRecording === true && !get(isRecording)) {
     await loveClient.record(room)
@@ -332,7 +316,7 @@ export async function createMeeting (
       meetId: _id
     }
     const func = await getResource(login.function.GetInviteLink)
-    const link = await func(-1, '', -1, AccountRole.Guest, encodeURIComponent(JSON.stringify(navigateUrl)))
+    const link = await func(-1, '', -1, AccountRole.DocGuest, encodeURIComponent(JSON.stringify(navigateUrl)))
     await client.update(event, { location: link })
   }
 }
@@ -378,20 +362,6 @@ export function getPlatformToken (): string {
   return token
 }
 
-export async function startTranscription (room: Room): Promise<void> {
-  const current = get(currentRoom)
-  if (current === undefined || room._id !== current._id) return
-
-  await connectMeeting(room._id, room.language, { transcription: true })
-}
-
-export async function stopTranscription (room: Room): Promise<void> {
-  const current = get(currentRoom)
-  if (current === undefined || room._id !== current._id) return
-
-  await disconnectMeeting(room._id)
-}
-
 export async function showRoomSettings (room?: Room): Promise<void> {
   if (room === undefined) return
 
@@ -418,16 +388,11 @@ async function getRoomGuestLink (room: Room): Promise<string> {
 
     console.log('Create link')
     const accountClient = getAccountClientRaw(accountsUrl, token)
-    return await accountClient.createAccessLink(AccountRole.Guest, {
+    return await accountClient.createAccessLink(AccountRole.DocGuest, {
       navigateUrl: encodeURIComponent(JSON.stringify(navigateUrl))
     })
   }
   return ''
-}
-
-export function isTranscriptionAllowed (): boolean {
-  const url = getMetadata(aiBot.metadata.EndpointURL) ?? ''
-  return url !== ''
 }
 
 export function createMeetingWidget (widget: Widget, room: Ref<Room>, video: boolean): void {
@@ -446,12 +411,6 @@ export function createMeetingWidget (widget: Widget, room: Ref<Room>, video: boo
       id: 'chat',
       label: chunter.string.Chat,
       icon: view.icon.Bubble,
-      readonly: true
-    },
-    {
-      id: 'transcription',
-      label: love.string.Transcription,
-      icon: view.icon.Feather,
       readonly: true
     }
   ]
@@ -500,7 +459,7 @@ export async function queryMeetingMinutes (
   search: string,
   filter?: { in?: RelatedDocument[], nin?: RelatedDocument[] }
 ): Promise<ObjectSearchResult[]> {
-  const q: DocumentQuery<MeetingMinutes> = { title: { $like: `%${search}%` } }
+  const q: DocumentQuery<MeetingMinutes> = { title: { $contains: search } }
   if (filter?.in !== undefined || filter?.nin !== undefined) {
     q._id = {}
     if (filter.in !== undefined) {

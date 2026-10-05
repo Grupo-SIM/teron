@@ -81,7 +81,6 @@ import {
 import attachment from '@hcengineering/model-attachment'
 import chunter from '@hcengineering/model-chunter'
 import core, { TAttachedDoc, TDoc, TSpace } from '@hcengineering/model-core'
-import { createPublicLinkAction } from '@hcengineering/model-guest'
 import { generateClassNotificationTypes } from '@hcengineering/model-notification'
 import presentation from '@hcengineering/model-presentation'
 import view, { createAction, createAttributePresenter, type Viewlet } from '@hcengineering/model-view'
@@ -89,6 +88,7 @@ import workbench from '@hcengineering/model-workbench'
 import notification from '@hcengineering/notification'
 import { getEmbeddedLabel, type Asset, type IntlString, type Resource } from '@hcengineering/platform'
 import setting from '@hcengineering/setting'
+import tags from '@hcengineering/tags'
 import templates from '@hcengineering/templates'
 import { type AnyComponent } from '@hcengineering/ui/src/types'
 import { type Action } from '@hcengineering/view'
@@ -217,10 +217,38 @@ export class TPerson extends TContact implements Person {
   @Prop(TypeDate(DateRangeMode.DATE, false), contact.string.Birthday)
     birthday?: Timestamp
 
+  @Prop(CollectionType(tags.class.TagReference, contact.string.Position), contact.string.Position)
+    functions?: number
+
+  @Prop(CollectionType(tags.class.TagReference, contact.string.Skills), contact.string.Skills)
+  @Hidden()
+    skills?: number
+
+  @Prop(TypeString(), contact.string.ProfessionalTitle)
+  @Hidden()
+    professionalTitle?: string
+
+  @Prop(TypeString(), contact.string.ContactSource)
+  @Hidden()
+    contactSource?: string
+
+  @Prop(TypeNumber(), contact.string.RemoteDaysPerWeek, {
+    editor: contact.component.WorkModeDays,
+    shortLabel: contact.string.RemoteDaysPerWeekShort
+  })
+    remoteDaysPerWeek?: number | null
+
+  @Prop(TypeNumber(), contact.string.OnsiteDaysPerWeek, {
+    editor: contact.component.WorkModeDays,
+    shortLabel: contact.string.OnsiteDaysPerWeekShort
+  })
+    onsiteDaysPerWeek?: number | null
+
   @Prop(CollectionType(contact.class.SocialIdentity), contact.string.SocialIds)
     socialIds?: Collection<SocialIdentity>
 
   @Prop(TypeRef(contact.class.UserProfile), contact.string.UserProfile)
+  @Hidden()
   @ReadOnly()
     profile?: Ref<Card>
 }
@@ -263,7 +291,7 @@ export class TEmployee extends TPerson implements Employee {
   @Prop(TypeString(), contact.string.Role)
   @ReadOnly()
   @Hidden()
-    role?: 'USER' | 'GUEST'
+    role?: 'USER'
 
   @Prop(CollectionType(contact.class.Status), contact.string.Status)
   @Hidden()
@@ -346,26 +374,6 @@ export function createModel (builder: Builder): void {
     TWorkspaceMemberStatus
   )
 
-  builder.mixin(contact.class.PersonSpace, core.class.Class, core.mixin.TxAccessLevel, {
-    createAccessLevel: AccountRole.Guest
-  })
-
-  builder.mixin(contact.class.WorkspaceMemberStatus, core.class.Class, core.mixin.TxAccessLevel, {
-    createAccessLevel: AccountRole.Guest,
-    updateAccessLevel: AccountRole.Guest,
-    removeAccessLevel: AccountRole.Guest
-  })
-
-  builder.mixin(contact.class.Person, core.class.Class, core.mixin.TxAccessLevel, {
-    createAccessLevel: AccountRole.Guest,
-    isIdentity: true
-  })
-
-  builder.mixin(contact.class.SocialIdentity, core.class.Class, core.mixin.TxAccessLevel, {
-    createAccessLevel: AccountRole.Guest,
-    isIdentity: true
-  })
-
   builder.mixin(contact.class.Contact, core.class.Class, activity.mixin.ActivityDoc, {})
 
   builder.mixin(contact.class.Person, core.class.Class, activity.mixin.ActivityDoc, {
@@ -409,10 +417,6 @@ export function createModel (builder: Builder): void {
   builder.createDoc(activity.class.ActivityExtension, core.space.Model, {
     ofClass: contact.class.Member,
     components: { input: { component: chunter.component.ChatMessageInput } }
-  })
-
-  builder.mixin(contact.mixin.Employee, core.class.Class, view.mixin.ObjectFactory, {
-    component: contact.component.CreateEmployee
   })
 
   builder.mixin(contact.class.Person, core.class.Class, view.mixin.ObjectFactory, {
@@ -462,41 +466,19 @@ export function createModel (builder: Builder): void {
             id: 'employees',
             component: workbench.component.SpecialView,
             icon: contact.icon.Person,
-            label: contact.string.Employee,
+            label: contact.string.Employees,
             accessLevel: AccountRole.DocGuest,
             componentProps: {
               _class: contact.mixin.Employee,
               icon: contact.icon.Person,
-              label: contact.string.Employee,
-              baseQuery: {
-                role: { $ne: 'GUEST' }
-              },
-              createLabel: contact.string.CreateEmployee,
-              createComponent: contact.component.CreateEmployee
-            }
-          },
-          {
-            id: 'guests',
-            component: workbench.component.SpecialView,
-            icon: contact.icon.Person,
-            label: contact.string.Guest,
-            accessLevel: AccountRole.DocGuest,
-            componentProps: {
-              _class: contact.mixin.Employee,
-              icon: contact.icon.Person,
-              label: contact.string.Guest,
-              baseQuery: {
-                role: 'GUEST'
-              },
-              createLabel: contact.string.Guest,
-              createComponent: contact.component.CreateGuest
+              label: contact.string.Employees
             }
           },
           {
             id: 'persons',
             component: workbench.component.SpecialView,
             icon: contact.icon.Person,
-            label: contact.string.Person,
+            label: contact.string.Persons,
             accessLevel: AccountRole.DocGuest,
             componentProps: {
               _class: contact.class.Person,
@@ -504,7 +486,7 @@ export function createModel (builder: Builder): void {
                 [contact.mixin.Employee]: { $exists: false }
               },
               icon: contact.icon.Person,
-              label: contact.string.Person,
+              label: contact.string.Persons,
               createLabel: contact.string.CreatePerson,
               createComponent: contact.component.CreatePerson
             }
@@ -513,12 +495,12 @@ export function createModel (builder: Builder): void {
             id: 'companies',
             component: workbench.component.SpecialView,
             icon: contact.icon.Company,
-            label: contact.string.Organization,
+            label: contact.string.Organizations,
             accessLevel: AccountRole.DocGuest,
             componentProps: {
               _class: contact.class.Organization,
               icon: contact.icon.Company,
-              label: contact.string.Organization,
+              label: contact.string.Organizations,
               createLabel: contact.string.CreateOrganization,
               createComponent: contact.component.CreateOrganization
             }
@@ -582,9 +564,12 @@ export function createModel (builder: Builder): void {
       config: [
         '',
         'city',
-        'attachments',
-        'modifiedOn',
-        { key: '', presenter: view.component.RolePresenter, label: view.string.Role },
+        {
+          key: 'functions',
+          presenter: tags.component.LabelsPresenter,
+          label: contact.string.Position,
+          props: { kind: 'list', full: false, key: 'functions', queryWhenEmpty: true }
+        },
         {
           key: '$lookup.channels',
           label: contact.string.ContactInfo,
@@ -593,6 +578,8 @@ export function createModel (builder: Builder): void {
       ],
       configOptions: {
         hiddenKeys: ['name'],
+        optionalKeys: ['birthday', 'onsiteDaysPerWeek', 'remoteDaysPerWeek'],
+        strict: true,
         sortable: true
       },
       baseQuery: {
@@ -613,9 +600,12 @@ export function createModel (builder: Builder): void {
       config: [
         { key: '', props: { showStatus: true } },
         'city',
-        'attachments',
-        'modifiedOn',
-        { key: '', presenter: view.component.RolePresenter, label: view.string.Role },
+        {
+          key: 'functions',
+          presenter: tags.component.LabelsPresenter,
+          label: contact.string.Position,
+          props: { kind: 'list', full: false, key: 'functions', queryWhenEmpty: true }
+        },
         {
           key: '$lookup.channels',
           label: contact.string.ContactInfo,
@@ -624,6 +614,8 @@ export function createModel (builder: Builder): void {
       ],
       configOptions: {
         hiddenKeys: ['name'],
+        optionalKeys: ['birthday', 'onsiteDaysPerWeek', 'remoteDaysPerWeek'],
+        strict: true,
         sortable: true
       },
       viewOptions: {
@@ -653,9 +645,6 @@ export function createModel (builder: Builder): void {
       config: [
         '',
         'city',
-        'attachments',
-        'modifiedOn',
-        { key: '', presenter: view.component.RolePresenter, label: view.string.Role },
         {
           key: '$lookup.channels',
           label: contact.string.ContactInfo,
@@ -664,6 +653,8 @@ export function createModel (builder: Builder): void {
       ],
       configOptions: {
         hiddenKeys: ['name'],
+        optionalKeys: [],
+        strict: true,
         sortable: true
       }
     },
@@ -1196,31 +1187,6 @@ export function createModel (builder: Builder): void {
     contact.action.OpenChannel
   )
 
-  createAction(
-    builder,
-    {
-      action: view.actionImpl.ShowPopup,
-      actionProps: {
-        component: contact.component.MergePersons,
-        element: 'top',
-        fillProps: {
-          _object: 'value'
-        }
-      },
-      query: {},
-      label: contact.string.MergePersons,
-      category: contact.category.Contact,
-      target: contact.class.Person,
-      visibilityTester: contact.function.CanMergePersons,
-      input: 'focus',
-      context: {
-        mode: ['context'],
-        group: 'remove'
-      },
-      secured: true
-    },
-    contact.action.MergePersons
-  )
 
   // Allow to use fuzzy search for mixins
   builder.createDoc(core.class.FullTextSearchContext, core.space.Model, {
@@ -1424,7 +1390,6 @@ export function createModel (builder: Builder): void {
     ['comments', 'attachments']
   )
 
-  createPublicLinkAction(builder, contact.class.Contact, contact.action.PublicLink)
 
   builder.createDoc(core.class.DomainIndexConfiguration, core.space.Model, {
     domain: DOMAIN_CHANNEL,
@@ -1484,7 +1449,7 @@ export function createModel (builder: Builder): void {
     icon: view.icon.Translate,
     component: contact.component.TranslationSettings,
     group: 'settings-account',
-    role: AccountRole.Guest,
+    role: AccountRole.User,
     feature: 'auto-translate',
     order: 1600
   })

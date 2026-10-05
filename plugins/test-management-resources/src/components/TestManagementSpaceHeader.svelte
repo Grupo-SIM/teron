@@ -86,7 +86,7 @@
     }
   ]
 
-  const dropdownItems = hasAccountRole(myAcc, AccountRole.User)
+  const dropdownItems = hasAccountRole(myAcc, AccountRole.Maintainer)
     ? [
         {
           id: testManagement.string.CreateProject,
@@ -100,7 +100,7 @@
 
 {#if loading}
   <Loading shrink />
-{:else}
+{:else if hasAccountRole(myAcc, AccountRole.Maintainer)}
   <div class="antiNav-subheader">
     {#if hasProject}
       <ButtonWithDropdown

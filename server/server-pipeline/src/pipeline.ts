@@ -28,7 +28,6 @@ import {
   DomainTxMiddleware,
   FindSecurityMiddleware,
   FullTextMiddleware,
-  GuestPermissionsMiddleware,
   IdentityMiddleware,
   LiveQueryMiddleware,
   LookupMiddleware,
@@ -73,6 +72,10 @@ import { createStorageDataAdapter } from './blobStorage'
 import { CommunicationMiddleware, type CommunicationApiFactory } from './communication'
 
 import { RatingMiddleware } from '@hcengineering/server-rating'
+import { TaskAssigneesMiddleware } from './TaskAssigneesMiddleware'
+import { CalendarPrivacyMiddleware } from './CalendarPrivacyMiddleware'
+import { WorkspaceAuthorizationMiddleware } from './WorkspaceAuthorizationMiddleware'
+import { DocumentLockMiddleware } from '@hcengineering/server-document-resources'
 
 /**
  * @public
@@ -140,9 +143,12 @@ export function createServerPipeline (
     const conf = getConfig(metrics, dbUrl, wsMetrics, opt, extensions)
 
     const middlewares: MiddlewareCreator[] = [
+      CalendarPrivacyMiddleware.create,
       LookupMiddleware.create,
       NormalizeTxMiddleware.create,
       IdentityMiddleware.create,
+      TaskAssigneesMiddleware.create,
+      WorkspaceAuthorizationMiddleware.create,
       ModifiedMiddleware.create,
       RankMiddleware.create,
       FindSecurityMiddleware.create,
@@ -151,7 +157,6 @@ export function createServerPipeline (
       (ctx: MeasureContext, context: PipelineContext, next?: Middleware) =>
         SpaceSecurityMiddleware.create(opt.adapterSecurity ?? false, ctx, context, next),
       SpacePermissionsMiddleware.create,
-      GuestPermissionsMiddleware.create,
       ConfigurationMiddleware.create,
       ContextNameMiddleware.create,
       MarkDerivedEntryMiddleware.create,
@@ -163,6 +168,7 @@ export function createServerPipeline (
       VersioningMiddleware.create,
       IdentifierMiddleware.create, // After ApplyTx to ensure that it pass
       RatingMiddleware.create, // Rating editing restrictions
+      DocumentLockMiddleware.create,
       TxMiddleware.create, // Store tx into transaction domain
       ...(opt.disableTriggers === true ? [] : [TriggersMiddleware.create]),
       ...(opt.fulltextUrl !== undefined

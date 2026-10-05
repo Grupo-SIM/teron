@@ -63,7 +63,7 @@
             const role = getCurrentAccount().role
             if (role === g.role) return true
             // DocGuest should also respect Guest module disables.
-            return role === AccountRole.DocGuest && g.role === AccountRole.Guest
+            return false
           })
           .map((g) => g.application as Ref<Application>)
       )
@@ -101,7 +101,7 @@
   function updateExcludedApps (): void {
     const me = getCurrentAccount()
 
-    if (me.role === AccountRole.ReadOnlyGuest || me.role === AccountRole.Guest) {
+    if (me.role === AccountRole.ReadOnlyGuest) {
       excludedApps = getMetadata(workbench.metadata.ExcludedApplicationsForAnonymous) ?? []
     } else {
       excludedApps = []

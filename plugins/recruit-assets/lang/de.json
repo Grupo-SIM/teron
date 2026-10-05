@@ -125,6 +125,12 @@
     "SwapFirstAndLastNames": "Vor- und Nachnamen tauschen",
     "ForbidCreateVacancyPermission": "Stellenerstellung verbieten",
     "ForbidCreateVacancyPermissionDescription": "Verbietet Benutzern das Erstellen neuer Stellenangebote"
+  ,
+    "Analyse": "Analyze",
+    "ExportExpertSkills": "Export expert skills",
+    "ExportPlan": "Export plan",
+    "Optimize": "Optimize",
+    "SkillsOptimizer": "Skills optimizer"
   },
   "status": {
     "ApplicationExists": "Bewerbung existiert bereits",

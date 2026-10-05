@@ -223,6 +223,20 @@ function defineDrive (builder: Builder): void {
     encode: drive.function.DriveLinkProvider
   })
 
+  createAction(builder, {
+    secured: true,
+    action: view.actionImpl.Delete,
+    actionProps: { confirmation: drive.string.DeleteDriveConfirm },
+    label: view.string.Delete,
+    icon: view.icon.Delete,
+    category: view.category.General,
+    input: 'focus',
+    target: drive.class.Drive,
+    visibilityTester: view.function.CanArchiveSpace,
+    context: { mode: ['context', 'browser'], group: 'remove' },
+    override: [view.action.Archive, view.action.Delete]
+  }, drive.action.DeleteDrive)
+
   // Space type
 
   builder.createDoc(
@@ -303,6 +317,7 @@ function defineDrive (builder: Builder): void {
   createAction(
     builder,
     {
+      secured: true,
       action: drive.actionImpl.EditDrive,
       label: drive.string.EditDrive,
       icon: view.icon.Edit,
@@ -511,6 +526,7 @@ function defineFolder (builder: Builder): void {
   createAction(
     builder,
     {
+      secured: true,
       action: drive.actionImpl.RenameFolder,
       label: drive.string.Rename,
       icon: view.icon.Edit,
@@ -547,6 +563,7 @@ function defineFolder (builder: Builder): void {
   )
 
   createAction(builder, {
+    secured: true,
     ...actionTemplates.move,
     action: view.actionImpl.ShowPopup,
     actionProps: {
@@ -588,6 +605,7 @@ function defineFileVersion (builder: Builder): void {
   createAction(
     builder,
     {
+      secured: true,
       action: drive.actionImpl.RestoreFileVersion,
       label: drive.string.Restore,
       icon: drive.icon.Restore,
@@ -607,6 +625,7 @@ function defineFileVersion (builder: Builder): void {
   createAction(
     builder,
     {
+      secured: true,
       action: view.actionImpl.Delete,
       visibilityTester: drive.function.CanDeleteFileVersion,
       label: view.string.Delete,
@@ -707,6 +726,7 @@ function defineFile (builder: Builder): void {
   createAction(
     builder,
     {
+      secured: true,
       action: drive.actionImpl.RenameFile,
       label: drive.string.Rename,
       icon: view.icon.Edit,
@@ -726,7 +746,9 @@ function defineFile (builder: Builder): void {
   createAction(
     builder,
     {
+      secured: true,
       action: view.actionImpl.Delete,
+      actionProps: { confirmation: drive.string.DeleteFileConfirm, confirmationTitle: drive.string.DeleteFile },
       label: view.string.Delete,
       icon: view.icon.Delete,
       category: drive.category.Drive,
@@ -761,6 +783,7 @@ function defineFile (builder: Builder): void {
   // )
 
   createAction(builder, {
+    secured: true,
     ...actionTemplates.move,
     action: view.actionImpl.ShowPopup,
     actionProps: {
@@ -842,20 +865,6 @@ export function createModel (builder: Builder): void {
   defineFile(builder)
   defineFileVersion(builder)
   defineApplication(builder)
-  builder.createDoc(
-    core.class.ModulePermissionGroup,
-    core.space.Model,
-    {
-      application: drive.app.Drive,
-      role: AccountRole.Guest,
-      permissions: [],
-      spaceClass: drive.class.Drive,
-      enabled: false,
-      order: 60
-    },
-    drive.ids.ModulePermissionGroup
-  )
-
   builder.createDoc(
     core.class.ModulePermissionGroup,
     core.space.Model,

@@ -154,7 +154,7 @@ export function checkUsageAgainstLimits (usageInfo: UsageStatus | undefined, tie
 
   const { storageLimit, trafficLimit } = calculateLimits(tier)
 
-  return storageUsedBytes > storageLimit || trafficUsedBytes > trafficLimit
+  return (storageLimit > 0 && storageUsedBytes > storageLimit) || (trafficLimit > 0 && trafficUsedBytes > trafficLimit)
 }
 
 export async function getCurrentSubscription (accountClient: AccountClient): Promise<SubscriptionData | undefined> {

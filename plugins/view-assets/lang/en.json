@@ -82,6 +82,7 @@
     "FilteredViews": "Filtered views",
     "NewFilteredView": "New filtered view",
     "FilteredViewName": "Filtered view name",
+    "LegacyMyTasks": "My tasks",
     "Then": "Then",
     "ShowPreviewOnClick": "Please click to show document index preview...",
     "Shown": "showing {len} results {total, plural, =-1 {} other {of filtered # items}}",

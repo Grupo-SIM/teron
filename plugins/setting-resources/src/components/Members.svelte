@@ -21,7 +21,8 @@
     SearchInput,
     getCurrentResolvedLocation,
     navigate,
-    showPopup
+    showPopup,
+    themeStore
   } from '@hcengineering/ui'
   import { onMount } from 'svelte'
 
@@ -35,13 +36,10 @@
   const accountClient = getAccountClient()
 
   const items: DropdownIntlItem[] = [
-    { id: AccountRole.ReadOnlyGuest, label: setting.string.ReadonlyGuest },
-    { id: AccountRole.Guest, label: setting.string.Guest },
     { id: AccountRole.User, label: setting.string.User },
     { id: AccountRole.Maintainer, label: setting.string.Maintainer },
     { id: AccountRole.Owner, label: setting.string.Owner }
   ]
-  const guestRoles = [AccountRole.ReadOnlyGuest, AccountRole.DocGuest, AccountRole.Guest]
 
   let workspaceMembers: Record<string, AccountRole> = {}
   let pendingInvites: Awaited<ReturnType<typeof accountClient.getWorkspacePendingInvites>> = []
@@ -49,6 +47,7 @@
   let employees: Employee[] = []
   let loading = true
   let search = ''
+  let failedInviteEmail: string | undefined
 
   async function load (): Promise<void> {
     loading = true
@@ -83,7 +82,7 @@
     workspaceMembers = workspaceMembers
     const employee = employees.find((item) => item.personUuid === personUuid)
     if (employee !== undefined) {
-      await client.update(employee, { role: guestRoles.includes(value) ? 'GUEST' : 'USER' })
+      await client.update(employee, { role: 'USER' })
     }
     await load()
   }
@@ -109,14 +108,21 @@
   }
 
   async function resendInvite (email: string, role: AccountRole): Promise<void> {
-    await accountClient.resendInvite(email, role)
-    await load()
+    failedInviteEmail = undefined
+    try {
+      await accountClient.resendInvite(email, role)
+      await load()
+    } catch {
+      failedInviteEmail = email
+    }
   }
 
   function openBilling (): void {
     const location = getCurrentResolvedLocation()
-    location.path[3] = 'billing'
-    location.path.length = 4
+    location.path[3] = 'setting'
+    location.path[4] = 'billing'
+    location.path[5] = 'subscriptions'
+    location.path.length = 6
     navigate(location)
   }
 
@@ -124,9 +130,11 @@
     return items.filter((item) => item.id === role || hasAccountRole(account, item.id as AccountRole))
   }
 
+  $: legacyMembers = Object.values(workspaceMembers).filter((role) => role === AccountRole.ReadOnlyGuest).length
   $: ownersCount = Object.values(workspaceMembers).filter((role) => role === AccountRole.Owner).length
   $: usedSeats = (entitlement?.memberSeats ?? 0) + (entitlement?.pendingInviteSeats ?? 0)
   $: availableSeats = entitlement?.availableSeats
+  $: hasAvailableSeat = entitlement?.plan !== 'business' || (availableSeats ?? 0) > 0
   $: normalizedSearch = search.trim().toLocaleLowerCase()
 </script>
 
@@ -136,6 +144,7 @@
     <Button
       label={setting.string.InviteMember}
       kind="primary"
+      disabled={!hasAvailableSeat}
       on:click={() => showPopup(InviteMemberPopup, {}, undefined, () => void load())}
     />
     <svelte:fragment slot="search"><SearchInput bind:value={search} collapsed /></svelte:fragment>
@@ -152,9 +161,9 @@
               <div><strong>{usedSeats}</strong><Label label={setting.string.OccupiedSeats} /></div>
               <div><strong>{availableSeats ?? 0}</strong><Label label={setting.string.AvailableSeats} /></div>
             </div>
-            {#if (availableSeats ?? 0) > 0}
+            {#if !hasAvailableSeat}
               <div class="seat-alert flex-row-center flex-gap-3">
-                <div class="flex-grow"><Label label={setting.string.AvailableSeatsHint} params={{ count: availableSeats }} /></div>
+                <div class="flex-grow"><Label label={setting.string.SeatLimitOwnerOnly} /></div>
                 {#if currentAccount.role === AccountRole.Owner}
                   <Button label={setting.string.ManageBilling} kind="secondary" on:click={openBilling} />
                 {/if}
@@ -162,6 +171,9 @@
             {/if}
           {/if}
 
+          {#if currentAccount.role === AccountRole.Owner && legacyMembers > 0}
+            <div class="seat-alert"><Label label={setting.string.LegacyReadOnlyMembers} params={{ count: legacyMembers }} /></div>
+          {/if}
           <div class="section-title"><Label label={setting.string.ActiveMembers} /></div>
           {#each employees as employee (employee._id)}
             {@const personUuid = employee.personUuid ?? undefined}
@@ -193,11 +205,19 @@
               <div class="member-row">
                 <div class="flex-grow">
                   <div>{invite.email}</div>
-                  <div class="text-sm text-secondary"><Label label={setting.string.InviteExpires} params={{ date: new Date(invite.expiresOn).toLocaleDateString() }} /></div>
+                  <div class="text-sm text-secondary">
+                    <Label
+                      label={setting.string.InviteExpires}
+                      params={{ date: new Date(invite.expiresOn).toLocaleDateString($themeStore.language) }}
+                    />
+                  </div>
                 </div>
                 <Label label={items.find((item) => item.id === invite.role)?.label ?? setting.string.User} />
                 <Button label={setting.string.ResendInvite} kind="secondary" on:click={() => void resendInvite(invite.email, invite.role)} />
                 <Button label={setting.string.CancelInvite} kind="secondary" on:click={() => void cancelInvite(invite.id)} />
+                {#if failedInviteEmail === invite.email}
+                  <div class="error-color text-sm"><Label label={setting.string.InviteMemberFailed} /></div>
+                {/if}
               </div>
             {/each}
           {/if}
@@ -211,7 +231,7 @@
   .seat-summary { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--spacing-2); }
   .seat-summary > div { display: flex; flex-direction: column; gap: var(--spacing-1); padding: var(--spacing-3); border: 1px solid var(--theme-divider-color); border-radius: var(--medium-BorderRadius); }
   .seat-summary strong { font-size: 1.5rem; }
-  .seat-alert { padding: var(--spacing-2); border: 1px solid var(--theme-state-positive-color); border-radius: var(--medium-BorderRadius); background: var(--theme-state-positive-background-color); }
+  .seat-alert { padding: var(--spacing-2); border: 1px solid var(--theme-state-negative-border-color); border-radius: var(--medium-BorderRadius); background: var(--theme-state-negative-background-color); }
   .section-title { font-size: 1rem; font-weight: 500; }
   .member-row { display: flex; align-items: center; gap: var(--spacing-2); padding: var(--spacing-2); border-bottom: 1px solid var(--theme-divider-color); }
 </style>

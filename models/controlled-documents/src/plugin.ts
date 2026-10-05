@@ -93,7 +93,6 @@ export default mergeIds(documentsId, documents, {
     StateNotification: '' as Ref<NotificationType>
   },
   ids: {
-    ModulePermissionGroup: '' as Ref<Doc>,
     ModulePermissionGroupReadOnlyGuest: '' as Ref<Doc>
   }
 })

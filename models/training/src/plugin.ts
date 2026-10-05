@@ -34,8 +34,6 @@ export default mergeIds(trainingId, training, {
     TrainingRequest: '' as Ref<NotificationType>
   },
   ids: {
-    GuestTrainingAttemptClassPermission: '' as Ref<Doc>,
-    ModulePermissionGroup: '' as Ref<Doc>,
     ModulePermissionGroupReadOnlyGuest: '' as Ref<Doc>
   },
 

@@ -14,7 +14,7 @@
 -->
 <script lang="ts">
   import { createEventDispatcher } from 'svelte'
-  import { Button, Label } from '@hcengineering/ui'
+  import { Button, Label, themeStore } from '@hcengineering/ui'
   import billing from '../plugin'
   import { restrictionStore } from '../stores/restriction'
   import { subscriptionStore } from '../stores/subscription'
@@ -29,7 +29,11 @@
   $: gracePeriodEndsAtDate = rState.gracePeriodEndsAt !== undefined ? new Date(rState.gracePeriodEndsAt) : undefined
   $: formattedDate =
     gracePeriodEndsAtDate !== undefined
-      ? gracePeriodEndsAtDate.toLocaleDateString(undefined, { day: 'numeric', month: 'short', year: 'numeric' })
+      ? gracePeriodEndsAtDate.toLocaleDateString($themeStore.language, {
+        day: 'numeric',
+        month: 'short',
+        year: 'numeric'
+      })
       : ''
 
   function handleUpgrade (): void {

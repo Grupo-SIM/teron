@@ -27,7 +27,14 @@
 </script>
 
 {#if onChange !== undefined && !readonly}
-  <NumberEditor {onChange} {value} {label} {kind} {attribute} />
+  <NumberEditor
+    {onChange}
+    {value}
+    {label}
+    {kind}
+    {attribute}
+    hideEmpty={kind === 'list' && (attribute?.name === 'onsiteDaysPerWeek' || attribute?.name === 'remoteDaysPerWeek')}
+  />
 {:else}
   <span>{value != null ? value : ''}</span>
 {/if}

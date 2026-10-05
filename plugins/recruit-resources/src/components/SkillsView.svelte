@@ -5,7 +5,6 @@
   import { buildFilterKey, setFilters } from '@hcengineering/view-resources'
   import { getClient } from '@hcengineering/presentation'
   import { Filter } from '@hcengineering/view'
-  import { getEmbeddedLabel } from '@hcengineering/platform'
   import OptimizeSkills from './OptimizeSkills.svelte'
   import { selectedTagElements } from '@hcengineering/tags-resources'
 
@@ -50,7 +49,7 @@
   }}
 >
   <Button
-    label={getEmbeddedLabel('Optimize')}
+    label={recruit.string.Optimize}
     kind={'regular'}
     on:click={() => {
       showPopup(OptimizeSkills, { targetClass: recruit.mixin.Candidate })

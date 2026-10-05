@@ -13,24 +13,26 @@
 // limitations under the License.
 -->
 <script lang="ts">
-  import { AccountRole, Ref, getCurrentAccount, hasAccountRole } from '@hcengineering/core'
-  import { IntlString } from '@hcengineering/platform'
-  import { getClient } from '@hcengineering/presentation'
+  import { AccountRole, getCurrentAccount, hasAccountRole, type Ref } from '@hcengineering/core'
+  import { getClient, isAdminUser, MessageBox } from '@hcengineering/presentation'
   import {
-    AccordionItem,
     ButtonIcon,
+    Icon,
+    IconChevronDown,
+    IconChevronRight,
     IconDelete,
     IconEdit,
     IconMoreH,
-    IconSettings,
-    Label,
     SelectPopup,
     eventToHTMLElement,
     showPopup,
+    tooltip,
     type SelectPopupValueType
   } from '@hcengineering/ui'
   import { Floor, ParticipantInfo, Room } from '@hcengineering/love'
   import { createEventDispatcher } from 'svelte'
+  import { translate } from '@hcengineering/platform'
+  import { getCurrentLanguage } from '@hcengineering/ui'
   import plugin from '../plugin'
   import { infos } from '../stores'
   import { calculateFloorSize } from '../utils'
@@ -42,39 +44,41 @@
   export let configurable: boolean = false
   export let rooms: Room[] = []
   export let selected: boolean
-  export let disabled: boolean = false
-  export let isOpen: boolean = false
-  export let cropped: boolean = false
-  export let showRoomName: boolean = false
-  export let size: 'small' | 'medium' | 'large' = 'large'
-  export let background: string | undefined = undefined
-  export let kind: 'default' | 'second' | 'no-border' = 'default'
-  export let configure: boolean = false
+  export let removable: boolean = true
+  export let dragging: boolean = false
+  export let sortingDisabled: boolean = false
+  let expanded = true
+  let reorderLabel = ''
+  $: void translate(plugin.string.ReorderFloors, {}, getCurrentLanguage()).then((label) => { reorderLabel = label })
+  $: if (rooms.length === 0) expanded = true
 
   const me = getCurrentAccount()
   const dispatch = createEventDispatcher()
 
-  let floorContainer: HTMLDivElement
-  let hovered: number = -1
-
-  function getInfo (room: Ref<Room>, info: ParticipantInfo[]): ParticipantInfo[] {
-    return info.filter((p) => p.room === room)
-  }
-
-  let roomName: IntlString | undefined = undefined
-
-  function hover (e: CustomEvent<any>, n: number): void {
-    roomName = e.detail.name
-    hovered = n
-  }
-
-  $: editable = hasAccountRole(me, AccountRole.Maintainer)
-  $: rows = calculateFloorSize(rooms) - (cropped ? 1 : 0)
+  $: editable = isAdminUser() || hasAccountRole(me, AccountRole.Maintainer)
 
   const client = getClient()
+  let floorContainer: HTMLDivElement
+  $: rows = calculateFloorSize(rooms)
 
-  async function remove (): Promise<void> {
-    await client.remove(floor)
+  function getInfo (room: Ref<Room>, info: ParticipantInfo[]): ParticipantInfo[] {
+    return info.filter((participant) => participant.room === room)
+  }
+
+  function remove (): void {
+    showPopup(MessageBox, {
+      label: plugin.string.DeleteFloor,
+      message: plugin.string.DeleteFloorConfirm,
+      params: { name: floor.name },
+      dangerous: true,
+      action: async () => {
+        for (const room of rooms) {
+          await client.remove(room)
+        }
+        await client.remove(floor)
+        dispatch('remove', floor)
+      }
+    })
   }
 
   function renameFloor (): void {
@@ -87,52 +91,168 @@
   const clickMore = (e: MouseEvent): void => {
     pressed = true
     const value: SelectPopupValueType[] = [{ id: 'rename', icon: IconEdit, label: plugin.string.RenameAFloor }]
+    if (removable) {
+      value.push({ id: 'delete', icon: IconDelete, label: plugin.string.DeleteFloor })
+    }
     showPopup(SelectPopup, { value }, eventToHTMLElement(e), (result) => {
-      if (result === 'configure') {
-        dispatch('configure', floor)
-        pressed = false
-      } else if (result === 'rename') renameFloor()
+      pressed = false
+      if (result === 'rename') renameFloor()
+      else if (result === 'delete') remove()
     })
   }
 </script>
 
-<AccordionItem
-  id={`floor-${floor._id}`}
-  title={floor.name}
-  {size}
-  {background}
-  {isOpen}
-  selectable
-  {selected}
-  {disabled}
-  {kind}
-  categoryHeader
-  contentAlign={'center'}
-  on:select
->
-  <svelte:fragment slot="actions">
-    {#if showRoomName && roomName !== undefined}
-      <span class="content-color overflow-label"><Label label={roomName} /></span>
-    {/if}
+<div class="floor-card preview" class:selected class:empty={rooms.length === 0} class:expanded={expanded && !dragging}>
+  <div class="floor-row">
     {#if configurable && editable}
-      {#if rooms.length === 0}
-        <div class="mr-2">
-          <ButtonIcon icon={IconDelete} kind={'negative'} size={'small'} on:click={remove} />
-        </div>
-      {/if}
+      <button
+        class="floor-drag-handle"
+        aria-label={`${reorderLabel} ${floor.name}`}
+        disabled={sortingDisabled}
+        use:tooltip={{ label: plugin.string.ReorderFloors, direction: 'bottom' }}
+        on:pointerdown={(event) => dispatch('dragstart', event)}
+        on:keydown={(event) => dispatch('reorderkey', event)}
+      >
+        <svg width="14" height="18" viewBox="0 0 14 18" fill="currentColor" aria-hidden="true">
+          {#each [4, 9, 14] as y}
+            <circle cx="4" cy={y} r="1.5" /><circle cx="10" cy={y} r="1.5" />
+          {/each}
+        </svg>
+      </button>
+    {/if}
+    {#if rooms.length > 0}
+      <button class="floor-select" aria-expanded={expanded} on:click={() => (expanded = !expanded)}>
+        <span class="overflow-label">{floor.name}</span>
+        <Icon icon={expanded ? IconChevronDown : IconChevronRight} size={'small'} />
+      </button>
+    {:else}
+      <div class="floor-select floor-title">
+        <span class="overflow-label">{floor.name}</span>
+      </div>
+    {/if}
+    <button
+      class="floor-activate"
+      class:selected
+      aria-label={floor.name}
+      aria-pressed={selected}
+      use:tooltip={{ label: plugin.string.EnterFloor, direction: 'bottom' }}
+      on:click={() => dispatch('select')}
+    >
+      <Icon icon={plugin.icon.EnterRoom} size={'small'} />
+    </button>
+    {#if configurable && editable}
       <ButtonIcon icon={IconMoreH} kind={'tertiary'} size={'small'} {pressed} on:click={clickMore} />
     {/if}
-  </svelte:fragment>
-  <FloorGrid bind:floorContainer {rows} preview on:mouseover={() => (roomName = undefined)}>
-    {#each rooms as room, i}
-      <RoomPreview
-        {room}
-        info={getInfo(room._id, $infos)}
-        preview
-        on:hover={(e) => {
-          hover(e, i)
-        }}
-      />
-    {/each}
-  </FloorGrid>
-</AccordionItem>
+  </div>
+  {#if expanded && !dragging}
+    {#if rooms.length > 0}
+      <div class="floor-preview-content">
+        <FloorGrid bind:floorContainer {rows} preview>
+          {#each rooms as room}
+            <RoomPreview {room} info={getInfo(room._id, $infos)} />
+          {/each}
+        </FloorGrid>
+      </div>
+    {:else}
+      <button class="floor-empty-select" aria-label={floor.name} on:click={() => dispatch('select')}>
+        <span>+</span>
+      </button>
+    {/if}
+  {/if}
+</div>
+
+<style lang="scss">
+  .floor-card {
+    width: 100%;
+    min-width: 0;
+    border: 1px solid var(--global-ui-BorderColor);
+    border-radius: var(--small-BorderRadius);
+    background-color: var(--theme-panel-color);
+
+    &.selected {
+      border-color: var(--theme-button-focused-border);
+      background-color: var(--theme-panel-color);
+    }
+
+    &.empty.expanded {
+      flex: 0 0 10rem;
+      max-width: 100%;
+      min-height: 9rem;
+    }
+  }
+
+  .floor-drag-handle {
+    display: flex;
+    padding: 0.35rem;
+    border: 1px solid var(--global-ui-BorderColor);
+    border-radius: var(--small-BorderRadius);
+    color: var(--theme-content-color);
+    cursor: grab;
+    touch-action: none;
+
+    &:active { cursor: grabbing; }
+    &:disabled { cursor: not-allowed; opacity: 0.5; }
+  }
+
+  .floor-row {
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+    padding: 0.25rem;
+  }
+
+  .floor-select {
+    display: flex;
+    flex: 1;
+    align-items: center;
+    justify-content: space-between;
+    min-width: 0;
+    padding: 0.5rem;
+    color: var(--theme-content-color);
+    cursor: pointer;
+  }
+
+  .floor-title {
+    cursor: default;
+  }
+
+  .floor-activate {
+    display: flex;
+    align-items: center;
+    padding: 0.5rem;
+    border: 1px solid var(--global-ui-BorderColor);
+    border-radius: var(--small-BorderRadius);
+    color: var(--theme-content-color);
+    cursor: pointer;
+    opacity: 0.5;
+
+    &.selected {
+      opacity: 1;
+    }
+  }
+
+  .floor-empty-select {
+    display: block;
+    width: 100%;
+    min-height: 5rem;
+    padding: 0 0.5rem 0.5rem;
+    cursor: pointer;
+    text-align: center;
+    color: var(--theme-content-color);
+    background: transparent;
+    border: 0;
+  }
+
+  .floor-preview-content {
+    display: flex;
+    justify-content: center;
+    width: 100%;
+    padding: 0 0.5rem 0.5rem;
+    overflow: hidden;
+
+    :global(.floorGrid) {
+      min-width: 0 !important;
+      max-width: 100% !important;
+    }
+  }
+</style>

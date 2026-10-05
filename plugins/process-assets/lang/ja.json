@@ -183,6 +183,8 @@
     "RequiredSlots": "必須スロット",
     "Bindings": "バインディング",
     "AskRequired": "必須フィールドを尋ねる"
+  ,
+    "NoSlotsDefined": "No slots defined for this process"
   },
   "error": {
     "MethodNotFound": "メソッドが見つかりません: {methodId}",

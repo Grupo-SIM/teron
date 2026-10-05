@@ -278,12 +278,6 @@ export function createModel (builder: Builder): void {
     TUserMentionInfo
   )
 
-  builder.mixin(activity.class.Reaction, core.class.Class, core.mixin.TxAccessLevel, {
-    createAccessLevel: AccountRole.Guest,
-    updateAccessLevel: AccountRole.Guest,
-    removeAccessLevel: AccountRole.Guest
-  })
-
   builder.mixin(activity.class.DocUpdateMessage, core.class.Class, view.mixin.ObjectPresenter, {
     presenter: activity.component.DocUpdateMessagePresenter
   })

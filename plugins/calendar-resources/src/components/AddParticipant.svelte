@@ -14,7 +14,7 @@
 -->
 <script lang="ts">
   import contact, { Person } from '@hcengineering/contact'
-  import { CreateGuest, getPersonRefByPersonId } from '@hcengineering/contact-resources'
+  import { getPersonRefByPersonId } from '@hcengineering/contact-resources'
   import { Ref, type PersonId } from '@hcengineering/core'
   import { IntlString, translateCB } from '@hcengineering/platform'
   import { createQuery, getClient } from '@hcengineering/presentation'
@@ -161,14 +161,6 @@
     }
   }
 
-  function addGuest (e: MouseEvent) {
-    showPopup(CreateGuest, {}, undefined, (res) => {
-      if (res) {
-        value = ''
-        dispatch('ref', res)
-      }
-    })
-  }
 </script>
 
 <!-- svelte-ignore a11y-click-events-have-key-events -->
@@ -212,26 +204,10 @@
         on:blur
       />
     </div>
-    <div class="tool">
-      <Button
-        {disabled}
-        focusIndex={2}
-        kind={'ghost'}
-        size={'small'}
-        icon={IconAdd}
-        showTooltip={{
-          label: contact.string.AddGuest
-        }}
-        on:click={addGuest}
-      />
-    </div>
   </div>
 </div>
 
 <style lang="scss">
-  .tool {
-    visibility: hidden;
-  }
 
   .container:hover {
     .tool {

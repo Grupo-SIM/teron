@@ -61,7 +61,7 @@ export interface SharedTelegramMessages extends AttachedDoc {
 /**
  * @public
  */
-export const telegramIntegrationKind = 'terongram' as IntegrationKind
+export const telegramIntegrationKind = 'telegram' as IntegrationKind
 
 /**
  * @public

@@ -45,6 +45,11 @@ describe('getTierLimitsBytes', () => {
     expect(bytes.trafficBytes).toBe(gb.trafficGB * 1e9)
   })
 
+  it('represents unlimited storage with a zero limit', () => {
+    expect(getTierLimitsBytes('common').storageBytes).toBe(0)
+    expect(getTierLimitsBytes('legendary').storageBytes).toBe(0)
+  })
+
   it('falls back to default tier in bytes', () => {
     const fallback = getTierLimitsBytes(undefined)
     expect(fallback.storageBytes).toBe(DEFAULT_TIER_LIMITS_GB.storageGB * 1e9)

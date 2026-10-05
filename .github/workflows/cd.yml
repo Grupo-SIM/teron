@@ -1,9 +1,9 @@
 name: CD
 
 on:
-  push:
-    branches:
-      - main
+  # push:
+  #   branches:
+  #     - main
   workflow_dispatch:
 
 concurrency:
@@ -11,12 +11,14 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  DOCKER_CONTEXT_IMAGE: docker.io/${{ github.repository }}_workspace:build-context
+  DOCKER_BACKEND_CONTEXT_IMAGE: docker.io/jbmidia/teron_workspace:backend-build-context
+  DOCKER_FRONT_BUILD_CACHE_IMAGE: docker.io/jbmidia/teron_workspace:front-build-cache-v2
+  DOCKER_FRONT_CONTEXT_IMAGE: docker.io/jbmidia/teron_workspace:front-build-context
   INIT_SCRIPTS_BRANCH: main
 
 jobs:
-  prepare:
-    name: Prepare shared Docker build context
+  prepare-backend:
+    name: Prepare backend Docker build context
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -82,13 +84,10 @@ jobs:
         id: rush-build-cache
         uses: actions/cache/restore@v5
         with:
-          path: |
-            common/temp/build-cache
-            dev/prod/.build_dev
-          key: ${{ runner.os }}-rush-build-${{ github.sha }}-${{ github.run_id }}-${{ github.run_attempt }}
+          path: common/temp/build-cache
+          key: ${{ runner.os }}-rush-backend-build-${{ github.sha }}
           restore-keys: |
-            ${{ runner.os }}-rush-build-${{ github.sha }}-
-            ${{ runner.os }}-rush-build-
+            ${{ runner.os }}-rush-backend-build-
 
       - name: Set model version
         run: node common/scripts/install-run-rush.js model-version
@@ -98,7 +97,6 @@ jobs:
           targets=(
             @hcengineering/pod-account
             @hcengineering/pod-collaborator
-            @hcengineering/pod-front
             @hcengineering/pod-fulltext
             @hcengineering/pod-github
             @hcengineering/pod-love
@@ -108,8 +106,9 @@ jobs:
             @hcengineering/rekoni-service
             @hcengineering/pod-stats
             @hcengineering/pod-server
+            @hcengineering/pod-telegram
+            @hcengineering/pod-telegram-bot
             @hcengineering/pod-workspace
-            @hcengineering/prod
           )
           selectors=()
 
@@ -124,7 +123,6 @@ jobs:
           targets=(
             @hcengineering/pod-account
             @hcengineering/pod-collaborator
-            @hcengineering/pod-front
             @hcengineering/pod-fulltext
             @hcengineering/pod-github
             @hcengineering/pod-love
@@ -134,6 +132,8 @@ jobs:
             @hcengineering/rekoni-service
             @hcengineering/pod-stats
             @hcengineering/pod-server
+            @hcengineering/pod-telegram
+            @hcengineering/pod-telegram-bot
             @hcengineering/pod-workspace
           )
           selectors=()
@@ -144,19 +144,11 @@ jobs:
 
           node common/scripts/install-run-rush.js bundle -v "${selectors[@]}"
 
-      - name: Package frontend assets
-        env:
-          NODE_OPTIONS: --max-old-space-size=4096
-          USE_CACHE: "true"
-        run: node common/scripts/install-run-rush.js package -v --only @hcengineering/prod --only @hcengineering/pod-front
-
       - name: Save Rush build cache
         if: always() && steps.rush-build-cache.outputs.cache-hit != 'true'
         uses: actions/cache/save@v5
         with:
-          path: |
-            common/temp/build-cache
-            dev/prod/.build_dev
+          path: common/temp/build-cache
           key: ${{ steps.rush-build-cache.outputs.cache-primary-key }}
 
       - name: Download workspace initialization scripts
@@ -171,7 +163,6 @@ jobs:
           contexts=(
             pods/account
             pods/collaborator
-            pods/front
             pods/fulltext
             pods/server
             pods/stats
@@ -182,6 +173,8 @@ jobs:
             services/notification/pod-notification
             services/print/pod-print
             services/rekoni
+            services/telegram/pod-telegram
+            services/telegram-bot/pod-telegram-bot
           )
 
           for context in "${contexts[@]}"; do
@@ -202,15 +195,168 @@ jobs:
 
       - name: Push shared Docker build context
         run: |
-          docker build --tag "$DOCKER_CONTEXT_IMAGE" --file - docker-contexts <<'DOCKERFILE'
+          docker build --tag "$DOCKER_BACKEND_CONTEXT_IMAGE" --file - docker-contexts <<'DOCKERFILE'
           FROM alpine:3.21
           COPY . /docker-contexts
           DOCKERFILE
-          docker push "$DOCKER_CONTEXT_IMAGE"
+          docker push "$DOCKER_BACKEND_CONTEXT_IMAGE"
+
+  prepare-front:
+    name: Prepare frontend Docker build context
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+        with:
+          fetch-depth: 0
+          filter: tree:0
+          submodules: recursive
+
+      - name: Set up Node.js
+        uses: actions/setup-node@v6
+        with:
+          node-version-file: .nvmrc
+
+      - name: Set up pnpm
+        uses: pnpm/action-setup@v5
+        with:
+          version: 10
+
+      - name: Restore Rush and pnpm cache
+        id: rush-dependencies-cache
+        uses: actions/cache/restore@v5
+        with:
+          path: |
+            common/temp/install-run
+            common/temp/pnpm-store
+            common/temp/node_modules
+            common/temp/*.flag
+            common/temp/*.json
+            common/temp/*.yaml
+            */node_modules
+            */*/node_modules
+            */*/*/node_modules
+            */*/*/*/node_modules
+          key: ${{ runner.os }}-rush-dependencies-${{ hashFiles('.nvmrc') }}-${{ hashFiles('rush.json', 'common/config/rush/pnpm-lock.yaml', 'common/config/rush/pnpm-config.json', 'common/config/rush/common-versions.json', 'common/config/rush/.pnpmfile.cjs') }}
+          restore-keys: |
+            ${{ runner.os }}-rush-dependencies-${{ hashFiles('.nvmrc') }}-
+
+      - name: Install root workspace dependencies
+        if: steps.rush-dependencies-cache.outputs.cache-hit != 'true'
+        run: node common/scripts/install-run-rush.js install
+
+      - name: Save Rush and pnpm cache
+        if: steps.rush-dependencies-cache.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v5
+        with:
+          path: |
+            common/temp/install-run
+            common/temp/pnpm-store
+            common/temp/node_modules
+            common/temp/*.flag
+            common/temp/*.json
+            common/temp/*.yaml
+            */node_modules
+            */*/node_modules
+            */*/*/node_modules
+            */*/*/*/node_modules
+          key: ${{ steps.rush-dependencies-cache.outputs.cache-primary-key }}
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v4
+        with:
+          registry: docker.io
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+
+      - name: Restore Rush build cache
+        id: rush-build-cache
+        uses: actions/cache/restore@v5
+        with:
+          path: |
+            common/temp/build-cache
+            dev/prod/.build_dev
+          key: ${{ runner.os }}-rush-front-build-${{ github.sha }}
+          restore-keys: |
+            ${{ runner.os }}-rush-front-build-
+
+      - name: Restore persistent frontend build cache
+        if: steps.rush-build-cache.outputs.cache-hit != 'true'
+        run: |
+          if [ -d common/temp/build-cache ] || [ -d dev/prod/.build_dev ]; then
+            exit 0
+          fi
+
+          if ! docker pull "$DOCKER_FRONT_BUILD_CACHE_IMAGE"; then
+            exit 0
+          fi
+
+          cache_container=$(docker create "$DOCKER_FRONT_BUILD_CACHE_IMAGE")
+          cache_archive=$(mktemp)
+          trap 'rm -f "$cache_archive"; docker rm -f "$cache_container"; docker image rm "$DOCKER_FRONT_BUILD_CACHE_IMAGE"' EXIT
+          docker cp "$cache_container:/cache.tar.gz" "$cache_archive"
+          tar -xzf "$cache_archive"
+
+      - name: Set model version
+        run: node common/scripts/install-run-rush.js model-version
+
+      - name: Build frontend dependencies
+        run: |
+          node common/scripts/install-run-rush.js build -v \
+            --to @hcengineering/pod-front \
+            --to @hcengineering/prod
+
+      - name: Package frontend assets
+        env:
+          NODE_OPTIONS: --max-old-space-size=4096
+          USE_CACHE: "true"
+        run: node common/scripts/install-run-rush.js package -v --only @hcengineering/prod --only @hcengineering/pod-front
+
+      - name: Bundle frontend service
+        run: node common/scripts/install-run-rush.js bundle -v --only @hcengineering/pod-front
+
+      - name: Save Rush build cache
+        if: always() && steps.rush-build-cache.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v5
+        with:
+          path: |
+            common/temp/build-cache
+            dev/prod/.build_dev
+          key: ${{ steps.rush-build-cache.outputs.cache-primary-key }}
+
+      - name: Push persistent frontend build cache
+        run: |
+          mkdir -p .ci/front-build-cache
+          trap 'rm -rf .ci/front-build-cache' EXIT
+          tar -czf .ci/front-build-cache/cache.tar.gz common/temp/build-cache dev/prod/.build_dev
+
+          docker build --tag "$DOCKER_FRONT_BUILD_CACHE_IMAGE" --file - .ci/front-build-cache <<'DOCKERFILE'
+          FROM scratch
+          COPY cache.tar.gz /cache.tar.gz
+          CMD ["/unused"]
+          DOCKERFILE
+          docker push "$DOCKER_FRONT_BUILD_CACHE_IMAGE"
+          docker image rm "$DOCKER_FRONT_BUILD_CACHE_IMAGE"
+
+      - name: Stage frontend Docker context files
+        run: |
+          mkdir -p docker-contexts/pods/front
+          cp -a pods/front/bundle docker-contexts/pods/front/bundle
+          cp -a pods/front/dist docker-contexts/pods/front/dist
+
+      - name: Push frontend Docker build context
+        run: |
+          docker build --tag "$DOCKER_FRONT_CONTEXT_IMAGE" --file - docker-contexts <<'DOCKERFILE'
+          FROM alpine:3.21
+          COPY . /docker-contexts
+          DOCKERFILE
+          docker push "$DOCKER_FRONT_CONTEXT_IMAGE"
 
   publish:
     name: Build and publish ${{ matrix.image }} image
-    needs: prepare
+    needs: prepare-backend
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -223,9 +369,6 @@ jobs:
             build-args: TERON_WORKSPACE_SEAT_AMOUNT=${{ vars.TERON_WORKSPACE_SEAT_AMOUNT || '9.99' }}
           - image: collaborator
             context: pods/collaborator
-          - image: front
-            context: pods/front
-            build-args: TERON_WORKSPACE_SEAT_AMOUNT=${{ vars.TERON_WORKSPACE_SEAT_AMOUNT || '9.99' }}
           - image: fulltext
             context: pods/fulltext
           - image: github
@@ -242,6 +385,10 @@ jobs:
             context: services/rekoni
           - image: stats
             context: pods/stats
+          - image: telegram
+            context: services/telegram/pod-telegram
+          - image: telegram-bot
+            context: services/telegram-bot/pod-telegram-bot
           - image: transactor
             context: pods/server
           - image: workspace
@@ -259,19 +406,55 @@ jobs:
 
       - name: Restore shared Docker build context
         run: |
-          docker pull "$DOCKER_CONTEXT_IMAGE"
-          context_container=$(docker create "$DOCKER_CONTEXT_IMAGE")
+          docker pull "$DOCKER_BACKEND_CONTEXT_IMAGE"
+          context_container=$(docker create "$DOCKER_BACKEND_CONTEXT_IMAGE")
           trap 'docker rm -f "$context_container"' EXIT
           docker cp "${context_container}:/docker-contexts/." .
 
       - name: Build and publish image
         uses: hyoretsu/gh-actions/ghcr@main
         with:
-          image: ${{ github.repository }}_${{ matrix.image }}
+          image: jbmidia/teron_${{ matrix.image }}
           context: ${{ matrix.context }}
           dockerfile: ${{ matrix.context }}/Dockerfile
           build-args: ${{ matrix.build-args }}
           cache-scope: ${{ matrix.image }}
+          registry: docker.io
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+
+  publish-front:
+    name: Build and publish front image
+    needs: prepare-front
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v6
+
+      - name: Log in to Docker Hub
+        uses: docker/login-action@v4
+        with:
+          registry: docker.io
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+
+      - name: Restore frontend Docker build context
+        run: |
+          docker pull "$DOCKER_FRONT_CONTEXT_IMAGE"
+          context_container=$(docker create "$DOCKER_FRONT_CONTEXT_IMAGE")
+          trap 'docker rm -f "$context_container"' EXIT
+          docker cp "${context_container}:/docker-contexts/." .
+
+      - name: Build and publish image
+        uses: hyoretsu/gh-actions/ghcr@main
+        with:
+          image: jbmidia/teron_front
+          context: pods/front
+          dockerfile: pods/front/Dockerfile
+          build-args: TERON_WORKSPACE_SEAT_AMOUNT=${{ vars.TERON_WORKSPACE_SEAT_AMOUNT || '9.99' }}
+          cache-scope: front
           registry: docker.io
           password: ${{ secrets.DOCKERHUB_TOKEN }}
           username: ${{ secrets.DOCKERHUB_USERNAME }}
@@ -288,7 +471,7 @@ jobs:
       - name: Build and publish image
         uses: hyoretsu/gh-actions/ghcr@main
         with:
-          image: ${{ github.repository }}_hulypulse
+          image: jbmidia/teron_hulypulse
           context: foundations/hulypulse
           dockerfile: foundations/hulypulse/Dockerfile
           cache-scope: hulypulse

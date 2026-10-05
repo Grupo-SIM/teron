@@ -214,6 +214,7 @@ export interface Branding {
     href: string
     type?: string
     sizes?: string
+    media?: string
   }>
   support?: {
     supportLink?: string
@@ -453,6 +454,10 @@ export async function configurePlatform() {
         htmlLink.setAttribute('sizes', link.sizes)
       }
 
+      if (link.media !== undefined) {
+        htmlLink.media = link.media
+      }
+
       document.head.appendChild(htmlLink)
     }
   }
@@ -534,7 +539,7 @@ export async function configurePlatform() {
 
   const languages = myBranding.languages
     ? myBranding.languages.split(',').map((l) => l.trim())
-    : ['pt-br', 'en']
+    : ['pt-br']
 
   setMetadata(uiPlugin.metadata.Languages, languages)
 
@@ -568,7 +573,6 @@ export async function configurePlatform() {
   addLocation(taskId, async () => await import(/* webpackChunkName: "task" */ '@hcengineering/task-resources'))
   addLocation(contactId, async () => await import(/* webpackChunkName: "contact" */ '@hcengineering/contact-resources'))
   addLocation(chunterId, async () => await import(/* webpackChunkName: "chunter" */ '@hcengineering/chunter-resources'))
-  addLocation(recruitId, async () => await import(/* webpackChunkName: "recruit" */ '@hcengineering/recruit-resources'))
   addLocation(
     activityId,
     async () => await import(/* webpackChunkName: "activity" */ '@hcengineering/activity-resources')
@@ -690,12 +694,10 @@ export async function configurePlatform() {
     async () => await import(/* webpackChunkName: "communication" */ '@hcengineering/communication-resources')
   )
   addLocation(emojiId, async () => await import(/* webpackChunkName: "emoji" */ '@hcengineering/emoji-resources'))
-  if ((config.BILLING_URL ?? '') !== '') {
-    addLocation(
-      billingId,
-      async () => await import(/* webpackChunkName: "billing" */ '@hcengineering/billing-resources')
-    )
-  }
+  addLocation(
+    billingId,
+    async () => await import(/* webpackChunkName: "billing" */ '@hcengineering/billing-resources')
+  )
   addLocation(
     teronMailId,
     async () => await import(/* webpackChunkName: "teronMail" */ '@hcengineering/teron-mail-resources')
@@ -724,7 +726,7 @@ export async function configurePlatform() {
 
   setMetadata(uiPlugin.metadata.PlatformTitle, title)
   setMetadata(workbench.metadata.PlatformTitle, title)
-  setDefaultLanguage(myBranding.defaultLanguage ?? 'pt-br')
+  setDefaultLanguage(myBranding.defaultLanguage ?? 'pt-br', languages)
   setMetadata(workbench.metadata.DefaultApplication, myBranding.defaultApplication ?? 'tracker')
   setMetadata(workbench.metadata.DefaultSpace, myBranding.defaultSpace ?? tracker.project.DefaultProject)
   setMetadata(workbench.metadata.DefaultSpecial, myBranding.defaultSpecial ?? 'issues')

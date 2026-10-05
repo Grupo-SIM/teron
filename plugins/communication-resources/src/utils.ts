@@ -140,7 +140,7 @@ export async function loadLinkPreviewParams (url: string): Promise<LinkPreviewPa
 }
 
 export function isCardAllowedForCommunications (card: Card): boolean {
-  if (getCurrentAccount().role !== AccountRole.Guest) return true
+  if (getCurrentAccount().role !== AccountRole.DocGuest) return true
   const allowedCards = get(guestCommunicationAllowedCards)
   if (allowedCards.includes(card._id)) return true
   for (const parentInfoElement of card.parentInfo) {

@@ -28,9 +28,11 @@ import {
   type SocialKey,
   SortingOrder,
   type Space,
+  TxOperations,
   type TxCUD
 } from '@hcengineering/core'
 import {
+  createOrUpdate,
   createDefaultSpace,
   type MigrateOperation,
   type MigrateUpdate,
@@ -46,6 +48,7 @@ import activity, { DOMAIN_ACTIVITY } from '@hcengineering/model-activity'
 import core, { getAccountsFromTxes, getSocialIdBySocialKey, getSocialKeyByOldEmail } from '@hcengineering/model-core'
 import { DOMAIN_VIEW } from '@hcengineering/model-view'
 import card, { type Card, DOMAIN_CARD } from '@hcengineering/card'
+import tags from '@hcengineering/tags'
 
 import contact, { contactId, DOMAIN_CHANNEL, DOMAIN_CONTACT } from './index'
 
@@ -219,7 +222,7 @@ async function assignEmployeeRoles (client: MigrationClient): Promise<void> {
           continue
         }
 
-        const role = memberInfo.role === AccountRole.Guest ? 'GUEST' : 'USER'
+        const role = 'USER'
 
         updates.push({
           filter: { _id: d._id },
@@ -718,6 +721,25 @@ export const contactOperation: MigrateOperation = {
         state: 'createSpace-v2',
         func: async (client) => {
           await createDefaultSpace(client, contact.space.Contacts, { name: 'Contacts', description: 'Contacts' })
+        }
+      },
+      {
+        state: 'create-employee-function-tags',
+        func: async (client) => {
+          const tx = new TxOperations(client, core.account.System)
+          await createOrUpdate(
+            tx,
+            tags.class.TagCategory,
+            core.space.Workspace,
+            {
+              icon: tags.icon.Tags,
+              label: contact.string.Position,
+              targetClass: contact.class.Person,
+              tags: [],
+              default: true
+            },
+            contact.category.Function
+          )
         }
       }
     ])

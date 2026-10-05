@@ -27,6 +27,7 @@
   import DPCalendarOver from './icons/DPCalendarOver.svelte'
   import { getMonthName } from './internal/DateUtils'
   import { registerFocus } from '../../focus'
+  import { themeStore } from '@hcengineering/theme'
 
   export let value: number | null | undefined
   export let mode: DateRangeMode = DateRangeMode.DATE
@@ -128,7 +129,7 @@
     {#if shouldShowLabel}
       {#if mode !== DateRangeMode.TIMEONLY}
         {new Date(value).getDate()}
-        {getMonthName(new Date(value), 'short')}
+        {getMonthName(new Date(value), 'short', $themeStore.language)}
         {#if new Date(value).getFullYear() !== today.getFullYear()}
           {new Date(value).getFullYear()}
         {/if}

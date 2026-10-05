@@ -10,7 +10,8 @@
     ButtonBase,
     IconChevronLeft,
     IconChevronRight,
-    getFormattedDate
+    getFormattedDate,
+    themeStore
   } from '@hcengineering/ui'
   import IconSun from './icons/Sun.svelte'
   import time from '../plugin'
@@ -35,7 +36,7 @@
     // if (areDatesEqual(day, tomorrow)) return time.string.Tomorrow
     const isCurrentYear = day.getFullYear() === new Date().getFullYear()
     return getEmbeddedLabel(
-      day.toLocaleDateString('default', {
+      day.toLocaleDateString($themeStore.language, {
         month: 'long',
         day: 'numeric',
         year: isCurrentYear ? undefined : 'numeric'
@@ -66,7 +67,9 @@
     <ButtonBase
       icon={IconSun}
       label={!doubleRow ? time.string.TodayColon : undefined}
-      title={!doubleRow ? getFormattedDate(todayDate.getTime(), { weekday: 'short', day: 'numeric' }) : undefined}
+      title={!doubleRow
+        ? getFormattedDate(todayDate.getTime(), { weekday: 'short', day: 'numeric' }, $themeStore.language)
+        : undefined}
       type={!doubleRow ? 'type-button' : 'type-button-icon'}
       kind={'secondary'}
       size={'small'}

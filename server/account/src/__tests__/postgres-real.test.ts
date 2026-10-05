@@ -185,7 +185,6 @@ describe('real-account', () => {
       {
         url: 'test-ws',
         name: 'test-ws',
-        allowGuestSignUp: true,
         allowReadOnlyGuest: true
       },
       {
@@ -206,7 +205,6 @@ describe('real-account', () => {
       {
         url: 'test-ws',
         name: 'test-ws',
-        allowGuestSignUp: true,
         allowReadOnlyGuest: true
       },
       {

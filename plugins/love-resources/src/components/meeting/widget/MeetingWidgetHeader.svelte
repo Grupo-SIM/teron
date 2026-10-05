@@ -29,7 +29,6 @@
   import { currentRoom } from '../../../stores'
   import MeetingOptionsButton from '../controls/MeetingOptionsButton.svelte'
   import RecordingButton from '../controls/RecordingButton.svelte'
-  import TranscriptionButton from '../controls/TranscriptionButton.svelte'
   import RoomAccessButton from '../controls/RoomAccessButton.svelte'
 
   export let room: Room
@@ -60,7 +59,6 @@
     {#if $currentRoom !== undefined}
       <RoomAccessButton {room} kind="tertiary" size="small" />
       <RecordingButton {room} kind="tertiary" size="small" />
-      <TranscriptionButton {room} kind="tertiary" size="small" />
       <MeetingOptionsButton {room} kind="tertiary" size="small" />
       <ButtonIcon icon={IconMaximize} kind="tertiary" size="small" noPrint on:click={maximize} />
     {/if}

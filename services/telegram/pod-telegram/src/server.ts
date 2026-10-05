@@ -4,6 +4,8 @@ import { Server } from 'http'
 import { ApiError } from './error'
 
 export type Handler = (req: Request, res: Response, next?: NextFunction) => Promise<void>
+export type HttpMethod = 'delete' | 'get' | 'post'
+export type Endpoint = readonly [method: HttpMethod, path: string, handler: Handler]
 
 const catchError = (fn: Handler) => (req: Request, res: Response, next: NextFunction) => {
   void (async () => {
@@ -15,14 +17,14 @@ const catchError = (fn: Handler) => (req: Request, res: Response, next: NextFunc
   })()
 }
 
-export function createServer (endpoints: Array<[string, Handler]>): Express {
+export function createServer (endpoints: Endpoint[]): Express {
   const app = express()
 
   app.use(cors())
   app.use(express.json())
 
-  endpoints.forEach(([endpoint, handler]) => {
-    app.post(endpoint, catchError(handler))
+  endpoints.forEach(([method, endpoint, handler]) => {
+    app[method](endpoint, catchError(handler))
   })
 
   app.use((_req, res, _next) => {

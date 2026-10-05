@@ -49,6 +49,7 @@ import { AnyComponent, ComponentExtensionId, Location, ResolvedLocation } from '
 import { Action, ActionCategory, IconProps } from '@hcengineering/view'
 
 export * from './analytics'
+export * from './time-tracking'
 
 /**
  * @public
@@ -124,7 +125,7 @@ export enum IssuePriority {
  */
 export enum IssuesGrouping {
   Status = 'status',
-  Assignee = 'assignee',
+  Assignee = 'assignees',
   Priority = 'priority',
   Component = 'component',
   Milestone = 'milestone',
@@ -208,6 +209,8 @@ export interface Issue extends Task {
 
   // ReportedTime time, auto updated using trigger.
   reportedTime: number
+  trackedTimeMs?: number
+  trackingStartedOn?: Timestamp | null
   // Collection of reportedTime entries, for proper time estimations per person.
   reports: CollectionSize<TimeSpendReport>
 
@@ -233,7 +236,8 @@ export interface IssueDraft {
   description: Markup
   status?: Ref<IssueStatus>
   priority: IssuePriority
-  assignee: Ref<Person> | null
+  assignees?: Ref<Person>[]
+  assignee?: Ref<Person> | null
   component: Ref<Component> | null
   space: Ref<Project>
   dueDate: Timestamp | null
@@ -261,7 +265,8 @@ export interface IssueTemplateData {
   description: Markup
   priority: IssuePriority
 
-  assignee: Ref<Person> | null
+  assignees?: Ref<Person>[]
+  assignee?: Ref<Person> | null
   component: Ref<Component> | null
 
   milestone?: Ref<Milestone> | null
@@ -330,6 +335,8 @@ export interface IssueChildInfo {
   childId: Ref<Issue>
   estimation: number
   reportedTime: number
+  trackedTimeMs?: number
+  trackingStartedOn?: Timestamp | null
 }
 
 /**

@@ -72,6 +72,15 @@
         "Inactive": "비활성",
         "Active": "활성",
         "Role": "역할",
+    "ProfessionalTitle": "Professional title",
+    "ContactSource": "Contact source",
+    "Skills": "Skills",
+    "RemoteDaysPerWeek": "Remote days per week",
+    "RemoteDaysPerWeekShort": "Remote",
+    "OnsiteDaysPerWeek": "On-site days per week",
+    "OnsiteDaysPerWeekShort": "On-site",
+    "WorkDaysPerWeekInvalid": "Use 0 to 7; the total cannot exceed 7 days.",
+    "WorkDaysPerWeekPlaceholder": "E.g. 3",
         "Birthday": "생일",
         "UseImage": "첨부 사진",
         "UseGravatar": "Gravatar",
@@ -107,7 +116,6 @@
         "People": "사람",
         "For": "수신자",
         "SelectUsers": "사용자 선택",
-        "AddGuest": "게스트 추가",
         "ViewProfile": "프로필 보기",
         "Viber": "Viber",
         "ViberPlaceholder": "Viber",
@@ -151,5 +159,8 @@
         "WorkspaceStatusIn4Hours": "4시간 후",
         "WorkspaceStatusEndOfDay": "오늘 종료",
         "WorkspaceStatusPickDate": "날짜 선택"
+    ,
+      "Enabled": "Enabled",
+      "HideInactive": "Hide inactive"
     }
 }

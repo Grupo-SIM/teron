@@ -14,9 +14,9 @@
 // limitations under the License.
 -->
 <script lang="ts">
-  import { Channel, Person, combineName, getCurrentEmployee, getFirstName, getLastName } from '@hcengineering/contact'
+  import { Channel, Person, combineName, getFirstName, getLastName } from '@hcengineering/contact'
   import { AccountRole, Ref, getCurrentAccount, hasAccountRole, type AccountUuid } from '@hcengineering/core'
-  import { AttributeEditor, createQuery, getClient, hasResource } from '@hcengineering/presentation'
+  import { AttributeEditor, InlineAttributeBarEditor, createQuery, getClient, hasResource } from '@hcengineering/presentation'
   import type { PersonRating } from '@hcengineering/rating'
   import ratingPlugin from '@hcengineering/rating'
   import setting, { IntegrationType } from '@hcengineering/setting'
@@ -36,15 +36,7 @@
   const h = client.getHierarchy()
 
   const account = getCurrentAccount()
-  const me = getCurrentEmployee()
-  $: owner = me === object._id
-
-  function isEditable (owner: boolean, object: Person): boolean {
-    if (owner) return true
-    if (!h.hasMixin(object, contact.mixin.Employee)) return true
-    return hasAccountRole(account, AccountRole.Maintainer)
-  }
-  $: editable = !readonly && isEditable(owner, object)
+  $: editable = !readonly && hasAccountRole(account, AccountRole.Maintainer)
 
   let avatarEditor: EditableAvatar
 
@@ -82,7 +74,19 @@
     }
   )
 
-  const sendOpen = () => dispatch('open', { ignoreKeys: ['comments', 'name', 'channels', 'city'] })
+  const sendOpen = () => dispatch('open', {
+    ignoreKeys: [
+      'comments',
+      'name',
+      'channels',
+      'city',
+      'functions',
+      'skills',
+      'professionalTitle',
+      'contactSource',
+      'profile'
+    ]
+  })
   onMount(sendOpen)
 
   async function onAvatarDone (): Promise<void> {
@@ -158,6 +162,15 @@
       <div class="location">
         <AttributeEditor maxWidth="20rem" _class={contact.class.Person} {object} {editable} key="city" focusIndex={3} />
       </div>
+      <div class="functions">
+        <InlineAttributeBarEditor
+          _class={contact.class.Person}
+          {object}
+          key="functions"
+          readonly={!editable}
+          extraProps={{ attribute: h.getAttribute(contact.class.Person, 'functions') }}
+        />
+      </div>
 
       <div class="separator" />
       <Scroller
@@ -205,6 +218,10 @@
   .location {
     margin-top: 0.25rem;
     font-size: 0.75rem;
+  }
+
+  .functions {
+    margin-top: 0.75rem;
   }
 
   .separator {

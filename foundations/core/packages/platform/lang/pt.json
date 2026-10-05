@@ -1,10 +1,10 @@
 {
   "status": {
     "LoadingPlugin": "Carregando plugin {plugin}...",
-    "UnknownError": "Erro desconhecido: {message}",
+    "UnknownError": "Erro desconhecido",
     "InvalidId": "Id inválido: {id}",
     "BadRequest": "Pedido inválido",
-    "Forbidden": "Proibido",
+    "Forbidden": "Você não tem permissão para executar esta ação",
     "Conflict": "Conflito",
     "ExpiredLink": "Este link de convite expirou",
     "Unauthorized": "Não autorizado",

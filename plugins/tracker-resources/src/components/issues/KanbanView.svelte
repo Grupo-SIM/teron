@@ -33,7 +33,7 @@
   import tags from '@hcengineering/tags'
   import { DocWithRank, getStates } from '@hcengineering/task'
   import { getTaskKanbanResultQuery, typeStore, updateTaskKanbanCategories } from '@hcengineering/task-resources'
-  import { Issue, IssuesGrouping, IssuesOrdering, Project } from '@hcengineering/tracker'
+  import { Issue, IssuesGrouping, IssuesOrdering, Project, currentChildReportedTime, currentReportedTime } from '@hcengineering/tracker'
   import {
     Button,
     ColorDefinition,
@@ -70,7 +70,6 @@
 
   import tracker from '../../plugin'
   import { activeProjects } from '../../utils'
-  import ComponentEditor from '../components/ComponentEditor.svelte'
   import CreateIssue from '../CreateIssue.svelte'
   import AssigneeEditor from './AssigneeEditor.svelte'
   import DueDatePresenter from './DueDatePresenter.svelte'
@@ -138,7 +137,11 @@
 
   onMount(() => {
     ;(document.activeElement as HTMLElement)?.blur()
+    const timer = setInterval(() => (now = Date.now()), 60000)
+    return () => clearInterval(timer)
   })
+
+  let now = Date.now()
 
   // Category information only
   let tasks: DocWithRank[] = []
@@ -386,7 +389,7 @@
       {@const issue = toIssue(object)}
       {@const issueId = object._id}
       {@const reports =
-        issue.reportedTime + (issue.childInfo ?? []).map((it) => it.reportedTime).reduce((a, b) => a + b, 0)}
+        currentReportedTime(issue, now) + currentChildReportedTime(issue.childInfo, now)}
       {@const estimations = (issue.childInfo ?? []).map((it) => it.estimation).reduce((a, b) => a + b, 0)}
       {#key issueId}
         <div
@@ -422,16 +425,6 @@
             {#if enabledConfig(config, 'priority')}
               <PriorityEditor
                 value={issue}
-                isEditable={true}
-                kind={'link-bordered'}
-                size={'small'}
-                justify={'center'}
-              />
-            {/if}
-            {#if enabledConfig(config, 'component')}
-              <ComponentEditor
-                value={issue}
-                {space}
                 isEditable={true}
                 kind={'link-bordered'}
                 size={'small'}

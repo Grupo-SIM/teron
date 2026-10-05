@@ -19,6 +19,17 @@ import { type IntlString, plugin } from '@hcengineering/platform'
 
 export default plugin(textEditorId, {
   string: {
+    HeadedTable1x2: '' as IntlString,
+    HeadedTable2x1: '' as IntlString,
+    HeadedTable2x2: '' as IntlString,
+    HeadedTable3x3: '' as IntlString,
+    HeadedTable5x5: '' as IntlString,
+    LinkPlaceholder: '' as IntlString,
+    Table1x2: '' as IntlString,
+    Table2x1: '' as IntlString,
+    Table2x2: '' as IntlString,
+    Table3x3: '' as IntlString,
+    Table5x5: '' as IntlString,
     CannotConnectToCollaborationService: '' as IntlString,
     SourceURL: '' as IntlString,
     LatestVersion: '' as IntlString

@@ -16,8 +16,10 @@
 import { getCategories } from '@anticrm/skillset'
 import core, {
   DOMAIN_MODEL_TX,
+  DOMAIN_MIGRATION,
   toIdMap,
   TxOperations,
+  type Domain,
   type Doc,
   type Ref,
   type Space,
@@ -30,17 +32,23 @@ import {
   tryUpgrade,
   type MigrateOperation,
   type MigrationClient,
+  type MigrationDocumentQuery,
   type MigrationUpgradeClient,
   type ModelLogger
 } from '@hcengineering/model'
-import tags, { type TagCategory } from '@hcengineering/model-tags'
-import task, { createSequence, DOMAIN_TASK, migrateDefaultStatusesBase } from '@hcengineering/model-task'
-import { recruitId, type Applicant } from '@hcengineering/recruit'
+import attachment, { DOMAIN_ATTACHMENT } from '@hcengineering/model-attachment'
+import tags, { DOMAIN_TAGS, type TagCategory } from '@hcengineering/model-tags'
+import task, { DOMAIN_TASK, migrateDefaultStatusesBase } from '@hcengineering/model-task'
+import { recruitId, type Applicant, type Candidate } from '@hcengineering/recruit'
 
-import { DOMAIN_CALENDAR } from '@hcengineering/model-calendar'
+import { DOMAIN_CALENDAR, DOMAIN_EVENT } from '@hcengineering/model-calendar'
+import contact, { DOMAIN_CONTACT } from '@hcengineering/model-contact'
+import { DOMAIN_DOC_NOTIFY, DOMAIN_NOTIFICATION, DOMAIN_USER_NOTIFY } from '@hcengineering/model-notification'
+import { type Person } from '@hcengineering/contact'
 import { DOMAIN_SPACE } from '@hcengineering/model-core'
 import recruit from './plugin'
 import { defaultApplicantStatuses } from './spaceType'
+import { candidateContactUpdate } from './candidate-contact'
 
 export const recruitOperation: MigrateOperation = {
   async preMigrate (client: MigrationClient, logger: ModelLogger, mode): Promise<void> {
@@ -80,6 +88,34 @@ export const recruitOperation: MigrateOperation = {
             { isDone: false }
           )
         }
+      },
+      {
+        state: 'preserve-candidate-contact-fields-v1',
+        mode: 'upgrade',
+        func: preserveCandidateContactFields
+      },
+      {
+        state: 'preserve-candidate-skills-v1',
+        mode: 'upgrade',
+        func: preserveCandidateSkills
+      },
+      {
+        state: 'preserve-applicant-files-v1',
+        mode: 'upgrade',
+        func: preserveApplicantFiles
+      },
+      {
+        state: 'preserve-applicant-comments-v1',
+        mode: 'upgrade',
+        func: preserveApplicantComments
+      },
+      {
+        state: 'remove-recruiting-records-v1',
+        mode: 'upgrade',
+        func: async (client) => {
+          await ensureCandidateDataPreserved(client)
+          await removeRecruitingRecords(client)
+        }
       }
     ])
   },
@@ -89,11 +125,199 @@ export const recruitOperation: MigrateOperation = {
         state: 'create-defaults-v2',
         func: async (client) => {
           const tx = new TxOperations(client, core.account.System)
-          await createDefaults(client, tx)
+          await createContactSkillCategories(client, tx)
         }
       }
     ])
   }
+}
+
+export async function ensureCandidateDataPreserved (client: MigrationClient): Promise<void> {
+  const required = [
+    'preserve-candidate-contact-fields-v1',
+    'preserve-candidate-skills-v1',
+    'preserve-applicant-files-v1',
+    'preserve-applicant-comments-v1'
+  ]
+  const completed = await client.find<Doc>(DOMAIN_MIGRATION, {
+    plugin: recruitId,
+    state: { $in: required }
+  } as MigrationDocumentQuery<Doc>)
+  const states = new Set(completed.map((doc) => (doc as Doc & { state: string }).state))
+  const missing = required.filter((state) => !states.has(state))
+  if (missing.length > 0) {
+    throw new Error(`Recruitment data preservation incomplete: ${missing.join(', ')}`)
+  }
+}
+
+export async function preserveApplicantFiles (client: MigrationClient): Promise<void> {
+  const applicants = await client.traverse<Applicant>(DOMAIN_TASK, { _class: recruit.class.Applicant })
+  try {
+    while (true) {
+      const batch = await applicants.next(100)
+      if (batch === null || batch.length === 0) break
+      for (const applicant of batch) {
+        const [candidate] = await client.find<Person>(DOMAIN_CONTACT, {
+          _id: applicant.attachedTo,
+          _class: contact.class.Person
+        } as MigrationDocumentQuery<Person>)
+        if (candidate === undefined) continue
+
+        await client.update(DOMAIN_ATTACHMENT, {
+          _class: attachment.class.Attachment,
+          attachedTo: applicant._id,
+          attachedToClass: recruit.class.Applicant
+        }, {
+          attachedTo: candidate._id,
+          attachedToClass: contact.class.Person,
+          collection: 'attachments',
+          space: candidate.space
+        })
+
+        const files = await client.find(DOMAIN_ATTACHMENT, {
+          _class: attachment.class.Attachment,
+          attachedTo: candidate._id,
+          attachedToClass: contact.class.Person,
+          collection: 'attachments'
+        })
+        if (candidate.attachments !== files.length) {
+          await client.update(DOMAIN_CONTACT, { _id: candidate._id }, { attachments: files.length })
+        }
+      }
+    }
+  } finally {
+    await applicants.close()
+  }
+}
+
+export async function preserveApplicantComments (client: MigrationClient): Promise<void> {
+  const activityDomain = 'activity' as Domain
+  const applicants = await client.traverse<Applicant>(DOMAIN_TASK, { _class: recruit.class.Applicant })
+  try {
+    while (true) {
+      const batch = await applicants.next(100)
+      if (batch === null || batch.length === 0) break
+      for (const applicant of batch) {
+        const [candidate] = await client.find<Person>(DOMAIN_CONTACT, {
+          _id: applicant.attachedTo,
+          _class: contact.class.Person
+        } as MigrationDocumentQuery<Person>)
+        if (candidate === undefined) continue
+
+        await client.update(activityDomain, {
+          attachedTo: applicant._id,
+          attachedToClass: recruit.class.Applicant,
+          collection: 'comments'
+        }, {
+          attachedTo: candidate._id,
+          attachedToClass: contact.class.Person,
+          space: candidate.space
+        })
+
+        const comments = await client.find(activityDomain, {
+          attachedTo: candidate._id,
+          attachedToClass: contact.class.Person,
+          collection: 'comments'
+        })
+        if (candidate.comments !== comments.length) {
+          await client.update(DOMAIN_CONTACT, { _id: candidate._id }, { comments: comments.length })
+        }
+      }
+    }
+  } finally {
+    await applicants.close()
+  }
+}
+
+export async function removeRecruitingRecords (client: MigrationClient): Promise<void> {
+  const activityDomain = 'activity' as Domain
+  const targets = [
+    { domain: DOMAIN_TASK, _class: recruit.class.ApplicantMatch },
+    { domain: 'recruit' as Domain, _class: recruit.class.Opinion },
+    { domain: DOMAIN_EVENT, _class: recruit.class.Review },
+    { domain: DOMAIN_TASK, _class: recruit.class.Applicant },
+    { domain: DOMAIN_SPACE, _class: recruit.class.Vacancy }
+  ]
+
+  for (const { domain, _class } of targets) {
+    while (true) {
+      const batch = await client.find<Doc>(domain, { _class }, { limit: 100 })
+      if (batch.length === 0) break
+      const ids = batch.map(({ _id }) => _id)
+      const attachedTo = { $in: ids }
+
+      await client.deleteMany(DOMAIN_ATTACHMENT, { attachedTo })
+      await client.deleteMany(activityDomain, { attachedTo })
+      await client.deleteMany(DOMAIN_TAGS, { attachedTo })
+      await client.deleteMany(DOMAIN_NOTIFICATION, { attachedTo })
+      await client.deleteMany(DOMAIN_USER_NOTIFY, { attachedTo })
+      await client.deleteMany(DOMAIN_DOC_NOTIFY, { objectId: { $in: ids } })
+      await client.deleteMany(domain, { _class, _id: { $in: ids } })
+    }
+  }
+}
+
+async function preserveCandidateContactFields (client: MigrationClient): Promise<void> {
+  const iterator = await client.traverse<Person>(DOMAIN_CONTACT, {
+    _class: contact.class.Person,
+    [recruit.mixin.Candidate]: { $exists: true }
+  } as MigrationDocumentQuery<Person>)
+  try {
+    while (true) {
+      const people = await iterator.next(100)
+      if (people === null || people.length === 0) break
+      for (const person of people) {
+        const candidate = (person as Person & Record<string, unknown>)[recruit.mixin.Candidate] as Partial<Candidate> | undefined
+        const update = candidateContactUpdate(person, candidate)
+        if (Object.keys(update).length > 0) {
+          await client.update(DOMAIN_CONTACT, { _id: person._id }, update)
+        }
+      }
+    }
+  } finally {
+    await iterator.close()
+  }
+}
+
+async function preserveCandidateSkills (client: MigrationClient): Promise<void> {
+  const iterator = await client.traverse<Person>(DOMAIN_CONTACT, {
+    _class: contact.class.Person,
+    [recruit.mixin.Candidate]: { $exists: true }
+  } as MigrationDocumentQuery<Person>)
+  try {
+    while (true) {
+      const people = await iterator.next(100)
+      if (people === null || people.length === 0) break
+      for (const person of people) {
+        const candidate = (person as Person & Record<string, unknown>)[recruit.mixin.Candidate] as Partial<Candidate> | undefined
+        if (person.skills === undefined && candidate?.skills !== undefined) {
+          await client.update(DOMAIN_CONTACT, { _id: person._id }, { skills: candidate.skills })
+        }
+      }
+    }
+  } finally {
+    await iterator.close()
+  }
+
+  await client.update(DOMAIN_TAGS, {
+    _class: tags.class.TagReference,
+    attachedToClass: recruit.mixin.Candidate,
+    collection: 'skills'
+  }, {
+    attachedToClass: contact.class.Person
+  })
+  await client.update(DOMAIN_TAGS, {
+    _class: tags.class.TagElement,
+    targetClass: recruit.mixin.Candidate
+  }, {
+    targetClass: contact.class.Person
+  })
+  await client.update(DOMAIN_TAGS, {
+    _class: tags.class.TagCategory,
+    targetClass: recruit.mixin.Candidate
+  }, {
+    targetClass: contact.class.Person
+  })
 }
 
 async function migrateIdentifiers (client: MigrationClient): Promise<void> {
@@ -188,7 +412,7 @@ async function migrateDefaultTypeMixins (client: MigrationClient): Promise<void>
   )
 }
 
-async function createDefaults (client: MigrationUpgradeClient, tx: TxOperations): Promise<void> {
+async function createContactSkillCategories (client: MigrationUpgradeClient, tx: TxOperations): Promise<void> {
   await createOrUpdate(
     tx,
     tags.class.TagCategory,
@@ -196,7 +420,7 @@ async function createDefaults (client: MigrationUpgradeClient, tx: TxOperations)
     {
       icon: recruit.icon.Skills,
       label: 'Other',
-      targetClass: recruit.mixin.Candidate,
+      targetClass: contact.class.Person,
       tags: [],
       default: true
     },
@@ -207,7 +431,7 @@ async function createDefaults (client: MigrationUpgradeClient, tx: TxOperations)
   const cats = getCategories().filter((it, idx, arr) => arr.findIndex((qt) => qt.id === it.id) === idx)
 
   const existingCategories = toIdMap(
-    await client.findAll<Doc>(tags.class.TagCategory, { targetClass: recruit.mixin.Candidate })
+    await client.findAll<Doc>(tags.class.TagCategory, { targetClass: contact.class.Person })
   )
   for (const c of cats) {
     await createOrUpdate(
@@ -217,7 +441,7 @@ async function createDefaults (client: MigrationUpgradeClient, tx: TxOperations)
       {
         icon: recruit.icon.Skills,
         label: c.label,
-        targetClass: recruit.mixin.Candidate,
+        targetClass: contact.class.Person,
         tags: c.skills,
         default: false
       },
@@ -227,8 +451,4 @@ async function createDefaults (client: MigrationUpgradeClient, tx: TxOperations)
   }
   await ops.commit()
 
-  await createSequence(tx, recruit.class.Review)
-  await createSequence(tx, recruit.class.Opinion)
-  await createSequence(tx, recruit.class.Applicant)
-  await createSequence(tx, recruit.class.Vacancy)
 }

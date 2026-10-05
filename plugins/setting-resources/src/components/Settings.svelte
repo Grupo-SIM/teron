@@ -70,7 +70,7 @@
         // optional legacy payment feature. Keep it reachable for every owner.
         (p) =>
           !hiddenCategories.has(p.name) &&
-          hasAccountRole(account, p.role) &&
+          hasAccountRole(account, p._id === setting.ids.Setting ? AccountRole.Maintainer : p.role) &&
           (p.name === 'billing' || !isDisabled(p.feature))
       )
       category = findCategory(categoryId)

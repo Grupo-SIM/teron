@@ -35,7 +35,6 @@
   let sessionsDurationByDay: { date: number, value: number }[] = []
   let sessionsBandwidthByDay: { date: number, value: number }[] = []
   let egressDurationByDay: { date: number, value: number }[] = []
-  let totalTranscriptDuration = 0
   let totalTokensCount = 0
 
   async function loadBillingData (): Promise<void> {
@@ -46,7 +45,6 @@
     totalSessionsDuration = billingStats.liveKitStats.sessions.reduce((sum, s) => sum + s.minutes, 0) * 60000
     totalSessionsBandwidth = billingStats.liveKitStats.sessions.reduce((sum, s) => sum + s.bandwidth, 0)
     totalEgressDuration = billingStats.liveKitStats.egress.reduce((sum, e) => sum + e.minutes, 0) * 60000
-    totalTranscriptDuration = billingStats.aiStats.transcript.totalDurationSeconds * 1000
     totalTokensCount = billingStats.aiStats.tokens.reduce((sum, s) => sum + s.totalTokens, 0)
 
     sessionsDurationByDay = billingStats.liveKitStats.sessions.map((s) => {
@@ -82,10 +80,6 @@
       </Category>
       <Category icon={view.icon.AiStar} label={billingPlugin.string.AI}>
         <div class="row">
-          <StatsCard
-            label={billingPlugin.string.TranscriptionTime}
-            text={formatDuration(totalTranscriptDuration, $themeStore.language)}
-          />
           <StatsCard label={billingPlugin.string.TotalTokens} text={formatNumberCompact(totalTokensCount)} />
         </div>
       </Category>

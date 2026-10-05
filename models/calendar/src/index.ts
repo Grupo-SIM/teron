@@ -347,11 +347,25 @@ export function createModel (builder: Builder): void {
   //   calendar.action.SaveEventReminder
   // )
 
+  createAction(builder, {
+    action: view.actionImpl.Delete,
+    actionProps: { skipCheck: true },
+    override: [view.action.Delete],
+    label: view.string.Delete,
+    icon: view.icon.Delete,
+    category: view.category.General,
+    input: 'any',
+    target: calendar.class.Event,
+    visibilityTester: calendar.function.CanDeleteOwnEvent,
+    context: { mode: ['context', 'browser'], group: 'remove' }
+  }, calendar.action.DeleteEvent)
+
   createAction(
     builder,
     {
       action: calendar.actionImpl.DeleteRecEvent,
-      override: [view.action.Delete],
+      visibilityTester: calendar.function.CanDeleteOwnEvent,
+      override: [view.action.Delete, calendar.action.DeleteEvent],
       label: view.string.Delete,
       icon: view.icon.Delete,
       keyBinding: ['Meta + Backspace'],

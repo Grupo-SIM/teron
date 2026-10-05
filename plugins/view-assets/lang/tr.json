@@ -78,6 +78,7 @@
     "FilteredViews": "Filtreli görünümler",
     "NewFilteredView": "Yeni filtreli görünüm",
     "FilteredViewName": "Filtreli görünüm adı",
+    "LegacyMyTasks": "Görevlerim",
     "Then": "Sonra",
     "ShowPreviewOnClick": "Doküman indeks önizlemesini göstermek için lütfen tıklayın...",
     "Shown": "{len} sonuç gösteriliyor {total, plural, =-1 {} other {filtrelenmiş # öğeden}}",

@@ -16,6 +16,7 @@
 import { Blob, Ref, generateId, type WorkspaceIds } from '@hcengineering/core'
 import { decodeToken } from '@hcengineering/server-token'
 import { onAuthenticatePayload } from '@hocuspocus/server'
+import type { CollaborationAccess } from './collaboration-access'
 import { ClientFactory, simpleClientFactory } from './platform'
 
 export interface Context {
@@ -23,6 +24,7 @@ export interface Context {
   wsIds: WorkspaceIds
   clientFactory: ClientFactory
 
+  authorization?: CollaborationAccess
   content?: Ref<Blob>
 }
 

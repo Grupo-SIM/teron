@@ -97,5 +97,9 @@
     "UpdateTasksStatusRequest": "ステータスは{total}個のタスクで使用されており、それらすべての更新が必要です。承認してください。",
     "TaskTypes": "タスクタイプ",
     "Collections": "コレクション"
+  ,
+    "AllowedParents": "Allowed parents",
+    "ParentTypeRestrictions": "Parent type restrictions",
+    "StatusCategory": "Status category"
   }
 }

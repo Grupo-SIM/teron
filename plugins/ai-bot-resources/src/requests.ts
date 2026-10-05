@@ -13,15 +13,12 @@
 // limitations under the License.
 //
 import {
-  type ConnectMeetingRequest,
-  type DisconnectMeetingRequest,
   type SummarizeMessagesRequest,
   type SummarizeMessagesResponse,
   type TranslateRequest,
   type TranslateResponse
 } from '@hcengineering/ai-bot'
 import { type Class, concatLink, type Doc, type Markup, type Ref } from '@hcengineering/core'
-import { type Room, type RoomLanguage } from '@hcengineering/love'
 import { getMetadata } from '@hcengineering/platform'
 import presentation from '@hcengineering/presentation'
 
@@ -87,58 +84,6 @@ export async function summarizeMessages (
     }
 
     return (await resp.json()) as SummarizeMessagesResponse
-  } catch (error) {
-    console.error(error)
-    return undefined
-  }
-}
-
-export async function connectMeeting (
-  roomId: Ref<Room>,
-  language: RoomLanguage,
-  options: Partial<ConnectMeetingRequest>
-): Promise<void> {
-  const url = getMetadata(aiBot.metadata.EndpointURL) ?? ''
-  const token = getMetadata(presentation.metadata.Token) ?? ''
-
-  if (url === '' || token === '') {
-    return undefined
-  }
-
-  try {
-    const req: ConnectMeetingRequest = { roomId, transcription: options.transcription ?? false, language }
-    await fetch(concatLink(url, 'love/connect'), {
-      method: 'POST',
-      headers: {
-        Authorization: 'Bearer ' + token,
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(req)
-    })
-  } catch (error) {
-    console.error(error)
-    return undefined
-  }
-}
-
-export async function disconnectMeeting (roomId: Ref<Room>): Promise<void> {
-  const url = getMetadata(aiBot.metadata.EndpointURL) ?? ''
-  const token = getMetadata(presentation.metadata.Token) ?? ''
-
-  if (url === '' || token === '') {
-    return undefined
-  }
-
-  try {
-    const req: DisconnectMeetingRequest = { roomId }
-    await fetch(concatLink(url, 'love/disconnect'), {
-      method: 'POST',
-      headers: {
-        Authorization: 'Bearer ' + token,
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify(req)
-    })
   } catch (error) {
     console.error(error)
     return undefined

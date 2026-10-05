@@ -13,7 +13,7 @@
 // limitations under the License.
 -->
 <script lang="ts">
-  import { Button } from '@hcengineering/ui'
+  import { Button, themeStore } from '@hcengineering/ui'
 
   export let selected: number[]
 
@@ -46,7 +46,7 @@
         kind={'ghost'}
       >
         <svelte:fragment slot="content">
-          {new Date(new Date().setMonth(month)).toLocaleString('default', { month: 'short' })}
+          {new Date(new Date().setMonth(month)).toLocaleString($themeStore.language, { month: 'short' })}
         </svelte:fragment>
       </Button>
     </div>

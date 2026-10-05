@@ -522,7 +522,7 @@ export async function queryCard (
   search: string,
   filter?: { in?: RelatedDocument[], nin?: RelatedDocument[] }
 ): Promise<ObjectSearchResult[]> {
-  const q: DocumentQuery<Card> = { title: { $like: `%${search}%` } }
+  const q: DocumentQuery<Card> = { title: { $contains: search } }
   if (filter?.in !== undefined || filter?.nin !== undefined) {
     q._id = {}
     if (filter.in !== undefined) {
@@ -821,7 +821,7 @@ export async function getSpaceAccessPublicLink (doc?: Doc | Doc[]): Promise<stri
   const navigateUrl = getCurrentLocation()
   navigateUrl.path[2] = cardId
   navigateUrl.path.length = 3
-  const accessLink = await accountClient.createAccessLink(AccountRole.Guest, {
+  const accessLink = await accountClient.createAccessLink(AccountRole.DocGuest, {
     spaces: [doc._id],
     navigateUrl: JSON.stringify(navigateUrl)
   })

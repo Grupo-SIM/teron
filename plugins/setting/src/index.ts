@@ -156,7 +156,6 @@ export interface RoleCapabilitySettings extends Configuration {
  * @public
  */
 export interface OfficeSettings extends Configuration {
-  defaultStartWithTranscription: boolean
   defaultStartWithRecording: boolean
 }
 
@@ -265,6 +264,11 @@ export default plugin(settingId, {
     Proceed: '' as IntlString,
     SendConfirmation: '' as IntlString,
     NewEmail: '' as IntlString,
+    ChangeEmail: '' as IntlString,
+    SetEmail: '' as IntlString,
+    CurrentEmail: '' as IntlString,
+    EmailReplacementHint: '' as IntlString,
+    EmailPlaceholder: '' as IntlString,
     AccountSettings: '' as IntlString,
     ChangePassword: '' as IntlString,
     Saving: '' as IntlString,
@@ -315,7 +319,6 @@ export default plugin(settingId, {
     MailboxLimitReached: '' as IntlString,
     OfficeSettings: '' as IntlString,
     OfficeDefaultSettings: '' as IntlString,
-    DefaultStartWithTranscription: '' as IntlString,
     DefaultStartWithRecording: '' as IntlString,
     GuestPermissionsSettings: '' as IntlString,
     GuestPermissionsApplicationPermissions: '' as IntlString,
@@ -333,6 +336,9 @@ export default plugin(settingId, {
     Security: '' as IntlString,
     TwoFactorAuth: '' as IntlString,
     TwoFactorAuthDescription: '' as IntlString,
+    TwoFactorSecret: '' as IntlString,
+    TwoFactorSecretCopied: '' as IntlString,
+    TwoFactorSetupInstructions: '' as IntlString,
     EnableTwoFactorAuth: '' as IntlString,
     DisableTwoFactorAuth: '' as IntlString,
     TwoFactorAuthEnabled: '' as IntlString,

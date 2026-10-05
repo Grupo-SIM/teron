@@ -14,7 +14,7 @@
 //
 
 export function getMigrations (): [string, string][] {
-  return [migrationV1(), migrationV2(), migrationV3()]
+  return [migrationV1(), migrationV2(), migrationV3(), migrationV4()]
 }
 
 function migrationV1 (): [string, string] {
@@ -53,18 +53,6 @@ function migrationV1 (): [string, string] {
 
 function migrationV2 (): [string, string] {
   const sql = `
-    CREATE TABLE IF NOT EXISTS billing.ai_transcript_usage (
-                                                         workspace UUID NOT NULL,
-                                                         day DATE NOT NULL,
-                                                         last_request_id STRING(255) NOT NULL,
-                                                         last_start_time TIMESTAMP NOT NULL,
-                                                         total_duration_seconds FLOAT NOT NULL,
-                                                         total_usd DECIMAL(12,6) NOT NULL,
-                                                         PRIMARY KEY (workspace, day)
-    );
-
-    CREATE INDEX IF NOT EXISTS idx_ai_transcript_usage_day ON billing.ai_transcript_usage (day);
-
     CREATE TABLE IF NOT EXISTS billing.ai_tokens_usage (
                                                              workspace UUID NOT NULL,
                                                              day DATE NOT NULL,
@@ -73,7 +61,7 @@ function migrationV2 (): [string, string] {
                                                              PRIMARY KEY (workspace, day, reason)
     );
 
-    CREATE INDEX IF NOT EXISTS idx_ai_tokens_usage_day ON billing.ai_transcript_usage (day);
+    CREATE INDEX IF NOT EXISTS idx_ai_tokens_usage_day ON billing.ai_tokens_usage (day);
   `
   return ['init_ai_usage_tables_02', sql]
 }
@@ -84,4 +72,8 @@ function migrationV3 (): [string, string] {
     ALTER TABLE billing.livekit_session ALTER COLUMN bandwidth SET DEFAULT 0;
   `
   return ['fix_bandwidth_nulls_03', sql]
+}
+
+function migrationV4 (): [string, string] {
+  return ['remove_call_transcription_usage_04', 'DROP TABLE IF EXISTS billing.ai_transcript_usage;']
 }

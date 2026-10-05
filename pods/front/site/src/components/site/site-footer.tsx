@@ -14,23 +14,20 @@ export function SiteFooter({ locale = defaultLocale }: { locale?: Locale }) {
       <div style={{ maxWidth: 1240, margin: "0 auto" }}>
         <div style={{ textAlign: "center", marginBottom: 40 }}>
           <Asset
-            src="/assets/LOGO TERON  - BRANCA.svg"
+            src="/assets/brand/logo-horizontal-light.svg"
             alt="Teron"
-            ratio="580 / 134"
+            ratio="1694 / 479"
             style={{ height: 44, width: "auto", display: "inline-block" }}
           />
         </div>
         <div className="lp-footer-bar">
           <span>
-            © {new Date().getFullYear()} Teron. Todos os direitos reservados.
-          </span>
+            © {new Date().getFullYear()} {"common.copyright"}</span>
           <span style={{ display: "flex", gap: 26 }}>
             <Link href="/termos" className="lp-footer-link">
-              Termos de Serviço
-            </Link>
+              {"common.terms"}</Link>
             <Link href="/privacidade" className="lp-footer-link">
-              Política de Privacidade
-            </Link>
+              {"common.privacy"}</Link>
           </span>
         </div>
       </div>

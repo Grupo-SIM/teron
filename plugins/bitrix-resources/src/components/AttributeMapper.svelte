@@ -1,7 +1,6 @@
 <script lang="ts">
   import { BitrixEntityMapping, BitrixFieldMapping, MappingOperation, Fields } from '@hcengineering/bitrix'
   import core, { AnyAttribute } from '@hcengineering/core'
-  import { getEmbeddedLabel } from '@hcengineering/platform'
   import { getClient } from '@hcengineering/presentation'
   import { Button, eventToHTMLElement, IconDelete, Menu, showPopup, Action, IconEdit } from '@hcengineering/ui'
   import bitrix from '../plugin'
@@ -43,37 +42,37 @@
 
   $: actions = [
     {
-      label: getEmbeddedLabel('Add Copy mapping'),
+      label: bitrix.string.AddCopyMapping,
       action: (_: any, evt: MouseEvent) => {
         addMapping(evt, MappingOperation.CopyValue)
       }
     },
     {
-      label: getEmbeddedLabel('Add Tag mapping'),
+      label: bitrix.string.AddTagMapping,
       action: (_: any, evt: MouseEvent) => {
         addMapping(evt, MappingOperation.CreateTag)
       }
     },
     {
-      label: getEmbeddedLabel('Add Channel mapping'),
+      label: bitrix.string.AddChannelMapping,
       action: (_: any, evt: MouseEvent) => {
         addMapping(evt, MappingOperation.CreateChannel)
       }
     },
     {
-      label: getEmbeddedLabel('Add Download Attachment mapping'),
+      label: bitrix.string.AddDownloadAttachmentMapping,
       action: (_: any, evt: MouseEvent) => {
         addMapping(evt, MappingOperation.DownloadAttachment)
       }
     },
     {
-      label: getEmbeddedLabel('Add Field reference mapping'),
+      label: bitrix.string.AddFieldReferenceMapping,
       action: (_: any, evt: MouseEvent) => {
         addMapping(evt, MappingOperation.FindReference)
       }
     },
     {
-      label: getEmbeddedLabel('Create Vacancy and application'),
+      label: bitrix.string.CreateVacancyAndApplication,
       action: (_: any, evt: MouseEvent) => {
         addMapping(evt, MappingOperation.CreateHRApplication)
       }

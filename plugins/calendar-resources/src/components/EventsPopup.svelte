@@ -14,11 +14,12 @@
 -->
 <script lang="ts">
   import type { Event } from '@hcengineering/calendar'
+  import { calendarByIdStore, isVisible } from '../utils'
   import EventPresenter from './EventPresenter.svelte'
 
   export let value: Event[]
 </script>
 
 {#each value as val}
-  <EventPresenter value={val} />
+  <EventPresenter value={val} hideDetails={!isVisible(val, $calendarByIdStore)} />
 {/each}

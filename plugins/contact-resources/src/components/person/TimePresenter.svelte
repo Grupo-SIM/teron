@@ -13,7 +13,7 @@
 // limitations under the License.
 -->
 <script lang="ts">
-  import { Label } from '@hcengineering/ui'
+  import { Label, themeStore } from '@hcengineering/ui'
 
   import contact from '@hcengineering/contact'
 
@@ -26,7 +26,7 @@
       minute: '2-digit'
     }
 
-    const formatter = new Intl.DateTimeFormat([], options)
+    const formatter = new Intl.DateTimeFormat($themeStore.language, options)
     const now = new Date()
     return formatter.format(now)
   }

@@ -23,9 +23,8 @@ import WorkbenchApp from './components/WorkbenchApp.svelte'
 import { doNavigate, logIn, logOut } from './utils'
 import Workbench from './components/Workbench.svelte'
 import ServerManager from './components/ServerManager.svelte'
-import WorkbenchTabs from './components/WorkbenchTabs.svelte'
 import { isAdminUser } from '@hcengineering/presentation'
-import { canCloseTab, closeCurrentTab, closeTab, OpenInNewTab, pinTab, unpinTab } from './workbench'
+import { OpenInNewTab } from './workbench'
 import { closeWidget, closeWidgetTab, createWidgetTab, getSidebarObject } from './sidebar'
 
 async function hasArchiveSpaces (spaces: Space[]): Promise<boolean> {
@@ -37,7 +36,6 @@ export { default as NavHeader } from './components/NavHeader.svelte'
 export { default as SpecialElement } from './components/navigator/SpecialElement.svelte'
 export { default as SpaceView } from './components/SpaceView.svelte'
 export { default as TreeSeparator } from './components/navigator/TreeSeparator.svelte'
-export { default as WorkbenchTabs } from './components/WorkbenchTabs.svelte'
 export { default as AppItem } from './components/AppItem.svelte'
 export { default as ComponentNavigator } from './components/ComponentNavigator.svelte'
 export { default as SavedView } from './components/SavedView.svelte'
@@ -54,13 +52,11 @@ export default async (): Promise<Resources> => ({
     SpacePanel,
     SpecialView,
     Workbench,
-    ServerManager,
-    WorkbenchTabs
+    ServerManager
   },
   function: {
     HasArchiveSpaces: hasArchiveSpaces,
     IsOwner: async (docs: Space[]) => getCurrentAccount().role === AccountRole.Owner || isAdminUser(),
-    CanCloseTab: canCloseTab,
     CreateWidgetTab: createWidgetTab,
     CloseWidgetTab: closeWidgetTab,
     CloseWidget: closeWidget,
@@ -70,10 +66,6 @@ export default async (): Promise<Resources> => ({
     OpenInNewTab
   },
   actionImpl: {
-    Navigate: doNavigate,
-    PinTab: pinTab,
-    UnpinTab: unpinTab,
-    CloseTab: closeTab,
-    CloseCurrentTab: closeCurrentTab
+    Navigate: doNavigate
   }
 })

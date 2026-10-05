@@ -95,5 +95,8 @@
     "EditMessageEllipsis": "Editar mensagem...",
     "ArrowDownMessages": "↓ Últimas mensagens",
     "ThreadWasRemoved": "Esta conversa foi removida."
+  ,
+    "Attachments": "Arquivos",
+    "Title": "Título"
   }
 }

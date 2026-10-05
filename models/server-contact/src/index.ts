@@ -82,6 +82,15 @@ export function createModel (builder: Builder): void {
   })
 
   builder.createDoc(serverCore.class.Trigger, core.space.Model, {
+    trigger: serverContact.trigger.OnEmployeeDeactivate,
+    isAsync: true,
+    txMatch: {
+      _class: core.class.TxMixin,
+      mixin: contact.mixin.Employee
+    }
+  })
+
+  builder.createDoc(serverCore.class.Trigger, core.space.Model, {
     trigger: serverContact.trigger.OnTypedSpaceCreate,
     txMatch: {
       objectClass: core.class.TypedSpace,

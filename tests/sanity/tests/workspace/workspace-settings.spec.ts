@@ -144,24 +144,4 @@ test.describe('Workspace tests', () => {
     await ownersPage.createEnumWithName(enumTitle, enumName)
   })
 
-  // Seems that there is currently a bug
-  test.skip('User is able to create Enums', async ({ page }) => {
-    newUser = {
-      firstName: faker.person.firstName(),
-      lastName: faker.person.lastName(),
-      email: faker.internet.email(),
-      password: '1234'
-    }
-    const newWorkspaceName = `New Workspace Name - ${generateId(2)}`
-    const enumTitle = faker.word.words(2)
-    const enumName = faker.word.words(2)
-    await loginPage.goto()
-    await loginPage.clickSignUp()
-    await signUpPage.signUp(newUser)
-    await selectWorkspacePage.createWorkspace(newWorkspaceName)
-    await userProfilePage.openProfileMenu()
-    await userProfilePage.clickSettings()
-    await workspaceSettingsPage.selectWorkspaceSettingsTab(ButtonType.InviteSettings)
-    await ownersPage.createEnumWithName(enumTitle, enumName)
-  })
 })

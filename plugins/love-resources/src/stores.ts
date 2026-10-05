@@ -30,7 +30,7 @@ export const currentRoom = derived([rooms, myInfo], ([rooms, myInfo]) => {
 })
 export const floors = writable<Floor[]>([])
 export const selectedFloor = writable<Ref<Floor> | undefined>(undefined)
-export const activeFloor = derived([rooms, myInfo, myOffice], ([rooms, myInfo, myOffice]) => {
+export const activeFloor = derived([rooms, myInfo, myOffice, floors], ([rooms, myInfo, myOffice, floors]) => {
   let res: Ref<Floor> | undefined
   if (myInfo !== undefined) {
     res = rooms.find((p) => p._id === myInfo.room)?.floor
@@ -38,7 +38,7 @@ export const activeFloor = derived([rooms, myInfo, myOffice], ([rooms, myInfo, m
   if (res === undefined && myOffice !== undefined) {
     res = rooms.find((p) => p._id === myOffice._id)?.floor
   }
-  return res ?? love.ids.MainFloor
+  return res ?? floors.find((floor) => floor._id === love.ids.MainFloor)?._id ?? floors[0]?._id ?? love.ids.MainFloor
 })
 
 export const myPreferences = writable<DevicesPreference | undefined>()
@@ -83,7 +83,7 @@ onClient(() => {
   )
   const floorPromise = new Promise<void>((resolve) =>
     floorsQuery.query(love.class.Floor, {}, (res) => {
-      floors.set(res)
+      floors.set(res.sort((a, b) => (a.sortOrder ?? Number.MAX_SAFE_INTEGER) - (b.sortOrder ?? Number.MAX_SAFE_INTEGER) || a.createdOn - b.createdOn || a._id.localeCompare(b._id)))
       resolve()
     })
   )

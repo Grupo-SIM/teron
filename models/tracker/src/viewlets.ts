@@ -26,28 +26,23 @@ import tracker from './plugin'
 export const issuesOptions = (kanban: boolean): ViewOptionsModel => ({
   groupBy: [
     'status',
-    'kind',
-    'assignee',
+    'assignees',
     'priority',
     'space',
-    'component',
     'milestone',
     'createdBy',
     'modifiedBy',
     'estimation',
-    'remainingTime',
     'reportedTime'
   ],
   orderBy: [
     ['modifiedOn', SortingOrder.Descending],
     ['status', SortingOrder.Ascending],
-    ['kind', SortingOrder.Ascending],
     ['priority', SortingOrder.Ascending],
     ['createdOn', SortingOrder.Descending],
     ['dueDate', SortingOrder.Ascending],
     ['rank', SortingOrder.Ascending],
     ['estimation', SortingOrder.Descending],
-    ['remainingTime', SortingOrder.Descending],
     ['reportedTime', SortingOrder.Descending]
   ],
   other: [
@@ -82,8 +77,7 @@ export const issuesOptions = (kanban: boolean): ViewOptionsModel => ({
 export function issueConfig (
   key: string = '',
   compact: boolean = false,
-  milestone: boolean = true,
-  component: boolean = true
+  milestone: boolean = true
 ): (BuildModelKey | string)[] {
   return [
     {
@@ -105,13 +99,6 @@ export function issueConfig (
       presenter: tracker.component.StatusEditor,
       props: { kind: 'list', size: 'small', justify: 'center' },
       displayProps: { key: key + 'status' }
-    },
-    {
-      key: 'kind',
-      label: task.string.TaskType,
-      presenter: task.component.TaskTypeListPresenter,
-      props: { kind: 'list', size: 'small', justify: 'center' },
-      displayProps: { key: key + 'kind' }
     },
     {
       key: '',
@@ -164,26 +151,6 @@ export function issueConfig (
           }
         ]
       : []),
-    ...(component
-      ? [
-          {
-            key: '',
-            label: tracker.string.Component,
-            presenter: tracker.component.ComponentEditor,
-            props: {
-              kind: 'list',
-              size: 'small',
-              shouldShowPlaceholder: false,
-              maxWidth: '30rem'
-            },
-            displayProps: {
-              key: key + 'component',
-              excludeByKey: 'component',
-              compression: true
-            }
-          }
-        ]
-      : []),
     {
       key: '',
       label: tracker.string.DueDate,
@@ -204,9 +171,9 @@ export function issueConfig (
       displayProps: { key: key + 'modified', fixed: 'left', dividerBefore: true }
     },
     {
-      key: 'assignee',
+      key: 'assignees',
       presenter: tracker.component.AssigneeEditor,
-      displayProps: { key: 'assignee', fixed: 'right' },
+      displayProps: { key: 'assignees', fixed: 'right' },
       props: { kind: 'list', shouldShowName: false, avatarSize: 'x-small' }
     }
   ]
@@ -259,10 +226,9 @@ export function defineViewlets (builder: Builder): void {
   )
 
   const subIssuesOptions: ViewOptionsModel = {
-    groupBy: ['status', 'kind', 'assignee', 'priority', 'milestone', 'createdBy', 'modifiedBy'],
+    groupBy: ['status', 'assignees', 'priority', 'milestone', 'createdBy', 'modifiedBy'],
     orderBy: [
       ['rank', SortingOrder.Ascending],
-      ['kind', SortingOrder.Ascending],
       ['status', SortingOrder.Ascending],
       ['priority', SortingOrder.Ascending],
       ['modifiedOn', SortingOrder.Descending],
@@ -302,7 +268,7 @@ export function defineViewlets (builder: Builder): void {
   )
 
   const milestoneIssueOptions: ViewOptionsModel = {
-    groupBy: ['status', 'assignee', 'priority', 'component', 'createdBy', 'modifiedBy'],
+    groupBy: ['status', 'assignees', 'priority', 'createdBy', 'modifiedBy'],
     orderBy: [
       ['rank', SortingOrder.Ascending],
       ['status', SortingOrder.Ascending],
@@ -338,13 +304,13 @@ export function defineViewlets (builder: Builder): void {
           'modifiedBy'
         ]
       },
-      config: issueConfig('sub', true, false, true)
+      config: issueConfig('sub', true, false)
     },
     tracker.viewlet.MilestoneIssuesList
   )
 
   const componentIssueOptions: ViewOptionsModel = {
-    groupBy: ['status', 'assignee', 'priority', 'milestone', 'createdBy', 'modifiedBy'],
+    groupBy: ['status', 'assignees', 'priority', 'milestone', 'createdBy', 'modifiedBy'],
     orderBy: [
       ['rank', SortingOrder.Ascending],
       ['status', SortingOrder.Ascending],
@@ -380,7 +346,7 @@ export function defineViewlets (builder: Builder): void {
           'modifiedBy'
         ]
       },
-      config: issueConfig('sub', true, true, false)
+      config: issueConfig('sub', true, true)
     },
     tracker.viewlet.ComponentIssuesList
   )
@@ -392,7 +358,7 @@ export function defineViewlets (builder: Builder): void {
       attachTo: tracker.class.IssueTemplate,
       descriptor: view.viewlet.List,
       viewOptions: {
-        groupBy: ['assignee', 'priority', 'component', 'milestone', 'createdBy', 'modifiedBy'],
+        groupBy: ['assignees', 'priority', 'milestone', 'createdBy', 'modifiedBy'],
         orderBy: [
           ['priority', SortingOrder.Ascending],
           ['modifiedOn', SortingOrder.Descending],
@@ -425,18 +391,6 @@ export function defineViewlets (builder: Builder): void {
         // { key: '', presenter: tracker.component.DueDatePresenter, props: { kind: 'list' } },
         {
           key: '',
-          presenter: tracker.component.ComponentEditor,
-          label: tracker.string.Component,
-          props: {
-            kind: 'list',
-            size: 'small',
-            shouldShowPlaceholder: false,
-            maxWidth: '30rem'
-          },
-          displayProps: { key: 'component', compression: true }
-        },
-        {
-          key: '',
           label: tracker.string.Milestone,
           presenter: tracker.component.MilestoneEditor,
           props: {
@@ -464,7 +418,7 @@ export function defineViewlets (builder: Builder): void {
           displayProps: { fixed: 'right', dividerBefore: true }
         },
         {
-          key: 'assignee',
+          key: 'assignees',
           presenter: tracker.component.AssigneeEditor,
           props: { kind: 'list', shouldShowName: false, avatarSize: 'x-small' }
         }

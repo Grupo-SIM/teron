@@ -63,7 +63,7 @@
         is={activity.component.Activity}
         props={{
           object,
-          showCommenInput: true,
+          showCommenInput: false,
           focusIndex: 1000
         }}
       />

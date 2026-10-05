@@ -161,7 +161,6 @@ export interface AccountClient {
   updateAllowReadOnlyGuests: (
     readOnlyGuestsAllowed: boolean
   ) => Promise<{ guestPerson: Person, guestSocialIds: SocialId[] } | undefined>
-  updateAllowGuestSignUp: (guestSignUpAllowed: boolean) => Promise<void>
   updateWorkspaceName: (name: string) => Promise<void>
   deleteWorkspace: () => Promise<void>
   findPersonBySocialKey: (socialKey: string, requireAccount?: boolean) => Promise<PersonUuid | undefined>
@@ -255,6 +254,8 @@ export interface AccountClient {
 
   getSubscriptions: (workspaceUuid?: WorkspaceUuid | undefined, activeOnly?: boolean) => Promise<Subscription[]>
   getWorkspaceEntitlement: (workspaceUuid?: WorkspaceUuid) => Promise<WorkspaceEntitlement>
+  cancelWorkspaceSubscription: () => Promise<Subscription>
+  uncancelWorkspaceSubscription: () => Promise<Subscription>
   getWorkspacePendingInvites: () => Promise<WorkspacePendingInvite[]>
   getWorkspaceSeatQuote: (targetSeatLimit: number) => Promise<WorkspaceSeatQuote>
   changeWorkspaceSeatLimit: (
@@ -829,15 +830,6 @@ class AccountClientImpl implements AccountClient {
     return await this.rpc(request)
   }
 
-  async updateAllowGuestSignUp (guestSignUpAllowed: boolean): Promise<void> {
-    const request = {
-      method: 'updateAllowGuestSignUp' as const,
-      params: { guestSignUpAllowed }
-    }
-
-    await this.rpc(request)
-  }
-
   async getWorkspaceMembers (): Promise<WorkspaceMemberInfo[]> {
     const request = {
       method: 'getWorkspaceMembers' as const,
@@ -1313,6 +1305,14 @@ class AccountClientImpl implements AccountClient {
       method: 'getWorkspaceEntitlement',
       params: { workspaceUuid }
     })
+  }
+
+  async cancelWorkspaceSubscription (): Promise<Subscription> {
+    return await this._rpc({ method: 'cancelWorkspaceSubscription', params: {} })
+  }
+
+  async uncancelWorkspaceSubscription (): Promise<Subscription> {
+    return await this._rpc({ method: 'uncancelWorkspaceSubscription', params: {} })
   }
 
   async getWorkspacePendingInvites (): Promise<WorkspacePendingInvite[]> {

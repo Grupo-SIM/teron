@@ -836,11 +836,6 @@ export class PostgresAccountDB implements AccountDB {
       .client`UPDATE ${this.client(this.workspace.getTableName())} SET allow_read_only_guest = ${readOnlyGuestsAllowed} WHERE uuid = ${workspaceId}`
   }
 
-  async updateAllowGuestSignUp (workspaceId: WorkspaceUuid, guestSignUpAllowed: boolean): Promise<void> {
-    await this
-      .client`UPDATE ${this.client(this.workspace.getTableName())} SET allow_guest_sign_up = ${guestSignUpAllowed} WHERE uuid = ${workspaceId}`
-  }
-
   async updatePasswordAgingRule (workspaceId: WorkspaceUuid, days: number | null): Promise<void> {
     await this
       .client`UPDATE ${this.client(this.workspace.getTableName())} SET password_aging_rule = ${days} WHERE uuid = ${workspaceId}`
@@ -902,7 +897,7 @@ export class PostgresAccountDB implements AccountDB {
         SELECT
           (SELECT COUNT(*) FROM ${this.client(this.getWsMembersTableName())}
             WHERE workspace_uuid = ${data.workspaceUuid}
-              AND role IN ('OWNER', 'MAINTAINER', 'USER', 'GUEST')) +
+              AND role IN ('OWNER', 'MAINTAINER', 'USER')) +
           (SELECT COUNT(*) FROM ${this.client(this.invite.getTableName())}
             WHERE workspace_uuid = ${data.workspaceUuid}
               AND email IS NOT NULL AND email <> ''
@@ -952,7 +947,7 @@ export class PostgresAccountDB implements AccountDB {
       const [row] = await tx`
         SELECT
           (SELECT COUNT(*) FROM ${this.client(this.getWsMembersTableName())}
-            WHERE workspace_uuid = ${workspaceUuid} AND role IN ('OWNER', 'MAINTAINER', 'USER', 'GUEST')) +
+            WHERE workspace_uuid = ${workspaceUuid} AND role IN ('OWNER', 'MAINTAINER', 'USER')) +
           (SELECT COUNT(*) FROM ${this.client(this.invite.getTableName())}
             WHERE workspace_uuid = ${workspaceUuid} AND email IS NOT NULL AND email <> ''
               AND (expires_on = -1 OR expires_on > ${Date.now()}) AND remaining_uses > 0) AS used
@@ -970,22 +965,26 @@ export class PostgresAccountDB implements AccountDB {
     accountUuid: AccountUuid,
     workspaceUuid: WorkspaceUuid,
     role: AccountRole,
-    capacity: number
+    capacity: number,
+    expectedRole?: AccountRole
   ): Promise<boolean> {
     return await this.client.begin(async (tx) => {
       await tx`SELECT uuid FROM ${this.client(this.workspace.getTableName())} WHERE uuid = ${workspaceUuid} FOR UPDATE`
+      const [member] = await tx`SELECT role FROM ${this.client(this.getWsMembersTableName())}
+        WHERE workspace_uuid = ${workspaceUuid} AND account_uuid = ${accountUuid} FOR UPDATE`
+      if (member == null || (expectedRole !== undefined && member.role !== expectedRole)) return false
       const [row] = await tx`
         SELECT
           (SELECT COUNT(*) FROM ${this.client(this.getWsMembersTableName())}
-            WHERE workspace_uuid = ${workspaceUuid} AND role IN ('OWNER', 'MAINTAINER', 'USER', 'GUEST')) +
+            WHERE workspace_uuid = ${workspaceUuid} AND role IN ('OWNER', 'MAINTAINER', 'USER')) +
           (SELECT COUNT(*) FROM ${this.client(this.invite.getTableName())}
             WHERE workspace_uuid = ${workspaceUuid} AND email IS NOT NULL AND email <> ''
               AND (expires_on = -1 OR expires_on > ${Date.now()}) AND remaining_uses > 0) AS used
       `
       if (Number(row?.used ?? 0) >= capacity) return false
-      await tx`UPDATE ${this.client(this.getWsMembersTableName())} SET role = ${role}
-        WHERE workspace_uuid = ${workspaceUuid} AND account_uuid = ${accountUuid}`
-      return true
+      const result = await tx`UPDATE ${this.client(this.getWsMembersTableName())} SET role = ${role}
+        WHERE workspace_uuid = ${workspaceUuid} AND account_uuid = ${accountUuid} AND role = ${member.role}`
+      return result.count === 1
     })
   }
 

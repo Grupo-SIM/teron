@@ -1,6 +1,8 @@
 {
   "string": {
-    "Planner": "Planificador",
+    "MyCalendars": "Minha Agenda",
+    "TeamCalendars": "Agendas da Equipe",
+    "Planner": "Calendário",
     "Calendar": "Calendário",
     "Agenda": "Agenda",
     "Me": "Eu",
@@ -14,7 +16,7 @@
     "Now": "Agora",
     "Scheduled": "Agendado",
     "Schedule": "Agenda",
-    "WithoutProject": "Sem projeto",
+    "WithoutProject": "Sem setor",
     "TotalGroupTime": "{days, plural, =0 {} other {#d}} {hours, plural, =0 {} other {#h}} {minutes, plural, =0 {} other {#m}}",
     "Tasks": "Tarefas",
     "WorkSlot": "Intervalo de trabalho",

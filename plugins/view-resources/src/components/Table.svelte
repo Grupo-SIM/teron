@@ -289,12 +289,12 @@
             editable
           }
     if (attribute.collectionAttr || attribute.attribute?.type?._class === core.class.TypeIdentifier) {
-      return { object, ...attribute.props, ...readonlyParams }
+      return { object, _class: object._class, key: attribute.key, ...attribute.props, ...readonlyParams }
     }
     if (attribute.attribute?.type._class === core.class.EnumOf) {
       return { ...attribute.props, type: attribute.attribute.type, ...readonlyParams }
     }
-    return { ...attribute.props, space: object.space, ...readonlyParams }
+    return { object, _class: object._class, key: attribute.key, ...attribute.props, space: object.space, ...readonlyParams }
   }
   function getValue (attribute: AttributeModel, object: Doc): any {
     if (attribute.castRequest) {
@@ -334,7 +334,8 @@
     config: Array<string | BuildModelKey>,
     lookup?: Lookup<Doc>
   ): Promise<void> {
-    const newModelOpts = { client, _class, keys: config, lookup }
+    // Saved column preferences can reference attributes removed from the current model.
+    const newModelOpts = { client, _class, keys: config, lookup, ignoreMissing: true }
     if (modelOptions == null || !deepEqual(modelOptions, newModelOpts)) {
       modelOptions = newModelOpts
       await build(modelOptions)
@@ -368,9 +369,9 @@
     attr: AnyAttribute | undefined,
     permissionsStore: PermissionsStore | undefined
   ): boolean {
-    if (permissionsStore === undefined) return true
+    if (permissionsStore === undefined) return false
     if (attr === undefined) return true
-    return canChangeAttribute(attr, object.space as Ref<TypedSpace>, permissionsStore, object._class)
+    return canChangeAttribute(attr, object.space as Ref<TypedSpace>, permissionsStore, object._class, object)
   }
 
   async function canEdit (object: Doc): Promise<boolean> {

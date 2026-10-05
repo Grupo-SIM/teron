@@ -66,6 +66,10 @@ export const documentPlugin = plugin(documentId, {
     Location: '' as Resource<(loc: Location) => Promise<ResolvedLocation | undefined>>
   },
   string: {
+    GuidelineReaders: '' as IntlString,
+    GuidelineEditors: '' as IntlString,
+    GuidelineReaderSectors: '' as IntlString,
+    GuidelineEditorSectors: '' as IntlString,
     ConfigLabel: '' as IntlString,
     CreateDocument: '' as IntlString,
     Documents: '' as IntlString,

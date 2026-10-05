@@ -1,0 +1,43 @@
+# Regressão local da simplificação
+
+Stack descartável do checkout atual. Usa contas `owner@regression.local` e `user@regression.local`, senha `Regression123!`. Dados ficam nos volumes `teron-regression_*`; nenhum serviço ou banco existente é reutilizado. Portas públicas limitadas a localhost: 30130 (contas), 30133 (transactor), 30178 (colaboração), 30180 (interface), 30199 (Pulse). Integrações, e-mail e telemetria externos ficam desativados.
+
+Dependências Rush já precisam estar instaladas. Preparação compila os pacotes necessários, gera modelo/bundles e frontend sem minificação; não publica imagens nem executa migrações remotas.
+
+```sh
+node dev/regression/prepare.mjs
+# Download acessa registros externos: agentes precisam de autorização específica antes deste comando.
+docker compose -f dev/docker-compose.regression.yaml pull
+docker compose -f dev/docker-compose.regression.yaml up -d --pull never
+node dev/tool/bundle/simplification.cjs
+```
+
+Runner cria workspace e duas contas caso ainda não existam. Estado de autenticação fica em `/tmp/teron-regression-accounts.json`, com permissão 0600; variável `TERON_REGRESSION_STATE` permite mudar caminho. Runner reexecuta com IDs fixos, restaura papel User após testar Maintainer e preserva fixtures para conferir interface. Resultado de backend fica em `/tmp/teron-regression-api-results.json`.
+
+Cobertura de backend: funções múltiplas, isolamento de habilidades/etiquetas, exclusão com referências em duas pessoas, busca parcial, dias opcionais, agendas compartilhadas, papéis de desbloqueio, tempo com reabertura/resumo do pai e troca de titular do escritório. Privacidade visual, menus, formulários, modelos de texto e substituição de identidade são cobertos pela regressão no navegador abaixo.
+
+Fechamento em 04/10/2026: sete grupos do runner base e sete do complementar passaram com duas contas reais. Doze testes de autorização passaram; builds de servidor/pacotes e bundle web passaram. Sete cenários de navegador validados: seis na rodada final e o cenário de modelos na repetição após corrigir seletor ambíguo entre descrição e comentário. A suíte confirma OTP com restauração da identidade, convite recebido/recusado, funções múltiplas e coleções isoladas, busca parcial, dias opcionais, seleção/privacidade das agendas, modelo inserido sem publicação e tarefa aberta em aba real sem `opener`.
+
+Regressões corrigiram gatilho de tempo, sincronização de identidades verificadas, presença online da própria conta, handles de eventos privados, editor de coleções, busca na navegação de contatos e IDs públicos de strings de modelos. Imagens originais indisponíveis; capturas locais verificam requisitos funcionais, sem comparação pixel a pixel. Stack e volumes descartados ao fechar; nenhum push ou comando remoto de banco/deploy.
+```sh
+# Encerra somente esta stack; --volumes descarta apenas seus dados.
+docker compose -f dev/docker-compose.regression.yaml down --volumes
+```
+
+Após encerrar, apagar também os dois arquivos temporários de estado/resultados mencionados acima.
+
+Busca global literal (plano 0004): `node dev/regression/elastic.mjs` usa Elasticsearch 7.14.2 e imagem base já instalados, em rede interna descartável. Não baixa imagens. Valida início/meio/fim, caixa/acentos, símbolos literais, espaço autorizado, paginação e reconstrução repetida do campo `literalSearch` sem alterar conteúdo original. Contêineres, volumes, rede e bundle temporário são removidos ao terminar. Reconstrução explícita usa `ElasticAdapter.rebuildLiteralSearch()`; não é executada automaticamente na inicialização ou em serviços externos.
+
+Conversão de contas legadas: `node dev/regression/roles.mjs` executa `convertLegacyReadOnlyMembers` em MongoDB/PostgreSQL novos, dentro de rede interna sem portas públicas. Usa apenas imagens já instaladas. Valida vagas disponíveis/insuficientes, convites reservados, concorrência pela última vaga e repetição. Não inicializa nem modifica bancos existentes; contêineres e volumes são descartados ao finalizar.
+
+Plano 0004: `node dev/tool/bundle/adjustments.cjs` valida duas contas, privacidade, concessões individuais/por setor, revogação, RPC colaborativo e atribuição múltipla/status. Depois das fixtures, `python3 dev/regression/migrations.py` injeta dados legados somente nesta stack, migra duas vezes e confere tarefas, templates aninhados e privacidade dos espaços. Runner pausa/reinicia apenas o transactor descartável.
+
+Navegador dos planos 0003/0004 (após ambos os runners, com transactor ativo; migrações são opcionais para conferir dados legados):
+
+```sh
+node tests/sanity/node_modules/@playwright/test/cli.js test --config dev/regression/playwright.config.cjs
+```
+
+Configuração usa Chromium já instalado, sem download. Testes locais são ignorados pela suíte comum sem `TERON_LOCAL_REGRESSION=1`. Verifica duas contas, privacidade, dia inteiro/meia-noite, nomes das seções, foto cover na edição e tokens de fundo nos temas claro/escuro. Produto atualmente força tema escuro; teste claro aplica classe CSS apenas na página descartável para conferir tokens, sem alterar preferência do produto. Capturas ficam em `/tmp/teron-regression-*`.
+
+Regressão do plano 0003 inclui OTP real de User com substituição/restauração de e-mail e comparação dos registros globais/locais. Pulse descartável (`s0.7.428`, memória, porta localhost 30199) permite entrega/recusa de convite sem áudio externo. `office-invite-fixture.cjs` prepara presença local em duas salas e remove as presenças após o teste; nenhum servidor de mídia é acionado.

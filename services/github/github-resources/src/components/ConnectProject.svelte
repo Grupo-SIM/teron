@@ -32,19 +32,19 @@
   export const baseIssueTaskStatuses: TaskStatusFactory[] = [
     {
       category: task.statusCategory.UnStarted,
-      statuses: [['Backlog', PaletteColorIndexes.Cloud, tracker.status.Backlog]]
+      statuses: [['Pendente', PaletteColorIndexes.Cloud, tracker.status.Backlog]]
     },
     {
       category: task.statusCategory.Active,
       statuses: [
-        ['Coding', PaletteColorIndexes.Porpoise, tracker.status.Coding],
-        ['Under review', PaletteColorIndexes.Cerulean, tracker.status.UnderReview]
+        ['Em andamento', PaletteColorIndexes.Cerulean, tracker.status.Coding],
+        ['Revisão', PaletteColorIndexes.Orange, tracker.status.UnderReview]
       ]
     },
-    { category: task.statusCategory.Won, statuses: [['Done', PaletteColorIndexes.Grass, tracker.status.Done]] },
+    { category: task.statusCategory.Won, statuses: [['Finalizado', PaletteColorIndexes.Grass, tracker.status.Done]] },
     {
       category: task.statusCategory.Lost,
-      statuses: [['Canceled', PaletteColorIndexes.Coin, tracker.status.Canceled]]
+      statuses: [['Ajustes', PaletteColorIndexes.Firework, tracker.status.Canceled]]
     }
   ]
 

@@ -220,7 +220,8 @@
 
     "NewMilestone": "Nowy cel",
     "CreateMilestone": "Utwórz",
-
+    "DeleteMilestoneConfirm": "Trwale usunąć wybrane projekty? Ich zadania zostaną zachowane bez projektu.",
+    "DeleteMilestoneTitle": "Usunąć {name}?",
     "MoveAndDeleteMilestone": "Przenieś zadania z celu {newMilestone} i usuń punkt docelowy {deleteMilestone}",
     "MoveAndDeleteMilestoneConfirm": "Czy chcesz usunąć ten cel i przenieść zadania do innego?",
 
@@ -236,6 +237,13 @@
     "TimeSpendReportDescription": "Opis",
     "TimeSpendDays": "{value, plural, =1 {1 dzień} other {# dni}}",
     "TimeSpendHours": "{value, plural, =1 {1 godzina} few {# godziny} many {# godzin} other {# godziny}}",
+    "TimeInputAmount": "e.g. 2",
+    "TimeUnit": "Unit",
+    "TimeUnitHours": "Hours",
+    "TimeUnitDays": "Days",
+    "TimeUnitMinutes": "Minutes",
+    "TimeInputHours": "e.g. 2 hours",
+    "TimeInputMinutes": "e.g. 30 minutes",
     "TimeSpendMinutes": "{value, plural, =1 {1 minuta} few {# minuty} many {# minut} other {# minuty}}",
     "ChildEstimation": "Wycena podzagadnień",
     "ChildReportedTime": "Czas poświęcony na podzagadnienia",
@@ -248,6 +256,8 @@
     "AddedAsBlocking": "Oznaczono jako blokujące",
 
     "IssueTemplate": "Szablon",
+    "DiscardTemplate": "Discard",
+    "TextTemplate": "Text template",
     "IssueTemplates": "Szablony",
     "NewProcess": "Nowy szablon",
     "SaveProcess": "Zapisz szablon",

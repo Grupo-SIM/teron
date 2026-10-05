@@ -16,14 +16,14 @@
 <script lang="ts">
   import { DocUpdateMessage } from '@hcengineering/activity'
   import chunter, { Channel } from '@hcengineering/chunter'
-  import { Label } from '@hcengineering/ui'
+  import { Label, themeStore } from '@hcengineering/ui'
 
   import ChannelIcon from '../ChannelIcon.svelte'
 
   export let message: DocUpdateMessage
   export let value: Channel | undefined
 
-  $: date = new Date(message.createdOn ?? message.modifiedOn).toLocaleString('default', {
+  $: date = new Date(message.createdOn ?? message.modifiedOn).toLocaleString($themeStore.language, {
     day: '2-digit',
     month: 'short',
     year: 'numeric'

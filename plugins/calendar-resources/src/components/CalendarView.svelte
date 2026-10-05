@@ -35,7 +35,8 @@
     getWeekStart,
     showPopup,
     AnySvelteComponent,
-    deviceOptionsStore as deviceInfo
+    deviceOptionsStore as deviceInfo,
+    themeStore
   } from '@hcengineering/ui'
 
   import { CalendarMode, DayCalendar, calendarByIdStore, hidePrivateEvents } from '../index'
@@ -60,7 +61,6 @@
   const me = getCurrentEmployee()
   const acc = getCurrentAccount()
   const myPrimaryId = acc.primarySocialId
-  const mySocialStrings = acc.socialIds
 
   let mode: CalendarMode = allowedModes.includes(CalendarMode.Days) ? CalendarMode.Days : allowedModes[0]
 
@@ -120,9 +120,16 @@
   const calendarsQuery = createQuery()
 
   let calendars: Calendar[] = []
+  let selectedCalendar = 'all'
+  $: displayedCalendars = selectedCalendar === 'all'
+    ? calendars
+    : calendars.filter((calendar) => calendar._id === selectedCalendar)
 
-  calendarsQuery.query(calendar.class.Calendar, { createdBy: { $in: mySocialStrings }, hidden: false }, (res) => {
+  calendarsQuery.query(calendar.class.Calendar, { hidden: false }, (res) => {
     calendars = res
+    if (selectedCalendar !== 'all' && !res.some((item) => item._id === selectedCalendar)) {
+      selectedCalendar = 'all'
+    }
   })
 
   const q = createQuery()
@@ -142,7 +149,7 @@
       { sort: { date: SortingOrder.Ascending }, ...options }
     )
   }
-  $: update(_class, query, calendars, options)
+  $: update(_class, query, displayedCalendars, options)
   $: visible = hidePrivateEvents(raw, $calendarByIdStore)
   $: objects = getAllEvents(visible, from, to)
 
@@ -203,7 +210,7 @@
     currentDate = currentDate
   }
   function getMonthName (date: Date): string {
-    return new Intl.DateTimeFormat('default', {
+    return new Intl.DateTimeFormat($themeStore.language, {
       month: 'long'
     }).format(date)
   }
@@ -335,6 +342,8 @@
     onToday={handleToday}
     onBack={handleBack}
     onForward={handleForward}
+    {calendars}
+    bind:selectedCalendar
   />
 {/if}
 {#if mode === CalendarMode.Year}

@@ -179,6 +179,8 @@
     "RequiredSlots": "Erforderliche Slots",
     "Bindings": "Bindungen",
     "AskRequiredFields": "Erforderliche Felder erfragen"
+  ,
+    "NoSlotsDefined": "No slots defined for this process"
   },
   "error": {
     "MethodNotFound": "Methode nicht gefunden: {methodId}",

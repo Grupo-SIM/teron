@@ -13,12 +13,11 @@
 // limitations under the License.
 -->
 <script lang="ts">
-  import core, { Class, Doc, Rank, Ref, toRank } from '@hcengineering/core'
+  import core, { Class, Doc, Ref, toRank } from '@hcengineering/core'
   import { IntlString } from '@hcengineering/platform'
   import { AttributesBar, KeyedAttribute, createQuery, getAttribute, getClient } from '@hcengineering/presentation'
-  import setting, { settingId } from '@hcengineering/setting'
-  import { Button, Label, getCurrentResolvedLocation, navigate } from '@hcengineering/ui'
-  import { getFiltredKeys, isCollectionAttr, restrictionStore } from '../utils'
+  import { Label } from '@hcengineering/ui'
+  import { getFiltredKeys, isCollectionAttr } from '../utils'
 
   export let object: Doc | Record<string, any>
   export let _class: Ref<Class<Doc>>
@@ -62,10 +61,7 @@
     return nonEmpty === undefined
   }
 
-  $: collapsed = getCollapsed(_class, nonEmpty)
-
-  $: clazz = hierarchy.getClass(_class)
-  $: isEditable = hierarchy.hasMixin(clazz, setting.mixin.Editable) && hierarchy.as(clazz, setting.mixin.Editable).value
+  $: collapsed = showHeader && getCollapsed(_class, nonEmpty)
 </script>
 
 {#if showHeader && (keys.length > 0 || isMainClass)}
@@ -87,27 +83,6 @@
           <path d="M0,0L6,3L0,6Z" />
         </svg>
       </div>
-    </div>
-    <div class="tool">
-      {#if !$restrictionStore.disableNavigation && isEditable}
-        <Button
-          icon={setting.icon.Setting}
-          kind={'link'}
-          size={'medium'}
-          showTooltip={{ label: setting.string.ClassSetting }}
-          on:click={(ev) => {
-            ev.stopPropagation()
-            const loc = getCurrentResolvedLocation()
-            loc.path[2] = settingId
-            loc.path[3] = 'setting'
-            loc.path[4] = 'classes'
-            loc.path.length = 5
-            loc.query = { _class }
-            loc.fragment = undefined
-            navigate(loc)
-          }}
-        />
-      {/if}
     </div>
   </div>
 {/if}
@@ -147,13 +122,6 @@
       transition-timing-function: var(--timing-main);
     }
 
-    .tool {
-      display: flex;
-      justify-content: center;
-      align-items: center;
-      opacity: 0;
-      transition: opacity 0.15s var(--timing-main);
-    }
     &.collapsed {
       background-color: var(--theme-divider-color);
       border-color: transparent;
@@ -169,9 +137,6 @@
       border-color: transparent;
 
       .icon-arrow {
-        opacity: 1;
-      }
-      .tool {
         opacity: 1;
       }
     }

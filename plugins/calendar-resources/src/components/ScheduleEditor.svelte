@@ -272,7 +272,9 @@
     for (let i = 0; i < 7; i++) {
       result.push({
         weekDay: ($deviceInfo.firstDayOfWeek + i) % 7,
-        dayName: capitalizeFirstLetter(getWeekDayName(new Date(startDate + i * 86_400_000), 'short'))
+        dayName: capitalizeFirstLetter(
+          getWeekDayName(new Date(startDate + i * 86_400_000), 'short', $themeStore.language)
+        )
       })
     }
     return result

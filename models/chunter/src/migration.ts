@@ -140,8 +140,8 @@ export async function createRandom (client: MigrationUpgradeClient, tx: TxOperat
         core.space.Space,
         {
           name: 'random',
-          description: 'Random Talks',
-          topic: 'Random Talks',
+          description: 'Conversas aleatórias',
+          topic: 'Conversas aleatórias',
           private: false,
           archived: false,
           members: await getAllAccounts(tx),
@@ -316,6 +316,19 @@ export const chunterOperation: MigrateOperation = {
           const tx = new TxOperations(client, core.account.System)
           await createGeneral(client, tx)
           await createRandom(client, tx)
+        }
+      },
+      {
+        state: 'translate-default-random-v1',
+        func: async (client) => {
+          const tx = new TxOperations(client, core.account.System)
+          const random = await tx.findOne(chunter.class.Channel, { _id: chunter.space.Random })
+          if (random !== undefined && (random.description === 'Random Talks' || random.topic === 'Random Talks')) {
+            await tx.update(random, {
+              ...(random.description === 'Random Talks' ? { description: 'Conversas aleatórias' } : {}),
+              ...(random.topic === 'Random Talks' ? { topic: 'Conversas aleatórias' } : {})
+            })
+          }
         }
       }
     ])

@@ -13,6 +13,7 @@
 // limitations under the License.
 -->
 <script lang="ts">
+  import { AccountRole, getCurrentAccount, hasAccountRole } from '@hcengineering/core'
   import { Doc, Ref } from '@hcengineering/core'
   import presentation from '@hcengineering/presentation'
   import { Button, Icon, IconAdd, Label, Scroller, showPopup } from '@hcengineering/ui'
@@ -57,7 +58,9 @@
       <Label label={recruit.string.Vacancies} />
     </span>
     {#if !readonly}
-      <Button id="appls.add" icon={IconAdd} kind={'ghost'} on:click={createApp} />
+      {#if hasAccountRole(getCurrentAccount(), AccountRole.Maintainer)}
+        <Button id="appls.add" icon={IconAdd} kind={'ghost'} on:click={createApp} />
+      {/if}
     {/if}
   </div>
   {#if (vacancies ?? 0) > 0}

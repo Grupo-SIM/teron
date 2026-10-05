@@ -1,5 +1,8 @@
 {
   "string": {
+    "DeleteFile": "Delete file",
+    "DeleteFileConfirm": "Do you want to delete {count, plural, =1 {this file} other {these # files}}?",
+    "DeleteDriveConfirm": "Delete the file space and all its folders, files, versions and attachments? This is permanent.",
     "Drive": "Laufwerk",
     "Drives": "Laufwerke",
     "Grid": "Raster",

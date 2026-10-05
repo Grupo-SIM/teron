@@ -210,7 +210,8 @@
 
     "NewMilestone": "Nový milník",
     "CreateMilestone": "Vytvořit",
-
+    "DeleteMilestoneConfirm": "Trvale smazat vybrané projekty? Jejich úkoly zůstanou bez projektu.",
+    "DeleteMilestoneTitle": "Smazat {name}?",
     "MoveAndDeleteMilestone": "Přesunout úkoly do {newMilestone} a smazat {deleteMilestone}",
     "MoveAndDeleteMilestoneConfirm": "Chcete smazat milník a přesunout úkoly do jiného milníku?",
 
@@ -226,6 +227,13 @@
     "TimeSpendReportDescription": "Popis",
     "TimeSpendDays": "{value}d",
     "TimeSpendHours": "{value}h",
+    "TimeInputAmount": "e.g. 2",
+    "TimeUnit": "Unit",
+    "TimeUnitHours": "Hours",
+    "TimeUnitDays": "Days",
+    "TimeUnitMinutes": "Minutes",
+    "TimeInputHours": "e.g. 2 hours",
+    "TimeInputMinutes": "e.g. 30 minutes",
     "TimeSpendMinutes": "{value}m",
     "ChildEstimation": "Odhad podúkolů",
     "ChildReportedTime": "Čas podúkolů",
@@ -238,6 +246,8 @@
     "AddedAsBlocking": "Označeno jako blokující",
 
     "IssueTemplate": "Šablona",
+    "DiscardTemplate": "Discard",
+    "TextTemplate": "Text template",
     "IssueTemplates": "Šablony",
     "NewProcess": "Nová šablona",
     "SaveProcess": "Uložit šablonu",

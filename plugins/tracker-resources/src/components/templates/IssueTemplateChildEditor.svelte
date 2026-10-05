@@ -178,7 +178,7 @@
           size="small"
           kind="no-border"
           width="auto"
-          on:change={({ detail }) => (newIssue.assignee = detail)}
+          on:change={({ detail }) => (newIssue.assignees = detail)}
         />
       {/key}
       <EstimationEditor

@@ -1,0 +1,139 @@
+# Local-only regression stack. Bundle the pods before starting (see regression/README.md).
+name: teron-regression
+
+x-pod: &pod
+  image: hardcoreeng/base-slim:v20250916
+  working_dir: /usr/src/app
+  command: [node, bundle.js]
+  networks: [local]
+
+x-env: &env
+  SERVER_SECRET: regression-local-secret
+  SECRET: regression-local-secret
+  DB_URL: postgres://postgres:regression@postgres:5432/postgres
+  ACCOUNTS_DB_URL: postgres://postgres:regression@postgres:5432/postgres
+  ACCOUNTS_URL: http://account:3000
+  STORAGE_CONFIG: minio|minio:9000?accessKey=regression&secretKey=regression-local&useSSL=false
+  QUEUE_CONFIG: redpanda:9092
+  FRONT_URL: http://localhost:30180
+  MAIL_URL: ""
+  STATS_URL: ""
+  OTEL_TRACES_EXPORTER: none
+  OTEL_METRICS_EXPORTER: none
+  OTEL_LOGS_EXPORTER: none
+  NODE_PATH: /opt/pnpm/snappy@7.3.3/node_modules:/opt/pnpm/sharp@0.34.5/node_modules
+
+services:
+  postgres:
+    image: postgres:16
+    environment:
+      POSTGRES_PASSWORD: regression
+    volumes: [postgres:/var/lib/postgresql/data]
+    healthcheck:
+      test: [CMD-SHELL, pg_isready -U postgres]
+      interval: 2s
+      timeout: 3s
+      retries: 30
+    networks: [local]
+  minio:
+    image: bitnamilegacy/minio:2025.4.22-debian-12-r0
+    environment:
+      MINIO_ROOT_USER: regression
+      MINIO_ROOT_PASSWORD: regression-local
+    volumes: [files:/bitnami/minio/data]
+    networks: [local]
+  redpanda:
+    image: docker.redpanda.com/redpandadata/redpanda:v24.3.6
+    command: [redpanda, start, --overprovisioned, --smp, "1", --memory, 512M, --reserve-memory, 0M, --node-id, "0", --check=false, --kafka-addr, 0.0.0.0:9092, --advertise-kafka-addr, redpanda:9092]
+    volumes: [queue:/var/lib/redpanda/data]
+    networks: [local]
+  pulse:
+    image: hardcoreeng/hulypulse:s0.7.428
+    networks: [local, ingress]
+    environment:
+      HULY_BACKEND: memory
+      HULY_TOKEN_SECRET: regression-local-secret
+      HULY_BIND_PORT: "8099"
+    ports: [127.0.0.1:30199:8099]
+  account:
+    <<: *pod
+    networks: [local, ingress]
+    volumes: [../pods/account/bundle/bundle.js:/usr/src/app/bundle.js:ro]
+    environment:
+      <<: *env
+      ACCOUNT_PORT: "3000"
+      REGION_INFO: regression|Local regression
+      TRANSACTOR_URL: ws://transactor:3333;ws://localhost:30133;regression
+      ADMIN_EMAILS: owner@regression.local
+    ports: [127.0.0.1:30130:3000]
+    depends_on:
+      postgres: {condition: service_healthy}
+  workspace:
+    <<: *pod
+    volumes: [../pods/workspace/bundle/bundle.js:/usr/src/app/bundle.js:ro]
+    environment:
+      <<: *env
+      REGION: regression
+      WS_OPERATION: all
+      INIT_REPO_DIR: /nonexistent
+    depends_on: [account, minio, redpanda]
+  transactor:
+    <<: *pod
+    networks: [local, ingress]
+    volumes:
+      - ../pods/server/bundle/bundle.js:/usr/src/app/bundle.js:ro
+      - ../pods/server/bundle/model.json:/usr/src/app/model.json:ro
+      - ../common/temp/node_modules/.pnpm:/opt/pnpm:ro
+    environment:
+      <<: *env
+      REGION: regression
+      SERVER_PORT: "3333"
+      FULLTEXT_URL: http://localhost:4702
+      COMMUNICATION_API_ENABLED: "false"
+    ports: [127.0.0.1:30133:3333]
+    depends_on: [account, minio, redpanda]
+  collaborator:
+    <<: *pod
+    networks: [local, ingress]
+    volumes: [../pods/collaborator/bundle/bundle.js:/usr/src/app/bundle.js:ro]
+    environment:
+      <<: *env
+      COLLABORATOR_PORT: "3078"
+    ports: [127.0.0.1:30178:3078]
+    depends_on: [account, minio]
+  front:
+    <<: *pod
+    networks: [local, ingress]
+    volumes:
+      - ../pods/front/bundle/bundle.js:/usr/src/app/bundle.js:ro
+      - ../dev/prod/dist:/usr/src/app/dist:ro
+      - ../common/temp/node_modules/.pnpm:/opt/pnpm:ro
+    environment:
+      <<: *env
+      SERVER_PORT: "8080"
+      ACCOUNTS_URL: http://localhost:30130
+      ACCOUNTS_URL_INTERNAL: http://account:3000
+      UPLOAD_URL: /files
+      COLLABORATOR_URL: ws://localhost:30178
+      PULSE_URL: ws://localhost:30199/ws
+      GMAIL_URL: ""
+      CALENDAR_URL: ""
+      TELEGRAM_URL: ""
+      REKONI_URL: ""
+      BRANDING_URL: http://localhost:30180/regression-branding.json
+      DEFAULT_LANGUAGE: pt-br
+      COMMUNICATION_API_ENABLED: "false"
+      DISABLED_FEATURES: auto-translate,mailboxes
+    ports: [127.0.0.1:30180:8080]
+    depends_on: [account]
+
+networks:
+  ingress:
+    driver_opts:
+      com.docker.network.bridge.enable_ip_masquerade: "false"
+  local:
+    internal: true
+volumes:
+  postgres:
+  files:
+  queue:

@@ -12,6 +12,8 @@
 // limitations under the License.
 
 import { utcToZonedTime, zonedTimeToUtc } from 'date-fns-tz'
+import { themeStore } from '@hcengineering/theme'
+import { get } from 'svelte/store'
 import { type TimeZone, capitalizeFirstLetter } from '../../..'
 
 export const DAYS_IN_WEEK = 7
@@ -41,20 +43,28 @@ export function daysInMonth (date: Date): number {
   return 33 - new Date(date.getFullYear(), date.getMonth(), 33).getDate()
 }
 
-export function getWeekDayName (weekDay: Date, weekFormat: 'narrow' | 'short' | 'long' | undefined = 'short'): string {
-  const locale = new Intl.NumberFormat().resolvedOptions().locale
-  return new Intl.DateTimeFormat(locale, {
+export function getDateLocale (locale?: string): string {
+  const storedLanguage = typeof localStorage === 'undefined' ? undefined : localStorage.getItem('lang') ?? undefined
+  return locale ?? get(themeStore)?.language ?? storedLanguage ?? new Intl.NumberFormat().resolvedOptions().locale
+}
+
+export function getWeekDayName (
+  weekDay: Date,
+  weekFormat: 'narrow' | 'short' | 'long' | undefined = 'short',
+  locale?: string
+): string {
+  return new Intl.DateTimeFormat(getDateLocale(locale), {
     weekday: weekFormat
   }).format(weekDay)
 }
 
-export function getWeekDayNames (): Map<number, string> {
+export function getWeekDayNames (locale?: string): Map<number, string> {
   const today: Date = new Date()
   const offset: number = 0 - today.getDay()
   const startDate: number = today.setTime(today.getTime() + MILLISECONDS_IN_DAY * offset)
   const result: Map<number, string> = new Map<number, string>()
   for (let i = 0; i < 7; i++) {
-    result.set(i, capitalizeFirstLetter(getWeekDayName(new Date(startDate + i * MILLISECONDS_IN_DAY), 'long')))
+    result.set(i, capitalizeFirstLetter(getWeekDayName(new Date(startDate + i * MILLISECONDS_IN_DAY), 'long', locale)))
   }
   return result
 }
@@ -90,10 +100,13 @@ export function isWeekend (date: Date): boolean {
   return date.getDay() === 0 || date.getDay() === 6
 }
 
-export function getMonthName (date: Date, option: 'narrow' | 'short' | 'long' | 'numeric' | '2-digit' = 'long'): string {
+export function getMonthName (
+  date: Date,
+  option: 'narrow' | 'short' | 'long' | 'numeric' | '2-digit' = 'long',
+  locale?: string
+): string {
   try {
-    const locale = new Intl.NumberFormat().resolvedOptions().locale
-    return new Intl.DateTimeFormat(locale, { month: option }).format(date)
+    return new Intl.DateTimeFormat(getDateLocale(locale), { month: option }).format(date)
   } catch (err) {
     console.error(err)
     return ''
@@ -106,15 +119,15 @@ export interface ICell {
   classes: TCellStyle
 }
 
-export function getLocalWeekStart (): number {
-  const locale = new Intl.Locale(navigator.language)
+export function getLocalWeekStart (language?: string): number {
+  const locale = new Intl.Locale(getDateLocale(language))
   return typeof (locale as any)?.getWeekInfo === 'function'
     ? (locale as any)?.getWeekInfo()?.firstDay
     : ((locale as any).weekInfo?.firstDay ?? 1)
 }
 
-export function hasLocalWeekStart (): boolean {
-  const locale = new Intl.Locale(navigator.language)
+export function hasLocalWeekStart (language?: string): boolean {
+  const locale = new Intl.Locale(getDateLocale(language))
   return typeof (locale as any)?.getWeekInfo === 'function' || (locale as any).weekInfo?.firstDay !== undefined
 }
 
@@ -155,8 +168,14 @@ export const getDueDateIconModifier = (
   return 'normal'
 }
 
-export function getFormattedDate (value: number | null, options?: Intl.DateTimeFormatOptions): string {
-  return value === null ? '' : new Date(value).toLocaleString('default', options ?? { month: 'short', day: 'numeric' })
+export function getFormattedDate (
+  value: number | null,
+  options?: Intl.DateTimeFormatOptions,
+  locale?: string
+): string {
+  return value === null
+    ? ''
+    : new Date(value).toLocaleString(getDateLocale(locale), options ?? { month: 'short', day: 'numeric' })
 }
 
 export const getTimeZoneName = (

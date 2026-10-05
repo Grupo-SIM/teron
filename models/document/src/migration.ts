@@ -400,6 +400,19 @@ export const documentOperation: MigrateOperation = {
   async migrate (client: MigrationClient, mode): Promise<void> {
     await tryMigrate(mode, client, documentId, [
       {
+        state: 'guideline-access-preserve-members',
+        func: async (client) => {
+          const spaces = await client.find<Teamspace>(DOMAIN_SPACE, { _class: document.class.Teamspace, guidelineAccess: { $exists: false } })
+          for (const space of spaces) {
+            await client.update(DOMAIN_SPACE, { _id: space._id }, {
+              guidelineAccess: true,
+              guidelineReaders: [], guidelineEditors: [...new Set(space.members)],
+              guidelineReaderSectors: [], guidelineEditorSectors: []
+            })
+          }
+        }
+      },
+      {
         state: 'updateDocumentIcons',
         mode: 'upgrade',
         func: migrateDocumentIcons

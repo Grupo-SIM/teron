@@ -14,14 +14,14 @@
 -->
 
 <script lang="ts">
-  import { tooltip } from '@hcengineering/ui'
+  import { themeStore, tooltip } from '@hcengineering/ui'
   import { getDisplayTime, Timestamp } from '@hcengineering/core'
   import { getEmbeddedLabel } from '@hcengineering/platform'
 
   export let date: Timestamp
   export let shortTime = false
 
-  $: fullDate = new Date(date).toLocaleString('default', {
+  $: fullDate = new Date(date).toLocaleString($themeStore.language, {
     minute: '2-digit',
     hour: 'numeric',
     day: '2-digit',
@@ -32,10 +32,10 @@
   function getShortTime (date: Timestamp): string {
     const options: Intl.DateTimeFormatOptions = { hour: 'numeric', minute: 'numeric' }
 
-    return new Date(date).toLocaleTimeString('default', options).split(' ')[0]
+    return new Date(date).toLocaleTimeString($themeStore.language, options).split(' ')[0]
   }
 </script>
 
 <span class="text-sm whitespace-nowrap" use:tooltip={{ label: getEmbeddedLabel(fullDate) }}>
-  {shortTime ? getShortTime(date) : getDisplayTime(date)}
+  {shortTime ? getShortTime(date) : getDisplayTime(date, $themeStore.language)}
 </span>

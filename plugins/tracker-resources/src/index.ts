@@ -28,7 +28,7 @@ import {
   toIdMap,
   type TxOperations
 } from '@hcengineering/core'
-import { type Resources, type Status, translate } from '@hcengineering/platform'
+import { type Resources, type Status } from '@hcengineering/platform'
 import { getClient, MessageBox, type ObjectSearchResult } from '@hcengineering/presentation'
 import { type Component, type Issue, type Milestone, type Project } from '@hcengineering/tracker'
 import {
@@ -36,8 +36,7 @@ import {
   getCurrentLocation,
   getCurrentResolvedLocation,
   navigate,
-  showPopup,
-  themeStore
+  showPopup
 } from '@hcengineering/ui'
 import ComponentEditor from './components/components/ComponentEditor.svelte'
 import ComponentFilterValuePresenter from './components/components/ComponentFilterValuePresenter.svelte'
@@ -132,7 +131,6 @@ import {
   deleteObjects,
   setFilters
 } from '@hcengineering/view-resources'
-import MoveAndDeleteMilestonePopup from './components/milestones/MoveAndDeleteMilestonePopup.svelte'
 import EditIssueTemplate from './components/templates/EditIssueTemplate.svelte'
 import TemplateEstimationEditor from './components/templates/EstimationEditor.svelte'
 import {
@@ -168,11 +166,11 @@ import CreateProject from './components/projects/CreateProject.svelte'
 import ProjectPresenter from './components/projects/ProjectPresenter.svelte'
 import ProjectSpacePresenter from './components/projects/ProjectSpacePresenter.svelte'
 
-import { get } from 'svelte/store'
 import { settingId } from '@hcengineering/setting'
 import type { TaskType } from '@hcengineering/task'
 import { getAllStates } from '@hcengineering/task-resources'
 import view, { type Filter } from '@hcengineering/view'
+import HoursEstimationValueEditor from './components/issues/timereport/HoursEstimationValueEditor.svelte'
 import EstimationValueEditor from './components/issues/timereport/EstimationValueEditor.svelte'
 import TimePresenter from './components/issues/timereport/TimePresenter.svelte'
 import { getTargetObjectFromUrl } from '@hcengineering/text-editor-resources'
@@ -190,7 +188,7 @@ export async function queryIssue<D extends Issue> (
   search: string,
   filter?: { in?: RelatedDocument[], nin?: RelatedDocument[] }
 ): Promise<ObjectSearchResult[]> {
-  const q: DocumentQuery<Issue> = { identifier: { $like: `%${search}%` } }
+  const q: DocumentQuery<Issue> = { identifier: { $contains: search } }
   if (filter?.in !== undefined || filter?.nin !== undefined) {
     q._id = {}
     if (filter.in !== undefined) {
@@ -207,7 +205,7 @@ export async function queryIssue<D extends Issue> (
     })
   )
 
-  const q2: DocumentQuery<Issue> = { title: { $like: `%${search}%` } }
+  const q2: DocumentQuery<Issue> = { title: { $contains: search } }
   if (q._id !== undefined) {
     q2._id = q._id
   }
@@ -315,53 +313,25 @@ async function deleteProject (project: Project | undefined): Promise<void> {
   }
 }
 
-async function moveAndDeleteMilestones (
-  client: TxOperations,
-  oldMilestones: Milestone[],
-  newMilestone?: Milestone
-): Promise<void> {
-  const noMilestoneLabel = await translate(tracker.string.NoMilestone, {}, get(themeStore).language)
-
-  showPopup(MessageBox, {
-    label: tracker.string.MoveAndDeleteMilestone,
-    message: tracker.string.MoveAndDeleteMilestoneConfirm,
-    labelProps: {
-      newMilestone: newMilestone?.label ?? noMilestoneLabel,
-      deleteMilestone: oldMilestones.map((p) => p.label)
-    },
-    action: async () => {
-      for (const oldMilestone of oldMilestones) {
-        void moveIssuesToAnotherMilestone(client, oldMilestone, newMilestone).then((success) => {
-          if (success) {
-            void deleteObject(client, oldMilestone)
-          }
-        })
-      }
-    }
-  })
-}
-
 async function deleteMilestone (milestones: Milestone | Milestone[]): Promise<void> {
   const client = getClient()
   const milestoneArray = Array.isArray(milestones) ? milestones : [milestones]
-  // Check if available to move issues to another milestone
-  const firstSearchedMilestone = await client.findOne(tracker.class.Milestone, {
-    _id: { $nin: milestoneArray.map((p) => p._id) }
+
+  showPopup(MessageBox, {
+    label: tracker.string.DeleteMilestoneTitle,
+    message: tracker.string.DeleteMilestoneConfirm,
+    labelProps: {
+      name: milestoneArray.map((milestone) => milestone.label).join(', ')
+    },
+    okLabel: tracker.string.Delete,
+    dangerous: true,
+    action: async () => {
+      for (const milestone of milestoneArray) {
+        const success = await moveIssuesToAnotherMilestone(client, milestone, undefined)
+        if (success) await deleteObject(client, milestone)
+      }
+    }
   })
-  if (firstSearchedMilestone !== undefined) {
-    showPopup(
-      MoveAndDeleteMilestonePopup,
-      {
-        milestones: milestoneArray,
-        moveAndDeleteMilestone: async (selectedMilestone?: Milestone) => {
-          await moveAndDeleteMilestones(client, milestoneArray, selectedMilestone)
-        }
-      },
-      'top'
-    )
-  } else {
-    await moveAndDeleteMilestones(client, milestoneArray)
-  }
 }
 
 function filterComponents (doc: Component, target: Component): boolean {
@@ -479,6 +449,7 @@ export default async (): Promise<Resources> => ({
     SettingsRelatedTargets,
     TimePresenter,
     EstimationValueEditor,
+    HoursEstimationValueEditor,
     IssueStatusIcon,
     MilestoneStatusIcon,
     PriorityIconPresenter,

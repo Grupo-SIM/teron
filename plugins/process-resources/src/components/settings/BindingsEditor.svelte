@@ -187,7 +187,7 @@
       </div>
     {/each}
     {#if Object.keys(process.requiredSlots ?? {}).length === 0}
-      <div class="opacity-40 text-center py-4">No slots defined for this process</div>
+      <div class="opacity-40 text-center py-4"><Label label={processPlugin.string.NoSlotsDefined} /></div>
     {/if}
   </div>
 </Card>

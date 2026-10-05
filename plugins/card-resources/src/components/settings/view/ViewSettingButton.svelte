@@ -13,55 +13,14 @@
 // limitations under the License.
 -->
 <script lang="ts">
-  import { createEventDispatcher } from 'svelte'
-
-  import { ButtonIcon, closeTooltip, showPopup } from '@hcengineering/ui'
-  import view, { Viewlet } from '@hcengineering/view'
-
+  import { Viewlet } from '@hcengineering/view'
   import { Data } from '@hcengineering/core'
-  import { AttributeConfig, Config } from '@hcengineering/view-resources'
   import ViewOptionsButton from './ViewOptionsButton.svelte'
-  import ViewletSetting from './ViewSetting.svelte'
 
   export let kind: 'primary' | 'secondary' | 'tertiary' | 'negative' = 'secondary'
   export let viewlet: Data<Viewlet> | undefined = undefined
-  export let disabled: boolean = false
-
-  const dispatch = createEventDispatcher()
-
-  let btn: HTMLButtonElement
-  let pressed: boolean = false
-
-  function clickHandler (): void {
-    pressed = true
-    closeTooltip()
-    showPopup(
-      ViewletSetting,
-      { viewlet },
-      btn,
-      () => {
-        pressed = false
-      },
-      (result: (Config | AttributeConfig)[]) => {
-        dispatch('save', result)
-      }
-    )
-  }
 </script>
 
-{#if viewlet}
-  {#if viewlet?.viewOptions !== undefined}
-    <ViewOptionsButton {viewlet} {kind} />
-  {/if}
-  <ButtonIcon
-    icon={view.icon.Configure}
-    {disabled}
-    {kind}
-    size={'small'}
-    {pressed}
-    tooltip={{ label: view.string.CustomizeView, direction: 'bottom' }}
-    dataId={'btn-viewSetting'}
-    bind:element={btn}
-    on:click={clickHandler}
-  />
+{#if viewlet?.viewOptions !== undefined}
+  <ViewOptionsButton {viewlet} {kind} />
 {/if}

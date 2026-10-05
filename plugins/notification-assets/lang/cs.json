@@ -58,5 +58,9 @@
     "SoundNotificationsDescription": "Přijímejte zvuková oznámení o událostech.",
     "NoAccessToObject": "Již nemáte přístup k tomuto objektu",
     "ViewIn": "Zobrazit v {app}"
+  ,
+    "ReactedToYourMessage": "Reacted to your message",
+    "InboxNotifications": "Inbox notifications",
+    "InboxSettings": "Inbox settings"
   }
 }

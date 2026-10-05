@@ -184,6 +184,8 @@
     "RequiredSlots": "Slots requis",
     "Bindings": "Bindings",
     "AskRequired": "Demander les champs requis"
+  ,
+    "NoSlotsDefined": "No slots defined for this process"
   },
   "error": {
     "MethodNotFound": "Méthode introuvable : {methodId}",

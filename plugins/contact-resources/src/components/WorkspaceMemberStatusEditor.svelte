@@ -19,7 +19,7 @@
   import { translate, type IntlString } from '@hcengineering/platform'
   import { getClient } from '@hcengineering/presentation'
   import { createEventDispatcher, onMount } from 'svelte'
-  import { getCurrentLanguage } from '@hcengineering/theme'
+  import { getCurrentLanguage, themeStore } from '@hcengineering/theme'
   import {
     Button,
     DatePopup,
@@ -134,7 +134,7 @@
 
   $: clearModeLabel = CLEAR_MODE_LABEL[clearMode]
 
-  $: untilPickerDateLabel = clearAt !== undefined ? new Date(clearAt).toLocaleDateString() : ''
+  $: untilPickerDateLabel = clearAt !== undefined ? new Date(clearAt).toLocaleDateString($themeStore.language) : ''
 
   $: untilPickerTimeInputValue =
     clearAt === undefined

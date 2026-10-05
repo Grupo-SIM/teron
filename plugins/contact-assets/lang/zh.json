@@ -72,6 +72,15 @@
     "Inactive": "非活动",
     "Active": "活动",
     "Role": "角色",
+    "ProfessionalTitle": "Professional title",
+    "ContactSource": "Contact source",
+    "Skills": "Skills",
+    "RemoteDaysPerWeek": "Remote days per week",
+    "RemoteDaysPerWeekShort": "Remote",
+    "OnsiteDaysPerWeek": "On-site days per week",
+    "OnsiteDaysPerWeekShort": "On-site",
+    "WorkDaysPerWeekInvalid": "Use 0 to 7; the total cannot exceed 7 days.",
+    "WorkDaysPerWeekPlaceholder": "E.g. 3",
     "Birthday": "生日",
     "UseImage": "附加照片",
     "UseGravatar": "头像",
@@ -107,7 +116,6 @@
     "People": "人员",
     "For": "为",
     "SelectUsers": "选择用户",
-    "AddGuest": "添加访客",
     "ViewProfile": "查看资料",
     "Viber": "Viber",
     "ViberPlaceholder": "Viber",
@@ -152,5 +160,7 @@
     "WorkspaceStatusEndOfDay": "今天结束",
     "WorkspaceStatusPickDate": "选择日期",
     "HideInactive": "隐藏非活跃"
+  ,
+    "Enabled": "Enabled"
   }
 }

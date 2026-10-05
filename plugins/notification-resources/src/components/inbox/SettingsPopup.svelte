@@ -16,8 +16,16 @@
   import { createEventDispatcher } from 'svelte'
   import { createFocusManager, FocusHandler, Label, ListView, ModernToggle, resizeObserver } from '@hcengineering/ui'
   import { SettingItem } from '../../types'
+  import { translateCB } from '@hcengineering/platform'
+  import { themeStore } from '@hcengineering/theme'
+  import notification from '../../plugin'
 
   export let items: SettingItem[] = []
+
+  let inboxSettingsLabel = ''
+  $: translateCB(notification.string.InboxSettings, {}, $themeStore.language, (value) => {
+    inboxSettingsLabel = value
+  })
 
   let popupElement: HTMLDivElement | undefined = undefined
 
@@ -100,7 +108,7 @@
   bind:this={popupElement}
   tabindex="0"
   role="dialog"
-  aria-label="Inbox settings"
+  aria-label={inboxSettingsLabel}
   use:resizeObserver={() => {
     dispatch('changeContent')
   }}

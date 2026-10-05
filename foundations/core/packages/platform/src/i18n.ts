@@ -33,7 +33,7 @@ type Messages = Record<string, IntlString | Record<string, IntlString>>
 const loaders = new Map<Plugin, Loader>()
 const translations = new Map<string, Map<Plugin, Messages | Status>>()
 const cache = new Map<string, Map<IntlString, IntlMessageFormat | Status>>()
-const englishTranslationsForMissing = new Map<Plugin, Messages | Status>()
+const pendingTranslations = new Map<string, Map<Plugin, Promise<Messages | Status>>>()
 
 function getIntlLocale (locale: string): string {
   if (locale === 'pt-br') return 'pt-BR'
@@ -47,6 +47,16 @@ function getIntlLocale (locale: string): string {
  */
 export function addStringsLoader (plugin: Plugin, loader: Loader): void {
   loaders.set(plugin, loader)
+  for (const messages of translations.values()) {
+    messages.delete(plugin)
+  }
+  for (const formats of cache.values()) {
+    for (const message of formats.keys()) {
+      if (message.startsWith(`${plugin}:`)) {
+        formats.delete(message)
+      }
+    }
+  }
 }
 
 /**
@@ -58,15 +68,10 @@ export async function loadPluginStrings (locale: string, force: boolean = false)
     cache.clear()
   }
   for (const [plugin] of loaders) {
-    const localtTanslations = translations.get(locale) ?? new Map<Plugin, Messages | Status<any>>()
-    if (!translations.has(locale)) {
-      translations.set(locale, localtTanslations)
+    if (force) {
+      translations.get(locale)?.delete(plugin)
     }
-    let messages = localtTanslations.get(plugin)
-    if (messages === undefined || force) {
-      messages = await loadTranslationsForComponent(plugin, locale)
-      localtTanslations.set(plugin, messages)
-    }
+    await getPluginTranslations(plugin, locale)
   }
 }
 
@@ -140,21 +145,38 @@ function getCachedTranslation (id: _IdInfo, locale: string): IntlString | Status
   }
 }
 
+async function getPluginTranslations (plugin: Plugin, locale: string, skipError?: boolean): Promise<Messages | Status> {
+  const messages = translations.get(locale) ?? new Map<Plugin, Messages | Status>()
+  translations.set(locale, messages)
+  const cached = messages.get(plugin)
+  if (cached !== undefined) return cached
+
+  const pending = pendingTranslations.get(locale) ?? new Map<Plugin, Promise<Messages | Status>>()
+  pendingTranslations.set(locale, pending)
+  const existing = pending.get(plugin)
+  if (existing !== undefined) return await existing
+
+  const loading = loadTranslationsForComponent(plugin, locale, skipError)
+  pending.set(plugin, loading)
+  try {
+    const result = await loading
+    // A failed chunk request must not poison the cache for the rest of the session.
+    if (!(result instanceof Status) || result.code === platform.status.NoLoaderForStrings) {
+      messages.set(plugin, result)
+    }
+    return result
+  } finally {
+    pending.delete(plugin)
+  }
+}
+
 async function getTranslation (
   id: _IdInfo,
   locale: string,
   skipError?: boolean
 ): Promise<IntlString | Status | undefined> {
   try {
-    const localtTanslations = translations.get(locale) ?? new Map<Plugin, Messages | Status<any>>()
-    if (!translations.has(locale)) {
-      translations.set(locale, localtTanslations)
-    }
-    let messages = localtTanslations.get(id.component)
-    if (messages === undefined) {
-      messages = await loadTranslationsForComponent(id.component, locale, skipError)
-      localtTanslations.set(id.component, messages)
-    }
+    const messages = await getPluginTranslations(id.component, locale, skipError)
     if (messages instanceof Status) {
       return messages
     }
@@ -162,11 +184,7 @@ async function getTranslation (
       if ((messages[id.kind] as Record<string, IntlString>)?.[id.name] !== undefined) {
         return (messages[id.kind] as Record<string, IntlString>)?.[id.name]
       } else {
-        let eng = englishTranslationsForMissing.get(id.component)
-        if (eng === undefined) {
-          eng = await loadTranslationsForComponent(id.component, 'en', skipError)
-          englishTranslationsForMissing.set(id.component, eng)
-        }
+        const eng = await getPluginTranslations(id.component, 'en', skipError)
         if (eng instanceof Status) {
           return eng
         }
@@ -212,7 +230,9 @@ export async function translate<P extends Record<string, any>> (
     }
     const translation = getCachedTranslation(id, locale) ?? (await getTranslation(id, locale, skipError)) ?? message
     if (translation instanceof Status) {
-      localCache.set(message, translation)
+      if (translation.code === platform.status.NoLoaderForStrings) {
+        localCache.set(message, translation)
+      }
       return message
     }
     const compiledNew = new IntlMessageFormat(translation, getIntlLocale(locale), undefined, { ignoreTag: true })
@@ -270,7 +290,7 @@ export function translateCB<P extends Record<string, any>> (
         return
       }
 
-      const compiledNew = new IntlMessageFormat(translation, locale, undefined, { ignoreTag: true })
+      const compiledNew = new IntlMessageFormat(translation, getIntlLocale(locale), undefined, { ignoreTag: true })
       localCache.set(message, compiledNew)
       resolve(compiledNew.format(params))
     }

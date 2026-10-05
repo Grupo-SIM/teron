@@ -10,6 +10,7 @@
   export let disabled: boolean = false
   export let focusIndex = -1
   export let withIcon: boolean = true
+  export let showSelector: boolean = true
 
   const dispatch = createEventDispatcher()
 
@@ -62,7 +63,7 @@
   }
 </script>
 
-{#if calendars.length > 0}
+{#if showSelector && calendars.length > 0}
   <div class="flex-row-center flex-gap-1">
     {#if withIcon}
       <Icon icon={calendar.icon.Calendar} size={'small'} />

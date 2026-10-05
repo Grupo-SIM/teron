@@ -46,27 +46,13 @@ export interface LiveKitEgressData {
   duration: number
 }
 
-export interface AiTranscriptStats {
-  totalDurationSeconds: number
-}
-
 export interface AiTokensStats {
   reason: string
   totalTokens: number
 }
 
 export interface AiStats {
-  transcript: AiTranscriptStats
   tokens: AiTokensStats[]
-}
-
-export interface AiTranscriptData {
-  workspace: WorkspaceUuid
-  day: string
-  lastRequestId: string
-  lastStartTime: string
-  durationSeconds: number
-  usd: number
 }
 
 export interface AiTokensData {

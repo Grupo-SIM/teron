@@ -20,6 +20,7 @@ import card from './plugin'
 
 export function createActions (builder: Builder): void {
   createAction(builder, {
+    secured: true,
     action: card.actionImpl.EditSpace,
     label: presentation.string.Edit,
     icon: view.icon.Edit,
@@ -54,6 +55,7 @@ export function createActions (builder: Builder): void {
   createAction(
     builder,
     {
+      secured: true,
       action: view.actionImpl.ShowPopup,
       actionProps: {
         component: card.component.SetParentActionPopup,
@@ -79,6 +81,7 @@ export function createActions (builder: Builder): void {
   createAction(
     builder,
     {
+      secured: true,
       action: view.actionImpl.UpdateDocument,
       actionProps: {
         key: 'parent',
@@ -137,6 +140,7 @@ export function createActions (builder: Builder): void {
   })
 
   createAction(builder, {
+    secured: true,
     action: view.actionImpl.ShowPopup,
     actionProps: {
       component: card.component.CreateTag,
@@ -159,6 +163,7 @@ export function createActions (builder: Builder): void {
   })
 
   createAction(builder, {
+    secured: true,
     action: view.actionImpl.ShowPopup,
     actionProps: {
       component: card.component.CreateTag,
@@ -183,6 +188,7 @@ export function createActions (builder: Builder): void {
   createAction(
     builder,
     {
+      secured: true,
       action: card.actionImpl.DeleteMasterTag,
       label: workbench.string.Delete,
       icon: view.icon.Delete,
@@ -198,6 +204,7 @@ export function createActions (builder: Builder): void {
   )
 
   createAction(builder, {
+    secured: true,
     action: card.actionImpl.DeleteMasterTag,
     label: workbench.string.Delete,
     icon: view.icon.Delete,
@@ -211,6 +218,7 @@ export function createActions (builder: Builder): void {
   })
 
   createAction(builder, {
+    secured: true,
     action: view.actionImpl.ShowPopup,
     actionProps: {
       component: card.component.ChangeType,
@@ -230,6 +238,7 @@ export function createActions (builder: Builder): void {
   })
 
   createAction(builder, {
+    secured: true,
     action: view.actionImpl.ShowPopup,
     actionProps: {
       component: card.component.CreateTag,
@@ -252,6 +261,7 @@ export function createActions (builder: Builder): void {
   })
 
   createAction(builder, {
+    secured: true,
     ...actionTemplates.move,
     input: 'any',
     target: card.class.Card,
@@ -264,6 +274,7 @@ export function createActions (builder: Builder): void {
   createAction(
     builder,
     {
+      secured: true,
       action: view.actionImpl.ShowPopup,
       actionProps: {
         component: card.component.DuplicateCard,
@@ -288,6 +299,7 @@ export function createActions (builder: Builder): void {
   createAction(
     builder,
     {
+      secured: true,
       action: card.actionImpl.CreateChild,
       label: card.string.CreateChild,
       icon: view.icon.Add,

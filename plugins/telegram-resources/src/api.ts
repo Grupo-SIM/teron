@@ -84,7 +84,7 @@ export async function getIntegrationClient (): Promise<IntegrationClient> {
   if (accountsUrl === undefined || token === undefined) {
     throw new Error('Accounts URL or token is not defined')
   }
-  return getIntegrationClientRaw(accountsUrl, token, telegramIntegrationKind, 'terongram')
+  return getIntegrationClientRaw(accountsUrl, token, telegramIntegrationKind, 'telegram')
 }
 
 export async function connect (phone: string, socialId: PersonId): Promise<Integration> {

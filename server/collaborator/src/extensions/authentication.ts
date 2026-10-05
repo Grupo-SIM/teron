@@ -16,11 +16,12 @@
 import { decodeDocumentId } from '@hcengineering/collaborator-client'
 import { MeasureContext } from '@hcengineering/core'
 import { decodeToken } from '@hcengineering/server-token'
-import { Extension, onAuthenticatePayload } from '@hocuspocus/server'
+import { Extension, onAuthenticatePayload, beforeHandleMessagePayload, onDisconnectPayload } from '@hocuspocus/server'
 import { isReadOnlyOrGuest } from '@hcengineering/account'
 
 import { Context, buildContext } from '../context'
 import { getWorkspaceIds } from '../utils'
+import { openCollaborationAccess } from '../collaboration-access'
 
 export interface AuthenticationConfiguration {
   ctx: MeasureContext
@@ -63,9 +64,34 @@ export class AuthenticationExtension implements Extension {
           throw new Error('documentName must include workspace id')
         }
 
-        return buildContext(data, ids)
+        const authorization = await openCollaborationAccess(token, data.documentName, data.requestParameters.get('content') ?? undefined)
+        data.connection.readOnly = readonly || await authorization.check()
+        authorization.client.notify = () => {
+          void authorization.check().then((readOnly) => {
+            const connection = data.instance.documents.get(data.documentName)?.getConnections().find((item) => item.socketId === data.socketId)
+            if (connection !== undefined) connection.readOnly = readonly || readOnly
+          }).catch(() => {
+            data.instance.documents.get(data.documentName)?.getConnections().find((item) => item.socketId === data.socketId)?.close({ code: 4403, reason: 'Document access revoked' })
+          })
+        }
+        return { ...buildContext(data, ids), authorization }
       },
       { workspaceId }
     )
+  }
+
+  async beforeHandleMessage (data: beforeHandleMessagePayload): Promise<void> {
+    const authorization = (data.context as Context).authorization
+    if (authorization === undefined) throw new Error('Missing collaboration authorization.')
+    try {
+      data.connection.readOnly = await authorization.check()
+    } catch (error) {
+      data.connection.close({ code: 4403, reason: 'Document access revoked' })
+      throw error
+    }
+  }
+
+  async onDisconnect (data: onDisconnectPayload): Promise<void> {
+    await (data.context as Context).authorization?.close()
   }
 }

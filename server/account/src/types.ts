@@ -117,7 +117,6 @@ export interface Workspace {
   name: string
   url: string
   allowReadOnlyGuest: boolean
-  allowGuestSignUp: boolean
   passwordAgingRule?: number | null // Number of days after which password must be changed
   dataId?: WorkspaceDataId // Old workspace identifier. E.g. Database name in Mongo, bucket in R2, etc.
   branding?: string
@@ -359,6 +358,8 @@ export interface WorkspaceSeatQuote {
   currentRecurringAmount: string
   nextRecurringAmount: string
   estimatedProrationAmount: string
+  prorationDays: number
+  prorationPeriodDays: number
   currency: 'BRL'
   periodEnd: Timestamp
 }
@@ -420,7 +421,6 @@ export interface AccountDB {
   init: () => Promise<void>
   createWorkspace: (data: WorkspaceData, status: WorkspaceStatusData) => Promise<WorkspaceUuid>
   updateAllowReadOnlyGuests: (workspaceId: WorkspaceUuid, readOnlyGuestsAllowed: boolean) => Promise<void>
-  updateAllowGuestSignUp: (workspaceId: WorkspaceUuid, guestSignUpAllowed: boolean) => Promise<void>
   updatePasswordAgingRule: (workspaceId: WorkspaceUuid, days: number | null) => Promise<void>
   assignWorkspace: (accountId: AccountUuid, workspaceId: WorkspaceUuid, role: AccountRole) => Promise<void>
   batchAssignWorkspace: (data: [AccountUuid, WorkspaceUuid, AccountRole][]) => Promise<void>
@@ -450,7 +450,8 @@ export interface AccountDB {
     accountId: AccountUuid,
     workspaceId: WorkspaceUuid,
     role: AccountRole,
-    capacity: number
+    capacity: number,
+    expectedRole?: AccountRole
   ) => Promise<boolean>
   batchAssignWorkspacePermission: (
     workspaceId: WorkspaceUuid,
@@ -584,7 +585,6 @@ export interface WorkspaceLoginInfo extends LoginInfo {
   workspaceDataId?: WorkspaceDataId
   endpoint: string
   role: AccountRole
-  allowGuestSignUp?: boolean
 }
 
 export interface OtpInfo {
@@ -605,6 +605,8 @@ export interface WorkspaceInviteInfo {
 
 export interface InviteInfo {
   workspaceName: string | null
+  email?: string
+  accountExists?: boolean
 }
 
 export interface MailboxOptions {
@@ -625,5 +627,5 @@ export interface AccountAggregatedInfo extends Omit<Account, 'hash' | 'salt'>, P
   uuid: AccountUuid
   integrations: Omit<Integration, 'data'>[]
   socialIds: SocialId[]
-  workspaces: Omit<WorkspaceInfo, 'allowReadOnlyGuest' | 'allowGuestSignUp'>[]
+  workspaces: Omit<WorkspaceInfo, 'allowReadOnlyGuest'>[]
 }

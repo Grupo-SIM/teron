@@ -48,6 +48,7 @@
   export let collapsed: boolean = getTreeCollapsed(_id, collapsedPrefix)
   export let highlighted: boolean = false
   export let selected: boolean = false
+  export let showSelectedArrow: boolean = true
   export let bold: boolean = false
   export let shouldTooltip: boolean = false
   export let showMenu: boolean = false
@@ -94,6 +95,7 @@
     {title}
     {highlighted}
     {selected}
+    {showSelectedArrow}
     isOpen={!collapsed}
     {collapsedPrefix}
     {type}

@@ -57,7 +57,6 @@ export default mergeIds(timeId, time, {
   },
   ids: {
     ToDoCreated: '' as Ref<NotificationType>,
-    ModulePermissionGroup: '' as Ref<Doc>,
     ModulePermissionGroupReadOnlyGuest: '' as Ref<Doc>
   },
   function: {

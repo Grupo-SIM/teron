@@ -125,6 +125,12 @@
     "SwapFirstAndLastNames": "Vyměňte jméno a příjmení",
     "ForbidCreateVacancyPermission": "Zakázat vytvoření pozice",
     "ForbidCreateVacancyPermissionDescription": "Zakazuje uživatelům vytvářet nové volné pozice"
+  ,
+    "Analyse": "Analyze",
+    "ExportExpertSkills": "Export expert skills",
+    "ExportPlan": "Export plan",
+    "Optimize": "Optimize",
+    "SkillsOptimizer": "Skills optimizer"
   },
   "status": {
     "ApplicationExists": "Přihláška již existuje",

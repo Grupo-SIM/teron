@@ -17,7 +17,6 @@ import { serverInventoryId } from '@hcengineering/server-inventory'
 import { serverLeadId } from '@hcengineering/server-lead'
 import { serverLoveId } from '@hcengineering/server-love'
 import { serverNotificationId } from '@hcengineering/server-notification'
-import { serverRecruitId } from '@hcengineering/server-recruit'
 import { serverRequestId } from '@hcengineering/server-request'
 import { serverSettingId } from '@hcengineering/server-setting'
 import { serverTagsId } from '@hcengineering/server-tags'
@@ -40,7 +39,6 @@ export function registerServerPlugins (): void {
   addLocation(serverChunterId, () => import('@hcengineering/server-chunter-resources'))
   addLocation(serverInventoryId, () => import('@hcengineering/server-inventory-resources'))
   addLocation(serverLeadId, () => import('@hcengineering/server-lead-resources'))
-  addLocation(serverRecruitId, () => import('@hcengineering/server-recruit-resources'))
   addLocation(serverTaskId, () => import('@hcengineering/server-task-resources'))
   addLocation(serverTrackerId, () => import('@hcengineering/server-tracker-resources'))
   addLocation(serverTagsId, () => import('@hcengineering/server-tags-resources'))

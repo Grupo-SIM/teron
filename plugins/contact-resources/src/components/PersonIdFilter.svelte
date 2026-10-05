@@ -79,7 +79,7 @@
     const resultQuery =
       search !== ''
         ? {
-            '$lookup.attachedTo.name': { $like: '%' + search + '%' },
+            '$lookup.attachedTo.name': { $contains: search },
             _id: { $in: Array.from(targets.keys()) }
           }
         : {

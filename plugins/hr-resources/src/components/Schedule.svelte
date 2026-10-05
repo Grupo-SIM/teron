@@ -35,7 +35,8 @@
     twoPanelsSeparators,
     deviceOptionsStore as deviceInfo,
     tableToCSV,
-    showPopup
+    showPopup,
+    themeStore
   } from '@hcengineering/ui'
   import view, { Viewlet, ViewletPreference, type ViewOptions } from '@hcengineering/view'
   import { ViewletSelector, ViewletSettingButton } from '@hcengineering/view-resources'
@@ -66,7 +67,7 @@
   let resultQuery: DocumentQuery<Staff> = {}
 
   function updateResultQuery (search: string, viewOptions: ViewOptions | undefined): void {
-    const q: DocumentQuery<Staff> = search === '' ? {} : { name: { $like: '%' + search + '%' } }
+    const q: DocumentQuery<Staff> = search === '' ? {} : { name: { $contains: search } }
     resultQuery = viewOptions?.hideInactive !== false ? { ...q, active: true } : q
   }
 
@@ -135,7 +136,7 @@
   }
 
   function getMonthName (date: Date): string {
-    return new Intl.DateTimeFormat('default', {
+    return new Intl.DateTimeFormat($themeStore.language, {
       month: 'long'
     }).format(date)
   }
@@ -186,7 +187,7 @@
       evt.target as HTMLElement,
       (res) => {
         if (res != null) {
-          const filename = 'exportStaff' + new Date().toLocaleDateString() + '.csv'
+          const filename = 'exportStaff' + new Date().toISOString().slice(0, 10) + '.csv'
           const link = document.createElement('a')
           link.style.display = 'none'
           link.setAttribute('target', '_blank')

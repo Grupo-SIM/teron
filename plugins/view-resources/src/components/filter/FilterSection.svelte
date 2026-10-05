@@ -29,6 +29,7 @@
   import { Filter, FilterMode } from '@hcengineering/view'
   import { createEventDispatcher, onDestroy } from 'svelte'
   import view from '../../plugin'
+  import { getFilterPresenterValue } from '../../filter-presenter-value'
   import ModeSelector from './ModeSelector.svelte'
 
   export let filter: Filter
@@ -168,7 +169,12 @@
         {#if valueComponent}
           <Component
             is={valueComponent}
-            props={{ value: currentFilter.value, onChange, filter: currentFilter, space }}
+            props={{
+              value: getFilterPresenterValue(currentFilter.value, currentFilter.key.component === view.component.ArrayFilter),
+              onChange,
+              filter: currentFilter,
+              space
+            }}
           />
         {:else}
           <span>{countLabel}</span>

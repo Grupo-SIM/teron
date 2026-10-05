@@ -62,7 +62,7 @@ import { type KeyFilter, type ViewletDescriptor } from '@hcengineering/view'
 import { CategoryQuery, ListSelectionProvider, statusStore, type SelectDirection } from '@hcengineering/view-resources'
 import { derived, get, writable } from 'svelte/store'
 import tracker from './plugin'
-import { defaultMilestoneStatuses, defaultPriorities } from './types'
+import { defaultPriorities } from './types'
 
 export const activeProjects = derived(taskActiveProjects, (projects) => {
   const client = getClient()
@@ -74,40 +74,11 @@ export * from './types'
 
 export type ComponentsFilterMode = 'all' | 'backlog' | 'active' | 'closed'
 
-export type MilestoneViewMode = 'all' | 'planned' | 'active' | 'closed'
-
-export const getIncludedMilestoneStatuses = (mode: MilestoneViewMode): MilestoneStatus[] => {
-  switch (mode) {
-    case 'all': {
-      return defaultMilestoneStatuses
-    }
-    case 'active': {
-      return [MilestoneStatus.InProgress]
-    }
-    case 'planned': {
-      return [MilestoneStatus.Planned]
-    }
-    case 'closed': {
-      return [MilestoneStatus.Completed, MilestoneStatus.Canceled]
-    }
-    default: {
-      return []
-    }
-  }
-}
-
 export const componentsTitleMap: Record<ComponentsFilterMode, IntlString> = Object.freeze({
   all: tracker.string.AllComponents,
   backlog: tracker.string.BacklogComponents,
   active: tracker.string.ActiveComponents,
   closed: tracker.string.ClosedComponents
-})
-
-export const milestoneTitleMap: Record<MilestoneViewMode, IntlString> = Object.freeze({
-  all: tracker.string.AllMilestones,
-  planned: tracker.string.PlannedMilestones,
-  active: tracker.string.ActiveMilestones,
-  closed: tracker.string.ClosedMilestones
 })
 
 /**
@@ -283,7 +254,6 @@ export async function canEditIssue (issue?: Issue | WithLookup<Issue>): Promise<
 
   const account = getCurrentAccount()
   const isGuest =
-    account.role === AccountRole.Guest ||
     account.role === AccountRole.DocGuest ||
     account.role === AccountRole.ReadOnlyGuest
 
@@ -412,19 +382,16 @@ export async function getPreviousAssignees (objectId: Ref<Issue> | undefined): P
   )[0]
   const updateTxes = await client.findAll<TxUpdateDoc<Issue>>(
     core.class.TxUpdateDoc,
-    { objectId, 'operations.assignee': { $exists: true } },
+    { objectId, $or: [{ 'operations.assignee': { $exists: true } }, { 'operations.assignees': { $exists: true } }] },
     { sort: { modifiedOn: -1 } }
   )
   const set = new Set<Ref<Person>>()
-  const createAssignee = createTx?.attributes?.assignee
+  const createAssignees = createTx?.attributes?.assignees ?? (createTx?.attributes?.assignee == null ? [] : [createTx.attributes.assignee])
   for (const tx of updateTxes) {
-    const assignee = tx.operations.assignee
-    if (assignee == null) continue
-    set.add(assignee)
+    const assignees = tx.operations.assignees ?? (tx.operations.assignee == null ? [] : [tx.operations.assignee])
+    for (const person of assignees) set.add(person)
   }
-  if (createAssignee != null) {
-    set.add(createAssignee)
-  }
+  for (const person of createAssignees) set.add(person)
   return Array.from(set)
 }
 

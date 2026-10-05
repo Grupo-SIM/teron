@@ -4,10 +4,11 @@ import { useEffect, useRef, useState, type FormEvent, type ReactNode } from "rea
 import Image from "next/image";
 
 import { usePillGlow } from "@/components/site/use-pill-glow";
-import type { Locale } from "@/i18n/site";
+import { getDictionary, type Locale, type SiteDictionary } from "@/i18n/site";
 
 import {
   AuthApi,
+  AuthApiError,
   authErrorMessage,
   loadAuthConfig,
   type LoginInfo,
@@ -34,159 +35,18 @@ type Step =
   | "create-workspace"
   | "join";
 
-const text = {
-  "pt-BR": {
-    loginTitle: "Entrar na Teron",
-    signupTitle: "Criar nova conta",
-    email: "E-mail",
-    emailPlaceholder: "nome@empresa.com.br",
-    password: "Senha",
-    repeatPassword: "Repita a senha",
-    firstName: "Nome",
-    lastName: "Sobrenome",
-    enter: "Entrar",
-    createAccount: "Criar conta",
-    useCode: "Entrar com código",
-    usePassword: "Entrar com senha",
-    setPassword: "Definir senha agora",
-    useCodeSignup: "Definir senha depois",
-    forgotPassword: "Esqueci minha senha",
-    or: "ou",
-    googleLogin: "Entrar com Google",
-    githubLogin: "Entrar com GitHub",
-    googleSignup: "Cadastrar com Google",
-    githubSignup: "Cadastrar com GitHub",
-    continueWith: "Continuar com",
-    codeTitle: "Digite o código",
-    codeDescription: "Enviamos um código de 6 dígitos para",
-    code: "Código de acesso",
-    verify: "Verificar",
-    resend: "Reenviar código",
-    changeEmail: "Alterar e-mail",
-    tfaTitle: "Autenticação em duas etapas",
-    profileTitle: "Como devemos chamar você?",
-    continue: "Continuar",
-    recoverTitle: "Recuperar senha",
-    recoverAction: "Enviar link de recuperação",
-    recoverySent: "Confira seu e-mail",
-    recoverySentBody: "Enviamos um link para você redefinir sua senha.",
-    restoreTitle: "Definir nova senha",
-    restoreAction: "Salvar nova senha",
-    changePasswordTitle: "Alterar senha",
-    currentPassword: "Senha atual",
-    changePasswordAction: "Alterar senha",
-    confirming: "Confirmando seu e-mail…",
-    confirmationSent: "Confirme seu e-mail",
-    confirmationSentBody: "Enviamos uma mensagem de confirmação para o endereço informado.",
-    workspacesTitle: "Escolha um workspace",
-    restoreWorkspaceTitle: "Restaurar workspace arquivado",
-    restoreWorkspaceBody: "Este workspace está arquivado. Restaure-o para acessá-lo novamente.",
-    restoreWorkspace: "Restaurar workspace",
-    createWorkspace: "Criar workspace",
-    workspaceName: "Nome do workspace",
-    seats: "Quantidade de integrantes",
-    billingTitle: "Pagamento mensal",
-    billingDescription: "Informe os dados para pagar o primeiro mês de acesso.",
-    document: "CPF ou CNPJ",
-    phone: "Telefone",
-    cardNumber: "Número do cartão",
-    cardExpiry: "Validade (MM/AA)",
-    cardCvv: "CVV",
-    cardHolder: "Nome impresso no cartão",
-    paidCreate: "Pagar e criar workspace",
-    freeTrialDescription: "Seu primeiro workspace inclui 30 dias gratuitos.",
-    region: "Região",
-    create: "Criar e continuar",
-    demoContent: "Criar projetos de exemplo e conteúdo demonstrativo",
-    changeAccount: "Entrar com outra conta",
-    joinTitle: "Participar do workspace",
-    joinCurrent: "Participar com esta conta",
-    joinLogin: "Entrar e participar",
-    joinSignup: "Criar conta e participar",
-    joining: "Convite para",
-    loading: "Carregando…",
-    back: "Voltar",
-    passwordsMismatch: "As senhas não coincidem.",
-    requiredFields: "Preencha todos os campos obrigatórios.",
-  },
-  "en-US": {
-    loginTitle: "Sign in to Teron",
-    signupTitle: "Create a new account",
-    email: "Email",
-    emailPlaceholder: "name@company.com",
-    password: "Password",
-    repeatPassword: "Repeat password",
-    firstName: "First name",
-    lastName: "Last name",
-    enter: "Sign in",
-    createAccount: "Create account",
-    useCode: "Sign in with code",
-    usePassword: "Sign in with password",
-    setPassword: "Set password now",
-    useCodeSignup: "Set password later",
-    forgotPassword: "Forgot password",
-    or: "or",
-    googleLogin: "Sign in with Google",
-    githubLogin: "Sign in with GitHub",
-    googleSignup: "Sign up with Google",
-    githubSignup: "Sign up with GitHub",
-    continueWith: "Continue with",
-    codeTitle: "Enter your code",
-    codeDescription: "We sent a 6-digit code to",
-    code: "Access code",
-    verify: "Verify",
-    resend: "Resend code",
-    changeEmail: "Change email",
-    tfaTitle: "Two-factor authentication",
-    profileTitle: "What should we call you?",
-    continue: "Continue",
-    recoverTitle: "Recover password",
-    recoverAction: "Send recovery link",
-    recoverySent: "Check your email",
-    recoverySentBody: "We sent you a link to reset your password.",
-    restoreTitle: "Set a new password",
-    restoreAction: "Save new password",
-    changePasswordTitle: "Change password",
-    currentPassword: "Current password",
-    changePasswordAction: "Change password",
-    confirming: "Confirming your email…",
-    confirmationSent: "Confirm your email",
-    confirmationSentBody: "We sent a confirmation message to the email address you provided.",
-    workspacesTitle: "Choose a workspace",
-    restoreWorkspaceTitle: "Restore archived workspace",
-    restoreWorkspaceBody: "This workspace is archived. Restore it to access it again.",
-    restoreWorkspace: "Restore workspace",
-    createWorkspace: "Create workspace",
-    workspaceName: "Workspace name",
-    seats: "Number of members",
-    billingTitle: "Monthly payment",
-    billingDescription: "Enter your details to pay for the first month of access.",
-    document: "Tax ID",
-    phone: "Phone",
-    cardNumber: "Card number",
-    cardExpiry: "Expiry (MM/YY)",
-    cardCvv: "CVV",
-    cardHolder: "Name on card",
-    paidCreate: "Pay and create workspace",
-    freeTrialDescription: "Your first workspace includes a 30-day free trial.",
-    region: "Region",
-    create: "Create and continue",
-    demoContent: "Create sample projects and demo content",
-    changeAccount: "Sign in with another account",
-    joinTitle: "Join workspace",
-    joinCurrent: "Join with this account",
-    joinLogin: "Sign in and join",
-    joinSignup: "Create account and join",
-    joining: "Invitation to",
-    loading: "Loading…",
-    back: "Back",
-    passwordsMismatch: "Passwords do not match.",
-    requiredFields: "Complete all required fields.",
-  },
-} as const;
+function workspaceSeatPriceInCents(value: string): number {
+  const match = /^(\d+)(?:\.(\d{1,2}))?$/.exec(value.trim());
+  if (!match) return 999;
+  return Number(match[1]) * 100 + Number((match[2] ?? "").padEnd(2, "0"));
+}
+
+// Next.js substitutes this direct public environment reference during the build.
+const WORKSPACE_SEAT_PRICE_IN_CENTS = workspaceSeatPriceInCents(process.env.NEXT_PUBLIC_WORKSPACE_SEAT_AMOUNT ?? "9.99");
 
 export function AuthFlow({ variant, locale }: { variant: Variant; locale: Locale }) {
-  const copy = text[locale];
+  const dictionary = getDictionary(locale);
+  const copy = dictionary.auth;
   const initialized = useRef(false);
   const autoJoin = useRef<{ inviteId: string; firstName: string; lastName: string } | undefined>(undefined);
   const navigateUrl = useRef<string | undefined>(undefined);
@@ -225,17 +85,18 @@ export function AuthFlow({ variant, locale }: { variant: Variant; locale: Locale
   const [inviteId, setInviteId] = useState("");
   const [joinWorkspaceUrl, setJoinWorkspaceUrl] = useState("");
   const [inviteWorkspace, setInviteWorkspace] = useState("");
+  const [inviteEmail, setInviteEmail] = useState("");
   const [joinSignup, setJoinSignup] = useState(false);
   const [hasCurrentAccount, setHasCurrentAccount] = useState(false);
 
   useEffect(() => {
-    void loadAuthConfig()
+    void loadAuthConfig(locale)
       .then((config) => {
         if (variant === "signup" && config.disableSignup) {
           window.location.assign(locale === "en-US" ? "/en-US/entrar" : "/entrar");
           return;
         }
-        const client = new AuthApi(config);
+        const client = new AuthApi(config, locale);
         setApi(client);
         setPasswordMode(!config.useOtp);
         void client.getProviders().then(setProviders).catch(() => setProviders([]));
@@ -290,10 +151,7 @@ export function AuthFlow({ variant, locale }: { variant: Variant; locale: Locale
           const info = await api!.getLoginInfo();
           const authToken = info && "token" in info ? info.token : undefined;
           if (authToken) setToken(authToken);
-          setFreeTrialAvailable((await api!.getWorkspaceCreationInfo(authToken)).freeTrialAvailable);
-          const availableRegions = await api!.getRegions(authToken);
-          setRegions(availableRegions.filter((item) => item.name));
-          setRegion(availableRegions.find((item) => item.name)?.region ?? "");
+          await loadWorkspaceCreationData(authToken);
           setStep("create-workspace");
         } else if (mode === "change-password") {
           setStep("change-password");
@@ -326,7 +184,10 @@ export function AuthFlow({ variant, locale }: { variant: Variant; locale: Locale
           if (authToken) setToken(authToken);
           await loadWorkspaces(authToken);
         } else if (!mode) {
-          const info = await api!.getLoginInfo();
+          const info = await api!.getLoginInfo().catch((cause: unknown) => {
+            if (cause instanceof AuthApiError && cause.code.split(":").at(-1) === "Unauthorized") return null;
+            throw cause;
+          });
           if (info && !("request" in info)) {
             const query = new URLSearchParams(params);
             query.set("mode", "workspaces");
@@ -403,15 +264,23 @@ export function AuthFlow({ variant, locale }: { variant: Variant; locale: Locale
     if (!api) return;
     const result = await api.getWorkspaces(authToken);
     setWorkspaces(result.toSorted((a, b) => (b.lastVisit ?? 0) - (a.lastVisit ?? 0)));
+    await loadWorkspaceCreationData(authToken);
     if (result.length === 0) {
-      setFreeTrialAvailable((await api.getWorkspaceCreationInfo(authToken)).freeTrialAvailable);
-      const availableRegions = await api.getRegions(authToken);
-      setRegions(availableRegions.filter((item) => item.name));
-      setRegion(availableRegions.find((item) => item.name)?.region ?? "");
       setStep("create-workspace");
     } else {
       setStep("workspaces");
     }
+  }
+
+  async function loadWorkspaceCreationData(authToken?: string) {
+    if (!api) return;
+    const [creationInfo, availableRegions] = await Promise.all([
+      api.getWorkspaceCreationInfo(authToken),
+      api.getRegions(authToken),
+    ]);
+    setFreeTrialAvailable(creationInfo.freeTrialAvailable);
+    setRegions(availableRegions.filter((item) => item.name));
+    setRegion(availableRegions.find((item) => item.name)?.region ?? "");
   }
 
   async function finishWorkspace(result: WorkspaceLoginInfo) {
@@ -477,6 +346,9 @@ export function AuthFlow({ variant, locale }: { variant: Variant; locale: Locale
     ]);
     const accountToken = account && "token" in account ? account.token : undefined;
     setInviteWorkspace(invite.workspaceName ?? "");
+    setInviteEmail(invite.email ?? "");
+    if (invite.email) setEmail(invite.email);
+    setJoinSignup(invite.accountExists === false);
     setToken(accountToken);
     setHasCurrentAccount(accountToken !== undefined);
     try {
@@ -579,6 +451,10 @@ export function AuthFlow({ variant, locale }: { variant: Variant; locale: Locale
     event.preventDefault();
     if (!api) return;
     await run(async () => {
+      if (joinSignup && password !== password2) {
+        setError(copy.passwordsMismatch);
+        return;
+      }
       const result = joinSignup
         ? await api.signUpJoin(email, password, firstName, lastName, inviteId, joinWorkspaceUrl)
         : await api.join(email, password, inviteId, joinWorkspaceUrl);
@@ -616,6 +492,13 @@ export function AuthFlow({ variant, locale }: { variant: Variant; locale: Locale
                       : step === "confirmation-sent"
                         ? copy.confirmationSent
                         : copy.confirming;
+  const seatsCount = Number(seats);
+  const monthlyTotalInCents = Number.isSafeInteger(seatsCount) && seatsCount > 0
+    ? seatsCount * WORKSPACE_SEAT_PRICE_IN_CENTS
+    : undefined;
+  const monthlyTotal = monthlyTotalInCents != null && Number.isSafeInteger(monthlyTotalInCents)
+    ? new Intl.NumberFormat(locale, { style: "currency", currency: "BRL" }).format(monthlyTotalInCents / 100)
+    : undefined;
 
   return (
     <>
@@ -706,7 +589,7 @@ export function AuthFlow({ variant, locale }: { variant: Variant; locale: Locale
       {step === "confirming" ? <p className="auth-status">{copy.loading}</p> : null}
       {step === "workspaces" ? (
         <div className="auth-workspaces">
-          {workspaces.map((workspace) => <button data-testid="auth-workspace" key={workspace.uuid} type="button" disabled={loading} onClick={() => void run(async () => selectWorkspace(workspace))}><span>{workspace.name ?? workspace.url}</span><small>{workspace.url}{workspace.mode === "archived" || workspace.mode?.startsWith("archiving-") ? " · arquivado" : ""}</small></button>)}
+          {workspaces.map((workspace) => <button data-testid="auth-workspace" key={workspace.uuid} type="button" disabled={loading} onClick={() => void run(async () => selectWorkspace(workspace))}><span>{workspace.name ?? workspace.url}</span><small>{workspace.url}{workspace.mode === "archived" || workspace.mode?.startsWith("archiving-") ? ` · ${dictionary.authPage.archived}` : ""}</small></button>)}
           <button data-testid="auth-create-workspace" className="auth-secondary" type="button" onClick={() => setStep("create-workspace")}>{copy.createWorkspace}</button>
           <button className="auth-back-action" type="button" disabled={loading} onClick={() => void changeAccount()}>{copy.changeAccount}</button>
         </div>
@@ -722,7 +605,7 @@ export function AuthFlow({ variant, locale }: { variant: Variant; locale: Locale
         <form className="auth-form" onSubmit={submitWorkspace}>
           <AuthInput testId="auth-workspace-name" label={copy.workspaceName} value={workspaceName} onChange={setWorkspaceName} autoComplete="organization" />
           {regions.length > 1 ? <label className="auth-label">{copy.region}<select className="auth-input auth-select" value={region} onChange={(event) => setRegion(event.target.value)}>{regions.map((item) => <option key={item.region} value={item.region}>{item.name}</option>)}</select></label> : null}
-          {freeTrialAvailable ? <p className="auth-description">{copy.freeTrialDescription}</p> : <fieldset className="auth-billing"><legend>{copy.billingTitle}</legend><p>{copy.billingDescription}</p><AuthInput label={copy.seats} value={seats} onChange={(value) => setSeats(value.replace(/\D/g, ""))} inputMode="numeric" /><AuthInput name="document" label={copy.document} value={customerDocument} onChange={(value) => setCustomerDocument(formatDocument(value))} placeholder="000.000.000-00" inputMode="numeric" /><AuthInput name="tel" label={copy.phone} value={customerPhone} onChange={(value) => setCustomerPhone(formatPhone(value))} placeholder="(00) 00000-0000" inputMode="numeric" autoComplete="tel" /><AuthInput name="cc-number" label={copy.cardNumber} value={cardNumber} onChange={(value) => setCardNumber(formatCardNumber(value))} placeholder="0000 0000 0000 0000" inputMode="numeric" autoComplete="cc-number" /><div className="auth-fields-row"><AuthInput name="cc-exp" label={copy.cardExpiry} value={cardExpiry} onChange={(value) => setCardExpiry(formatCardExpiry(value))} placeholder="MM/AA" inputMode="numeric" autoComplete="cc-exp" /><AuthInput name="cc-csc" label={copy.cardCvv} value={cardCvv} onChange={(value) => setCardCvv(digitsOnly(value).slice(0, 4))} placeholder="123" inputMode="numeric" autoComplete="cc-csc" /></div><AuthInput name="cc-name" label={copy.cardHolder} value={cardHolder} onChange={setCardHolder} autoComplete="cc-name" /></fieldset>}
+          {freeTrialAvailable ? <p className="auth-description">{copy.freeTrialDescription}</p> : <fieldset className="auth-billing"><legend>{copy.billingTitle}</legend><p>{copy.billingDescription}</p><AuthInput label={copy.seats} value={seats} onChange={(value) => setSeats(value.replace(/\D/g, ""))} inputMode="numeric" />{monthlyTotal ? <p className="auth-billing-total" aria-live="polite"><span>{copy.billingTotal}</span><strong>{monthlyTotal}</strong></p> : null}<AuthInput name="document" label={copy.document} value={customerDocument} onChange={(value) => setCustomerDocument(formatDocument(value))} placeholder={copy.documentPlaceholder} inputMode="numeric" /><AuthInput name="tel" label={copy.phone} value={customerPhone} onChange={(value) => setCustomerPhone(formatPhone(value))} placeholder={copy.phonePlaceholder} inputMode="numeric" autoComplete="tel" /><AuthInput name="cc-number" label={copy.cardNumber} value={cardNumber} onChange={(value) => setCardNumber(formatCardNumber(value))} placeholder={copy.cardNumberPlaceholder} inputMode="numeric" autoComplete="cc-number" /><div className="auth-fields-row"><AuthInput name="cc-exp" label={copy.cardExpiry} value={cardExpiry} onChange={(value) => setCardExpiry(formatCardExpiry(value))} placeholder={copy.cardExpiryPlaceholder} inputMode="numeric" autoComplete="cc-exp" /><AuthInput name="cc-csc" label={copy.cardCvv} value={cardCvv} onChange={(value) => setCardCvv(digitsOnly(value).slice(0, 4))} placeholder={copy.cardCvvPlaceholder} inputMode="numeric" autoComplete="cc-csc" /></div><AuthInput name="cc-name" label={copy.cardHolder} value={cardHolder} onChange={setCardHolder} autoComplete="cc-name" /></fieldset>}
           <label className="auth-check">
             <input className="auth-check-input" type="checkbox" checked={withDemoContent} onChange={(event) => setWithDemoContent(event.target.checked)} />
             <span className="auth-check-control" aria-hidden="true"><svg viewBox="0 0 12 12"><path d="m2.25 6.25 2.3 2.3 5.2-5.2" /></svg></span>
@@ -736,19 +619,20 @@ export function AuthFlow({ variant, locale }: { variant: Variant; locale: Locale
         <form className="auth-form" onSubmit={submitJoin}>
           {inviteWorkspace ? <p className="auth-description">{copy.joining} <strong>{inviteWorkspace}</strong>.</p> : null}
           {hasCurrentAccount ? <button data-testid="join-with-this-account" className="auth-secondary" type="button" onClick={() => void run(async () => finishWorkspace(await api!.joinByToken(inviteId, token)))}>{copy.joinCurrent}</button> : null}
-          {joinSignup ? <div className="auth-fields-row"><AuthInput label={copy.firstName} value={firstName} onChange={setFirstName} /><AuthInput label={copy.lastName} value={lastName} onChange={setLastName} /></div> : null}
-          <AuthInput label={copy.email} value={email} onChange={setEmail} type="email" autoComplete="email" />
+          {joinSignup ? <div className="auth-fields-row"><AuthInput name="given-name" label={copy.firstName} value={firstName} onChange={setFirstName} autoComplete="given-name" /><AuthInput name="family-name" label={copy.lastName} value={lastName} onChange={setLastName} autoComplete="family-name" /></div> : null}
+          <AuthInput name="email" label={copy.email} value={email} onChange={setEmail} type="email" autoComplete="email" placeholder={copy.emailPlaceholder} readOnly={Boolean(inviteEmail)} />
           <AuthInput testId="auth-password" label={copy.password} value={password} onChange={setPassword} type="password" autoComplete={joinSignup ? "new-password" : "current-password"} />
-          <AuthSubmit testId="join-form-submit" disabled={!email || !password || (joinSignup && (!firstName || !lastName))} loading={loading} label={joinSignup ? copy.joinSignup : copy.joinLogin} />
+          {joinSignup ? <AuthInput testId="auth-password-repeat" label={copy.repeatPassword} value={password2} onChange={setPassword2} type="password" autoComplete="new-password" /> : null}
+          <AuthSubmit testId="join-form-submit" disabled={!email || !password || (joinSignup && (!firstName || !lastName || !password2))} loading={loading} label={joinSignup ? copy.joinSignup : copy.joinLogin} />
           <BackButton testId="join-form-toggle" label={joinSignup ? copy.enter : copy.createAccount} onClick={() => setJoinSignup((value) => !value)} />
-          <Providers api={api} providers={providers} variant="signup" copy={copy} query={{ inviteId, navigateUrl: navigateUrl.current }} />
+          <Providers api={api} providers={providers} variant={joinSignup ? "signup" : "login"} copy={copy} query={{ inviteId, navigateUrl: navigateUrl.current }} />
         </form>
       ) : null}
     </>
   );
 }
 
-type Copy = (typeof text)[Locale];
+type Copy = SiteDictionary["auth"];
 
 function digitsOnly(value: string) {
   return value.replace(/\D/g, "");
@@ -795,7 +679,7 @@ function isValidCardExpiry(value: string) {
   return match !== null && Number(match[1]) >= 1 && Number(match[1]) <= 12;
 }
 
-function AuthInput({ label, value, onChange, type = "text", required = true, testId, ...props }: { label: string; value: string; onChange: (value: string) => void; type?: string; required?: boolean; testId?: string; name?: string; placeholder?: string; autoComplete?: string; inputMode?: "numeric" }) {
+function AuthInput({ label, value, onChange, type = "text", required = true, testId, ...props }: { label: string; value: string; onChange: (value: string) => void; type?: string; required?: boolean; testId?: string; name?: string; placeholder?: string; autoComplete?: string; inputMode?: "numeric"; readOnly?: boolean }) {
   return <label className="auth-label">{label}<span className="auth-input-row"><input data-testid={testId} className="auth-input" required={required} value={value} onChange={(event) => onChange(event.target.value)} type={type} {...props} /></span></label>;
 }
 

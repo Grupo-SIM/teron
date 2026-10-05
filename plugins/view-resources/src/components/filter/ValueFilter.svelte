@@ -79,7 +79,7 @@
     const resultQuery =
       isSearchable && search !== ''
         ? {
-            [prefix + filter.key.key]: { $like: '%' + search + '%' }
+            [prefix + filter.key.key]: { $contains: search }
           }
         : {}
 

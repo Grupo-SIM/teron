@@ -50,6 +50,7 @@
   export let visible: boolean = false
   export let highlighted: boolean = false
   export let selected: boolean = false
+  export let showSelectedArrow: boolean = true
   export let type: 'default' | 'nested' | 'nested-selectable' | 'selectable-header' = 'default'
   export let noDivider: boolean = false
   export let showMenu: boolean = false
@@ -160,7 +161,7 @@
         <slot name="actions" />
       </div>
     {/if}
-    {#if selected && type === 'nested-selectable'}
+    {#if showSelectedArrow && selected && type === 'nested-selectable'}
       <div class="teronNavGroup-header__arrow"><IconOpenedArrow size={'small'} /></div>
     {/if}
   </button>

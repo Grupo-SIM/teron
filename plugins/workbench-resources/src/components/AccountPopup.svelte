@@ -22,10 +22,9 @@
   import contactResources from '@hcengineering/contact-resources/src/plugin'
   import core, { AccountRole, getCurrentAccount, hasAccountRole } from '@hcengineering/core'
   import rating, { type PersonRating } from '@hcengineering/rating'
-  import login, { openAuthRoute } from '@hcengineering/login'
+  import { openAuthRoute } from '@hcengineering/login'
   import presentation, {
     createQuery,
-    getCurrentWorkspaceUrl,
     hasResource
   } from '@hcengineering/presentation'
   import setting, { settingId, SettingsCategory } from '@hcengineering/setting'
@@ -44,7 +43,6 @@
   import view from '@hcengineering/view'
   import { logOut } from '../utils'
   import { Analytics } from '@hcengineering/analytics'
-  import { allowGuestSignUpStore } from '@hcengineering/view-resources'
   import { getMetadata } from '@hcengineering/platform'
   import { onMount } from 'svelte'
 
@@ -157,16 +155,6 @@
     }
 
     if (account.role === AccountRole.ReadOnlyGuest) {
-      if ($allowGuestSignUpStore) {
-        actions.push({
-          icon: setting.icon.InviteWorkspace,
-          label: view.string.ReadOnlyJoinWorkspace,
-          action: async () => {
-            openAuthRoute('join', { workspace: getCurrentWorkspaceUrl() })
-          },
-          group: 'end'
-        })
-      }
       actions.push({
         icon: setting.icon.InviteWorkspace,
         label: view.string.ReadOnlySignUp,
@@ -177,17 +165,19 @@
       })
     }
 
-    actions.push({
-      icon: setting.icon.Signout,
-      label: hasAccountRole(account, AccountRole.DocGuest) ? setting.string.Signout : login.string.LogIn,
-      action: async () => {
-        await logOut()
-        openAuthRoute()
-        Analytics.handleEvent('workbench.SignOut')
-        Analytics.logout()
-      },
-      group: 'end'
-    })
+    if (hasAccountRole(account, AccountRole.DocGuest)) {
+      actions.push({
+        icon: setting.icon.Signout,
+        label: setting.string.Signout,
+        action: async () => {
+          await logOut()
+          openAuthRoute()
+          Analytics.handleEvent('workbench.SignOut')
+          Analytics.logout()
+        },
+        group: 'end'
+      })
+    }
   }
   let menu: Menu
   $: addClass = $deviceInfo.isMobile && $deviceInfo.isPortrait ? 'self-end' : undefined

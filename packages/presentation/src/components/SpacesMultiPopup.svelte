@@ -49,7 +49,7 @@
   $: query.query<Space>(
     core.class.Space,
     {
-      name: { $like: '%' + searchQuery + '%' },
+      name: { $contains: searchQuery },
       _class: { $in: _classes }
     },
     (result) => {

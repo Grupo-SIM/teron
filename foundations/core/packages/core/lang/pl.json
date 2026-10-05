@@ -72,6 +72,9 @@
     "AddRelation": "Dodaj skojarzenie",
     "PersonId": "Osoba",
     "AccountId": "Konto",
-    "Version": "Wersja"
+    "Version": "Wersja",
+    "Body": "Body",
+    "Content": "Content",
+    "ObjectId": "Object ID"
   }
 }

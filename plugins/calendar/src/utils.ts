@@ -358,7 +358,7 @@ function getReccuringEventInstances (
 /**
  * @public
  */
-export function getAllEvents (events: Event[], from: Timestamp, to: Timestamp): Event[] {
+export function getAllEvents (events: Event[], from: Timestamp, to: Timestamp, clipToRange = true): Event[] {
   const base: Event[] = []
   const recur: ReccuringEvent[] = []
   const instances: ReccuringInstance[] = []
@@ -388,9 +388,9 @@ export function getAllEvents (events: Event[], from: Timestamp, to: Timestamp): 
     ...base,
     ...recurData,
     ...instances.filter((p) => {
-      return from <= p.dueDate && p.date <= to && p.isCancelled !== true
+      return from < p.dueDate && p.date < to && p.isCancelled !== true
     })
-  ].map((it) => ({ ...it, date: Math.max(from, it.date), dueDate: Math.min(to, it.dueDate) }))
+  ].map((it) => clipToRange ? { ...it, date: Math.max(from, it.date), dueDate: Math.min(to, it.dueDate) } : { ...it })
   res.sort((a, b) => a.date - b.date)
   return res
 }

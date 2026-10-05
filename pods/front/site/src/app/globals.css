@@ -2344,6 +2344,7 @@ a {
   top: 50%;
   width: 58px;
   height: 58px;
+  object-fit: contain;
   transform: translate(-50%, -50%);
 }
 

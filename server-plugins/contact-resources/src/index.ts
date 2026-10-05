@@ -58,6 +58,7 @@ import { getMetadata } from '@hcengineering/platform'
 import { makeRank } from '@hcengineering/rank'
 import { getAccountBySocialId, getCurrentPerson } from '@hcengineering/server-contact'
 import serverCore, { TriggerControl } from '@hcengineering/server-core'
+import task from '@hcengineering/task'
 import { workbenchId } from '@hcengineering/workbench'
 
 export async function OnSpaceTypeMembers (txes: Tx[], control: TriggerControl): Promise<Tx[]> {
@@ -145,68 +146,6 @@ export async function OnEmployeeCreate (_txes: Tx[], control: TriggerControl): P
     const txes = await createPersonSpace(account, mixinTx.objectId, control)
     result.push(...txes)
 
-    const emp = control.hierarchy.as(person, contact.mixin.Employee)
-    if (emp.role === 'GUEST') {
-      let readOnlyGuestSpaces: Space[] = []
-      const readonlyEmployees = await control.findAll(control.ctx, contact.mixin.Employee, {
-        personUuid: readOnlyGuestAccountUuid
-      })
-      if (readonlyEmployees.length !== 0) {
-        const readonlyEmployee = readonlyEmployees[0]
-        if (readonlyEmployee.active) {
-          readOnlyGuestSpaces = await control.findAll(control.ctx, core.class.Space, {
-            members: readOnlyGuestAccountUuid
-          })
-        }
-      }
-
-      const grantSpaces = await getGrantSpaces(control, control.ctx.contextData.grant)
-
-      for (const space of [...readOnlyGuestSpaces, ...grantSpaces]) {
-        if (space._class === contact.class.PersonSpace || space.members.includes(account)) continue
-
-        systemTxes.push(
-          systemTxFactory.createTxUpdateDoc(space._class, space.space, space._id, {
-            $push: {
-              members: account
-            }
-          })
-        )
-      }
-
-      const guestAutoJoinSpaces = await control.findAll(control.ctx, core.class.Space, {
-        autoJoinForRoles: AccountRole.Guest
-      })
-      for (const space of guestAutoJoinSpaces) {
-        if (space._class === contact.class.PersonSpace || space.members.includes(account)) continue
-        if (control.hierarchy.isDerived(space._class, chunter.class.DirectMessage)) continue
-
-        systemTxes.push(
-          systemTxFactory.createTxUpdateDoc(space._class, space.space, space._id, {
-            $push: {
-              members: account
-            }
-          })
-        )
-      }
-
-      const collabs = await control.findAll(control.ctx, core.class.Collaborator, {
-        collaborator: readOnlyGuestAccountUuid
-      })
-
-      for (const collab of collabs) {
-        const pushTx = systemTxFactory.createTxCreateDoc(core.class.Collaborator, collab.space, {
-          attachedTo: collab.attachedTo,
-          collaborator: account,
-          attachedToClass: collab.attachedToClass,
-          collection: 'collaborators'
-        })
-        systemTxes.push(pushTx)
-      }
-
-      continue
-    }
-
     const spaces = await control.findAll(control.ctx, core.class.Space, { autoJoin: true })
     const grantSpaces = await getGrantSpaces(control, control.ctx.contextData.grant)
 
@@ -242,6 +181,34 @@ export async function OnEmployeeCreate (_txes: Tx[], control: TriggerControl): P
       result.push(
         control.txFactory.createTxUpdateDoc(space._class, space.space, space._id, {
           owners: [account.uuid]
+        })
+      )
+    }
+  }
+
+  return result
+}
+
+export async function OnEmployeeDeactivate (txes: Tx[], control: TriggerControl): Promise<Tx[]> {
+  const result: Tx[] = []
+
+  for (const tx of txes) {
+    if (tx._class !== core.class.TxMixin) continue
+
+    const mixinTx = tx as TxMixin<Person, Employee>
+    if (mixinTx.mixin !== contact.mixin.Employee || mixinTx.attributes.active !== false) continue
+
+    const person = (await control.findAll(control.ctx, contact.class.Person, { _id: mixinTx.objectId }))[0]
+    if (person?.personUuid === undefined) continue
+
+    const projects = await control.findAll(control.ctx, task.class.Project, {
+      members: person.personUuid as AccountUuid
+    })
+
+    for (const project of projects) {
+      result.push(
+        control.txFactory.createTxUpdateDoc(project._class, project.space, project._id, {
+          $pull: { members: person.personUuid as AccountUuid }
         })
       )
     }
@@ -505,6 +472,7 @@ export async function getContactFirstName (
 export default async () => ({
   trigger: {
     OnEmployeeCreate,
+    OnEmployeeDeactivate,
     OnTypedSpaceCreate,
     OnPersonCreate,
     OnContactDelete,

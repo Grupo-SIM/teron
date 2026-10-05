@@ -122,6 +122,12 @@
     "SwapFirstAndLastNames": "Trocar primeiro e último nome",
     "ForbidCreateVacancyPermission": "Proibir criação de vaga",
     "ForbidCreateVacancyPermissionDescription": "Proíbe os utilizadores de criar novas vagas"
+  ,
+    "Analyse": "Analisar",
+    "ExportExpertSkills": "Exportar competências de especialista",
+    "ExportPlan": "Exportar plano",
+    "Optimize": "Otimizar",
+    "SkillsOptimizer": "Otimizador de competências"
   },
   "status": {
     "ApplicationExists": "A candidatura já existe",

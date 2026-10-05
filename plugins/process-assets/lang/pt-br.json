@@ -185,6 +185,8 @@
     "ConfirmRejection": "Confirmar rejeição",
     "RejectionReason": "Motivo da rejeição",
     "ProvideRejectionReason": "Informe o motivo da rejeição"
+  ,
+    "NoSlotsDefined": "Nenhum espaço definido para este processo"
   },
   "error": {
     "MethodNotFound": "Método não encontrado: {methodId}",

@@ -50,7 +50,7 @@
     showPopup(CreateSpace, {}, 'top')
   }
 
-  const globalActions = hasAccountRole(me, AccountRole.User)
+  const globalActions = hasAccountRole(me, AccountRole.Maintainer)
     ? [
         {
           label: card.string.CreateCard,
@@ -79,4 +79,6 @@
   }
 </script>
 
+{#if hasAccountRole(me, AccountRole.Maintainer)}
 <ButtonIcon icon={IconAdd} hasMenu {pressed} kind={'primary'} size={'small'} on:click={addButtonClicked} />
+{/if}

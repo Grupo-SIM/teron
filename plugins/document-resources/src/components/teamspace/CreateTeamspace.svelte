@@ -28,7 +28,7 @@
     notEmpty,
     AccountUuid
   } from '@hcengineering/core'
-  import document, { Teamspace, DocumentEvents } from '@hcengineering/document'
+  import document, { Teamspace, GuidelineGrants, DocumentEvents } from '@hcengineering/document'
   import { Asset } from '@hcengineering/platform'
   import presentation, { IconWithEmoji, Card, getClient, reduceCalls } from '@hcengineering/presentation'
   import {
@@ -48,6 +48,7 @@
   import { Analytics } from '@hcengineering/analytics'
 
   import documentRes from '../../plugin'
+  import GuidelineAccessFields from './GuidelineAccessFields.svelte'
 
   export let teamspace: Teamspace | undefined = undefined
   export let namePlaceholder: string = ''
@@ -68,6 +69,14 @@
   let owners: AccountUuid[] =
     teamspace?.owners !== undefined ? hierarchy.clone(teamspace.owners) : [getCurrentAccount().uuid]
   let rolesAssignment: RolesAssignment = {}
+  let grants: GuidelineGrants = {
+    guidelineAccess: true,
+    guidelineReaders: [...(teamspace?.guidelineReaders ?? [])],
+    guidelineEditors: [...(teamspace?.guidelineEditors ?? teamspace?.members ?? [getCurrentAccount().uuid])],
+    guidelineReaderSectors: [...(teamspace?.guidelineReaderSectors ?? [])],
+    guidelineEditorSectors: [...(teamspace?.guidelineEditorSectors ?? [])]
+  }
+
 
   $: isNew = teamspace === undefined
   $: membersPersons = members.map((m) => $employeeRefByAccountUuidStore.get(m)).filter(notEmpty)
@@ -116,6 +125,7 @@
 
   function getTeamspaceData (): Omit<Data<Teamspace>, 'type'> {
     return {
+      ...grants,
       name,
       description,
       private: isPrivate,
@@ -135,6 +145,7 @@
 
     const teamspaceData = getTeamspaceData()
     const update: DocumentUpdate<Teamspace> = {}
+    if (Object.entries(grants).some(([key, value]) => !deepEqual(value, (teamspace as any)[key]))) Object.assign(update, grants)
     if (teamspaceData.name !== teamspace?.name) {
       update.name = teamspaceData.name
     }
@@ -394,19 +405,7 @@
       <Toggle id={'teamspace-private'} bind:on={isPrivate} disabled={!isPrivate && members.length === 0} />
     </div>
 
-    <div class="antiGrid-row">
-      <div class="antiGrid-row__header">
-        <Label label={documentRes.string.TeamspaceMembers} />
-      </div>
-      <AccountArrayEditor
-        value={members}
-        allowGuests
-        label={documentRes.string.TeamspaceMembers}
-        onChange={handleMembersChanged}
-        kind={'regular'}
-        size={'large'}
-      />
-    </div>
+    <GuidelineAccessFields bind:grants {teamspace} />
 
     <div class="antiGrid-row">
       <div class="antiGrid-row__header withDesciption">

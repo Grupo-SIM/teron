@@ -27,16 +27,20 @@ export default mergeIds(documentId, document, {
     CreateTeamspace: '' as AnyComponent
   },
   function: {
+    CanCreateGuidelineDocument: '' as Resource<(doc?: Doc | Doc[]) => Promise<boolean>>,
     DocumentTitleProvider: '' as Resource<<T extends Doc>(client: Client, ref: Ref<T>, doc?: T) => Promise<string>>,
     GetObjectLinkFragment: '' as Resource<(doc: Doc, props: Record<string, any>) => Promise<Location>>,
     GetDocumentLinkId: '' as Resource<(doc: Doc) => Promise<string>>,
     ParseDocumentId: '' as Resource<(id: string) => Promise<Ref<Document> | undefined>>
   },
   string: {
+    RemoveCustomIcon: '' as IntlString,
+    CustomIconRemoved: '' as IntlString,
     DocumentNamePlaceholder: '' as IntlString,
     Name: '' as IntlString,
     Cancel: '' as IntlString,
     Document: '' as IntlString,
+    DeleteDocumentConfirm: '' as IntlString,
     SearchDocument: '' as IntlString,
     Version: '' as IntlString,
     Snapshot: '' as IntlString,

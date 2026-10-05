@@ -67,7 +67,7 @@
     contact.mixin.Employee,
     {
       ...(docQuery ?? {}),
-      [searchField]: { $like: '%' + search + '%' },
+      [searchField]: { $contains: search },
       _id: {
         ...(typeof docQuery?._id === 'object' ? docQuery._id : {}),
         $nin: ignoreUsers

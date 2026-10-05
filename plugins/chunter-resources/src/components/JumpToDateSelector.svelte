@@ -14,7 +14,7 @@
 -->
 <script lang="ts">
   import { getDay, Timestamp } from '@hcengineering/core'
-  import { DateRangePopup, showPopup } from '@hcengineering/ui'
+  import { DateRangePopup, showPopup, themeStore } from '@hcengineering/ui'
   import { createEventDispatcher } from 'svelte'
 
   export let selectedDate: Timestamp | undefined
@@ -47,7 +47,7 @@
       }}
     >
       {#if time}
-        {new Date(time).toLocaleDateString('default', {
+        {new Date(time).toLocaleDateString($themeStore.language, {
           weekday: 'short',
           month: 'long',
           day: 'numeric',
