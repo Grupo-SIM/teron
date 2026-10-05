@@ -19,6 +19,8 @@
     ButtonIcon,
     Icon,
     IconCheck,
+    IconChevronDown,
+    IconChevronRight,
     IconDelete,
     IconEdit,
     IconMoreH,
@@ -41,7 +43,7 @@
   export let rooms: Room[] = []
   export let selected: boolean
   export let removable: boolean = true
-  let expanded = selected && rooms.length > 0
+  let expanded = true
 
   const me = getCurrentAccount()
   const dispatch = createEventDispatcher()
@@ -93,25 +95,27 @@
   }
 </script>
 
-<div class="floor-card preview" class:selected>
+<div class="floor-card preview" class:selected class:empty={rooms.length === 0} class:expanded>
   <div class="floor-row">
-    <button class="floor-select" on:click={() => dispatch('select')}>
+    <button class="floor-select" aria-expanded={expanded} on:click={() => (expanded = !expanded)}>
       <span class="overflow-label">{floor.name}</span>
-      {#if selected}
-        <Icon icon={IconCheck} size={'small'} />
-      {/if}
+      <Icon icon={expanded ? IconChevronDown : IconChevronRight} size={'small'} />
+    </button>
+    <button
+      class="floor-activate"
+      class:selected
+      aria-label={floor.name}
+      aria-pressed={selected}
+      on:click={() => dispatch('select')}
+    >
+      <Icon icon={IconCheck} size={'small'} />
     </button>
     {#if configurable && editable}
       <ButtonIcon icon={IconMoreH} kind={'tertiary'} size={'small'} {pressed} on:click={clickMore} />
     {/if}
   </div>
-  <button
-    class="floor-preview-toggle"
-    aria-label={floor.name}
-    aria-expanded={expanded}
-    on:click={() => (expanded = !expanded)}
-  >
-    {#if expanded}
+  {#if expanded}
+    {#if rooms.length > 0}
       <div class="floor-preview-content">
         <FloorGrid bind:floorContainer {rows} preview>
           {#each rooms as room}
@@ -120,14 +124,17 @@
         </FloorGrid>
       </div>
     {:else}
-      <span>+</span>
+      <button class="floor-empty-select" aria-label={floor.name} on:click={() => dispatch('select')}>
+        <span>+</span>
+      </button>
     {/if}
-  </button>
+  {/if}
 </div>
 
 <style lang="scss">
   .floor-card {
-    margin: 0 0.5rem 0.5rem;
+    width: 100%;
+    min-width: 0;
     border: 1px solid var(--global-ui-BorderColor);
     border-radius: var(--small-BorderRadius);
     background-color: var(--theme-panel-color);
@@ -137,8 +144,9 @@
       background-color: var(--theme-panel-color);
     }
 
-    &:not(:has(.floor-preview-content)) {
-      width: 10rem;
+    &.empty.expanded {
+      flex: 0 0 10rem;
+      max-width: 100%;
       min-height: 9rem;
     }
   }
@@ -161,7 +169,22 @@
     cursor: pointer;
   }
 
-  .floor-preview-toggle {
+  .floor-activate {
+    display: flex;
+    align-items: center;
+    padding: 0.25rem;
+    border: 1px solid var(--global-ui-BorderColor);
+    border-radius: var(--small-BorderRadius);
+    color: var(--theme-content-color);
+    cursor: pointer;
+    opacity: 0.5;
+
+    &.selected {
+      opacity: 1;
+    }
+  }
+
+  .floor-empty-select {
     display: block;
     width: 100%;
     min-height: 5rem;
@@ -177,6 +200,7 @@
     display: flex;
     justify-content: center;
     width: 100%;
+    padding: 0 0.5rem 0.5rem;
     overflow: hidden;
 
     :global(.floorGrid) {

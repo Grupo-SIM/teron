@@ -69,26 +69,36 @@
 <div class="teronModal-container noTopIndent type-aside office-floor-selector">
   <div class="teronModal-content">
     <Scroller>
-      {#each $floors as _floor}
-        <FloorPreview
-          floor={_floor}
-          configurable
-          removable={$floors.length > 1}
-          rooms={getRooms($rooms, _floor._id)}
-          selected={floor?._id === _floor._id}
-          on:select={() => {
-            selectedFloor.set(_floor?._id)
-            floor = _floor
-            dispatch('close')
-          }}
-          on:remove={() => handleFloorRemoved(_floor)}
-        />
-      {/each}
+      <div class="office-floors">
+        {#each $floors as _floor (_floor._id)}
+          <FloorPreview
+            floor={_floor}
+            configurable
+            removable={$floors.length > 1}
+            rooms={getRooms($rooms, _floor._id)}
+            selected={floor?._id === _floor._id}
+            on:select={() => {
+              selectedFloor.set(_floor?._id)
+              floor = _floor
+              dispatch('close')
+            }}
+            on:remove={() => handleFloorRemoved(_floor)}
+          />
+        {/each}
+      </div>
     </Scroller>
   </div>
 </div>
 
 <style lang="scss">
+  .office-floors {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    gap: 0.5rem;
+    padding: 0.75rem 0.5rem 0.5rem;
+  }
+
   .office-floor-selector {
     background-color: var(--theme-panel-color);
   }
