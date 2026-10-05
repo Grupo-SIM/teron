@@ -57,6 +57,7 @@
     'status',
     'kind',
     'number',
+    'remainingTime',
     'assignees',
     'component',
     'dueDate',
