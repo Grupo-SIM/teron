@@ -67,6 +67,7 @@ export default mergeIds(loveId, love, {
     DeleteFloorConfirm: '' as IntlString,
     KnockingTo: '' as IntlString,
     Cancel: '' as IntlString,
+    EnterFloor: '' as IntlString,
     EnterRoom: '' as IntlString,
     Configure: '' as IntlString,
     MeetingRoom: '' as IntlString,

@@ -21,6 +21,7 @@
     "IsKnocking": "{name} 正在敲门...",
     "Accept": "接受",
     "Decline": "拒绝",
+    "EnterFloor": "进入楼层",
     "EnterRoom": "进入房间",
     "TeamRoom": "团队房间",
     "MeetingRoom": "会议室",

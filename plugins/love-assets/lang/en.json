@@ -21,6 +21,7 @@
     "IsKnocking": "{name} is knocking...",
     "Accept": "Accept",
     "Decline": "Decline",
+    "EnterFloor": "Enter floor",
     "EnterRoom": "Enter room",
     "TeamRoom": "Team room",
     "MeetingRoom": "Meeting room",

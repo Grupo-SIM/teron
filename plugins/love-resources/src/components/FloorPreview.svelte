@@ -18,7 +18,6 @@
   import {
     ButtonIcon,
     Icon,
-    IconCheck,
     IconChevronDown,
     IconChevronRight,
     IconDelete,
@@ -27,6 +26,7 @@
     SelectPopup,
     eventToHTMLElement,
     showPopup,
+    tooltip,
     type SelectPopupValueType
   } from '@hcengineering/ui'
   import { Floor, ParticipantInfo, Room } from '@hcengineering/love'
@@ -106,9 +106,10 @@
       class:selected
       aria-label={floor.name}
       aria-pressed={selected}
+      use:tooltip={{ label: plugin.string.EnterFloor, direction: 'bottom' }}
       on:click={() => dispatch('select')}
     >
-      <Icon icon={IconCheck} size={'small'} />
+      <Icon icon={plugin.icon.EnterRoom} size={'small'} />
     </button>
     {#if configurable && editable}
       <ButtonIcon icon={IconMoreH} kind={'tertiary'} size={'small'} {pressed} on:click={clickMore} />
@@ -172,7 +173,7 @@
   .floor-activate {
     display: flex;
     align-items: center;
-    padding: 0.25rem;
+    padding: 0.5rem;
     border: 1px solid var(--global-ui-BorderColor);
     border-radius: var(--small-BorderRadius);
     color: var(--theme-content-color);

@@ -21,6 +21,7 @@
         "IsKnocking": "{name}님이 노크하고 있습니다...",
         "Accept": "수락",
         "Decline": "거절",
+        "EnterFloor": "층 입장",
         "EnterRoom": "룸 입장",
         "TeamRoom": "팀 룸",
         "MeetingRoom": "회의 룸",

@@ -21,6 +21,7 @@
     "IsKnocking": "{name} がノックしています...",
     "Accept": "承諾",
     "Decline": "拒否",
+    "EnterFloor": "フロアに入る",
     "EnterRoom": "入室",
     "TeamRoom": "チームルーム",
     "MeetingRoom": "会議室",

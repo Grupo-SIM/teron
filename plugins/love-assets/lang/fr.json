@@ -21,6 +21,7 @@
     "IsKnocking": "{name} frappe à la porte...",
     "Accept": "Accepter",
     "Decline": "Refuser",
+    "EnterFloor": "Entrer dans l’étage",
     "EnterRoom": "Entrer dans la salle",
     "TeamRoom": "Salle d'équipe",
     "MeetingRoom": "Salle de réunion",
