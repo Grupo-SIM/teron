@@ -38,7 +38,7 @@ const docs = new Map<string, object>([
 function fixture (role = AccountRole.User, verifiedIdentities: SocialId[] = []): { middleware: WorkspaceAuthorizationMiddleware, ctx: MeasureContext<SessionData>, forward: jest.Mock } {
   const forward = jest.fn(async () => [])
   const next = { tx: forward, findAll: async (_ctx: unknown, _class: string, query: any) => [...docs.values()].filter((doc: any) => doc._class === _class && (query._id?.$in?.includes(doc._id) || query._id === doc._id || query.personUuid !== undefined && query.personUuid === doc.personUuid)) } as unknown as Middleware
-  const context = { contextVars: { getVerifiedSocialIds: async () => verifiedIdentities }, hierarchy: { isDerived: (actual: string, expected: string) => actual === expected || expected === core.class.AttachedDoc && [attachment.class.Attachment, contact.class.SocialIdentity, calendar.class.Event, time.class.ToDo, task.class.Task].includes(actual as any) }, head: next } as unknown as PipelineContext
+  const context = { contextVars: { getVerifiedSocialIds: async () => verifiedIdentities }, hierarchy: { isDerived: (actual: string, expected: string) => actual === expected || actual === tracker.class.Issue && expected === task.class.Task || expected === core.class.AttachedDoc && [attachment.class.Attachment, contact.class.SocialIdentity, calendar.class.Event, time.class.ToDo, task.class.Task, tracker.class.Issue].includes(actual as any) }, head: next } as unknown as PipelineContext
   const account = { uuid: 'account', role, primarySocialId: user, socialIds: [user] } as Account
   return { middleware: new WorkspaceAuthorizationMiddleware(context, next), ctx: { contextData: { account } } as MeasureContext<SessionData>, forward }
 }
@@ -75,6 +75,16 @@ describe('server authorization before persistence', () => {
     await expect(middleware.tx(ctx, [create('folder', [])])).rejects.toBeInstanceOf(PlatformError)
     await expect(middleware.tx(ctx, [update('folder', drive.class.Folder, { title: 'New' })])).rejects.toMatchObject({ status: { code: platform.status.Forbidden } })
     expect(forward).toHaveBeenCalledTimes(3)
+  })
+  it.each([AccountRole.User, AccountRole.ReadOnlyGuest, AccountRole.DocGuest])('allows %s root issues and rejects nonexistent parents', async (role) => {
+    const { middleware, ctx, forward } = fixture(role)
+    const create = (attachedTo: string): Tx => ({
+      _class: core.class.TxCreateDoc, objectId: 'new-issue', objectClass: tracker.class.Issue, objectSpace: space,
+      attributes: { attachedTo, attachedToClass: tracker.class.Issue, collection: 'subIssues', title: 'New' }
+    }) as unknown as Tx
+    await middleware.tx(ctx, [create(tracker.ids.NoParent)])
+    await expect(middleware.tx(ctx, [create('missing')])).rejects.toThrow()
+    expect(forward).toHaveBeenCalledTimes(1)
   })
   it.each(Object.values(AccountRole))('allows %s task CRUD, unassigned status and sequence allocation', async (role) => {
     const { middleware, ctx, forward } = fixture(role)

@@ -59,7 +59,8 @@ export class WorkspaceAuthorizationMiddleware extends BaseMiddleware {
         const attached = data as Doc & { attachedTo: Ref<Doc>, attachedToClass: any }
         const standaloneEvent = hierarchy.isDerived(data._class, calendar.class.Event) && attached.attachedTo === calendar.ids.NoAttached
         const standaloneTodo = data._class === time.class.ToDo && attached.attachedToClass === time.class.ToDo
-        if (!standaloneEvent && !standaloneTodo) {
+        const standaloneIssue = hierarchy.isDerived(data._class, tracker.class.Issue) && attached.attachedTo === tracker.ids.NoParent && attached.attachedToClass === tracker.class.Issue && (data as Doc & { collection?: string }).collection === 'subIssues'
+        if (!standaloneEvent && !standaloneTodo && !standaloneIssue) {
           const parent = pending.get(attached.attachedTo) ?? (await reader.findAll(ctx, attached.attachedToClass, { _id: attached.attachedTo }))[0]
           if (parent === undefined) throw new Error('Cannot attach content to an inaccessible parent.')
           // Workslots and personal agenda entries live in their own system spaces.
