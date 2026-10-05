@@ -18,10 +18,11 @@
   import { getClient } from '@hcengineering/presentation'
   import { Issue, IssueDraft } from '@hcengineering/tracker'
   import { Button, ButtonKind, ButtonSize, eventToHTMLElement, showPopup } from '@hcengineering/ui'
-  import { EditBoxPopup, FixedColumn } from '@hcengineering/view-resources'
+  import { FixedColumn } from '@hcengineering/view-resources'
   import { createEventDispatcher } from 'svelte'
   import tracker from '../../../plugin'
   import EstimationStatsPresenter from './EstimationStatsPresenter.svelte'
+  import TimeInputPopup from './TimeInputPopup.svelte'
   import TimePresenter from './TimePresenter.svelte'
 
   export let value: Issue | AttachedData<Issue> | IssueDraft
@@ -43,7 +44,7 @@
       return
     }
 
-    showPopup(EditBoxPopup, { value: value.estimation, format: 'number', placeholder: tracker.string.TimeInputHours, minValue: 0 }, eventToHTMLElement(event), (res) => {
+    showPopup(TimeInputPopup, { value: value.estimation }, eventToHTMLElement(event), (res) => {
       if (typeof res === 'number' && Number.isFinite(res) && res >= 0) {
         changeEstimation(res)
       }
