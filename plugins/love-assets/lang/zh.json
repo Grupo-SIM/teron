@@ -1,5 +1,8 @@
 {
   "string": {
+    "ReorderFloors": "Drag to reorder floors. Use arrow keys to move; Escape cancels.",
+    "FloorsReordered": "Floor order saved",
+    "FloorReorderFailed": "Could not save floor order. Please try again.",
     "ChangeOfficeAssignee": "要更换分配给此办公室的人员，请删除此办公室，然后将该人员分配到新办公室。",
     "OfficeCannotBeDeleted": "This office cannot be deleted while it is in use or its assigned person is online.",
     "Office": "办公室",

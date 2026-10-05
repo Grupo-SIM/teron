@@ -16,6 +16,7 @@ export enum RoomType {
 }
 
 export interface Floor extends Doc {
+  sortOrder?: number
   name: string
 }
 

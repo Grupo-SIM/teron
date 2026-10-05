@@ -1,5 +1,8 @@
 {
   "string": {
+    "ReorderFloors": "Arraste para reordenar andares. Use as setas para mover; Escape cancela.",
+    "FloorsReordered": "Ordem dos andares salva",
+    "FloorReorderFailed": "Não foi possível salvar a ordem dos andares. Tente novamente.",
     "ChangeOfficeAssignee": "Para trocar a pessoa deste escritório, exclua este escritório e atribua a pessoa a um novo escritório.",
     "OfficeCannotBeDeleted": "Não é possível excluir este escritório enquanto ele estiver em uso ou a pessoa atribuída estiver online.",
     "Office": "Escritório",

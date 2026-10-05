@@ -137,6 +137,7 @@ export class TOffice extends TRoom implements Office {
 
 @Model(love.class.Floor, core.class.Doc, DOMAIN_LOVE)
 export class TFloor extends TDoc implements Floor {
+  sortOrder?: number
   name!: string
 }
 

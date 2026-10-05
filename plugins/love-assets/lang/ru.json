@@ -1,5 +1,8 @@
 {
   "string": {
+    "ReorderFloors": "Drag to reorder floors. Use arrow keys to move; Escape cancels.",
+    "FloorsReordered": "Floor order saved",
+    "FloorReorderFailed": "Could not save floor order. Please try again.",
     "ChangeOfficeAssignee": "Чтобы изменить человека, назначенного в этот офис, удалите этот офис и назначьте человека в новый офис.",
     "OfficeCannotBeDeleted": "This office cannot be deleted while it is in use or its assigned person is online.",
     "Office": "Офис",

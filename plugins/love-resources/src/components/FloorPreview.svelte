@@ -31,6 +31,8 @@
   } from '@hcengineering/ui'
   import { Floor, ParticipantInfo, Room } from '@hcengineering/love'
   import { createEventDispatcher } from 'svelte'
+  import { translate } from '@hcengineering/platform'
+  import { getCurrentLanguage } from '@hcengineering/ui'
   import plugin from '../plugin'
   import { infos } from '../stores'
   import { calculateFloorSize } from '../utils'
@@ -43,7 +45,11 @@
   export let rooms: Room[] = []
   export let selected: boolean
   export let removable: boolean = true
+  export let dragging: boolean = false
+  export let sortingDisabled: boolean = false
   let expanded = true
+  let reorderLabel = ''
+  $: void translate(plugin.string.ReorderFloors, {}, getCurrentLanguage()).then((label) => { reorderLabel = label })
   $: if (rooms.length === 0) expanded = true
 
   const me = getCurrentAccount()
@@ -96,8 +102,24 @@
   }
 </script>
 
-<div class="floor-card preview" class:selected class:empty={rooms.length === 0} class:expanded>
+<div class="floor-card preview" class:selected class:empty={rooms.length === 0} class:expanded={expanded && !dragging}>
   <div class="floor-row">
+    {#if configurable && editable}
+      <button
+        class="floor-drag-handle"
+        aria-label={`${reorderLabel} ${floor.name}`}
+        disabled={sortingDisabled}
+        use:tooltip={{ label: plugin.string.ReorderFloors, direction: 'bottom' }}
+        on:pointerdown={(event) => dispatch('dragstart', event)}
+        on:keydown={(event) => dispatch('reorderkey', event)}
+      >
+        <svg width="14" height="18" viewBox="0 0 14 18" fill="currentColor" aria-hidden="true">
+          {#each [4, 9, 14] as y}
+            <circle cx="4" cy={y} r="1.5" /><circle cx="10" cy={y} r="1.5" />
+          {/each}
+        </svg>
+      </button>
+    {/if}
     {#if rooms.length > 0}
       <button class="floor-select" aria-expanded={expanded} on:click={() => (expanded = !expanded)}>
         <span class="overflow-label">{floor.name}</span>
@@ -122,7 +144,7 @@
       <ButtonIcon icon={IconMoreH} kind={'tertiary'} size={'small'} {pressed} on:click={clickMore} />
     {/if}
   </div>
-  {#if expanded}
+  {#if expanded && !dragging}
     {#if rooms.length > 0}
       <div class="floor-preview-content">
         <FloorGrid bind:floorContainer {rows} preview>
@@ -157,6 +179,19 @@
       max-width: 100%;
       min-height: 9rem;
     }
+  }
+
+  .floor-drag-handle {
+    display: flex;
+    padding: 0.35rem;
+    border: 1px solid var(--global-ui-BorderColor);
+    border-radius: var(--small-BorderRadius);
+    color: var(--theme-content-color);
+    cursor: grab;
+    touch-action: none;
+
+    &:active { cursor: grabbing; }
+    &:disabled { cursor: not-allowed; opacity: 0.5; }
   }
 
   .floor-row {

@@ -83,7 +83,7 @@ onClient(() => {
   )
   const floorPromise = new Promise<void>((resolve) =>
     floorsQuery.query(love.class.Floor, {}, (res) => {
-      floors.set(res)
+      floors.set(res.sort((a, b) => (a.sortOrder ?? Number.MAX_SAFE_INTEGER) - (b.sortOrder ?? Number.MAX_SAFE_INTEGER) || a.createdOn - b.createdOn || a._id.localeCompare(b._id)))
       resolve()
     })
   )

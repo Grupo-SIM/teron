@@ -73,3 +73,5 @@ Conta mantém um único email ativo confirmado. Alteração exige código enviad
 User pode entrar e sair de canais públicos ativos alterando somente a própria participação; não pode adicionar/remover terceiros nem alterar configuração do canal. Canal privado permite somente saída da própria conta já participante; entrada exige administração.
 
 Funções cadastradas nos contatos podem ser excluídas pelo seletor. Exclusão exige confirmação em segundo clique, expira após três segundos e remove todos os vínculos da função sem excluir contatos.
+
+Owner/Maintainer podem reordenar andares do Escritório pela alça de arraste ou pelas setas do teclado. Ordem é compartilhada e persistida; novos andares sem ordem aparecem ao final.
