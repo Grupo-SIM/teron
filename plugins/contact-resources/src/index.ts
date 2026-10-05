@@ -111,6 +111,7 @@ import SocialEditor from './components/SocialEditor.svelte'
 import SpaceMembers from './components/SpaceMembers.svelte'
 import WorkspaceMemberStatusEditor from './components/WorkspaceMemberStatusEditor.svelte'
 import SpaceMembersEditor from './components/SpaceMembersEditor.svelte'
+import WorkModeDays from './components/WorkModeDays.svelte'
 import SystemAvatar from './components/SystemAvatar.svelte'
 import UserBox from './components/UserBox.svelte'
 import UserBoxItems from './components/UserBoxItems.svelte'
@@ -400,6 +401,7 @@ export default async (): Promise<Resources> => ({
     EditOrganizationPanel,
     ChannelIcon,
     SpaceMembersEditor,
+    WorkModeDays,
     ContactNamePresenter,
     PersonIdFilter,
     AssigneePopup,

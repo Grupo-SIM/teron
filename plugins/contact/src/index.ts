@@ -278,6 +278,7 @@ export const contactPlugin = plugin(contactId, {
     EditOrganizationPanel: '' as AnyComponent,
     CollaborationUserAvatar: '' as AnyComponent,
     SpaceMembersEditor: '' as AnyComponent,
+    WorkModeDays: '' as AnyComponent,
     ContactNamePresenter: '' as AnyComponent,
     PersonFilterValuePresenter: '' as AnyComponent,
     PersonIdFilter: '' as AnyComponent,

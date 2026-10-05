@@ -224,15 +224,16 @@ export class TPerson extends TContact implements Person {
     skills?: number
 
   @Prop(TypeString(), contact.string.ProfessionalTitle)
+  @Hidden()
     professionalTitle?: string
 
   @Prop(TypeString(), contact.string.ContactSource)
     contactSource?: string
 
-  @Prop(TypeNumber(), contact.string.RemoteDaysPerWeek)
+  @Prop(TypeNumber(), contact.string.RemoteDaysPerWeek, { editor: contact.component.WorkModeDays })
     remoteDaysPerWeek?: number | null
 
-  @Prop(TypeNumber(), contact.string.OnsiteDaysPerWeek)
+  @Prop(TypeNumber(), contact.string.OnsiteDaysPerWeek, { editor: contact.component.WorkModeDays })
     onsiteDaysPerWeek?: number | null
 
   @Prop(CollectionType(contact.class.SocialIdentity), contact.string.SocialIds)
