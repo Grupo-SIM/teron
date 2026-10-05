@@ -25,11 +25,11 @@
   --primary-button-hovered: #2C70DE;
   --primary-button-pressed: #2058B8;
   --primary-button-focused: #2869D8;
-  --secondary-button-color: rgba(0, 0, 0, .8);
-  --secondary-button-default: #E27252;
-  --secondary-button-hovered: #F08362;
-  --secondary-button-pressed: #B9573D;
-  --secondary-button-focused: #E27252;
+  --secondary-button-color: var(--primary-button-color);
+  --secondary-button-default: var(--primary-button-default);
+  --secondary-button-hovered: var(--primary-button-hovered);
+  --secondary-button-pressed: var(--primary-button-pressed);
+  --secondary-button-focused: var(--primary-button-focused);
   --positive-button-default: #05A05C;
   --positive-button-hovered: #05AD63;
   --positive-button-pressed: #019253;
