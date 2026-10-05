@@ -14,6 +14,8 @@
     "AddLabel": "Etiket ekle",
     "EditTag": "{word} Düzenle",
     "DeleteTagConfirmation": "Delete \"{title}\" and all references? This cannot be undone.",
+    "TagDeleted": "Tag deleted",
+    "TagDeleteFailed": "Could not delete tag",
     "TagCreateLabel": "Etiket",
     "CancelLabel": "İptal",
     "SearchCreate": "Ara/İsim ...",

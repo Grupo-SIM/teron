@@ -14,6 +14,8 @@
         "AddLabel": "라벨 추가",
         "EditTag": "{word} 편집",
     "DeleteTagConfirmation": "Delete \"{title}\" and all references? This cannot be undone.",
+    "TagDeleted": "Tag deleted",
+    "TagDeleteFailed": "Could not delete tag",
         "TagCreateLabel": "태그",
         "CancelLabel": "취소",
         "SearchCreate": "검색/이름 ...",

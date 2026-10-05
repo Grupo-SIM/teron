@@ -14,6 +14,8 @@
     "AddLabel": "Adicionar etiqueta",
     "EditTag": "Editar {word}",
     "DeleteTagConfirmation": "Excluir \"{title}\" e todas as referências? Esta ação é permanente.",
+    "TagDeleted": "Função excluída",
+    "TagDeleteFailed": "Não foi possível excluir função",
     "TagCreateLabel": "Etiqueta",
     "CancelLabel": "Cancelar",
     "SearchCreate": "Pesquisar/Nome...",

@@ -14,6 +14,8 @@
     "AddLabel": "ラベルを追加",
     "EditTag": "{word}を編集",
     "DeleteTagConfirmation": "Delete \"{title}\" and all references? This cannot be undone.",
+    "TagDeleted": "Tag deleted",
+    "TagDeleteFailed": "Could not delete tag",
     "TagCreateLabel": "タグ",
     "CancelLabel": "キャンセル",
     "SearchCreate": "検索/名前 ...",

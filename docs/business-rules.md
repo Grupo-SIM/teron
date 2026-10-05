@@ -69,3 +69,5 @@ Tabelas de contatos permitem selecionar e reordenar colunas. Funcionários e Ext
 Conta mantém um único email ativo confirmado. Alteração exige código enviado ao novo endereço; email anterior permanece válido até confirmação. Após confirmar, endereços anteriores são liberados, inclusive em chamadas diretas ao servidor. Cancelar ou falhar na confirmação preserva email atual.
 
 User pode entrar e sair de canais públicos ativos alterando somente a própria participação; não pode adicionar/remover terceiros nem alterar configuração do canal. Canal privado permite somente saída da própria conta já participante; entrada exige administração.
+
+Funções cadastradas nos contatos podem ser excluídas pelo seletor. Exclusão exige confirmação em segundo clique, expira após três segundos e remove todos os vínculos da função sem excluir contatos.
