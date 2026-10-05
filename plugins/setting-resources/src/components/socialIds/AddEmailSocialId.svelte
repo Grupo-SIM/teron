@@ -179,11 +179,11 @@
 <AddSocialId {provider} label={currentEmail != null ? setting.string.ChangeEmail : setting.string.SetEmail} on:close>
   <div class="flex-col flex-gap-2">
     {#if currentEmail != null}
+      <Label label={setting.string.EmailReplacementHint} />
       <div class="flex-row-center flex-gap-4">
         <Label label={setting.string.CurrentEmail} />
         <span>{currentEmail.value}</span>
       </div>
-      <Label label={setting.string.EmailReplacementHint} />
     {/if}
     <div class="flex-row-center flex-gap-4">
       <span class="newEmail"><Label label={setting.string.NewEmail} /></span>
