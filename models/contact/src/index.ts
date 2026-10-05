@@ -221,6 +221,7 @@ export class TPerson extends TContact implements Person {
     functions?: number
 
   @Prop(CollectionType(tags.class.TagReference, contact.string.Skills), contact.string.Skills)
+  @Hidden()
     skills?: number
 
   @Prop(TypeString(), contact.string.ProfessionalTitle)

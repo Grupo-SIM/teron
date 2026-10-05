@@ -170,14 +170,6 @@
         />
       </div>
 
-      <InlineAttributeBarEditor
-        _class={contact.class.Person}
-        {object}
-        key="skills"
-        readonly={!editable}
-        extraProps={{ attribute: h.getAttribute(contact.class.Person, 'skills') }}
-      />
-
       <div class="separator" />
       <Scroller
         contentDirection={'horizontal'}
