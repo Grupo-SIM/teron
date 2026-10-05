@@ -1,6 +1,8 @@
 import core, { AccountRole, type Account, type Doc, type MeasureContext, type SessionData, type SocialId, type Tx } from '@hcengineering/core'
 import contact from '@hcengineering/contact'
 import task from '@hcengineering/task'
+import drive from '@hcengineering/drive'
+import platform, { PlatformError } from '@hcengineering/platform'
 import document from '@hcengineering/document'
 import calendar from '@hcengineering/calendar'
 import attachment from '@hcengineering/attachment'
@@ -17,6 +19,8 @@ const docs = new Map<string, object>([
   ['editorSpace', { _id: 'editorSpace', _class: core.class.Space, members: ['account'], guidelineAccess: true, guidelineEditors: ['account'] }],
   ['readerDoc', { _id: 'readerDoc', _class: document.class.Document, space: 'readerSpace' }],
   ['editorDoc', { _id: 'editorDoc', _class: document.class.Document, space: 'editorSpace' }],
+  ['folder', { _id: 'folder', _class: drive.class.Folder, space, parent: drive.ids.Root, path: [], createdBy: 'other' }],
+  ['foreignFolder', { _id: 'foreignFolder', _class: drive.class.Folder, space: 'foreign', parent: drive.ids.Root, path: [] }],
   [user, { _id: user, _class: contact.class.SocialIdentity, attachedTo: person }],
   ['task', { _id: 'task', _class: task.class.Task, space, assignees: [person] }],
   ['otherTask', { _id: 'otherTask', _class: task.class.Task, space, assignees: [] }],
@@ -38,6 +42,18 @@ function fixture (role = AccountRole.User, verifiedIdentities: SocialId[] = []):
 const update = (objectId: string, objectClass: string, operations: object, objectSpace = space): Tx => ({ _class: core.class.TxUpdateDoc, objectId, objectClass, operations, objectSpace }) as unknown as Tx
 
 describe('server authorization before persistence', () => {
+  it('allows User folder creation/deletion but rejects updates and inaccessible parents', async () => {
+    const { middleware, ctx, forward } = fixture()
+    const create = (parent: string, path: string[]): Tx => ({ _class: core.class.TxCreateDoc, objectId: 'new-folder', objectClass: drive.class.Folder, objectSpace: space, attributes: { title: 'Folder', parent, path } }) as unknown as Tx
+    await middleware.tx(ctx, [create(drive.ids.Root, [])])
+    await middleware.tx(ctx, [create('folder', ['folder'])])
+    await middleware.tx(ctx, [{ _class: core.class.TxRemoveDoc, objectId: 'folder', objectClass: drive.class.Folder, objectSpace: space } as unknown as Tx])
+    await expect(middleware.tx(ctx, [create('missing', ['missing'])])).rejects.toBeInstanceOf(PlatformError)
+    await expect(middleware.tx(ctx, [create('foreignFolder', ['foreignFolder'])])).rejects.toBeInstanceOf(PlatformError)
+    await expect(middleware.tx(ctx, [create('folder', [])])).rejects.toBeInstanceOf(PlatformError)
+    await expect(middleware.tx(ctx, [update('folder', drive.class.Folder, { title: 'New' })])).rejects.toMatchObject({ status: { code: platform.status.Forbidden } })
+    expect(forward).toHaveBeenCalledTimes(3)
+  })
   it('allows assigned status and accessible descriptions, forwarding once', async () => {
     const { middleware, ctx, forward } = fixture()
     await middleware.tx(ctx, [update('task', task.class.Task, { status: 'done' }), update('otherTask', task.class.Task, { description: 'text' })])

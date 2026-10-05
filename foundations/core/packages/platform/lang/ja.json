@@ -1,7 +1,7 @@
 {
   "status": {
     "LoadingPlugin": "プラグイン {plugin} を読み込み中…",
-    "UnknownError": "不明なエラー: {message}",
+    "UnknownError": "不明なエラー",
     "InvalidId": "無効なID: {id}",
     "BadRequest": "不正なリクエスト",
     "Forbidden": "アクセスが禁止されています",

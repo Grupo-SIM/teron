@@ -1,7 +1,7 @@
 {
   "status": {
     "LoadingPlugin": "Cargando complemento {plugin}...",
-    "UnknownError": "Error desconocido: {message}",
+    "UnknownError": "Error desconocido",
     "InvalidId": "Id no válido: {id}",
     "BadRequest": "Solicitud incorrecta",
     "Forbidden": "Prohibido",

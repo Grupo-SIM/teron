@@ -1,7 +1,7 @@
 {
   "status": {
     "LoadingPlugin": "Wczytywanie wtyczki {plugin}...",
-    "UnknownError": "Nieznany błąd: {message}",
+    "UnknownError": "Nieznany błąd",
     "InvalidId": "Nieprawidłowy identyfikator: {id}",
     "BadRequest": "Nieprawidłowe żądanie",
     "Forbidden": "Brak dostępu",

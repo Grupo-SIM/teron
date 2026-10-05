@@ -1,7 +1,7 @@
 {
   "status": {
     "LoadingPlugin": "Chargement du plugin {plugin}...",
-    "UnknownError": "Erreur inconnue : {message}",
+    "UnknownError": "Erreur inconnue",
     "InvalidId": "Id invalide : {id}",
     "BadRequest": "Mauvaise requête",
     "Forbidden": "Interdit",

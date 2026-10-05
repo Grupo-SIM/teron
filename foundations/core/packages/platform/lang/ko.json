@@ -1,7 +1,7 @@
 {
     "status": {
         "LoadingPlugin": "{plugin} 플러그인 로딩 중...",
-        "UnknownError": "알 수 없는 오류: {message}",
+        "UnknownError": "알 수 없는 오류",
         "InvalidId": "잘못된 ID: {id}",
         "BadRequest": "잘못된 요청",
         "Forbidden": "접근 권한이 없습니다",

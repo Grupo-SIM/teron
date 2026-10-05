@@ -26,6 +26,7 @@ import core, {
 } from '@hcengineering/core'
 import { getClient } from '@hcengineering/presentation'
 import { get } from 'svelte/store'
+import { canDeleteWorkspaceFolder } from './folder-role-policy'
 import { spaceSpace } from './utils'
 
 function isTypedSpace (space: Space): space is TypedSpace {
@@ -38,7 +39,9 @@ function isSpaceOwner (space: Space): boolean {
 }
 
 export async function canDeleteObject (doc?: Doc | Doc[]): Promise<boolean> {
-  if (!hasAccountRole(getCurrentAccount(), AccountRole.Maintainer)) return false
+  if (!hasAccountRole(getCurrentAccount(), AccountRole.Maintainer) &&
+    (doc === undefined || !(Array.isArray(doc) ? doc : [doc]).every((item) =>
+      canDeleteWorkspaceFolder(getCurrentAccount(), getClient().getHierarchy().getAncestors(item._class))))) return false
   if (doc === undefined) {
     return false
   }

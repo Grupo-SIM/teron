@@ -6,6 +6,8 @@ import core, {
   AccountRole, hasAccountRole, type Doc, type MeasureContext, type Ref, type SessionData,
   systemAccountUuid, TxProcessor, type AccountUuid, type SocialId, type Tx, type TxCreateDoc, type TxUpdateDoc
 } from '@hcengineering/core'
+import drive, { type Folder } from '@hcengineering/drive'
+import platform, { PlatformError, Severity, Status } from '@hcengineering/platform'
 import document, { guidelineAccessFor, type Teamspace } from '@hcengineering/document'
 import love from '@hcengineering/love'
 import notification from '@hcengineering/notification'
@@ -25,7 +27,7 @@ export class WorkspaceAuthorizationMiddleware extends BaseMiddleware {
     const account = ctx.contextData.account
     if (account.uuid === systemAccountUuid || ctx.contextData.isTriggerCtx === true) return await this.provideTx(ctx, txes)
     const administrator = isWorkspaceAdministrator(account)
-    if (!hasAccountRole(account, AccountRole.User)) throw new Error('Workspace is read-only for this member.')
+    if (!hasAccountRole(account, AccountRole.User)) throw new PlatformError(new Status(Severity.ERROR, platform.status.Forbidden, {}))
     const reader = this.context.head ?? this.next
     if (reader === undefined) throw new Error('Missing authorization reader.')
     const people = await reader.findAll(ctx, contact.class.SocialIdentity, { _id: { $in: account.socialIds } })
@@ -101,6 +103,19 @@ export class WorkspaceAuthorizationMiddleware extends BaseMiddleware {
         const sectors = await reader.findAll(ctx, core.class.TypedSpace, { _id: { $in: space.guidelineEditorSectors ?? [] } })
         const access = guidelineAccessFor(space, account.uuid, new Map(sectors.map((sector) => [sector._id, sector.members])))
         allowed = access === 'editor' && (data as Doc & { lockedBy?: unknown }).lockedBy == null && (created || (updated && fields.every((field) => ['title', 'content', 'icon', 'color'].includes(field))))
+      } else if (hierarchy.isDerived(tx.objectClass, drive.class.Folder)) {
+        allowed = created || tx._class === core.class.TxRemoveDoc
+        if (created) {
+          const folder = data as Folder
+          if (folder.parent === drive.ids.Root) {
+            allowed = Array.isArray(folder.path) && folder.path.length === 0
+          } else {
+            const parent = pending.get(folder.parent) ?? (await reader.findAll(ctx, drive.class.Folder, { _id: folder.parent }))[0]
+            allowed = parent !== undefined && parent.space === folder.space &&
+              hierarchy.isDerived(parent._class, drive.class.Folder) && Array.isArray(folder.path) &&
+              JSON.stringify(folder.path) === JSON.stringify([parent._id, ...(parent as Folder).path])
+          }
+        }
       } else if (hierarchy.isDerived(tx.objectClass, attachment.class.Attachment)) {
         allowed = created
       } else if (hierarchy.isDerived(tx.objectClass, chunter.class.ChatMessage)) {
@@ -116,7 +131,7 @@ export class WorkspaceAuthorizationMiddleware extends BaseMiddleware {
       } else if (hierarchy.isDerived(tx.objectClass, love.class.ParticipantInfo)) {
         allowed = personIds.includes((data as Doc & { person: Ref<Doc> }).person) && (created || (updated && fields.every((field) => ['room', 'x', 'y', 'sessionId'].includes(field))) || tx._class === core.class.TxRemoveDoc)
       }
-      if (!allowed) throw new Error('Member is not authorized to change workspace structure or this document.')
+      if (!allowed) throw new PlatformError(new Status(Severity.ERROR, platform.status.Forbidden, {}))
       if (created) pending.set(tx.objectId, data)
     }
     return await this.provideTx(ctx, txes)

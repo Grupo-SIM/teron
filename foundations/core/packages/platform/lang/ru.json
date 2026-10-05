@@ -1,7 +1,7 @@
 {
   "status": {
     "LoadingPlugin": "Загрузка плагина {plugin}...",
-    "UnknownError": "Неизвестная ошибка: {message}",
+    "UnknownError": "Неизвестная ошибка",
     "InvalidId": "Некорректный Id: {id}",
     "BadRequest": "Некорректный запрос",
     "Forbidden": "Запрещено",

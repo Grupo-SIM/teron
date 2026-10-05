@@ -40,6 +40,8 @@
 
 - Owner/Maintainer administram estrutura, contatos, responsáveis, prazos, permissões e exclusões, respeitando acesso ao espaço.
 - User pode editar descrição de tarefa acessível; status exige participação nos responsáveis. Demais mudanças organizacionais são recusadas pelo servidor, inclusive lotes e transações condicionais.
+- User pode criar e excluir pastas em Arquivos, incluindo conteúdo descendente, respeitando acesso e permissões do espaço. Não concede administração do espaço nem alteração de outras entidades.
+- Erros exibidos no frontend usam mensagens traduzidas; detalhes técnicos de falhas inesperadas permanecem nos diagnósticos.
 - Usuários podem usar suas agendas/eventos, conversar, entrar em chamadas, enviar arquivos e editar conteúdo de documentos acessíveis e desbloqueados. Diretrizes aplicam concessões herdadas Leitor/Editor também em busca, realtime e colaboração.
 - Exceções de contadores, histórico e notificações pertencem somente a contextos internos confiáveis; transações cliente não podem usar essas exceções.
 
