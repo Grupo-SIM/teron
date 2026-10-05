@@ -22,7 +22,7 @@
   import { clearTyping, setTyping } from '@hcengineering/presence-resources'
   import { deleteFile, getClient, isLinkPreviewEnabled, uploadFile } from '@hcengineering/presentation'
   import { areEqualMarkups, isEmptyMarkup } from '@hcengineering/text'
-  import { showPopup, ThrottledCaller } from '@hcengineering/ui'
+  import { getCurrentLocation, showPopup, ThrottledCaller } from '@hcengineering/ui'
   import { FileUploadCallbackParams, getUploadHandlers, UploadHandlerDefinition } from '@hcengineering/uploader'
   import { createEventDispatcher, tick } from 'svelte'
 
@@ -386,7 +386,7 @@
   }
 
   let uploadActionIndex = 1000
-  const uploadHandlers = getUploadHandlers(client, { category: 'media' })
+  const uploadHandlers = getUploadHandlers(client, { category: 'media' }, getCurrentLocation().path[2])
   const uploadActions = uploadHandlers.map((handler) => ({
     order: handler.order ?? uploadActionIndex++,
     label: handler.label,

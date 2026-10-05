@@ -15,7 +15,6 @@
 
 import { Client, type DocumentQuery } from '@hcengineering/core'
 import { getResource } from '@hcengineering/platform'
-import { getCurrentLocation } from '@hcengineering/ui'
 
 import uploader from './plugin'
 import type { FileUploadOptions, FileUploadPopupOptions, FileWithPath, UploadHandlerDefinition } from './types'
@@ -38,11 +37,12 @@ export async function uploadFile (file: File, options: FileUploadOptions): Promi
 /** @public */
 export function getUploadHandlers (
   client: Client,
-  query?: DocumentQuery<UploadHandlerDefinition>
+  query?: DocumentQuery<UploadHandlerDefinition>,
+  application?: string
 ): UploadHandlerDefinition[] {
   const handlers = client.getModel().findAllSync(uploader.class.UploadHandlerDefinition, query ?? {})
   // Task editors share upload actions with other applications, but do not support recording.
-  return getCurrentLocation().path[2] === 'tracker'
+  return application === 'tracker'
     ? handlers.filter((handler) => handler.handler !== 'recorder:function:Record')
     : handlers
 }

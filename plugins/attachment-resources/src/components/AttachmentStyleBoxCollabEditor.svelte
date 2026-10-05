@@ -28,7 +28,7 @@
     defaultRefActions,
     getModelRefActions
   } from '@hcengineering/text-editor-resources'
-  import { AnySvelteComponent, getEventPositionElement, getPopupPositionElement } from '@hcengineering/ui'
+  import { getCurrentLocation, AnySvelteComponent, getEventPositionElement, getPopupPositionElement } from '@hcengineering/ui'
   import {
     getUploadHandlers,
     uploadFiles,
@@ -96,7 +96,7 @@
   }
 
   let uploadActionIndex = 1000
-  const uploadHandlers = getUploadHandlers(client, { category: 'media' })
+  const uploadHandlers = getUploadHandlers(client, { category: 'media' }, getCurrentLocation().path[2])
   uploadActions = uploadHandlers.map((handler) => ({
     order: handler.order ?? uploadActionIndex++,
     label: handler.label,

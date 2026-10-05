@@ -18,7 +18,7 @@
   import { type Drive } from '@hcengineering/drive'
   import { getResource } from '@hcengineering/platform'
   import { createQuery, getClient } from '@hcengineering/presentation'
-  import { HeaderButton, HeaderButtonAction } from '@hcengineering/ui'
+  import { getCurrentLocation, HeaderButton, HeaderButtonAction } from '@hcengineering/ui'
   import { getUploadHandlers } from '@hcengineering/uploader'
   import drive from '../plugin'
   import { getFolderIdFromFragment } from '../navigation'
@@ -56,7 +56,7 @@
   const query = createQuery()
 
   onMount(() => {
-    const handlers = getUploadHandlers(client)
+    const handlers = getUploadHandlers(client, undefined, getCurrentLocation().path[2])
     const newUploadActions: HeaderButtonAction[] = []
     for (const handler of handlers) {
       const uploadHandler = async (): Promise<void> => {
