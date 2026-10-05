@@ -13,9 +13,11 @@
 // limitations under the License.
 -->
 <script lang="ts">
-  import { Asset, Metadata } from '@hcengineering/platform'
+  import { Asset, Metadata, type IntlString } from '@hcengineering/platform'
   import {
     ButtonIcon,
+    Button,
+    IconDelete,
     fromCodePoint,
     Scroller,
     getPlatformColor,
@@ -36,6 +38,21 @@
   export let color: number | number[] = 0
   export let showColor: boolean = true
   export let showEmoji: boolean = true
+  export let removeLabel: IntlString | undefined = undefined
+  export let onRemove: (() => Promise<void>) | undefined = undefined
+
+  let removing = false
+
+  async function removeIcon (): Promise<void> {
+    if (onRemove === undefined || removing) return
+    removing = true
+    try {
+      await onRemove()
+      dispatch('close')
+    } finally {
+      removing = false
+    }
+  }
 
   const dispatch = createEventDispatcher()
 
@@ -104,9 +121,28 @@
       }}
     />
   {/if}
+  {#if onRemove !== undefined && removeLabel !== undefined}
+    <div class="remove-action">
+      <Button
+        icon={IconDelete}
+        label={removeLabel}
+        kind="regular"
+        size="small"
+        disabled={removing}
+        on:click={removeIcon}
+      />
+    </div>
+  {/if}
 </div>
 
 <style lang="scss">
+  .remove-action {
+    display: flex;
+    justify-content: flex-end;
+    padding: 0.5rem 0.75rem;
+    border-top: 1px solid var(--theme-divider-color);
+    color: var(--theme-caption-color);
+  }
   .pallete {
     display: flex;
     justify-content: space-between;

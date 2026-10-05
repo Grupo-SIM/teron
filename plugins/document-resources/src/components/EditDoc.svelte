@@ -46,7 +46,6 @@
 
   import {
     Button,
-    IconDelete,
     addNotification,
     NotificationSeverity,
     NotificationToast,
@@ -201,7 +200,13 @@
           await client.update(doc, { icon: result.icon, color: result.color })
         }
       }
-      showPopup(IconPicker, { icon, color, icons }, 'top', update, update)
+      showPopup(IconPicker, {
+        icon,
+        color,
+        icons,
+        removeLabel: document.string.RemoveCustomIcon,
+        onRemove: !effectiveReadonly && (icon !== undefined || color !== undefined) ? removeIcon : undefined
+      }, 'top', update, update)
     }
   }
 
@@ -383,9 +388,6 @@
             showTooltip={{ label: document.string.Icon, direction: 'bottom' }}
             on:click={chooseIcon}
           />
-          {#if !effectiveReadonly && (doc.icon !== undefined || doc.color !== undefined)}
-            <Button icon={IconDelete} kind="secondary" size="small" showTooltip={{ label: document.string.RemoveCustomIcon }} on:click={removeIcon} />
-          {/if}
         </div>
 
         <DocumentTitle
