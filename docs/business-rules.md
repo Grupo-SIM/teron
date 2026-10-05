@@ -19,6 +19,7 @@
 - A entidade `Project` aparece para pessoas usuárias como Setor; `Milestone` aparece como Projeto. IDs e URLs legados permanecem.
 - Tarefas seguem Pendente, Em andamento, Revisão, Finalizado e Ajustes. Pendente, Em andamento e Revisão acumulam tempo corrido; Finalizado e Ajustes pausam a contagem. Reabrir tarefa inicia novo intervalo.
 - Projetos seguem Pendente, Em andamento, Concluído e Cancelado.
+- Histórico de atividade preserva cada edição como entrada separada, inclusive alterações consecutivas do mesmo campo e edições logo após a criação.
 - Exclusão de projeto pede uma única confirmação; tarefas são preservadas em Sem projeto, sem escolher outro destino.
 - Modelos de texto inserem conteúdo no editor de comentário de tarefa sem publicar automaticamente.
 
