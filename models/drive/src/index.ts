@@ -748,6 +748,7 @@ function defineFile (builder: Builder): void {
     {
       secured: true,
       action: view.actionImpl.Delete,
+      actionProps: { confirmation: drive.string.DeleteFileConfirm, confirmationTitle: drive.string.DeleteFile },
       label: view.string.Delete,
       icon: view.icon.Delete,
       category: drive.category.Drive,

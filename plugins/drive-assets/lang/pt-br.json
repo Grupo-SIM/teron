@@ -1,5 +1,7 @@
 {
   "string": {
+    "DeleteFile": "Apagar arquivo",
+    "DeleteFileConfirm": "Deseja apagar {count, plural, =1 {este arquivo} other {estes # arquivos}}?",
     "DeleteDriveConfirm": "Excluir espaço de arquivos e todas as pastas, arquivos, versões e anexos contidos? Exclusão permanente.",
     "Drive": "Arquivos",
     "Drives": "Espaços de arquivos",

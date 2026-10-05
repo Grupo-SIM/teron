@@ -107,6 +107,8 @@ export default mergeIds(driveId, drive, {
   },
   string: {
     DeleteDriveConfirm: '' as IntlString,
+    DeleteFile: '' as IntlString,
+    DeleteFileConfirm: '' as IntlString,
     Grid: '' as IntlString,
     Name: '' as IntlString,
     Description: '' as IntlString,
