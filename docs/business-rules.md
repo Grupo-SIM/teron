@@ -18,6 +18,7 @@
 
 - A entidade `Project` aparece para pessoas usuárias como Setor; `Milestone` aparece como Projeto. IDs e URLs legados permanecem.
 - Tarefas seguem Pendente, Em andamento, Revisão, Finalizado e Ajustes. Pendente, Em andamento e Revisão acumulam tempo corrido; Finalizado e Ajustes pausam a contagem. Reabrir tarefa inicia novo intervalo.
+- Tempo gasto e estimativa exibem dias de 24 horas. Tempo gasto não é limitado pela estimativa; total de subtarefas considera somente tarefas existentes vinculadas ao pai.
 - Projetos seguem Pendente, Em andamento, Concluído e Cancelado.
 - Histórico de atividade preserva cada edição como entrada separada, inclusive alterações consecutivas do mesmo campo e edições logo após a criação.
 - Exclusão de projeto pede uma única confirmação; tarefas são preservadas em Sem projeto, sem escolher outro destino.
@@ -39,7 +40,7 @@
 ## Autorização de workspace
 
 - Owner/Maintainer administram estrutura, contatos, responsáveis, prazos, permissões e exclusões, respeitando acesso ao espaço.
-- User pode editar descrição e estimativa de tarefa acessível; estimativa aceita número finito não negativo e seletor de horas, dias ou minutos, com frações permitidas; armazenamento permanece em horas e cada dia equivale a 8 horas de trabalho; status exige participação nos responsáveis. Demais mudanças organizacionais são recusadas pelo servidor, inclusive lotes e transações condicionais.
+- User pode editar descrição e estimativa de tarefa acessível; estimativa aceita número finito não negativo e seletor de horas, dias ou minutos, com frações permitidas; armazenamento permanece em horas e cada dia equivale a 24 horas; status exige participação nos responsáveis. Demais mudanças organizacionais são recusadas pelo servidor, inclusive lotes e transações condicionais.
 - User pode criar e excluir pastas em Arquivos, incluindo conteúdo descendente, respeitando acesso e permissões do espaço. Não concede administração do espaço nem alteração de outras entidades.
 - Erros exibidos no frontend usam mensagens traduzidas; detalhes técnicos de falhas inesperadas permanecem nos diagnósticos.
 - Usuários podem usar suas agendas/eventos, conversar, entrar em chamadas, enviar arquivos e editar conteúdo de documentos acessíveis e desbloqueados. Diretrizes aplicam concessões herdadas Leitor/Editor também em busca, realtime e colaboração.

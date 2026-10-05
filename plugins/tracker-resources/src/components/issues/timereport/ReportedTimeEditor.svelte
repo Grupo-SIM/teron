@@ -14,6 +14,8 @@
 // limitations under the License.
 -->
 <script lang="ts">
+  import { createQuery } from '@hcengineering/presentation'
+  import tracker from '../../../plugin'
   import type { IntlString } from '@hcengineering/platform'
   import { Issue, Project, currentChildReportedTime, currentReportedTime } from '@hcengineering/tracker'
   import { Label, floorFractionDigits } from '@hcengineering/ui'
@@ -29,6 +31,12 @@
   export let currentProject: Project | undefined
   export let readonly: boolean = false
 
+  const childrenQuery = createQuery()
+  let children: Issue[] = []
+  $: childrenQuery.query(tracker.class.Issue, { 'parents.parentId': object._id }, (result) => {
+    children = result
+  })
+
   let now = Date.now()
   onMount(() => {
     const timer = setInterval(() => (now = Date.now()), 60000)
@@ -36,7 +44,7 @@
   })
   $: trackedHours = currentReportedTime({ ...object, reportedTime: value }, now)
   $: childTime = floorFractionDigits(
-    currentChildReportedTime(object.childInfo, now),
+    currentChildReportedTime(children, now),
     3
   )
 </script>
