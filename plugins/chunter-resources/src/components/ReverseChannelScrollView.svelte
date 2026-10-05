@@ -22,7 +22,7 @@
     clearMessageInLocation
   } from '@hcengineering/activity-resources'
   import core, { Doc, generateId, getCurrentAccount, Ref, Space, Timestamp, Tx, TxCUD } from '@hcengineering/core'
-  import { DocNotifyContext } from '@hcengineering/notification'
+  import { DocNotifyContext, InboxNotification } from '@hcengineering/notification'
   import { InboxNotificationsClientImpl } from '@hcengineering/notification-resources'
   import { addTxListener, getClient, removeTxListener } from '@hcengineering/presentation'
   import { ModernButton, Scroller } from '@hcengineering/ui'
@@ -408,20 +408,30 @@
   }
 
   let forceRead = false
-  $: void forceReadContext(isScrollAtBottom, notifyContext)
+  $: if (!freeze && !isPageHidden) {
+    void forceReadContext(isScrollAtBottom, notifyContext, $notificationsByContextStore)
+  }
 
-  async function forceReadContext (isScrollAtBottom: boolean, context?: DocNotifyContext): Promise<void> {
+  async function forceReadContext (
+    isScrollAtBottom: boolean,
+    context: DocNotifyContext | undefined,
+    notificationsByContext: Map<Ref<DocNotifyContext>, InboxNotification[]>
+  ): Promise<void> {
     if (context === undefined || !isScrollAtBottom || forceRead || isFreeze()) return
     const { lastUpdateTimestamp = 0, lastViewedTimestamp = 0 } = context
 
     if (lastViewedTimestamp >= lastUpdateTimestamp) return
 
-    const notifications = $notificationsByContextStore.get(context._id) ?? []
+    const notifications = notificationsByContext.get(context._id) ?? []
     const unViewed = notifications.filter(({ isViewed }) => !isViewed)
 
     if (unViewed.length === 0) {
       forceRead = true
-      await inboxClient.readDoc(object._id)
+      try {
+        await inboxClient.readDoc(object._id)
+      } finally {
+        forceRead = false
+      }
     }
   }
 
