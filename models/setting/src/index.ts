@@ -236,7 +236,7 @@ export function createModel (builder: Builder): void {
         navigation: setting.component.WorkspaceSettings
       },
       group: 'settings',
-      role: AccountRole.User,
+      role: AccountRole.Maintainer,
       order: 2000
     },
     setting.ids.Setting
