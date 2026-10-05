@@ -276,6 +276,7 @@ export default mergeIds(trackerId, tracker, {
     TimeSpendReportDescription: '' as IntlString,
     TimeSpendDays: '' as IntlString,
     TimeSpendHours: '' as IntlString,
+    TimeInputHours: '' as IntlString,
     TimeInputMinutes: '' as IntlString,
     TimeSpendMinutes: '' as IntlString,
 
@@ -365,6 +366,7 @@ export default mergeIds(trackerId, tracker, {
     EditMilestone: '' as AnyComponent,
     ReportedTimeEditor: '' as AnyComponent,
     TimePresenter: '' as AnyComponent,
+    HoursEstimationValueEditor: '' as AnyComponent,
     EstimationValueEditor: '' as AnyComponent,
     TimeSpendReport: '' as AnyComponent,
     EstimationEditor: '' as AnyComponent,

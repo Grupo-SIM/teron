@@ -237,6 +237,7 @@
     "TimeSpendReportDescription": "Beschreibung",
     "TimeSpendDays": "{value}T",
     "TimeSpendHours": "{value}Std",
+    "TimeInputHours": "e.g. 2 hours",
     "TimeInputMinutes": "e.g. 30 minutes",
     "TimeSpendMinutes": "{value}Min",
     "ChildEstimation": "Schätzung Unteraufgaben",

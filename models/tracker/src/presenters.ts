@@ -154,7 +154,7 @@ export function definePresenters (builder: Builder): void {
     builder,
     tracker.class.TypeEstimation,
     tracker.component.TimePresenter,
-    tracker.component.EstimationValueEditor
+    tracker.component.HoursEstimationValueEditor
   )
 
   classPresenter(

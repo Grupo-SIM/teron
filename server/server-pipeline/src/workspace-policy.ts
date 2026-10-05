@@ -37,6 +37,10 @@ export function memberTaskUpdateAllowed (tx: Tx, doc: Doc & { assignees?: string
   const fields = changedFields(operations)
   if (fields.includes('status') && typeof (operations.status ?? operations.$set?.status) !== 'string') return false
   if (Object.keys(operations).some((key) => key.includes('.')) || Object.keys(operations.$set ?? {}).some((key) => key.includes('.'))) return false
+  if (fields.includes('estimation')) {
+    const estimation = operations.estimation ?? operations.$set?.estimation
+    if (typeof estimation !== 'number' || !Number.isFinite(estimation) || estimation < 0) return false
+  }
   const assigned = (doc.assignees ?? (doc.assignee == null ? [] : [doc.assignee])).some((id) => people.includes(id))
-  return fields.every((field) => field === 'description' || (field === 'status' && assigned))
+  return fields.every((field) => field === 'description' || field === 'estimation' || (field === 'status' && assigned))
 }

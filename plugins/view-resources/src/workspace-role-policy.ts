@@ -14,7 +14,7 @@ const memberFields: Record<string, string[]> = {
   'calendar:class:Schedule': ['title', 'description', 'meetingDuration', 'meetingInterval', 'availability', 'timeZone', 'calendar'],
   'calendar:class:Event': ['title', 'description', 'date', 'dueDate', 'allDay', 'timeZone', 'visibility', 'participants', 'externalParticipants', 'location', 'reminders', 'rules', 'rdate', 'exdate', 'isCancelled'],
   'time:class:ToDo': ['title', 'description', 'doneOn', 'priority', 'visibility', 'rank'],
-  'task:class:Task': ['description', 'status']
+  'task:class:Task': ['description', 'status', 'estimation']
 }
 
 /** Workspace role ceiling; ownership and per-space permissions still apply separately. */

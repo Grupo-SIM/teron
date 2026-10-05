@@ -79,6 +79,12 @@ describe('server authorization before persistence', () => {
     await middleware.tx(ctx, [update('task', task.class.Task, { status: 'done' }), update('otherTask', task.class.Task, { description: 'text' })])
     expect(forward).toHaveBeenCalledTimes(1)
   })
+  it('allows members to estimate accessible tasks without changing structural fields', async () => {
+    const { middleware, ctx, forward } = fixture()
+    await middleware.tx(ctx, [update('otherTask', task.class.Task, { estimation: 1.5 })])
+    await expect(middleware.tx(ctx, [update('otherTask', task.class.Task, { estimation: 2, dueDate: 0 })])).rejects.toThrow()
+    expect(forward).toHaveBeenCalledTimes(1)
+  })
   it('enforces inherited reader/editor grants and denies editor deletion', async () => {
     const { middleware, ctx, forward } = fixture()
     await expect(middleware.tx(ctx, [update('readerDoc', document.class.Document, { title: 'new' }, 'readerSpace')])).rejects.toThrow()

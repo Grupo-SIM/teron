@@ -225,6 +225,7 @@
     "TimeSpendReportDescription": "Descrizione",
     "TimeSpendDays": "{value}d",
     "TimeSpendHours": "{value}h",
+    "TimeInputHours": "e.g. 2 hours",
     "TimeInputMinutes": "e.g. 30 minutes",
     "TimeSpendMinutes": "{value}m",
     "ChildEstimation": "Stima delle subissue",

@@ -22,6 +22,7 @@
   import tracker from '../../../plugin'
 
   // export let label: IntlString
+  export let unit: 'minutes' | 'hours' = 'minutes'
   export let placeholder: IntlString
   export let value: number | undefined
   export let autoFocus: boolean = false
@@ -35,12 +36,14 @@
 
   let shown: boolean = false
 
-  $: minutes = value == null ? undefined : value * 60
+  $: multiplier = unit === 'minutes' ? 60 : 1
+  $: inputValue = value == null ? undefined : value * multiplier
+  $: inputPlaceholder = unit === 'minutes' ? tracker.string.TimeInputMinutes : tracker.string.TimeInputHours
 
   function _onchange (ev: Event) {
     const value = (ev.target as HTMLInputElement).valueAsNumber
     if (Number.isFinite(value)) {
-      onChange(value / 60)
+      onChange(value / multiplier)
     }
   }
 </script>
@@ -54,9 +57,9 @@
     disabled={readonly}
     on:click={(ev) => {
       if (!shown && !readonly) {
-        showPopup(EditBoxPopup, { value: minutes, format: 'number', placeholder: tracker.string.TimeInputMinutes, minValue: 0 }, eventToHTMLElement(ev), (res) => {
+        showPopup(EditBoxPopup, { value: inputValue, format: 'number', placeholder: inputPlaceholder, minValue: 0 }, eventToHTMLElement(ev), (res) => {
           if (Number.isFinite(res)) {
-            value = res / 60
+            value = res / multiplier
             onChange(value)
           }
           shown = false
@@ -79,5 +82,5 @@
     <span class="content-dark-color"><Label label={placeholder} /></span>
   {/if}
 {:else}
-  <EditBox placeholder={tracker.string.TimeInputMinutes} bind:value={minutes} format={'number'} minValue={0} {autoFocus} on:change={_onchange} />
+  <EditBox placeholder={inputPlaceholder} bind:value={inputValue} format={'number'} minValue={0} {autoFocus} on:change={_onchange} />
 {/if}

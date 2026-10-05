@@ -21,7 +21,6 @@
   import { EditBoxPopup, FixedColumn } from '@hcengineering/view-resources'
   import { createEventDispatcher } from 'svelte'
   import tracker from '../../../plugin'
-  import EstimationPopup from './EstimationPopup.svelte'
   import EstimationStatsPresenter from './EstimationStatsPresenter.svelte'
   import TimePresenter from './TimePresenter.svelte'
 
@@ -44,15 +43,11 @@
       return
     }
 
-    if (kind === 'list') {
-      showPopup(EstimationPopup, { value: value.estimation, format: 'number', object: value }, 'top')
-    } else {
-      showPopup(EditBoxPopup, { value: value.estimation, format: 'number', placeholder: tracker.string.Estimation }, eventToHTMLElement(event), (res) => {
-        if (res !== undefined) {
-          changeEstimation(res)
-        }
-      })
-    }
+    showPopup(EditBoxPopup, { value: value.estimation, format: 'number', placeholder: tracker.string.TimeInputHours, minValue: 0 }, eventToHTMLElement(event), (res) => {
+      if (typeof res === 'number' && Number.isFinite(res) && res >= 0) {
+        changeEstimation(res)
+      }
+    })
   }
 
   const changeEstimation = async (newEstimation: number | undefined) => {

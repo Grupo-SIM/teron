@@ -170,6 +170,7 @@ import { settingId } from '@hcengineering/setting'
 import type { TaskType } from '@hcengineering/task'
 import { getAllStates } from '@hcengineering/task-resources'
 import view, { type Filter } from '@hcengineering/view'
+import HoursEstimationValueEditor from './components/issues/timereport/HoursEstimationValueEditor.svelte'
 import EstimationValueEditor from './components/issues/timereport/EstimationValueEditor.svelte'
 import TimePresenter from './components/issues/timereport/TimePresenter.svelte'
 import { getTargetObjectFromUrl } from '@hcengineering/text-editor-resources'
@@ -448,6 +449,7 @@ export default async (): Promise<Resources> => ({
     SettingsRelatedTargets,
     TimePresenter,
     EstimationValueEditor,
+    HoursEstimationValueEditor,
     IssueStatusIcon,
     MilestoneStatusIcon,
     PriorityIconPresenter,

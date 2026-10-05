@@ -22,11 +22,12 @@ describe('workspace role ceiling', () => {
     expect(canMutateWorkspaceClass(member, classes, 'update', 'parent')).toBe(false)
     expect(canMutateWorkspaceClass(member, classes, 'remove')).toBe(false)
   })
-  test('derived tasks retain description/status only', () => {
+  test('derived tasks retain description/status/estimation edits', () => {
     const member = account(AccountRole.User)
     const classes = ['tracker:class:Issue', 'task:class:Task']
     expect(canMutateWorkspaceClass(member, classes, 'update', 'description')).toBe(true)
     expect(canMutateWorkspaceClass(member, classes, 'update', 'status')).toBe(true)
+    expect(canMutateWorkspaceClass(member, classes, 'update', 'estimation')).toBe(true)
     expect(canMutateWorkspaceClass(member, classes, 'update', 'assignees')).toBe(false)
     expect(canMutateWorkspaceClass(member, classes, 'create')).toBe(false)
     expect(canMutateWorkspaceClass(member, classes, 'remove')).toBe(false)
