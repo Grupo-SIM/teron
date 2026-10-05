@@ -111,7 +111,7 @@
   import SpaceView from './SpaceView.svelte'
   import TopMenu from './icons/TopMenu.svelte'
   import WidgetsBar from './sidebar/Sidebar.svelte'
-  import { sidebarStore, SidebarVariant, syncSidebarState } from '../sidebar'
+  import { minimizeSidebar, sidebarStore, SidebarVariant, syncSidebarState } from '../sidebar'
 
   const HIDE_NAVIGATOR = 720
   const FLOAT_ASIDE = 1024 // lg
@@ -607,9 +607,22 @@
   ) {
     $sidebarStore.widget = Array.from($sidebarStore.widgetsState.keys())[0]
   }
-  location.subscribe(() => {
-    if (mobileAdaptive && $sidebarStore.variant !== SidebarVariant.MINI) $sidebarStore.variant = SidebarVariant.MINI
-  })
+  let previousScreenPath = [...getCurrentLocation().path]
+  onDestroy(
+    location.subscribe((loc) => {
+      const screenChanged =
+        previousScreenPath.length !== loc.path.length ||
+        previousScreenPath.some((segment, index) => segment !== loc.path[index])
+      previousScreenPath = [...loc.path]
+
+      if (screenChanged) {
+        minimizeSidebar()
+        hiddenAside = true
+      } else if (mobileAdaptive && $sidebarStore.variant !== SidebarVariant.MINI) {
+        $sidebarStore.variant = SidebarVariant.MINI
+      }
+    })
+  )
   $: $deviceInfo.navigator.direction = $deviceInfo.isMobile && $deviceInfo.isPortrait ? 'horizontal' : 'vertical'
   let appsMini: boolean
   $: appsMini =
