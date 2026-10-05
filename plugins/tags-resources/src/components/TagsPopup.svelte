@@ -204,7 +204,10 @@
             <div class="menu-group">
               {#each catObjects.slice(0, 50) as element}
                 {@const color = getPlatformColorDef(element.color, $themeStore.dark)}
-                <div class="flex-row-center">
+                <div
+                  class="flex-row-center"
+                  class:pr-2={!hideAdd && !newElements.some((tag) => tag._id === element._id)}
+                >
                   <button
                     class="menu-item no-focus flex-row-center flex-grow"
                     class:selected={isSelected(selected, element)}
