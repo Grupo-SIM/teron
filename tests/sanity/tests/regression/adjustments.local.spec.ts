@@ -12,7 +12,7 @@ async function login (page: Page, email: string): Promise<void> {
   await page.getByRole('button', { name: 'Entrar', exact: true }).click()
   await expect(page).toHaveURL(/mode=workspaces/, { timeout: 30000 })
   await page.goto(`/workbench/${workspace}/time`, { waitUntil: 'domcontentloaded' })
-  await expect(page.getByText('Minhas Agendas', { exact: true })).toBeVisible({ timeout: 120000 })
+  await expect(page.getByText('Minha Agenda', { exact: true })).toBeVisible({ timeout: 120000 })
 }
 test('two accounts keep private agendas busy and own agendas separate', async ({ page, browser }) => {
   const errors: string[] = []
