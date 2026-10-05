@@ -320,7 +320,8 @@ export function findAttributePresenter (
 
   const attribute = hierarchy.findAttribute(_class, key)
   if (attribute === undefined) return
-  const { attrClass, category } = getAttributePresenterClass(hierarchy, attribute.type)
+  const { attrClass, category: attributeCategory } = getAttributePresenterClass(hierarchy, attribute.type)
+  const category = _category ?? attributeCategory
   let overridedPresenter = model.findAllSync(view.class.AttrPresenter, {
     objectClass: _class,
     attribute: attribute._id,
