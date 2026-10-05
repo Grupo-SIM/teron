@@ -115,7 +115,6 @@
     isFold
     empty={sortedItems.length === 0}
     visible={visibleItem !== undefined}
-    noDivider
   >
     {#each sortedItems as item (item.id)}
       {@const context = contexts.find(({ objectId }) => objectId === item.id)}
