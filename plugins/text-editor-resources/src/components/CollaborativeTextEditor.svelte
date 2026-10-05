@@ -138,7 +138,8 @@
     !contentError &&
     synced &&
     editorReady &&
-    hasAccountRole(account, AccountRole.User)
+    (hasAccountRole(account, AccountRole.User) ||
+      client.getHierarchy().isDerived(objectClass, 'task:class:Task' as Ref<Class<Doc>>))
 
   void provider.loaded.then(() => (synced = true))
   void provider.loaded.then(() => dispatch('loaded'))

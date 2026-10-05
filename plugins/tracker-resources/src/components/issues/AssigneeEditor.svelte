@@ -1,7 +1,7 @@
 <script lang="ts">
   import { Employee } from '@hcengineering/contact'
   import { EmployeeArrayEditor } from '@hcengineering/contact-resources'
-  import { AccountRole, getCurrentAccount, hasAccountRole, Ref } from '@hcengineering/core'
+  import { Ref } from '@hcengineering/core'
   import { getClient } from '@hcengineering/presentation'
   import { getTaskAssignees } from '@hcengineering/task'
   import { ButtonKind, ButtonSize, IconSize, TooltipAlignment } from '@hcengineering/ui'
@@ -25,13 +25,12 @@
 
   const client = getClient()
   const dispatch = createEventDispatcher()
-  const administrator = hasAccountRole(getCurrentAccount(), AccountRole.Maintainer)
   $: target = object ?? value
   $: targets = Array.isArray(target) ? target : target === undefined ? [] : [target]
   $: selected = targets.length === 0 ? [] : getTaskAssignees(targets[0]) as Ref<Employee>[]
 
   async function change (refs: Ref<Employee>[]): Promise<void> {
-    if (readonly || !administrator) return
+    if (readonly) return
     const assignees = getTaskAssignees({ assignees: refs })
     const stored = targets.filter((item) => '_class' in item)
     const operations = client.apply()
@@ -44,4 +43,4 @@
   }
 </script>
 
-<EmployeeArrayEditor label={tracker.string.Assignee} value={selected} onChange={change} {kind} {size} {width} readonly={readonly || !administrator} />
+<EmployeeArrayEditor label={tracker.string.Assignee} value={selected} onChange={change} {kind} {size} {width} {readonly} />

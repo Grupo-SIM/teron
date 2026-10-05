@@ -740,7 +740,7 @@ async function getRelationPresenter (client: Client, key: BuildModelKey): Promis
 export async function deleteObject (client: TxOperations, object: Doc): Promise<void> {
   const currentAcc = getCurrentAccount()
   const socialStrings = new Set(await getAllSocialStringsByPersonRef(client, getCurrentEmployee()))
-  if (!hasAccountRole(currentAcc, AccountRole.Maintainer) && !canDeleteWorkspaceFolder(currentAcc, client.getHierarchy().getAncestors(object._class)) && !socialStrings.has(object.createdBy as PersonId)) return
+  if (!hasAccountRole(currentAcc, AccountRole.Maintainer) && !client.getHierarchy().getAncestors(object._class).includes('task:class:Task' as Ref<Class<Doc>>) && !canDeleteWorkspaceFolder(currentAcc, client.getHierarchy().getAncestors(object._class)) && !socialStrings.has(object.createdBy as PersonId)) return
   if (client.getHierarchy().isDerived(object._class, core.class.AttachedDoc)) {
     const adoc = object as AttachedDoc
     await client

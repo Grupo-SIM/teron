@@ -14,7 +14,7 @@
 -->
 <script lang="ts">
   import { EmployeeBox, getPersonRefByPersonIdCb } from '@hcengineering/contact-resources'
-  import core, { Class, ClassifierKind, Doc, Mixin, Ref, AccountRole, getCurrentAccount, hasAccountRole } from '@hcengineering/core'
+  import core, { Class, ClassifierKind, Doc, Mixin, Ref } from '@hcengineering/core'
   import { AttributeBarEditor, createQuery, getClient, KeyedAttribute } from '@hcengineering/presentation'
   import { Person } from '@hcengineering/contact'
   import tags from '@hcengineering/tags'
@@ -38,7 +38,7 @@
 
   export let issue: Issue
   export let readonly = false
-  $: structureReadonly = readonly || !hasAccountRole(getCurrentAccount(), AccountRole.Maintainer)
+  $: structureReadonly = readonly
 
   const query = createQuery()
   let showIsBlocking = false

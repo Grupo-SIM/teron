@@ -896,13 +896,6 @@ export async function selectWorkspace (
     void setTimezone(ctx, db, accountUuid, account, meta)
   }
 
-  if (role === AccountRole.ReadOnlyGuest) {
-    if (extra == null) {
-      extra = {}
-    }
-    extra.readonly = 'true'
-  }
-
   const tier = selectTierSubscription(await findTierSubscriptions(db, workspace.uuid))
   const subscriptionReadOnlyAfter = tier?.trialEnd ?? tier?.periodEnd
   if (db.subscription?.find != null && tier == null) {

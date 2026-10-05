@@ -17,6 +17,7 @@ import core, {
   type Tx,
   type TxApplyIf,
   type TxCUD,
+  type TxUpdateDoc,
   TxProcessor,
   type TxResult
 } from '@hcengineering/core'
@@ -351,8 +352,22 @@ export class ReadOnlyAccessMiddleware extends BasePresentationMiddleware impleme
     return new ReadOnlyAccessMiddleware(client, next)
   }
 
+  private isTaskMutation (tx: Tx): boolean {
+    if (tx._class === core.class.TxApplyIf) {
+      const txes = (tx as TxApplyIf).txes
+      return txes.length > 0 && txes.every((nested) => this.isTaskMutation(nested))
+    }
+    if (!TxProcessor.isExtendsCUD(tx._class)) return false
+    const cud = tx as TxCUD<Doc>
+    if (this.client.getHierarchy().isDerived(cud.objectClass, 'task:class:Task' as Ref<Class<Doc>>)) return true
+    if (cud.objectClass !== 'tracker:class:Project' || tx._class !== core.class.TxUpdateDoc) return false
+    const operations = (tx as TxUpdateDoc<Doc>).operations as Record<string, any>
+    return Object.keys(operations).length === 1 &&
+      Object.keys(operations.$inc ?? {}).length === 1 && operations.$inc?.sequence === 1
+  }
+
   async tx (tx: Tx): Promise<TxResult> {
-    if (getCurrentAccount()?.role === AccountRole.ReadOnlyGuest) {
+    if (getCurrentAccount()?.role === AccountRole.ReadOnlyGuest && !this.isTaskMutation(tx)) {
       addNotification(
         await translate(view.string.ReadOnlyWarningTitle, {}, getCurrentLanguage()),
         await translate(view.string.ReadOnlyWarningMessage, {}, getCurrentLanguage()),

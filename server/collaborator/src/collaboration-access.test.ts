@@ -1,7 +1,9 @@
 import core, { AccountRole } from '@hcengineering/core'
 import document from '@hcengineering/document'
+import task from '@hcengineering/task'
 import { openCollaborationAccess } from './collaboration-access'
 
+const documentId = { objectClass: document.class.Document, objectId: 'doc', objectAttr: 'content' }
 const member = { person: 'user', role: AccountRole.User }
 const doc: any = { _id: 'doc', _class: document.class.Document, space: 'space', content: 'blob' }
 const space: any = { _id: 'space', members: ['user'], guidelineAccess: true, guidelineReaders: ['user'], guidelineEditors: [] }
@@ -14,11 +16,14 @@ const client = {
 jest.mock('./config', () => ({ __esModule: true, default: { AccountsUrl: 'http://local' } }))
 jest.mock('@hcengineering/server-client', () => ({ getTransactorEndpoint: async () => 'local', createClient: async () => client }))
 jest.mock('@hcengineering/server-token', () => ({ generateToken: () => 'local-token' }))
-jest.mock('@hcengineering/collaborator-client', () => ({ decodeDocumentId: () => ({ documentId: { objectClass: 'document:class:Document', objectId: 'doc', objectAttr: 'content' } }) }))
+jest.mock('@hcengineering/collaborator-client', () => ({ decodeDocumentId: () => ({ documentId }) }))
 jest.mock('@hcengineering/account-client', () => ({ getClient: () => ({ getWorkspaceMembers: async () => [member] }) }))
 const token: any = { account: 'user', workspace: 'local', extra: {} }
 beforeEach(() => {
   member.role = AccountRole.User
+  doc._class = document.class.Document
+  documentId.objectAttr = 'content'
+  token.extra = {}
   doc.content = 'blob'
   delete doc.lockedBy
   space.guidelineReaders = ['user']
@@ -59,6 +64,23 @@ describe('collaborative document access', () => {
     expect(await access.check()).toBe(true)
     member.role = AccountRole.Owner
     doc.lockedBy = 'owner'
+    expect(await access.check()).toBe(true)
+  })
+})
+
+describe('task descriptions', () => {
+  beforeEach(() => {
+    doc._class = task.class.Task
+    documentId.objectAttr = 'description'
+  })
+  it.each(Object.values(AccountRole))('allows %s to edit descriptions', async (role) => {
+    member.role = role
+    const access = await openCollaborationAccess(token, 'local')
+    expect(await access.check()).toBe(false)
+  })
+  it.each([{ readonly: 'true' }, { readonlyAfter: String(Date.now() - 1000) }])('keeps billing read-only restrictions %j', async (extra) => {
+    token.extra = extra
+    const access = await openCollaborationAccess(token, 'local')
     expect(await access.check()).toBe(true)
   })
 })

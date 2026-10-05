@@ -31,7 +31,9 @@ export async function openCollaborationAccess (token: Token, documentName: strin
     const accountClient = getAccountClient(config.AccountsUrl, userToken)
     const members = await accountClient.getWorkspaceMembers()
     const role = members.find((member) => member.person === token.account)?.role
-    const readonly = isReadOnlyOrGuest(token.account, token.extra) || ![AccountRole.User, AccountRole.Maintainer, AccountRole.Owner].includes(role as AccountRole)
+    if (isReadOnlyOrGuest(token.account, token.extra)) return true
+    if (role !== undefined && Object.values(AccountRole).includes(role) && hierarchy.isDerived(doc._class, task.class.Task) && documentId.objectAttr === 'description') return false
+    const readonly = ![AccountRole.User, AccountRole.Maintainer, AccountRole.Owner].includes(role as AccountRole)
     if (readonly) return true
     if (hierarchy.isDerived(doc._class, document.class.Document)) {
       const space = await client.findOne(document.class.Teamspace, { _id: doc.space })

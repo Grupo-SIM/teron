@@ -14,7 +14,7 @@ import core, {
 } from '@hcengineering/core'
 import { getMetadata } from '@hcengineering/platform'
 import { getClient } from '@hcengineering/presentation'
-import task, { getTaskAssignees, type Task } from '@hcengineering/task'
+import task from '@hcengineering/task'
 import { canMutateWorkspaceClass } from './workspace-role-policy'
 
 export function canChangeAttribute (
@@ -26,12 +26,8 @@ export function canChangeAttribute (
 ): boolean {
   const account = getCurrentAccount()
   const ancestors = getClient().getHierarchy().getAncestors(_class)
-  if (!hasAccountRole(account, AccountRole.Maintainer)) {
+  if (!ancestors.includes(task.class.Task) && !hasAccountRole(account, AccountRole.Maintainer)) {
     if (!hasAccountRole(account, AccountRole.User)) return false
-    if (ancestors.includes(task.class.Task)) {
-      if (attr.name !== 'description' && attr.name !== 'status') return false
-      if (attr.name === 'status' && (object === undefined || !getTaskAssignees(object as Task).includes(getCurrentEmployee()))) return false
-    }
     if (ancestors.includes('document:class:Document' as Ref<Class<Doc>>) && object !== undefined && (object as Doc & { lockedBy?: unknown }).lockedBy != null) return false
     if (ancestors.some((id) => ['calendar:class:Event', 'calendar:class:Calendar', 'calendar:class:Schedule', 'time:class:ToDo'].includes(id))) {
       if (object === undefined) return false

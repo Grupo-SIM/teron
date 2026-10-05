@@ -1337,6 +1337,23 @@ describe('account utils', () => {
         })
       })
 
+      test('should not mark read-only guest task access as globally read-only', async () => {
+        ;(mockDb.workspace.findOne as jest.Mock).mockResolvedValue(mockWorkspace)
+        ;(mockDb.account.findOne as jest.Mock).mockResolvedValue(mockAccount)
+        ;(mockDb.getWorkspaceRole as jest.Mock).mockResolvedValue(AccountRole.ReadOnlyGuest)
+        ;(mockDb.workspaceStatus.findOne as jest.Mock).mockResolvedValue({ isDisabled: false })
+        ;(mockDb.person.findOne as jest.Mock).mockResolvedValue(mockPerson)
+
+        const result = await selectWorkspace(mockCtx, mockDb, mockBranding, userToken, {
+          workspaceUrl,
+          kind: 'external'
+        })
+
+        expect(result.role).toBe(AccountRole.ReadOnlyGuest)
+        expect(result.readOnly).toBeUndefined()
+        expect(generateToken).toHaveBeenLastCalledWith(mockAccount.uuid, mockWorkspace.uuid, {}, undefined, expect.any(Object))
+      })
+
       test('should throw error if account not found', async () => {
         ;(mockDb.account.findOne as jest.Mock).mockResolvedValue(null)
 

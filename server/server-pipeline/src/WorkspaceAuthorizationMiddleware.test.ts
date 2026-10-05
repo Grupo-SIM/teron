@@ -7,6 +7,7 @@ import platform, { PlatformError } from '@hcengineering/platform'
 import document from '@hcengineering/document'
 import calendar from '@hcengineering/calendar'
 import attachment from '@hcengineering/attachment'
+import tracker from '@hcengineering/tracker'
 import time from '@hcengineering/time'
 import { type Middleware, type PipelineContext } from '@hcengineering/server-core'
 import { WorkspaceAuthorizationMiddleware } from './WorkspaceAuthorizationMiddleware'
@@ -23,6 +24,7 @@ const docs = new Map<string, object>([
   ['folder', { _id: 'folder', _class: drive.class.Folder, space, parent: drive.ids.Root, path: [], createdBy: 'other' }],
   ['foreignFolder', { _id: 'foreignFolder', _class: drive.class.Folder, space: 'foreign', parent: drive.ids.Root, path: [] }],
   [user, { _id: user, _class: contact.class.SocialIdentity, attachedTo: person }],
+  ['project', { _id: 'project', _class: tracker.class.Project, space, sequence: 1 }],
   ['task', { _id: 'task', _class: task.class.Task, space, assignees: [person] }],
   ['otherTask', { _id: 'otherTask', _class: task.class.Task, space, assignees: [] }],
   ['event', { _id: 'event', _class: calendar.class.Event, space, user }],
@@ -74,16 +76,34 @@ describe('server authorization before persistence', () => {
     await expect(middleware.tx(ctx, [update('folder', drive.class.Folder, { title: 'New' })])).rejects.toMatchObject({ status: { code: platform.status.Forbidden } })
     expect(forward).toHaveBeenCalledTimes(3)
   })
+  it.each(Object.values(AccountRole))('allows %s task CRUD, unassigned status and sequence allocation', async (role) => {
+    const { middleware, ctx, forward } = fixture(role)
+    const create = { _class: core.class.TxCreateDoc, objectId: 'new-task', objectClass: task.class.Task, objectSpace: space, attributes: { attachedTo: 'task', attachedToClass: task.class.Task, collection: 'tasks', title: 'New' } } as unknown as Tx
+    const remove = { _class: core.class.TxRemoveDoc, objectId: 'new-task', objectClass: task.class.Task, objectSpace: space } as unknown as Tx
+    await middleware.tx(ctx, [update('project', tracker.class.Project, { $inc: { sequence: 1 } })])
+    await middleware.tx(ctx, [{ _class: core.class.TxApplyIf, txes: [create, update('new-task', task.class.Task, { title: 'Changed', dueDate: 0 }), update('otherTask', task.class.Task, { status: 'done' }), update('task', task.class.Task, { $push: { assignees: 'other' } }), remove] } as unknown as Tx])
+    expect(forward).toHaveBeenCalledTimes(2)
+  })
+  it.each([AccountRole.User, AccountRole.ReadOnlyGuest, AccountRole.DocGuest])('protects %s inaccessible parents, moves and project changes', async (role) => {
+    const { middleware, ctx } = fixture(role)
+    await middleware.tx(ctx, [update('task', task.class.Task, { space: 'readerSpace' })])
+    await expect(middleware.tx(ctx, [update('task', task.class.Task, { space: 'hidden' })])).rejects.toThrow()
+    await expect(middleware.tx(ctx, [update('task', task.class.Task, { $set: { '_id.value': 'forged' } })])).rejects.toThrow()
+    await expect(middleware.tx(ctx, [update('project', tracker.class.Project, { $inc: { sequence: 2 } })])).rejects.toThrow()
+    await expect(middleware.tx(ctx, [update('project', tracker.class.Project, { $inc: { sequence: 1 }, name: 'Forged' })])).rejects.toThrow()
+    const create = { _class: core.class.TxCreateDoc, objectId: 'new-task', objectClass: task.class.Task, objectSpace: space, attributes: { attachedTo: 'hidden', attachedToClass: task.class.Task, collection: 'tasks' } } as unknown as Tx
+    await expect(middleware.tx(ctx, [create])).rejects.toThrow()
+  })
   it('allows assigned status and accessible descriptions, forwarding once', async () => {
     const { middleware, ctx, forward } = fixture()
     await middleware.tx(ctx, [update('task', task.class.Task, { status: 'done' }), update('otherTask', task.class.Task, { description: 'text' })])
     expect(forward).toHaveBeenCalledTimes(1)
   })
-  it('allows members to estimate accessible tasks without changing structural fields', async () => {
+  it('allows members to estimate and change accessible task structure', async () => {
     const { middleware, ctx, forward } = fixture()
     await middleware.tx(ctx, [update('otherTask', task.class.Task, { estimation: 1.5 })])
-    await expect(middleware.tx(ctx, [update('otherTask', task.class.Task, { estimation: 2, dueDate: 0 })])).rejects.toThrow()
-    expect(forward).toHaveBeenCalledTimes(1)
+    await middleware.tx(ctx, [update('otherTask', task.class.Task, { estimation: 2, dueDate: 0 })])
+    expect(forward).toHaveBeenCalledTimes(2)
   })
   it('enforces inherited reader/editor grants and denies editor deletion', async () => {
     const { middleware, ctx, forward } = fixture()
@@ -106,19 +126,18 @@ describe('server authorization before persistence', () => {
     await expect(middleware.tx(ctx, [{ ...create, attributes: { ...(create as any).attributes, calendar: 'hidden-calendar' } } as unknown as Tx])).rejects.toThrow()
     expect(forward).toHaveBeenCalledTimes(1)
   })
-  it('prevents personal agenda completion from changing an unassigned task status', async () => {
+  it('allows personal agenda completion linked to an unassigned task', async () => {
     const { middleware, ctx } = fixture()
-    await expect(middleware.tx(ctx, [update('todo', time.class.ToDo, { doneOn: 123 })])).rejects.toThrow()
+    await middleware.tx(ctx, [update('todo', time.class.ToDo, { doneOn: 123 })])
     await middleware.tx(ctx, [update('todo', time.class.ToDo, { description: 'personal note' })])
   })
-  it('rejects a batch containing any structural change without forwarding', async () => {
+  it('rejects a batch containing an inaccessible task without forwarding', async () => {
     const { middleware, ctx, forward } = fixture()
-    await expect(middleware.tx(ctx, [update('task', task.class.Task, { description: 'text' }), update('task', task.class.Task, { dueDate: 0 })])).rejects.toThrow()
+    await expect(middleware.tx(ctx, [update('task', task.class.Task, { description: 'text' }), update('hidden', task.class.Task, { dueDate: 0 })])).rejects.toThrow()
     expect(forward).not.toHaveBeenCalled()
   })
-  it('rejects non-assigned status and other peoples events', async () => {
+  it('rejects other peoples events', async () => {
     const { middleware, ctx, forward } = fixture()
-    await expect(middleware.tx(ctx, [update('otherTask', task.class.Task, { status: 'done' })])).rejects.toThrow()
     await expect(middleware.tx(ctx, [update('otherEvent', calendar.class.Event, { title: 'x' })])).rejects.toThrow()
     expect(forward).not.toHaveBeenCalled()
   })
@@ -162,9 +181,9 @@ describe('server authorization before persistence', () => {
     await expect(middleware.tx(ctx, [update('ownPresence', core.class.UserStatus, { online: 'true' })])).rejects.toThrow()
     expect(forward).toHaveBeenCalledTimes(2)
   })
-  it('refuses readonly members and preserves trusted trigger transactions', async () => {
+  it('refuses readonly non-task edits and preserves trusted trigger transactions', async () => {
     const { middleware, ctx, forward } = fixture(AccountRole.ReadOnlyGuest)
-    await expect(middleware.tx(ctx, [update('task', task.class.Task, { description: 'text' })])).rejects.toThrow()
+    await expect(middleware.tx(ctx, [update('event', calendar.class.Event, { title: 'text' })])).rejects.toThrow()
     ctx.contextData.isTriggerCtx = true
     await middleware.tx(ctx, [update('task', task.class.Task, { $inc: { comments: 1 } })])
     expect(forward).toHaveBeenCalledTimes(1)

@@ -13,8 +13,7 @@
 // limitations under the License.
 -->
 <script lang="ts">
-  import { AttachedData, Ref, WithLookup, AccountRole, getCurrentAccount, hasAccountRole } from '@hcengineering/core'
-  import { getCurrentEmployee } from '@hcengineering/contact'
+  import { AttachedData, Ref, WithLookup } from '@hcengineering/core'
   import { getClient } from '@hcengineering/presentation'
   import { getTaskTypeStates } from '@hcengineering/task'
   import { taskTypeStore } from '@hcengineering/task-resources'
@@ -56,8 +55,7 @@
   export let focusIndex: number | undefined = undefined
   export let short: boolean = false
 
-  $: canChangeStatus = isEditable && (hasAccountRole(getCurrentAccount(), AccountRole.Maintainer) ||
-    ((value as Issue & { assignees?: string[] }).assignees ?? (value.assignee == null ? [] : [value.assignee])).includes(getCurrentEmployee()))
+  $: canChangeStatus = isEditable
 
   const client = getClient()
   const dispatch = createEventDispatcher()

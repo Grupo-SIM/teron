@@ -21,6 +21,8 @@ import core, {
   AccountRole,
   hasAccountRole,
   type Doc,
+  type Class,
+  type Ref,
   type Space,
   type TypedSpace
 } from '@hcengineering/core'
@@ -41,6 +43,7 @@ function isSpaceOwner (space: Space): boolean {
 export async function canDeleteObject (doc?: Doc | Doc[]): Promise<boolean> {
   if (!hasAccountRole(getCurrentAccount(), AccountRole.Maintainer) &&
     (doc === undefined || !(Array.isArray(doc) ? doc : [doc]).every((item) =>
+      getClient().getHierarchy().getAncestors(item._class).includes('task:class:Task' as Ref<Class<Doc>>) ||
       canDeleteWorkspaceFolder(getCurrentAccount(), getClient().getHierarchy().getAncestors(item._class))))) return false
   if (doc === undefined) {
     return false

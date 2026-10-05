@@ -14,7 +14,7 @@
 -->
 <script lang="ts">
   import { AttachmentStyleBoxCollabEditor } from '@hcengineering/attachment-resources'
-  import { Class, Doc, Ref, WithLookup, AccountRole, getCurrentAccount, hasAccountRole } from '@hcengineering/core'
+  import { Class, Doc, Ref, WithLookup } from '@hcengineering/core'
   import { Panel } from '@hcengineering/panel'
   import presentation, {
     ActionContext,
@@ -77,7 +77,7 @@
   }
 
   let effectiveReadonly = true
-  $: structureReadonly = effectiveReadonly || !hasAccountRole(getCurrentAccount(), AccountRole.Maintainer)
+  $: structureReadonly = effectiveReadonly
   $: if (issue !== undefined) {
     const currentIssue = issue
     void canEditIssue(currentIssue).then((canEdit) => {

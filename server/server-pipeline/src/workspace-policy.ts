@@ -1,14 +1,14 @@
 import core, {
   AccountRole, hasAccountRole, systemAccountUuid, type Account, type Doc,
-  type Tx, type TxApplyIf, type TxCUD, type TxUpdateDoc
+  type Tx, type TxApplyIf, type TxCUD
 } from '@hcengineering/core'
 
-/** Inspect operator targets, including dotted paths; never trust client counter updates. */
-export function changedFields (operations: Record<string, unknown>): string[] {
+/** Inspect operator targets, including dotted paths; task edits also support array and counter operators. */
+export function changedFields (operations: Record<string, unknown>, allowTaskOperators = false): string[] {
   const fields = new Set<string>()
   for (const [key, value] of Object.entries(operations)) {
     if (key.startsWith('$')) {
-      if (key !== '$set' && key !== '$unset') return ['*']
+      if (key !== '$set' && key !== '$unset' && !(allowTaskOperators && ['$push', '$pull', '$inc', '$update'].includes(key))) return ['*']
       if (value === null || typeof value !== 'object' || Array.isArray(value)) return ['*']
       for (const field of Object.keys(value)) fields.add(field.split('.')[0])
     } else fields.add(key.split('.')[0])
@@ -29,18 +29,4 @@ export function clientTransactions (transactions: Tx[]): TxCUD<Doc>[] {
 
 export function isWorkspaceAdministrator (account: Account): boolean {
   return account.uuid === systemAccountUuid || hasAccountRole(account, AccountRole.Maintainer)
-}
-
-export function memberTaskUpdateAllowed (tx: Tx, doc: Doc & { assignees?: string[], assignee?: string | null }, people: string[]): boolean {
-  if (tx._class !== core.class.TxUpdateDoc) return false
-  const operations = (tx as TxUpdateDoc<Doc>).operations as Record<string, any>
-  const fields = changedFields(operations)
-  if (fields.includes('status') && typeof (operations.status ?? operations.$set?.status) !== 'string') return false
-  if (Object.keys(operations).some((key) => key.includes('.')) || Object.keys(operations.$set ?? {}).some((key) => key.includes('.'))) return false
-  if (fields.includes('estimation')) {
-    const estimation = operations.estimation ?? operations.$set?.estimation
-    if (typeof estimation !== 'number' || !Number.isFinite(estimation) || estimation < 0) return false
-  }
-  const assigned = (doc.assignees ?? (doc.assignee == null ? [] : [doc.assignee])).some((id) => people.includes(id))
-  return fields.every((field) => field === 'description' || field === 'estimation' || (field === 'status' && assigned))
 }

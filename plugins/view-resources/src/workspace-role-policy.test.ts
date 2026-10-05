@@ -22,15 +22,14 @@ describe('workspace role ceiling', () => {
     expect(canMutateWorkspaceClass(member, classes, 'update', 'parent')).toBe(false)
     expect(canMutateWorkspaceClass(member, classes, 'remove')).toBe(false)
   })
-  test('derived tasks retain description/status/estimation edits', () => {
-    const member = account(AccountRole.User)
+  test.each(Object.values(AccountRole))('all roles can manage derived tasks (%s)', (role) => {
     const classes = ['tracker:class:Issue', 'task:class:Task']
-    expect(canMutateWorkspaceClass(member, classes, 'update', 'description')).toBe(true)
-    expect(canMutateWorkspaceClass(member, classes, 'update', 'status')).toBe(true)
-    expect(canMutateWorkspaceClass(member, classes, 'update', 'estimation')).toBe(true)
-    expect(canMutateWorkspaceClass(member, classes, 'update', 'assignees')).toBe(false)
-    expect(canMutateWorkspaceClass(member, classes, 'create')).toBe(false)
-    expect(canMutateWorkspaceClass(member, classes, 'remove')).toBe(false)
+    for (const operation of ['create', 'update', 'remove'] as const) {
+      expect(canMutateWorkspaceClass(account(role), classes, operation)).toBe(true)
+    }
+    for (const field of ['description', 'status', 'estimation', 'assignees', 'dueDate', 'title', 'priority']) {
+      expect(canMutateWorkspaceClass(account(role), classes, 'update', field)).toBe(true)
+    }
   })
   test('members retain folder creation/deletion, but cannot rename', () => {
     const member = account(AccountRole.User)

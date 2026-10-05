@@ -16,7 +16,6 @@
 import { Analytics } from '@hcengineering/analytics'
 import { type Person } from '@hcengineering/contact'
 import core, {
-  AccountRole,
   SortingOrder,
   toIdMap,
   type ApplyOperations,
@@ -35,7 +34,6 @@ import core, {
   type TxOperations,
   type TxResult,
   type TxUpdateDoc,
-  getCurrentAccount,
   type WithLookup
 } from '@hcengineering/core'
 import { type IntlString } from '@hcengineering/platform'
@@ -249,26 +247,7 @@ export async function moveIssuesToAnotherMilestone (
 }
 
 export async function canEditIssue (issue?: Issue | WithLookup<Issue>): Promise<boolean> {
-  const client = getClient()
-  if (issue === undefined) return false
-
-  const account = getCurrentAccount()
-  const isGuest =
-    account.role === AccountRole.DocGuest ||
-    account.role === AccountRole.ReadOnlyGuest
-
-  if (!isGuest) return true
-
-  const isCreator =
-    issue.createdBy !== undefined && Array.isArray(account.socialIds) && account.socialIds.includes(issue.createdBy)
-
-  if (isCreator) return true
-
-  const collaborator = await client.findOne(core.class.Collaborator, {
-    attachedTo: issue._id,
-    collaborator: account.uuid
-  })
-  return collaborator !== undefined
+  return issue !== undefined
 }
 
 export function getTimeReportDate (type: TimeReportDayType): number {

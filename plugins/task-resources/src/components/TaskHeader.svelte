@@ -14,9 +14,8 @@
 // limitations under the License.
 -->
 <script lang="ts">
-  import { AccountRole, getCurrentAccount, hasAccountRole, Doc, Mixin } from '@hcengineering/core'
+  import { Doc, Mixin } from '@hcengineering/core'
   import { AttributesBar, getClient, KeyedAttribute } from '@hcengineering/presentation'
-  import { getCurrentEmployee } from '@hcengineering/contact'
   import { EmployeeArrayEditor } from '@hcengineering/contact-resources'
   import { getTaskAssignees } from '@hcengineering/task'
   import { Task } from '@hcengineering/task'
@@ -35,11 +34,9 @@
   const hierarchy = client.getHierarchy()
 
   async function change (assignees: Task['assignees']): Promise<void> {
-    if (readonly || !hasAccountRole(getCurrentAccount(), AccountRole.Maintainer)) return
+    if (readonly) return
     await client.update(object, { assignees: getTaskAssignees({ assignees }) })
   }
-  $: administrator = hasAccountRole(getCurrentAccount(), AccountRole.Maintainer)
-  $: statusReadonly = readonly || (!administrator && !getTaskAssignees(object).includes(getCurrentEmployee()))
   $: assigneeTitle = hierarchy.getAttribute(object._class, 'assignees').label
   const taskKeys = ['status', 'assignee', 'assignees']
 
@@ -53,26 +50,23 @@
         label={assigneeTitle}
         value={getTaskAssignees(object)}
         onChange={change}
-        readonly={readonly || !hasAccountRole(getCurrentAccount(), AccountRole.Maintainer)}
+        {readonly}
       />
       <div class="column">
-        <AttributesBar {object} _class={object._class} keys={filtredKeys} readonly={readonly || !administrator} />
+        <AttributesBar {object} _class={object._class} keys={filtredKeys} {readonly} />
       </div>
     </div>
-    <AttributesBar {object} _class={object._class} keys={['status']} showHeader={false} readonly={statusReadonly} />
+    <AttributesBar {object} _class={object._class} keys={['status']} showHeader={false} {readonly} />
   </div>
 {:else}
   <DocAttributeBar
     {object}
-    ignoreKeys={administrator ? ignoreKeys : [...ignoreKeys, 'status']}
+    {ignoreKeys}
     {mixins}
     {allowedCollections}
-    readonly={readonly || !administrator}
+    {readonly}
     on:update
   />
-  {#if !administrator && !ignoreKeys.includes('status')}
-    <AttributesBar {object} _class={object._class} keys={['status']} readonly={statusReadonly} />
-  {/if}
 {/if}
 
 <style lang="scss">

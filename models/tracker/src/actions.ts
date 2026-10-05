@@ -158,7 +158,6 @@ export function createActions (builder: Builder, issuesId: string, myIssuesId: s
   createAction(
     builder,
     {
-      secured: true,
       action: tracker.actionImpl.DeleteIssue,
       label: workbench.string.Delete,
       icon: view.icon.Delete,
@@ -186,7 +185,6 @@ export function createActions (builder: Builder, issuesId: string, myIssuesId: s
   createAction(
     builder,
     {
-      secured: true,
       action: view.actionImpl.ShowPopup,
       actionProps: {
         component: tracker.component.CreateIssue,
@@ -212,7 +210,6 @@ export function createActions (builder: Builder, issuesId: string, myIssuesId: s
   createAction(
     builder,
     {
-      secured: true,
       action: view.actionImpl.ShowPopup,
       actionProps: {
         component: tracker.component.CreateIssue,
@@ -235,7 +232,6 @@ export function createActions (builder: Builder, issuesId: string, myIssuesId: s
   createAction(
     builder,
     {
-      secured: true,
       action: view.actionImpl.ShowPopup,
       actionProps: {
         component: tracker.component.CreateIssue,
@@ -262,7 +258,6 @@ export function createActions (builder: Builder, issuesId: string, myIssuesId: s
   createAction(
     builder,
     {
-      secured: true,
       action: view.actionImpl.ShowPopup,
       actionProps: {
         component: tracker.component.SetParentIssueActionPopup,
@@ -287,7 +282,6 @@ export function createActions (builder: Builder, issuesId: string, myIssuesId: s
   createAction(
     builder,
     {
-      secured: true,
       action: view.actionImpl.UpdateDocument,
       actionProps: {
         key: 'attachedTo',
@@ -313,7 +307,6 @@ export function createActions (builder: Builder, issuesId: string, myIssuesId: s
 
 
   createAction(builder, {
-    secured: true,
     action: view.actionImpl.ShowPopup,
     actionPopup: tracker.component.SetParentIssueActionPopup,
     actionProps: {
@@ -390,7 +383,6 @@ export function createActions (builder: Builder, issuesId: string, myIssuesId: s
   createAction(
     builder,
     {
-      secured: true,
       action: view.actionImpl.ValueSelector,
       actionPopup: view.component.ValueSelector,
       actionProps: {
@@ -415,7 +407,6 @@ export function createActions (builder: Builder, issuesId: string, myIssuesId: s
   createAction(
     builder,
     {
-      secured: true,
       action: view.actionImpl.AttributeSelector,
       actionPopup: tracker.component.AssigneeEditor,
       actionProps: {
@@ -444,7 +435,6 @@ export function createActions (builder: Builder, issuesId: string, myIssuesId: s
   createAction(
     builder,
     {
-      secured: true,
       action: view.actionImpl.AttributeSelector,
       actionPopup: tracker.component.MilestoneEditor,
       actionProps: {
@@ -469,7 +459,6 @@ export function createActions (builder: Builder, issuesId: string, myIssuesId: s
   createAction(
     builder,
     {
-      secured: true,
       action: view.actionImpl.ShowPopup,
       actionProps: {
         component: tags.component.ObjectsTagsEditorPopup,
@@ -496,7 +485,6 @@ export function createActions (builder: Builder, issuesId: string, myIssuesId: s
   createAction(
     builder,
     {
-      secured: true,
       action: view.actionImpl.ShowPopup,
       actionProps: {
         component: tracker.component.SetDueDateActionPopup,
@@ -547,7 +535,6 @@ export function createActions (builder: Builder, issuesId: string, myIssuesId: s
   createAction(
     builder,
     {
-      secured: true,
       action: tracker.actionImpl.Move,
       label: tracker.string.MoveToProject,
       icon: view.icon.Move,
@@ -566,7 +553,6 @@ export function createActions (builder: Builder, issuesId: string, myIssuesId: s
   createAction(
     builder,
     {
-      secured: true,
       action: view.actionImpl.ValueSelector,
       actionPopup: tracker.component.RelationsPopup,
       actionProps: {
@@ -588,7 +574,6 @@ export function createActions (builder: Builder, issuesId: string, myIssuesId: s
   createAction(
     builder,
     {
-      secured: true,
       action: view.actionImpl.ShowPopup,
       actionProps: {
         component: tracker.component.CreateIssue,

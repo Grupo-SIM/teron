@@ -12,10 +12,11 @@ import document, { guidelineAccessFor, type Teamspace } from '@hcengineering/doc
 import love from '@hcengineering/love'
 import notification from '@hcengineering/notification'
 import preference from '@hcengineering/preference'
-import task, { getTaskAssignees, type Task } from '@hcengineering/task'
+import task from '@hcengineering/task'
+import tracker from '@hcengineering/tracker'
 import time, { type ToDo } from '@hcengineering/time'
 import { BaseMiddleware, type Middleware, type PipelineContext, type TxMiddlewareResult } from '@hcengineering/server-core'
-import { changedFields, clientTransactions, isWorkspaceAdministrator, memberTaskUpdateAllowed } from './workspace-policy'
+import { changedFields, clientTransactions, isWorkspaceAdministrator } from './workspace-policy'
 
 /** Runs before triggers; only trusted server trigger contexts can bypass client restrictions. */
 export class WorkspaceAuthorizationMiddleware extends BaseMiddleware {
@@ -27,7 +28,6 @@ export class WorkspaceAuthorizationMiddleware extends BaseMiddleware {
     const account = ctx.contextData.account
     if (account.uuid === systemAccountUuid || ctx.contextData.isTriggerCtx === true) return await this.provideTx(ctx, txes)
     const administrator = isWorkspaceAdministrator(account)
-    if (!hasAccountRole(account, AccountRole.User)) throw new PlatformError(new Status(Severity.ERROR, platform.status.Forbidden, {}))
     const reader = this.context.head ?? this.next
     if (reader === undefined) throw new Error('Missing authorization reader.')
     const people = await reader.findAll(ctx, contact.class.SocialIdentity, { _id: { $in: account.socialIds } })
@@ -38,6 +38,9 @@ export class WorkspaceAuthorizationMiddleware extends BaseMiddleware {
     const getVerifiedSocialIds = this.context.contextVars?.getVerifiedSocialIds as
       ((account: AccountUuid) => Promise<SocialId[]>) | undefined
     for (const tx of clientTransactions(txes)) {
+      const isTask = hierarchy.isDerived(tx.objectClass, task.class.Task)
+      const taskSequence = tx.objectClass === tracker.class.Project && tx._class === core.class.TxUpdateDoc && JSON.stringify((tx as TxUpdateDoc<Doc>).operations) === JSON.stringify({ $inc: { sequence: 1 } })
+      if (!isTask && !taskSequence && !hasAccountRole(account, AccountRole.User)) throw new PlatformError(new Status(Severity.ERROR, platform.status.Forbidden, {}))
       const created = tx._class === core.class.TxCreateDoc
       const updated = tx._class === core.class.TxUpdateDoc
       const data = created
@@ -61,11 +64,17 @@ export class WorkspaceAuthorizationMiddleware extends BaseMiddleware {
           if (parent.space !== tx.objectSpace && !hierarchy.isDerived(data._class, calendar.class.Event) && !hierarchy.isDerived(data._class, time.class.ToDo)) throw new Error('Cannot attach content across spaces.')
         }
       }
-      const fields = updated ? changedFields((tx as TxUpdateDoc<Doc>).operations) : []
-      if (updated && fields.some((field) => (field === '*' ? tx.objectClass !== chunter.class.Channel : ['_id', '_class', 'space', 'createdBy', 'createdOn', 'modifiedBy', 'modifiedOn'].includes(field)))) throw new Error('Cannot change document identity or move content.')
+      const fields = updated ? changedFields((tx as TxUpdateDoc<Doc>).operations, isTask || taskSequence) : []
+      if (updated && fields.some((field) => (field === '*' ? tx.objectClass !== chunter.class.Channel : ['_id', '_class', ...(isTask ? [] : ['space']), 'createdBy', 'createdOn', 'modifiedBy', 'modifiedOn'].includes(field)))) throw new Error('Cannot change document identity or move content.')
+      if (isTask && updated && fields.includes('space')) {
+        const moved = TxProcessor.updateDoc2Doc({ ...data }, tx as TxUpdateDoc<Doc>)
+        if (typeof moved.space !== 'string' || (await reader.findAll(ctx, core.class.Space, { _id: moved.space })).length === 0) throw new Error('Cannot move a task to an inaccessible space.')
+      }
       let allowed = false
-      if (hierarchy.isDerived(tx.objectClass, task.class.Task)) {
-        allowed = memberTaskUpdateAllowed(tx, data, personIds)
+      if (isTask) {
+        allowed = true
+      } else if (taskSequence) {
+        allowed = true
       } else if (tx.objectClass === core.class.UserStatus) {
         const status = data as Doc & { user: AccountUuid, online: boolean }
         const nextStatus = updated ? TxProcessor.updateDoc2Doc({ ...status }, tx as TxUpdateDoc<Doc>) : status
@@ -86,7 +95,7 @@ export class WorkspaceAuthorizationMiddleware extends BaseMiddleware {
         const todo = data as ToDo
         if (allowed && hierarchy.isDerived(todo.attachedToClass, task.class.Task) && (created || fields.includes('doneOn'))) {
           const parent = pending.get(todo.attachedTo) ?? (await reader.findAll(ctx, todo.attachedToClass, { _id: todo.attachedTo }))[0]
-          allowed = parent !== undefined && getTaskAssignees(parent as Task).some((person) => personIds.includes(person))
+          allowed = parent !== undefined
         }
       } else if (hierarchy.isDerived(tx.objectClass, calendar.class.Event)) {
         const eventCalendar = (await reader.findAll(ctx, calendar.class.Calendar, { _id: (data as Event).calendar }))[0]
@@ -160,6 +169,7 @@ export class WorkspaceAuthorizationMiddleware extends BaseMiddleware {
       }
       if (!allowed) throw new PlatformError(new Status(Severity.ERROR, platform.status.Forbidden, {}))
       if (created) pending.set(tx.objectId, data)
+      else if (isTask && updated) pending.set(tx.objectId, TxProcessor.updateDoc2Doc({ ...data }, tx as TxUpdateDoc<Doc>))
     }
     return await this.provideTx(ctx, txes)
   }

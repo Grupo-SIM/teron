@@ -13,8 +13,7 @@ const memberFields: Record<string, string[]> = {
   'calendar:class:Calendar': ['name', 'hidden', 'visibility'],
   'calendar:class:Schedule': ['title', 'description', 'meetingDuration', 'meetingInterval', 'availability', 'timeZone', 'calendar'],
   'calendar:class:Event': ['title', 'description', 'date', 'dueDate', 'allDay', 'timeZone', 'visibility', 'participants', 'externalParticipants', 'location', 'reminders', 'rules', 'rdate', 'exdate', 'isCancelled'],
-  'time:class:ToDo': ['title', 'description', 'doneOn', 'priority', 'visibility', 'rank'],
-  'task:class:Task': ['description', 'status', 'estimation']
+  'time:class:ToDo': ['title', 'description', 'doneOn', 'priority', 'visibility', 'rank']
 }
 
 /** Workspace role ceiling; ownership and per-space permissions still apply separately. */
@@ -24,13 +23,11 @@ export function canMutateWorkspaceClass (
   operation: 'create' | 'update' | 'remove',
   field?: string
 ): boolean {
+  if (ancestors.includes('task:class:Task')) return true
   if (hasAccountRole(account, AccountRole.Maintainer)) return true
   if (!hasAccountRole(account, AccountRole.User)) return false
   if (ancestors.includes('drive:class:Folder')) return operation === 'create' || operation === 'remove'
   if (ancestors.includes('drive:class:Folder')) return operation === 'create' || operation === 'remove'
-  if (ancestors.includes('task:class:Task')) {
-    return operation === 'update' && (field === undefined || memberFields['task:class:Task'].includes(field))
-  }
   const content = ancestors.find((id) => memberContent.has(id))
   if (content === undefined) return false
   if (operation === 'remove' && (content === 'document:class:Document' || content === 'calendar:class:Calendar')) return false

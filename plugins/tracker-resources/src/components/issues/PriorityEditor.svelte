@@ -13,7 +13,7 @@
 // limitations under the License.
 -->
 <script lang="ts">
-  import { AttachedData, AccountRole, getCurrentAccount, hasAccountRole } from '@hcengineering/core'
+  import { AttachedData } from '@hcengineering/core'
   import { getClient } from '@hcengineering/presentation'
   import { Issue, IssueDraft, IssuePriority, IssueTemplateData, TrackerEvents } from '@hcengineering/tracker'
   import { ButtonKind, ButtonSize } from '@hcengineering/ui'
@@ -34,7 +34,7 @@
 
   const client = getClient()
   const dispatch = createEventDispatcher()
-  $: canEditPriority = isEditable && hasAccountRole(getCurrentAccount(), AccountRole.Maintainer)
+  $: canEditPriority = isEditable
   $: selectedPriority = value.priority
 
   const changePriority = async (newPriority: IssuePriority | undefined) => {
