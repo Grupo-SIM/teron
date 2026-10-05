@@ -1310,7 +1310,7 @@ export async function resendInvite (
 
 /**
  * Given an invite and sign in information, assigns the user to the workspace in a given role.
- * If already a member, updates the role if necessary.
+ * Existing members retain their current role and can reopen accepted invitations.
  * Returns the workspace login information.
  */
 export async function join (
@@ -1332,20 +1332,18 @@ export async function join (
     throw new PlatformError(new Status(Severity.ERROR, platform.status.BadRequest, {}))
   }
 
-  const workspaceJoinInfo = await getWorkspaceJoinInfo(ctx, db, email, inviteId, workspaceUrl)
+  const { token, account } = await login(ctx, db, branding, _token, { email, password })
+
+  if (token == null) {
+    return { account }
+  }
+
+  const workspaceJoinInfo = await getWorkspaceJoinInfo(ctx, db, email, inviteId, workspaceUrl, account)
   ctx.info('Joining a workspace using invite', {
     email,
     normalizedEmail: workspaceJoinInfo.email,
     ...workspaceJoinInfo.invite
   })
-
-  const { token, account } = await login(ctx, db, branding, _token, { email: workspaceJoinInfo.email, password })
-
-  if (token == null) {
-    return {
-      account
-    }
-  }
 
   return await doJoinByInvite(ctx, db, branding, token, account, workspaceJoinInfo.workspace, workspaceJoinInfo.invite)
 }
@@ -1401,7 +1399,7 @@ export async function getInviteInfo (
 }
 
 /**
- * Given an invite and a token, checks if the user has already joined the workspace and updates the role if necessary.
+ * Given an invite and a token, checks existing workspace membership without changing its role.
  * Returns the workspace login information if the user has already joined. Otherwise, throws an error.
  */
 export async function checkJoin (
@@ -1423,17 +1421,11 @@ export async function checkJoin (
   }
 
   const { account: accountUuid } = decodeTokenVerbose(ctx, token)
-  const emailSocialId = await db.socialId.findOne({
-    type: SocialIdType.EMAIL,
-    personUuid: accountUuid,
-    verifiedOn: { $gt: 0 }
-  })
-  const email = emailSocialId?.value ?? ''
-  const workspaceUuid = await checkInvite(ctx, invite, email)
+  const workspaceUuid = invite.workspaceUuid
   const workspace = await getWorkspaceById(db, workspaceUuid)
 
   if (workspace === null) {
-    ctx.error('Workspace not found in checkJoin', { workspaceUuid, email, inviteId })
+    ctx.error('Workspace not found in checkJoin', { workspaceUuid, inviteId })
     throw new PlatformError(new Status(Severity.ERROR, platform.status.WorkspaceNotFound, { workspaceUuid }))
   }
 
@@ -1442,16 +1434,7 @@ export async function checkJoin (
     throw new PlatformError(new Status(Severity.ERROR, platform.status.Forbidden, {}))
   }
 
-  const wsLoginInfo = await selectWorkspace(ctx, db, branding, token, { workspaceUrl: workspace.url, kind: 'external' })
-
-  if (getRolePower(wsLoginInfo.role) < getRolePower(invite.role)) {
-    await db.updateWorkspaceRole(accountUuid, workspaceUuid, invite.role)
-  }
-
-  return {
-    ...wsLoginInfo,
-    role: invite.role
-  }
+  return await selectWorkspace(ctx, db, branding, token, { workspaceUrl: workspace.url, kind: 'external' })
 }
 
 /**
@@ -1483,7 +1466,10 @@ export async function joinByToken (
     verifiedOn: { $gt: 0 }
   })
   const email = emailSocialId?.value ?? ''
-  const workspaceUuid = await checkInvite(ctx, invite, email)
+  const workspaceUuid = invite.workspaceUuid
+  if ((await db.getWorkspaceRole(accountUuid, workspaceUuid)) == null) {
+    await checkInvite(ctx, invite, email)
+  }
   const workspace = await getWorkspaceById(db, workspaceUuid)
 
   if (workspace === null) {
@@ -1581,15 +1567,6 @@ export async function checkAutoJoin (
           invite.role
         )
         if (!accepted) throw new PlatformError(new Status(Severity.ERROR, platform.status.Forbidden, {}))
-      } else if (getRolePower(targetRole) < getRolePower(invite.role)) {
-        const accepted = await db.consumeInviteAndAssignWorkspace(
-          invite.id,
-          targetAccount.uuid,
-          workspace.uuid,
-          invite.role
-        )
-        if (!accepted) throw new PlatformError(new Status(Severity.ERROR, platform.status.Forbidden, {}))
-        await db.updateWorkspaceRole(targetAccount.uuid, workspace.uuid, invite.role)
       }
 
       if (token === undefined || token === null) {

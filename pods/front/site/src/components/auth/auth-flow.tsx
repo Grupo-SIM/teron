@@ -342,7 +342,10 @@ export function AuthFlow({ variant, locale }: { variant: Variant; locale: Locale
     setStep("join");
     const [invite, account] = await Promise.all([
       api.getInviteInfo(id),
-      api.getLoginInfo().catch(() => null),
+      api.getLoginInfo().catch((cause: unknown) => {
+        if (cause instanceof AuthApiError && cause.code.split(":").at(-1) === "Unauthorized") return null;
+        throw cause;
+      }),
     ]);
     const accountToken = account && "token" in account ? account.token : undefined;
     setInviteWorkspace(invite.workspaceName ?? "");
@@ -353,8 +356,11 @@ export function AuthFlow({ variant, locale }: { variant: Variant; locale: Locale
     setHasCurrentAccount(accountToken !== undefined);
     try {
       await finishWorkspace(await api.checkJoin(id, accountToken));
-    } catch {
-      // The form remains available when the invite still needs authentication.
+    } catch (cause) {
+      // These responses are expected when the invite still needs authentication or acceptance.
+      if (!(cause instanceof AuthApiError) || !["Unauthorized", "Forbidden"].includes(cause.code.split(":").at(-1) ?? "")) {
+        throw cause;
+      }
     }
   }
 

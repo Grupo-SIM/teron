@@ -1,10 +1,10 @@
 import attachment from '@hcengineering/attachment'
 import calendar, { type Event } from '@hcengineering/calendar'
 import chunter from '@hcengineering/chunter'
-import contact, { type SocialIdentity } from '@hcengineering/contact'
+import contact, { type Person, type SocialIdentity } from '@hcengineering/contact'
 import core, {
   AccountRole, hasAccountRole, type Doc, type MeasureContext, type Ref, type SessionData,
-  systemAccountUuid, TxProcessor, type AccountUuid, type SocialId, type Tx, type TxCreateDoc, type TxUpdateDoc
+  systemAccountUuid, TxProcessor, type AccountUuid, type SocialId, type Tx, type TxCreateDoc, type TxMixin, type TxUpdateDoc
 } from '@hcengineering/core'
 import drive, { type Folder } from '@hcengineering/drive'
 import platform, { PlatformError, Severity, Status } from '@hcengineering/platform'
@@ -32,6 +32,8 @@ export class WorkspaceAuthorizationMiddleware extends BaseMiddleware {
     if (reader === undefined) throw new Error('Missing authorization reader.')
     const people = await reader.findAll(ctx, contact.class.SocialIdentity, { _id: { $in: account.socialIds } })
     const personIds = people.map((item) => item.attachedTo)
+    const ownPeople = await reader.findAll(ctx, contact.class.Person, { personUuid: account.uuid })
+    for (const person of ownPeople) if (!personIds.includes(person._id)) personIds.push(person._id)
     const hierarchy = this.context.hierarchy
     const pending = new Map<Ref<Doc>, Doc>()
     let verifiedIdentities: SocialId[] | undefined
@@ -80,13 +82,37 @@ export class WorkspaceAuthorizationMiddleware extends BaseMiddleware {
         const nextStatus = updated ? TxProcessor.updateDoc2Doc({ ...status }, tx as TxUpdateDoc<Doc>) : status
         allowed = status.user === account.uuid && typeof (nextStatus as typeof status).online === 'boolean' &&
           (created || (updated && fields.every((field) => field === 'online')))
+      } else if (tx.objectClass === contact.class.Person && tx.objectSpace === contact.space.Contacts) {
+        const person = data as Person
+        const ownPerson = person.personUuid === account.uuid || (person.personUuid == null && personIds.includes(person._id))
+        if (created) {
+          const attributes = (tx as TxCreateDoc<Person>).attributes
+          // Bootstrap only the authenticated account, never an arbitrary contact or employee.
+          allowed = person.personUuid === account.uuid && ownPeople.length === 0 &&
+            Object.keys(attributes).every((field) => ['personUuid', 'name', 'city', 'avatarType'].includes(field))
+        } else if (updated) {
+          const operations = (tx as TxUpdateDoc<Person>).operations
+          allowed = ownPerson && Object.keys(operations).length === 1 && operations.personUuid === account.uuid
+        } else if (tx._class === core.class.TxMixin) {
+          const mixin = tx as TxMixin<Person, Person>
+          const attributes = mixin.attributes as Record<string, unknown>
+          allowed = ownPerson && mixin.mixin === contact.mixin.Employee &&
+            ((Object.keys(attributes).length === 2 && attributes.active === true && attributes.role === 'USER' &&
+                (person as unknown as Record<string, any>)[contact.mixin.Employee]?.active !== false) ||
+              (Object.keys(attributes).length === 1 && typeof attributes.timezone === 'string'))
+        }
+        if (allowed && !personIds.includes(person._id)) personIds.push(person._id)
+        if (allowed && created) ownPeople.push(person)
       } else if (tx.objectClass === contact.class.SocialIdentity && (created || updated)) {
         if (getVerifiedSocialIds !== undefined && (created || fields.every((field) => ['type', 'value', 'key', 'verifiedOn', 'isDeleted'].includes(field)))) {
           verifiedIdentities ??= await getVerifiedSocialIds(account.uuid)
           const identity = updated ? TxProcessor.updateDoc2Doc({ ...data }, tx as TxUpdateDoc<Doc>) : data
           const verified = verifiedIdentities.find((item) => item._id === identity._id)
           const local = identity as SocialIdentity
-          allowed = local.collection === 'socialIds' && personIds.includes(local.attachedTo) && verified !== undefined && verified.verifiedOn != null &&
+          const owner = pending.get(local.attachedTo) ?? (await reader.findAll(ctx, contact.class.Person, { _id: local.attachedTo }))[0]
+          const ownsPerson = owner !== undefined && ((owner as Person).personUuid === account.uuid ||
+            ((owner as Person).personUuid == null && personIds.includes(owner._id)))
+          allowed = ownsPerson && local.attachedToClass === contact.class.Person && local.collection === 'socialIds' && personIds.includes(local.attachedTo) && verified !== undefined && verified.verifiedOn != null &&
             local.type === verified.type && local.value === verified.value && local.key === verified.key &&
             local.verifiedOn === verified.verifiedOn && (local.isDeleted === true) === (verified.isDeleted === true)
         }

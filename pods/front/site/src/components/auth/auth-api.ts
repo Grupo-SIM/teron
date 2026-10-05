@@ -257,6 +257,7 @@ export function authErrorMessage(error: unknown, locale: Locale): string {
   const messages = getDictionary(locale).authErrors;
   const match = code in messages ? messages[code as keyof typeof messages] : undefined;
   if (match) return match;
+  if (error instanceof AuthApiError) return messages.unknown;
   if (error instanceof Error && error.message) return error.message;
   return messages.unknown;
 }

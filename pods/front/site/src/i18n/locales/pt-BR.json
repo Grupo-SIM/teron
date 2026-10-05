@@ -143,6 +143,7 @@
     "InvalidOtp": "Código inválido ou expirado.",
     "AccountAlreadyExists": "Já existe uma conta com este e-mail.",
     "Unauthorized": "Sua sessão expirou. Entre novamente.",
+    "Forbidden": "Não foi possível acessar este convite. Se você já participa do workspace, entre pela tela de acesso.",
     "WorkspaceNotFound": "Workspace não encontrado.",
     "WorkspacePaymentRequired": "Conclua o pagamento para criar outro workspace.",
     "WorkspacePaymentFailed": "Não foi possível aprovar o pagamento. Revise os dados do cartão.",

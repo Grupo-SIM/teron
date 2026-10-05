@@ -12,6 +12,7 @@
 - Aumento entra em vigor após pagamento aprovado do valor proporcional ao tempo restante do ciclo.
 - Redução não gera crédito. Fica agendada para renovação e não pode ficar abaixo da ocupação atual.
 - Remover membro ou cancelar convite libera vaga, mas não reduz assinatura automaticamente.
+- Membro autenticado pode reabrir link de convite consumido ou expirado para acessar seu workspace; reingresso preserva papel atual e não consome convite nem vaga adicional. Conta sem vínculo continua sujeita à validade e ao destinatário do convite.
 - Vaga livre continua disponível para novo convite até Owner reduzir quantidade em Plano.
 
 ## Setores, projetos e tarefas
@@ -41,6 +42,7 @@
 
 ## Autorização de workspace
 
+- Inicialização permite provisionar perfil de funcionário da própria conta autenticada e sincronizar suas identidades confirmadas; não concede administração de contatos nem alteração do perfil de terceiros.
 - Owner/Maintainer administram estrutura, contatos, responsáveis, prazos, permissões e exclusões, respeitando acesso ao espaço.
 - Qualquer role pode criar, editar, excluir, mover e alterar status de tarefas acessíveis, incluindo responsáveis, prazos e prioridade; status não exige participação nos responsáveis. Acesso e permissões do espaço continuam aplicáveis. Estimativa aceita número finito não negativo e seletor de horas, dias ou minutos, com frações permitidas; armazenamento permanece em horas e cada dia equivale a 24 horas. Restrições organizacionais das demais entidades permanecem, inclusive em lotes e transações condicionais.
 - User pode criar e excluir pastas em Arquivos, incluindo conteúdo descendente, respeitando acesso e permissões do espaço. Não concede administração do espaço nem alteração de outras entidades.

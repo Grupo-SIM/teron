@@ -32,12 +32,12 @@ const docs = new Map<string, object>([
   ['todo', { _id: 'todo', _class: time.class.ToDo, space, user: person, attachedTo: 'otherTask', attachedToClass: task.class.Task }],
   ['ownPresence', { _id: 'ownPresence', _class: core.class.UserStatus, space, user: 'account', online: false }],
   ['otherPresence', { _id: 'otherPresence', _class: core.class.UserStatus, space, user: 'other', online: false }],
-  ['released', { _id: 'released', _class: contact.class.SocialIdentity, space, attachedTo: person, collection: 'socialIds', type: 'email', value: 'old@example.test', key: 'email:old@example.test', verifiedOn: 100, isDeleted: false }],
+  ['released', { _id: 'released', _class: contact.class.SocialIdentity, space, attachedTo: person, attachedToClass: contact.class.Person, collection: 'socialIds', type: 'email', value: 'old@example.test', key: 'email:old@example.test', verifiedOn: 100, isDeleted: false }],
   ['otherEvent', { _id: 'otherEvent', _class: calendar.class.Event, space, user: 'other' }]
 ])
 function fixture (role = AccountRole.User, verifiedIdentities: SocialId[] = []): { middleware: WorkspaceAuthorizationMiddleware, ctx: MeasureContext<SessionData>, forward: jest.Mock } {
   const forward = jest.fn(async () => [])
-  const next = { tx: forward, findAll: async (_ctx: unknown, _class: string, query: any) => [...docs.values()].filter((doc: any) => doc._class === _class && (query._id?.$in?.includes(doc._id) || query._id === doc._id)) } as unknown as Middleware
+  const next = { tx: forward, findAll: async (_ctx: unknown, _class: string, query: any) => [...docs.values()].filter((doc: any) => doc._class === _class && (query._id?.$in?.includes(doc._id) || query._id === doc._id || query.personUuid !== undefined && query.personUuid === doc.personUuid)) } as unknown as Middleware
   const context = { contextVars: { getVerifiedSocialIds: async () => verifiedIdentities }, hierarchy: { isDerived: (actual: string, expected: string) => actual === expected || expected === core.class.AttachedDoc && [attachment.class.Attachment, contact.class.SocialIdentity, calendar.class.Event, time.class.ToDo, task.class.Task].includes(actual as any) }, head: next } as unknown as PipelineContext
   const account = { uuid: 'account', role, primarySocialId: user, socialIds: [user] } as Account
   return { middleware: new WorkspaceAuthorizationMiddleware(context, next), ctx: { contextData: { account } } as MeasureContext<SessionData>, forward }
@@ -169,6 +169,46 @@ describe('server authorization before persistence', () => {
       await expect(middleware.tx(ctx, [update('released', contact.class.SocialIdentity, { attachedTo: 'another-person' })])).rejects.toThrow()
       expect(forward).toHaveBeenCalledTimes(2)
     } finally { docs.delete(person) }
+  })
+  it('bootstraps an invited member without allowing another account or employee privilege escalation', async () => {
+    const verified = { _id: 'first-social', type: 'email', value: 'invite@example.test', key: 'email:invite@example.test', verifiedOn: 200 } as SocialId
+    const { middleware, ctx, forward } = fixture(AccountRole.User, [verified])
+    const create = (personUuid = 'account'): Tx => ({ _class: core.class.TxCreateDoc, objectId: 'invited-person', objectClass: contact.class.Person, objectSpace: contact.space.Contacts, attributes: { personUuid, name: 'Invited person', city: '', avatarType: 'color' } }) as unknown as Tx
+    const employee = (attributes: object = { active: true, role: 'USER' }): Tx => ({ _class: core.class.TxMixin, objectId: 'invited-person', objectClass: contact.class.Person, objectSpace: contact.space.Contacts, mixin: contact.mixin.Employee, attributes }) as unknown as Tx
+    docs.set(contact.space.Contacts, { _id: contact.space.Contacts, _class: core.class.Space })
+    try {
+      const identity = { _class: core.class.TxCreateDoc, objectId: verified._id, objectClass: contact.class.SocialIdentity, objectSpace: contact.space.Contacts, attributes: { attachedTo: 'invited-person', attachedToClass: contact.class.Person, collection: 'socialIds', type: verified.type, value: verified.value, key: verified.key, verifiedOn: verified.verifiedOn } } as unknown as Tx
+      await middleware.tx(ctx, [create(), identity, employee()])
+      await expect(middleware.tx(ctx, [create(), { ...create(), objectId: 'duplicate-person' } as unknown as Tx])).rejects.toThrow()
+      await expect(middleware.tx(ctx, [create('someone-else')])).rejects.toThrow()
+      docs.set('invited-person', { _id: 'invited-person', _class: contact.class.Person, space: contact.space.Contacts, personUuid: 'account' })
+      await middleware.tx(ctx, [employee()])
+      await expect(middleware.tx(ctx, [create()])).rejects.toThrow()
+      await expect(middleware.tx(ctx, [employee({ active: true, role: 'OWNER' })])).rejects.toThrow()
+      await expect(middleware.tx(ctx, [employee({ active: true, role: 'USER', forged: true })])).rejects.toThrow()
+      docs.set('invited-person', { _id: 'invited-person', _class: contact.class.Person, space: contact.space.Contacts, personUuid: 'someone-else' })
+      await expect(middleware.tx(ctx, [employee()])).rejects.toThrow()
+      docs.set('invited-person', { _id: 'invited-person', _class: contact.class.Person, space: contact.space.Contacts, personUuid: 'account', [contact.mixin.Employee]: { active: false, role: 'USER' } })
+      await expect(middleware.tx(ctx, [employee()])).rejects.toThrow()
+      expect(forward).toHaveBeenCalledTimes(2)
+    } finally { docs.delete('invited-person'); docs.delete(contact.space.Contacts) }
+  })
+  it('links and initializes only the caller legacy person and verifies the first local social identity', async () => {
+    const verified = { _id: 'first-social', type: 'email', value: 'invite@example.test', key: 'email:invite@example.test', verifiedOn: 200 } as SocialId
+    const { middleware, ctx, forward } = fixture(AccountRole.User, [verified])
+    docs.set(contact.space.Contacts, { _id: contact.space.Contacts, _class: core.class.Space })
+    docs.set(person, { _id: person, _class: contact.class.Person, space: contact.space.Contacts })
+    const createIdentity: Tx = { _class: core.class.TxCreateDoc, objectId: verified._id, objectClass: contact.class.SocialIdentity, objectSpace: contact.space.Contacts, attributes: { attachedTo: person, attachedToClass: contact.class.Person, collection: 'socialIds', type: verified.type, value: verified.value, key: verified.key, verifiedOn: verified.verifiedOn } } as unknown as Tx
+    try {
+      await middleware.tx(ctx, [update(person, contact.class.Person, { personUuid: 'account' }, contact.space.Contacts)])
+      await middleware.tx(ctx, [createIdentity])
+      await expect(middleware.tx(ctx, [update(person, contact.class.Person, { personUuid: 'other' }, contact.space.Contacts)])).rejects.toThrow()
+      await expect(middleware.tx(ctx, [update(person, contact.class.Person, { name: 'Changed' }, contact.space.Contacts)])).rejects.toThrow()
+      await expect(middleware.tx(ctx, [{ ...createIdentity, attributes: { ...(createIdentity as any).attributes, value: 'forged@example.test' } } as unknown as Tx])).rejects.toThrow()
+      docs.set(person, { _id: person, _class: contact.class.Person, space: contact.space.Contacts, personUuid: 'other' })
+      await expect(middleware.tx(ctx, [update(person, contact.class.Person, { personUuid: 'account' }, contact.space.Contacts)])).rejects.toThrow()
+      expect(forward).toHaveBeenCalledTimes(2)
+    } finally { docs.delete(person); docs.delete(contact.space.Contacts) }
   })
   it('permits own online presence without accepting other accounts or identity changes', async () => {
     const { middleware, ctx, forward } = fixture()

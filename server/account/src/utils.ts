@@ -1500,7 +1500,8 @@ export async function getWorkspaceJoinInfo (
   db: AccountDB,
   email: string,
   inviteId: string,
-  workspaceUrl: string
+  workspaceUrl: string,
+  account?: AccountUuid
 ): Promise<WorkspaceJoinInfo> {
   if (email === undefined || email === '' || email === null) {
     throw new PlatformError(new Status(Severity.ERROR, platform.status.BadRequest, {}))
@@ -1511,7 +1512,10 @@ export async function getWorkspaceJoinInfo (
     if (invite == null) {
       throw new PlatformError(new Status(Severity.ERROR, platform.status.Forbidden, {}))
     }
-    const workspaceUuid = await checkInvite(ctx, invite, normalizedEmail)
+    const workspaceUuid = invite.workspaceUuid
+    if (account == null || (await db.getWorkspaceRole(account, workspaceUuid)) == null) {
+      await checkInvite(ctx, invite, normalizedEmail)
+    }
     const workspace = await getWorkspaceById(db, workspaceUuid)
     if (workspace == null) {
       throw new PlatformError(new Status(Severity.ERROR, platform.status.WorkspaceNotFound, { workspaceUuid }))
@@ -1538,6 +1542,12 @@ export async function doJoinByInvite (
   invite: WorkspaceInvite | null | undefined
 ): Promise<WorkspaceLoginInfo> {
   const role = await db.getWorkspaceRole(account, workspace.uuid)
+
+  // Membership is authoritative; reopening an accepted invite must not consume it
+  // again or restore a role that an administrator has since changed.
+  if (role != null) {
+    return await selectWorkspace(ctx, db, branding, token, { workspaceUrl: workspace.url, kind: 'external' })
+  }
 
   const tierSubscriptions = await findTierSubscriptions(db, workspace.uuid)
   const tier = selectTierSubscription(tierSubscriptions)
@@ -1586,10 +1596,8 @@ export async function doJoinByInvite (
       } else {
         await db.assignWorkspace(account, workspace.uuid, invite.role)
       }
-    } else if (getRolePower(role) < getRolePower(invite.role)) {
-      await db.updateWorkspaceRole(account, workspace.uuid, invite.role)
     }
-    if (!isBusiness || role != null) await useInvite(db, invite.id)
+    if (!isBusiness) await useInvite(db, invite.id)
   } else {
     throw new PlatformError(new Status(Severity.ERROR, platform.status.Forbidden, {}))
   }
@@ -1724,7 +1732,11 @@ export async function joinWithProvider (
     throw new PlatformError(new Status(Severity.ERROR, platform.status.Forbidden, {}))
   }
 
-  const workspaceUuid = await checkInvite(ctx, invite, normalizedEmail)
+  const workspaceUuid = invite.workspaceUuid
+  const existingIdentity = await db.socialId.findOne({ type: socialId.type, value: normalizeValue(socialId.value) })
+  if (existingIdentity == null || (await db.getWorkspaceRole(existingIdentity.personUuid, workspaceUuid)) == null) {
+    await checkInvite(ctx, invite, normalizedEmail)
+  }
   const workspace = await getWorkspaceById(db, workspaceUuid)
 
   if (workspace == null) {
