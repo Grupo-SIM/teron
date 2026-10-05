@@ -65,8 +65,8 @@
 
   <svelte:fragment slot="aside">
     {#if _class === chunter.class.Channel && channel}
-      <div class="flex-col-center">
-        <span class="fs-title text-xl overflow-label mt-4 mb-2"><Label label={chunter.string.Settings} /></span>
+      <div class="channel-settings">
+        <span class="fs-title text-xl overflow-label"><Label label={chunter.string.Settings} /></span>
         {#key channel._id}
           <EditChannelSettingsTab {channel} on:close />
         {/key}
@@ -93,3 +93,14 @@
     </div>
   </Scroller>
 </Panel>
+
+<style>
+  .channel-settings {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 1.5rem;
+    padding: 2.5rem 1.5rem;
+    min-width: 0;
+  }
+</style>

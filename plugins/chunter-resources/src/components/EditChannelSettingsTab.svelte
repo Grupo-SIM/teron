@@ -34,9 +34,9 @@
 </script>
 
 {#if channel}
-  <div class="flex-col gap-4 p-2">
-    <div class="flex-col gap-1">
-      <div class="flex-row-center gap-2">
+  <div class="settings-content">
+    <div class="settings-field">
+      <div class="settings-field-header">
         <Label label={core.string.AutoJoin} />
         <Toggle
           data-id="channel-auto-join-toggle"
@@ -48,13 +48,47 @@
       </div>
       <span class="text-sm content-dark-color"><Label label={core.string.AutoJoinDescr} /></span>
     </div>
+    <div class="settings-actions">
+      <Button
+        label={chunter.string.ArchiveChannel}
+        justify={'left'}
+        size={'x-large'}
+        width={'100%'}
+        on:click={(evt) => {
+          ArchiveChannel(channel, evt, { afterArchive: () => dispatch('close') })
+        }}
+      />
+    </div>
   </div>
-  <Button
-    label={chunter.string.ArchiveChannel}
-    justify={'left'}
-    size={'x-large'}
-    on:click={(evt) => {
-      ArchiveChannel(channel, evt, { afterArchive: () => dispatch('close') })
-    }}
-  />
 {/if}
+
+<style>
+  .settings-content {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    min-width: 0;
+  }
+
+  .settings-field {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+  }
+
+  .settings-field-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+  }
+
+  .settings-field > span {
+    line-height: 1.5;
+  }
+
+  .settings-actions {
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--theme-divider-color);
+  }
+</style>
