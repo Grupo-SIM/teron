@@ -358,6 +358,14 @@ export function findAttributePresenter (
   }
 }
 
+export function getTableAttributeLabel (attribute: AnyAttribute, hierarchy: Hierarchy): IntlString {
+  if (hierarchy.isDerived(attribute.attributeOf, contact.class.Person)) {
+    if (attribute.name === 'onsiteDaysPerWeek') return contact.string.OnsiteDaysPerWeekShort
+    if (attribute.name === 'remoteDaysPerWeek') return contact.string.RemoteDaysPerWeekShort
+  }
+  return attribute.shortLabel ?? attribute.label
+}
+
 export async function getAttributePresenter (
   client: Client,
   _class: Ref<Class<Obj>>,
@@ -403,7 +411,7 @@ export async function getAttributePresenter (
     key: preserveKey.key,
     sortingKey,
     _class: attrClass,
-    label: preserveKey.label ?? attribute.shortLabel ?? attribute.label,
+    label: preserveKey.label ?? getTableAttributeLabel(attribute, hierarchy),
     presenter: await getResource(presenterRef),
     props: preserveKey.props,
     displayProps: preserveKey.displayProps,

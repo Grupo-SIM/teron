@@ -20,6 +20,7 @@
   import EditBoxPopup from './EditBoxPopup.svelte'
   import { AnyAttribute, TypeNumber } from '@hcengineering/core'
 
+  export let hideEmpty = false
   export let label: IntlString
   export let value: number | undefined
   export let autoFocus: boolean = false
@@ -71,7 +72,7 @@
     <svelte:fragment slot="content">
       {#if value != null}
         <span class="caption-color overflow-label pointer-events-none">{value}</span>
-      {:else}
+      {:else if !hideEmpty}
         <span class="content-dark-color overflow-labelpointer-events-none"><Label {label} /></span>
       {/if}
     </svelte:fragment>

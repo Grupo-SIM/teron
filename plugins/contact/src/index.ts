@@ -366,6 +366,8 @@ export const contactPlugin = plugin(contactId, {
     LastNameFirst: '' as Metadata<boolean>
   },
   string: {
+    RemoteDaysPerWeekShort: '' as IntlString,
+    OnsiteDaysPerWeekShort: '' as IntlString,
     PersonAlreadyExists: '' as IntlString,
     Person: '' as IntlString,
     Employee: '' as IntlString,
