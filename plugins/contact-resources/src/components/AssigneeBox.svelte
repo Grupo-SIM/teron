@@ -198,7 +198,7 @@
             <div
               class="flex-presenter not-selected"
               class:cursor-default={readonly}
-              style:color={kind === 'secondary' && !readonly ? 'var(--primary-button-content-color)' : undefined}
+              style:color={kind === 'secondary' && !readonly ? 'var(--secondary-button-color)' : undefined}
             >
               {#if icon}
                 <div class="icon w-4 flex-no-shrink" class:small-gap={size === 'inline' || size === 'small'}>
