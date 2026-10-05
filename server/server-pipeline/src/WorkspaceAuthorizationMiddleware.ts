@@ -40,6 +40,7 @@ export class WorkspaceAuthorizationMiddleware extends BaseMiddleware {
     const getVerifiedSocialIds = this.context.contextVars?.getVerifiedSocialIds as
       ((account: AccountUuid) => Promise<SocialId[]>) | undefined
     for (const tx of clientTransactions(txes)) {
+      const isDocument = hierarchy.isDerived(tx.objectClass, document.class.Document)
       const isTask = hierarchy.isDerived(tx.objectClass, task.class.Task)
       const taskSequence = tx.objectClass === tracker.class.Project && tx._class === core.class.TxUpdateDoc && JSON.stringify((tx as TxUpdateDoc<Doc>).operations) === JSON.stringify({ $inc: { sequence: 1 } })
       if (!isTask && !taskSequence && !hasAccountRole(account, AccountRole.User)) throw new PlatformError(new Status(Severity.ERROR, platform.status.Forbidden, {}))
@@ -68,7 +69,7 @@ export class WorkspaceAuthorizationMiddleware extends BaseMiddleware {
         }
       }
       const fields = updated ? changedFields((tx as TxUpdateDoc<Doc>).operations, isTask || taskSequence) : []
-      if (updated && fields.some((field) => (field === '*' ? tx.objectClass !== chunter.class.Channel : ['_id', '_class', ...(isTask ? [] : ['space']), 'createdBy', 'createdOn', 'modifiedBy', 'modifiedOn'].includes(field)))) throw new Error('Cannot change document identity or move content.')
+      if (updated && fields.some((field) => (field === '*' ? tx.objectClass !== chunter.class.Channel : ['_id', '_class', ...(isTask || isDocument ? [] : ['space']), 'createdBy', 'createdOn', 'modifiedBy', 'modifiedOn'].includes(field)))) throw new Error('Cannot change document identity or move content.')
       if (isTask && updated && fields.includes('space')) {
         const moved = TxProcessor.updateDoc2Doc({ ...data }, tx as TxUpdateDoc<Doc>)
         if (typeof moved.space !== 'string' || (await reader.findAll(ctx, core.class.Space, { _id: moved.space })).length === 0) throw new Error('Cannot move a task to an inaccessible space.')
@@ -138,7 +139,16 @@ export class WorkspaceAuthorizationMiddleware extends BaseMiddleware {
         const space = spaces[0] as Teamspace
         const sectors = await reader.findAll(ctx, core.class.TypedSpace, { _id: { $in: space.guidelineEditorSectors ?? [] } })
         const access = guidelineAccessFor(space, account.uuid, new Map(sectors.map((sector) => [sector._id, sector.members])))
-        allowed = access === 'editor' && (data as Doc & { lockedBy?: unknown }).lockedBy == null && (created || (updated && fields.every((field) => ['title', 'content', 'icon', 'color'].includes(field))))
+        allowed = access === 'editor' && (data as Doc & { lockedBy?: unknown }).lockedBy == null && (created || tx._class === core.class.TxRemoveDoc || (updated && fields.every((field) => ['title', 'content', 'icon', 'color', 'space', 'parent', 'rank'].includes(field))))
+        if (allowed && updated && fields.includes('space')) {
+          const moved = TxProcessor.updateDoc2Doc({ ...data }, tx as TxUpdateDoc<Doc>)
+          const destination = (await reader.findAll(ctx, core.class.Space, { _id: moved.space }))[0] as Teamspace | undefined
+          if (destination === undefined) allowed = false
+          else {
+            const destinationSectors = await reader.findAll(ctx, core.class.TypedSpace, { _id: { $in: destination.guidelineEditorSectors ?? [] } })
+            allowed = guidelineAccessFor(destination, account.uuid, new Map(destinationSectors.map((sector) => [sector._id, sector.members]))) === 'editor'
+          }
+        }
       } else if (hierarchy.isDerived(tx.objectClass, drive.class.Folder)) {
         allowed = created || tx._class === core.class.TxRemoveDoc
         if (created) {
@@ -196,7 +206,7 @@ export class WorkspaceAuthorizationMiddleware extends BaseMiddleware {
       }
       if (!allowed) throw new PlatformError(new Status(Severity.ERROR, platform.status.Forbidden, {}))
       if (created) pending.set(tx.objectId, data)
-      else if (isTask && updated) pending.set(tx.objectId, TxProcessor.updateDoc2Doc({ ...data }, tx as TxUpdateDoc<Doc>))
+      else if ((isTask || isDocument) && updated) pending.set(tx.objectId, TxProcessor.updateDoc2Doc({ ...data }, tx as TxUpdateDoc<Doc>))
     }
     return await this.provideTx(ctx, txes)
   }

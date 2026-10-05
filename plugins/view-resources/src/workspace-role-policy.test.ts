@@ -14,13 +14,16 @@ describe('workspace role ceiling', () => {
       expect(canMutateWorkspaceClass(account(AccountRole.User), [id], operation)).toBe(false)
     }
   })
-  test('members retain guideline content edits but cannot delete or move', () => {
+  test('members can edit, delete and move guidelines', () => {
     const member = account(AccountRole.User)
     const classes = ['document:class:Document']
     expect(canMutateWorkspaceClass(member, classes, 'create')).toBe(true)
     expect(canMutateWorkspaceClass(member, classes, 'update', 'title')).toBe(true)
-    expect(canMutateWorkspaceClass(member, classes, 'update', 'parent')).toBe(false)
-    expect(canMutateWorkspaceClass(member, classes, 'remove')).toBe(false)
+    expect(canMutateWorkspaceClass(member, classes, 'update', 'parent')).toBe(true)
+    expect(canMutateWorkspaceClass(member, classes, 'update', 'space')).toBe(true)
+    expect(canMutateWorkspaceClass(member, classes, 'update', 'rank')).toBe(true)
+    expect(canMutateWorkspaceClass(member, classes, 'update', 'lockedBy')).toBe(false)
+    expect(canMutateWorkspaceClass(member, classes, 'remove')).toBe(true)
   })
   test.each(Object.values(AccountRole))('all roles can manage derived tasks (%s)', (role) => {
     const classes = ['tracker:class:Issue', 'task:class:Task']

@@ -14,7 +14,7 @@
 // limitations under the License.
 //
 
-import { canDeleteWorkspaceFolder } from './folder-role-policy'
+import { canDeleteWorkspaceFolder, canDeleteWorkspaceDocument } from './folder-role-policy'
 import { Analytics } from '@hcengineering/analytics'
 import core, {
   AccountRole,
@@ -740,7 +740,7 @@ async function getRelationPresenter (client: Client, key: BuildModelKey): Promis
 export async function deleteObject (client: TxOperations, object: Doc): Promise<void> {
   const currentAcc = getCurrentAccount()
   const socialStrings = new Set(await getAllSocialStringsByPersonRef(client, getCurrentEmployee()))
-  if (!hasAccountRole(currentAcc, AccountRole.Maintainer) && !client.getHierarchy().getAncestors(object._class).includes('task:class:Task' as Ref<Class<Doc>>) && !canDeleteWorkspaceFolder(currentAcc, client.getHierarchy().getAncestors(object._class)) && !socialStrings.has(object.createdBy as PersonId)) return
+  if (!hasAccountRole(currentAcc, AccountRole.Maintainer) && !client.getHierarchy().getAncestors(object._class).includes('task:class:Task' as Ref<Class<Doc>>) && !(canDeleteWorkspaceFolder(currentAcc, client.getHierarchy().getAncestors(object._class)) || canDeleteWorkspaceDocument(currentAcc, client.getHierarchy().getAncestors(object._class))) && !socialStrings.has(object.createdBy as PersonId)) return
   if (client.getHierarchy().isDerived(object._class, core.class.AttachedDoc)) {
     const adoc = object as AttachedDoc
     await client
@@ -767,7 +767,7 @@ export async function deleteObjects (client: TxOperations, objects: Doc[], skipC
     const adminUser = isAdminUser()
     for (const [cl, docs] of byClass.entries()) {
       const realDocs = await client.findAll(cl, { _id: { $in: docs.map((it: Doc) => it._id) } })
-      const notAllowed = realDocs.filter((p) => !socialStrings.has(p.createdBy as PersonId) && !canDeleteWorkspaceFolder(currentAcc, client.getHierarchy().getAncestors(p._class)))
+      const notAllowed = realDocs.filter((p) => !socialStrings.has(p.createdBy as PersonId) && !(canDeleteWorkspaceFolder(currentAcc, client.getHierarchy().getAncestors(p._class)) || canDeleteWorkspaceDocument(currentAcc, client.getHierarchy().getAncestors(p._class))))
 
       if (notAllowed.length > 0) {
         console.error('You are not allowed to delete this object', notAllowed)
@@ -775,7 +775,7 @@ export async function deleteObjects (client: TxOperations, objects: Doc[], skipC
       if (hasAccountRole(currentAcc, AccountRole.Maintainer) || adminUser) {
         realObjects.push(...realDocs)
       } else {
-        realObjects.push(...realDocs.filter((p) => socialStrings.has(p.createdBy as PersonId) || canDeleteWorkspaceFolder(currentAcc, client.getHierarchy().getAncestors(p._class))))
+        realObjects.push(...realDocs.filter((p) => socialStrings.has(p.createdBy as PersonId) || (canDeleteWorkspaceFolder(currentAcc, client.getHierarchy().getAncestors(p._class)) || canDeleteWorkspaceDocument(currentAcc, client.getHierarchy().getAncestors(p._class)))))
       }
     }
   } else {

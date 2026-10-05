@@ -115,12 +115,33 @@ describe('server authorization before persistence', () => {
     await middleware.tx(ctx, [update('otherTask', task.class.Task, { estimation: 2, dueDate: 0 })])
     expect(forward).toHaveBeenCalledTimes(2)
   })
-  it('enforces inherited reader/editor grants and denies editor deletion', async () => {
+  it('enforces inherited reader/editor grants for edits, moves and deletion', async () => {
     const { middleware, ctx, forward } = fixture()
     await expect(middleware.tx(ctx, [update('readerDoc', document.class.Document, { title: 'new' }, 'readerSpace')])).rejects.toThrow()
     await middleware.tx(ctx, [update('editorDoc', document.class.Document, { title: 'new' }, 'editorSpace')])
-    await expect(middleware.tx(ctx, [{ _class: core.class.TxRemoveDoc, objectId: 'editorDoc', objectClass: document.class.Document, objectSpace: 'editorSpace' } as unknown as Tx])).rejects.toThrow()
-    expect(forward).toHaveBeenCalledTimes(1)
+    await middleware.tx(ctx, [update('editorDoc', document.class.Document, { parent: 'parent', rank: 'rank' }, 'editorSpace')])
+    await middleware.tx(ctx, [update('editorDoc', document.class.Document, { space: 'editorSpace', parent: 'parent', rank: 'rank' }, 'editorSpace')])
+    await expect(middleware.tx(ctx, [update('editorDoc', document.class.Document, { space: 'readerSpace' }, 'editorSpace')])).rejects.toThrow()
+    await expect(middleware.tx(ctx, [update('editorDoc', document.class.Document, { space: 'missing' }, 'editorSpace')])).rejects.toThrow()
+    await middleware.tx(ctx, [{ _class: core.class.TxRemoveDoc, objectId: 'editorDoc', objectClass: document.class.Document, objectSpace: 'editorSpace' } as unknown as Tx])
+    expect(forward).toHaveBeenCalledTimes(4)
+  })
+  it('requires editor access at both ends and preserves locked document protection', async () => {
+    const { middleware, ctx, forward } = fixture()
+    docs.set('destination', { _id: 'destination', _class: core.class.Space, guidelineAccess: true, guidelineEditors: ['account'] })
+    docs.set('lockedDoc', { _id: 'lockedDoc', _class: document.class.Document, space: 'editorSpace', lockedBy: 'other' })
+    try {
+      await middleware.tx(ctx, [update('editorDoc', document.class.Document, { space: 'destination', parent: document.ids.NoParent, rank: 'rank' }, 'editorSpace')])
+      await expect(middleware.tx(ctx, [update('readerDoc', document.class.Document, { space: 'destination' }, 'readerSpace')])).rejects.toThrow()
+      await expect(middleware.tx(ctx, [update('lockedDoc', document.class.Document, { parent: document.ids.NoParent }, 'editorSpace')])).rejects.toThrow()
+      for (const id of ['readerDoc', 'lockedDoc']) {
+        await expect(middleware.tx(ctx, [{ _class: core.class.TxRemoveDoc, objectId: id, objectClass: document.class.Document, objectSpace: id === 'readerDoc' ? 'readerSpace' : 'editorSpace' } as unknown as Tx])).rejects.toThrow()
+      }
+      expect(forward).toHaveBeenCalledTimes(1)
+    } finally {
+      docs.delete('destination')
+      docs.delete('lockedDoc')
+    }
   })
   it('validates direct attachment parents rather than relying on collection wrappers', async () => {
     const { middleware, ctx, forward } = fixture()

@@ -1,6 +1,6 @@
 import { AccountRole, type Account } from '@hcengineering/core'
 import { canMutateWorkspaceClass } from './workspace-role-policy'
-import { canDeleteWorkspaceFolder } from './folder-role-policy'
+import { canDeleteWorkspaceFolder, canDeleteWorkspaceDocument } from './folder-role-policy'
 
 describe('folder role permissions', () => {
   it('allows User folders regardless of creator without allowing other entities', () => {
@@ -15,5 +15,15 @@ describe('folder role permissions', () => {
 
   it('keeps read-only accounts from deleting folders', () => {
     expect(canDeleteWorkspaceFolder({ role: AccountRole.ReadOnlyGuest } as Account, ['drive:class:Folder'])).toBe(false)
+  })
+})
+
+describe('document deletion role ceiling', () => {
+  test.each([AccountRole.User, AccountRole.Maintainer, AccountRole.Owner])('members may delete derived documents (%s)', (role) => {
+    expect(canDeleteWorkspaceDocument({ role } as Account, ['custom:class:Document', 'document:class:Document'])).toBe(true)
+    expect(canDeleteWorkspaceDocument({ role } as Account, ['document:class:Teamspace'])).toBe(false)
+  })
+  test.each([AccountRole.ReadOnlyGuest, AccountRole.DocGuest])('guests cannot delete documents (%s)', (role) => {
+    expect(canDeleteWorkspaceDocument({ role } as Account, ['document:class:Document'])).toBe(false)
   })
 })

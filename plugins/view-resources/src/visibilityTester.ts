@@ -26,9 +26,10 @@ import core, {
   type Space,
   type TypedSpace
 } from '@hcengineering/core'
+import { getResource, type Resource } from '@hcengineering/platform'
 import { getClient } from '@hcengineering/presentation'
 import { get } from 'svelte/store'
-import { canDeleteWorkspaceFolder } from './folder-role-policy'
+import { canDeleteWorkspaceFolder, canDeleteWorkspaceDocument } from './folder-role-policy'
 import { spaceSpace } from './utils'
 
 function isTypedSpace (space: Space): space is TypedSpace {
@@ -44,13 +45,20 @@ export async function canDeleteObject (doc?: Doc | Doc[]): Promise<boolean> {
   if (!hasAccountRole(getCurrentAccount(), AccountRole.Maintainer) &&
     (doc === undefined || !(Array.isArray(doc) ? doc : [doc]).every((item) =>
       getClient().getHierarchy().getAncestors(item._class).includes('task:class:Task' as Ref<Class<Doc>>) ||
-      canDeleteWorkspaceFolder(getCurrentAccount(), getClient().getHierarchy().getAncestors(item._class))))) return false
+      (canDeleteWorkspaceFolder(getCurrentAccount(), getClient().getHierarchy().getAncestors(item._class)) || canDeleteWorkspaceDocument(getCurrentAccount(), getClient().getHierarchy().getAncestors(item._class)))))) return false
   if (doc === undefined) {
     return false
   }
 
   const client = getClient()
   const targets = Array.isArray(doc) ? doc : [doc]
+  if (!hasAccountRole(getCurrentAccount(), AccountRole.Maintainer)) {
+    const documents = targets.filter((item) => canDeleteWorkspaceDocument(getCurrentAccount(), client.getHierarchy().getAncestors(item._class)))
+    if (documents.length > 0) {
+      const canEdit = await getResource('document:function:CanCreateGuidelineDocument' as Resource<(doc: Doc) => Promise<boolean>>)
+      if (!(await Promise.all(documents.map(async (item) => (item as Doc & { lockedBy?: unknown }).lockedBy == null && await canEdit(item)))).every(Boolean)) return false
+    }
+  }
   // Note: allow deleting objects in NOT typed spaces for now
   const targetSpaces = toIdMap(
     (await client.findAll(core.class.Space, { _id: { $in: targets.map((t) => t.space) } })).filter(isTypedSpace)

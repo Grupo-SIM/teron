@@ -17,7 +17,7 @@
   import { AccountRole, Doc, getCurrentAccount, PersonId, Ref, uniqueNotEmpty } from '@hcengineering/core'
   import { Card, HTMLViewer, isAdminUser, getClient } from '@hcengineering/presentation'
   import ui, { Button, Label } from '@hcengineering/ui'
-  import { canDeleteWorkspaceFolder } from '@hcengineering/view-resources/src/folder-role-policy'
+  import { canDeleteWorkspaceFolder, canDeleteWorkspaceDocument } from '@hcengineering/view-resources/src/folder-role-policy'
   import { ObjectPresenter } from '@hcengineering/view-resources'
   import view from '@hcengineering/view-resources/src/plugin'
   import { createEventDispatcher } from 'svelte'
@@ -51,7 +51,7 @@
 
   $: canDelete =
     (skipCheck ||
-      objectArray.every((item) => canDeleteWorkspaceFolder(getCurrentAccount(), getClient().getHierarchy().getAncestors(item._class))) ||
+      objectArray.every((item) => (canDeleteWorkspaceFolder(getCurrentAccount(), getClient().getHierarchy().getAncestors(item._class)) || canDeleteWorkspaceDocument(getCurrentAccount(), getClient().getHierarchy().getAncestors(item._class)))) ||
       (creators !== undefined && creators.length === 1 && creators[0] === me) ||
       getCurrentAccount().role === AccountRole.Owner ||
       isAdminUser()) &&

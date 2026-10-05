@@ -9,7 +9,7 @@ const memberContent = new Set([
   'time:class:ToDo'
 ])
 const memberFields: Record<string, string[]> = {
-  'document:class:Document': ['title', 'content', 'icon', 'color'],
+  'document:class:Document': ['title', 'content', 'icon', 'color', 'space', 'parent', 'rank'],
   'calendar:class:Calendar': ['name', 'hidden', 'visibility'],
   'calendar:class:Schedule': ['title', 'description', 'meetingDuration', 'meetingInterval', 'availability', 'timeZone', 'calendar'],
   'calendar:class:Event': ['title', 'description', 'date', 'dueDate', 'allDay', 'timeZone', 'visibility', 'participants', 'externalParticipants', 'location', 'reminders', 'rules', 'rdate', 'exdate', 'isCancelled'],
@@ -30,6 +30,6 @@ export function canMutateWorkspaceClass (
   if (ancestors.includes('drive:class:Folder')) return operation === 'create' || operation === 'remove'
   const content = ancestors.find((id) => memberContent.has(id))
   if (content === undefined) return false
-  if (operation === 'remove' && (content === 'document:class:Document' || content === 'calendar:class:Calendar')) return false
+  if (operation === 'remove' && content === 'calendar:class:Calendar') return false
   return field === undefined || memberFields[content].includes(field)
 }
