@@ -35,6 +35,7 @@
   export let collapsedPrefix: string = ''
   export let highlighted: boolean = false
   export let selected: boolean = false
+  export let showSelectedArrow: boolean = true
   export let showMenu: boolean = false
   export let noDivider: boolean = false
   export let shouldTooltip: boolean = false
@@ -60,6 +61,7 @@
   {parent}
   {highlighted}
   {selected}
+  {showSelectedArrow}
   {shouldTooltip}
   {showMenu}
   {noDivider}
