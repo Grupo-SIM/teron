@@ -17,7 +17,7 @@ import { AccountRole, getCurrentAccount, hasAccountRole } from '@hcengineering/c
 import { translate, type Resources } from '@hcengineering/platform'
 import { getCurrentLanguage } from '@hcengineering/theme'
 import { type FileUploadOptions } from '@hcengineering/uploader'
-import { addNotification, NotificationSeverity } from '@hcengineering/ui'
+import { addNotification, getCurrentLocation, NotificationSeverity } from '@hcengineering/ui'
 import view from '@hcengineering/view'
 
 import { record } from './recording'
@@ -27,6 +27,8 @@ import WorkbenchExtension from './components/WorkbenchExtension.svelte'
 export { ScreenRecorder } from './screen-recorder'
 
 async function uploadHandler ({ onFileUploaded, target }: FileUploadOptions): Promise<void> {
+  if (getCurrentLocation().path[2] === 'tracker') return
+
   if (!hasAccountRole(getCurrentAccount(), AccountRole.DocGuest)) {
     addNotification(
       await translate(view.string.ReadOnlyWarningTitle, {}, getCurrentLanguage()),
