@@ -185,7 +185,7 @@
     <Scroller>
       <div class="office-floors" bind:this={list} style:min-height={dragging !== undefined ? `${listHeight}px` : undefined}>
         {#each ordered as _floor (_floor._id)}
-          <div class="sortable-floor" data-floor={_floor._id} animate:flip={{ duration: 180 }}>
+          <div class="sortable-floor" class:empty={getRooms($rooms, _floor._id).length === 0} data-floor={_floor._id} animate:flip={{ duration: 180 }}>
           <div class:dragging={dragging === _floor._id} style:transform={dragging === _floor._id ? `translateY(${offset}px)` : undefined}>
           <FloorPreview
             floor={_floor}
@@ -214,14 +214,19 @@
 
 <style lang="scss">
   .office-floors {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-start;
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    align-items: start;
     gap: 0.5rem;
     padding: 0.75rem 0.5rem 0.5rem;
   }
 
-  .sortable-floor { width: 100%; min-width: 0; }
+  .sortable-floor {
+    grid-column: span 2;
+    min-width: 0;
+
+    &.empty { grid-column: span 1; }
+  }
   .dragging { position: relative; z-index: 1; opacity: 0.6; }
 
   .office-floor-selector {
