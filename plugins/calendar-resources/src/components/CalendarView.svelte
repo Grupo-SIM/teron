@@ -43,6 +43,7 @@
   import calendar from '../plugin'
   import Day from './Day.svelte'
   import CalendarHeader from './CalendarHeader.svelte'
+  import { getDayRange } from '../day-range'
 
   export let _class: Ref<Class<Doc>> = calendar.class.Event
   export let query: DocumentQuery<Event> | undefined = undefined
@@ -76,10 +77,10 @@
   function getFrom (date: Date, mode: CalendarMode): Timestamp {
     switch (mode) {
       case CalendarMode.Days: {
-        return new Date(date).setHours(0, 0, 0, 0)
+        return getDayRange(date).from
       }
       case CalendarMode.Day: {
-        return new Date(date).setHours(0, 0, 0, 0)
+        return getDayRange(date).from
       }
       case CalendarMode.Week: {
         return getWeekStart(date, $deviceInfo.firstDayOfWeek).getTime()
@@ -96,10 +97,10 @@
   function getTo (date: Date, mode: CalendarMode): Timestamp {
     switch (mode) {
       case CalendarMode.Days: {
-        return new Date(date).setDate(date.getDate() + 4)
+        return getDayRange(date, 3).to
       }
       case CalendarMode.Day: {
-        return new Date(date).setDate(date.getDate() + 1)
+        return getDayRange(date).to
       }
       case CalendarMode.Week: {
         const startDay = getWeekStart(date, $deviceInfo.firstDayOfWeek)
@@ -181,7 +182,9 @@
   function inc (val: number): void {
     if (val === 0) {
       currentDate = new Date()
-      dayCalendar.scrollToTime(currentDate)
+      if (mode === CalendarMode.Day || mode === CalendarMode.Days || mode === CalendarMode.Week) {
+        dayCalendar?.scrollToTime(currentDate)
+      }
       return
     }
     switch (mode) {
