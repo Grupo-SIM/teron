@@ -9,6 +9,7 @@ import calendar from '@hcengineering/calendar'
 import attachment from '@hcengineering/attachment'
 import tracker from '@hcengineering/tracker'
 import time from '@hcengineering/time'
+import tags from '@hcengineering/tags'
 import { type Middleware, type PipelineContext } from '@hcengineering/server-core'
 import { WorkspaceAuthorizationMiddleware } from './WorkspaceAuthorizationMiddleware'
 
@@ -26,6 +27,7 @@ const docs = new Map<string, object>([
   [user, { _id: user, _class: contact.class.SocialIdentity, attachedTo: person }],
   ['project', { _id: 'project', _class: tracker.class.Project, space, sequence: 1 }],
   ['task', { _id: 'task', _class: task.class.Task, space, assignees: [person] }],
+  ['foreignTask', { _id: 'foreignTask', _class: task.class.Task, space: 'foreign', assignees: [] }],
   ['otherTask', { _id: 'otherTask', _class: task.class.Task, space, assignees: [] }],
   ['event', { _id: 'event', _class: calendar.class.Event, space, user }],
   ['calendar', { _id: 'calendar', _class: calendar.class.Calendar, space, user }],
@@ -38,7 +40,7 @@ const docs = new Map<string, object>([
 function fixture (role = AccountRole.User, verifiedIdentities: SocialId[] = []): { middleware: WorkspaceAuthorizationMiddleware, ctx: MeasureContext<SessionData>, forward: jest.Mock } {
   const forward = jest.fn(async () => [])
   const next = { tx: forward, findAll: async (_ctx: unknown, _class: string, query: any) => [...docs.values()].filter((doc: any) => doc._class === _class && (query._id?.$in?.includes(doc._id) || query._id === doc._id || query.personUuid !== undefined && query.personUuid === doc.personUuid)) } as unknown as Middleware
-  const context = { contextVars: { getVerifiedSocialIds: async () => verifiedIdentities }, hierarchy: { isDerived: (actual: string, expected: string) => actual === expected || actual === tracker.class.Issue && expected === task.class.Task || expected === core.class.AttachedDoc && [attachment.class.Attachment, contact.class.SocialIdentity, calendar.class.Event, time.class.ToDo, task.class.Task, tracker.class.Issue].includes(actual as any) }, head: next } as unknown as PipelineContext
+  const context = { contextVars: { getVerifiedSocialIds: async () => verifiedIdentities }, hierarchy: { isDerived: (actual: string, expected: string) => actual === expected || actual === tracker.class.Issue && expected === task.class.Task || expected === core.class.AttachedDoc && [tags.class.TagReference, attachment.class.Attachment, contact.class.SocialIdentity, calendar.class.Event, time.class.ToDo, task.class.Task, tracker.class.Issue].includes(actual as any) }, head: next } as unknown as PipelineContext
   const account = { uuid: 'account', role, primarySocialId: user, socialIds: [user] } as Account
   return { middleware: new WorkspaceAuthorizationMiddleware(context, next), ctx: { contextData: { account } } as MeasureContext<SessionData>, forward }
 }
@@ -85,6 +87,26 @@ describe('server authorization before persistence', () => {
     await middleware.tx(ctx, [create(tracker.ids.NoParent)])
     await expect(middleware.tx(ctx, [create('missing')])).rejects.toThrow()
     expect(forward).toHaveBeenCalledTimes(1)
+  })
+  it.each(Object.values(AccountRole))('allows %s task label assignment/removal and protects other parents', async (role) => {
+    const { middleware, ctx, forward } = fixture(role)
+    const reference = (attachedTo: string, attachedToClass: string = task.class.Task, collection = 'labels'): Tx => ({
+      _class: core.class.TxCreateDoc, objectId: 'label-reference', objectClass: tags.class.TagReference, objectSpace: space,
+      attributes: { attachedTo, attachedToClass, collection, title: 'Label', color: 1, tag: 'tag' }
+    }) as unknown as Tx
+    const remove = { _class: core.class.TxRemoveDoc, objectId: 'label-reference', objectClass: tags.class.TagReference, objectSpace: space } as unknown as Tx
+    await middleware.tx(ctx, [{ _class: core.class.TxApplyIf, txes: [reference('otherTask'), remove] } as unknown as Tx])
+    docs.set('label-reference', { _id: 'label-reference', _class: tags.class.TagReference, space, attachedTo: 'otherTask', attachedToClass: task.class.Task, collection: 'labels' })
+    try { await middleware.tx(ctx, [remove]) } finally { docs.delete('label-reference') }
+    expect(forward).toHaveBeenCalledTimes(2)
+    if (role === AccountRole.User || role === AccountRole.ReadOnlyGuest || role === AccountRole.DocGuest) {
+      await expect(middleware.tx(ctx, [reference('missing')])).rejects.toThrow()
+      await expect(middleware.tx(ctx, [reference('foreignTask')])).rejects.toThrow()
+      await expect(middleware.tx(ctx, [reference('foreignFolder', drive.class.Folder)])).rejects.toThrow()
+      await expect(middleware.tx(ctx, [reference('folder', drive.class.Folder)])).rejects.toThrow()
+      await expect(middleware.tx(ctx, [reference('otherTask', task.class.Task, 'attachments')])).rejects.toThrow()
+      await expect(middleware.tx(ctx, [reference('otherTask'), update('label-reference', tags.class.TagReference, { attachedTo: 'folder' })])).rejects.toThrow()
+    }
   })
   it.each(Object.values(AccountRole))('allows %s task CRUD, unassigned status and sequence allocation', async (role) => {
     const { middleware, ctx, forward } = fixture(role)

@@ -12,6 +12,7 @@ import document, { guidelineAccessFor, type Teamspace } from '@hcengineering/doc
 import love from '@hcengineering/love'
 import notification from '@hcengineering/notification'
 import preference from '@hcengineering/preference'
+import tags, { type TagReference } from '@hcengineering/tags'
 import task from '@hcengineering/task'
 import tracker from '@hcengineering/tracker'
 import time, { type ToDo } from '@hcengineering/time'
@@ -42,8 +43,9 @@ export class WorkspaceAuthorizationMiddleware extends BaseMiddleware {
     for (const tx of clientTransactions(txes)) {
       const isDocument = hierarchy.isDerived(tx.objectClass, document.class.Document)
       const isTask = hierarchy.isDerived(tx.objectClass, task.class.Task)
+      const isTagReference = hierarchy.isDerived(tx.objectClass, tags.class.TagReference)
       const taskSequence = tx.objectClass === tracker.class.Project && tx._class === core.class.TxUpdateDoc && JSON.stringify((tx as TxUpdateDoc<Doc>).operations) === JSON.stringify({ $inc: { sequence: 1 } })
-      if (!isTask && !taskSequence && !hasAccountRole(account, AccountRole.User)) throw new PlatformError(new Status(Severity.ERROR, platform.status.Forbidden, {}))
+      if (!isTask && !isTagReference && !taskSequence && !hasAccountRole(account, AccountRole.User)) throw new PlatformError(new Status(Severity.ERROR, platform.status.Forbidden, {}))
       const created = tx._class === core.class.TxCreateDoc
       const updated = tx._class === core.class.TxUpdateDoc
       const data = created
@@ -77,6 +79,13 @@ export class WorkspaceAuthorizationMiddleware extends BaseMiddleware {
       let allowed = false
       if (isTask) {
         allowed = true
+      } else if (isTagReference) {
+        const reference = data as TagReference
+        const parent = pending.get(reference.attachedTo) ??
+          (await reader.findAll(ctx, reference.attachedToClass, { _id: reference.attachedTo }))[0]
+        allowed = (created || tx._class === core.class.TxRemoveDoc) && reference.collection === 'labels' &&
+          hierarchy.isDerived(reference.attachedToClass, task.class.Task) && parent !== undefined &&
+          hierarchy.isDerived(parent._class, task.class.Task) && parent.space === reference.space
       } else if (taskSequence) {
         allowed = true
       } else if (tx.objectClass === core.class.UserStatus) {
