@@ -24,13 +24,20 @@
   import Close from './icons/Close.svelte'
   import Info from './icons/Info.svelte'
   import { NotificationSeverity } from './notifications/NotificationSeverity'
+  import type { Notification } from './notifications/Notification'
 
   export let onClose: (() => void) | undefined = undefined
   export let severity: NotificationSeverity | undefined = undefined
-  export let title: string
+  export let title: string = ''
+  export let notification: Notification | undefined = undefined
+  export let onRemove: (() => void) | undefined = undefined
 
-  const getIcon = (): ComponentType | undefined => {
-    switch (severity) {
+  $: displayTitle = notification?.title ?? title
+  $: displaySeverity = notification?.severity ?? severity
+  $: closeHandler = onRemove ?? onClose
+
+  const getIcon = (value: NotificationSeverity | undefined): ComponentType | undefined => {
+    switch (value) {
       case NotificationSeverity.Success:
         return CheckCircle
       case NotificationSeverity.Error:
@@ -40,7 +47,7 @@
     }
   }
 
-  $: icon = getIcon()
+  $: icon = getIcon(displaySeverity)
 </script>
 
 <div class="notifyPopup" in:fade out:fade>
@@ -49,18 +56,18 @@
       {#if icon}
         <div
           class="mr-2"
-          class:icon-success={severity === NotificationSeverity.Success}
-          class:icon-error={severity === NotificationSeverity.Error}
-          class:icon-info={severity === NotificationSeverity.Info}
-          class:icon-warning={severity === NotificationSeverity.Warning}
+          class:icon-success={displaySeverity === NotificationSeverity.Success}
+          class:icon-error={displaySeverity === NotificationSeverity.Error}
+          class:icon-info={displaySeverity === NotificationSeverity.Info}
+          class:icon-warning={displaySeverity === NotificationSeverity.Warning}
         >
           <Icon {icon} size="medium" />
         </div>
       {/if}
-      <span class="overflow-label fs-bold text-base caption-color">{title}</span>
+      <span class="overflow-label fs-bold text-base caption-color">{displayTitle}</span>
     </div>
-    {#if onClose !== undefined}
-      <Button icon={Close} kind="ghost" size="small" dataId={'btnNotifyClose'} on:click={onClose} />
+    {#if closeHandler !== undefined}
+      <Button icon={Close} kind="ghost" size="small" dataId={'btnNotifyClose'} on:click={closeHandler} />
     {/if}
   </div>
 
