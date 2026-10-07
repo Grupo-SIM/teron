@@ -45,7 +45,7 @@
   <div class="m-1 p-2">
     <div class="flex-col flex-grow flex-gap-0-5">
       <MeetingHeader room={$currentRoom} />
-      <div class="flex-between items-start flex-gap-2 mt-2">
+      <div class="meeting-controls mt-2">
         <!-- Avatars -->
         {#if overLimit}
           <div class="teronCombineAvatars-container">
@@ -74,7 +74,7 @@
           </div>
         {/if}
 
-        <div class="flex-row-center flex-gap-3">
+        <div class="meeting-actions">
           <!-- Leave Button -->
           {#if allowLeave || leaving}
             <Button
@@ -117,6 +117,23 @@
 {/if}
 
 <style lang="scss">
+  .meeting-controls {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem;
+    min-width: 0;
+  }
+
+  .meeting-actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem;
+    margin-left: auto;
+    min-width: 0;
+  }
+
   .separator {
     border-top: 1px solid var(--theme-divider-color);
     width: 100%;
