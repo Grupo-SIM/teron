@@ -102,7 +102,7 @@
   }
 </script>
 
-<div class="floor-card preview" class:selected class:empty={rooms.length === 0} class:expanded={expanded && !dragging}>
+<div class="floor-preview preview" class:selected class:empty={rooms.length === 0} class:expanded={expanded && !dragging}>
   <div class="floor-row">
     {#if configurable && editable}
       <button
@@ -145,23 +145,36 @@
     {/if}
   </div>
   {#if expanded && !dragging}
-    {#if rooms.length > 0}
-      <div class="floor-preview-content">
-        <FloorGrid bind:floorContainer {rows} preview>
-          {#each rooms as room}
-            <RoomPreview {room} info={getInfo(room._id, $infos)} />
-          {/each}
-        </FloorGrid>
-      </div>
-    {:else}
-      <button class="floor-empty-select" aria-label={floor.name} on:click={() => dispatch('select')}>
-        <span>+</span>
-      </button>
-    {/if}
+    <div class="floor-card" class:selected>
+      {#if rooms.length > 0}
+        <div class="floor-preview-content">
+          <FloorGrid bind:floorContainer {rows} preview>
+            {#each rooms as room}
+              <RoomPreview {room} info={getInfo(room._id, $infos)} />
+            {/each}
+          </FloorGrid>
+        </div>
+      {:else}
+        <button class="floor-empty-select" aria-label={floor.name} on:click={() => dispatch('select')}>
+          <span>+</span>
+        </button>
+      {/if}
+    </div>
   {/if}
 </div>
 
 <style lang="scss">
+  .floor-preview {
+    width: 100%;
+    min-width: 0;
+
+    &.empty.expanded {
+      flex: 0 0 10rem;
+      max-width: 100%;
+      min-height: 9rem;
+    }
+  }
+
   .floor-card {
     width: 100%;
     min-width: 0;
@@ -172,12 +185,6 @@
     &.selected {
       border-color: var(--theme-button-focused-border);
       background-color: var(--theme-panel-color);
-    }
-
-    &.empty.expanded {
-      flex: 0 0 10rem;
-      max-width: 100%;
-      min-height: 9rem;
     }
   }
 
@@ -235,7 +242,7 @@
     display: block;
     width: 100%;
     min-height: 5rem;
-    padding: 0 0.5rem 0.5rem;
+    padding: 0.5rem;
     cursor: pointer;
     text-align: center;
     color: var(--theme-content-color);
@@ -247,7 +254,7 @@
     display: flex;
     justify-content: center;
     width: 100%;
-    padding: 0 0.5rem 0.5rem;
+    padding: 0.5rem;
     overflow: hidden;
 
     :global(.floorGrid) {
