@@ -90,12 +90,16 @@ export class LoveClient {
     const platformToken = getPlatformToken()
     const res = await fetch(concatLink(endpoint, '/getToken'), {
       method: 'POST',
+      signal: AbortSignal.timeout(10000),
       headers: {
         Authorization: `Bearer ${platformToken}`,
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({ roomName: sessionName, _id: myPerson._id, participantName: myPerson.name })
     })
+    if (!res.ok) {
+      throw new Error(`Failed to obtain room token: ${res.status}`)
+    }
     return await res.text()
   }
 

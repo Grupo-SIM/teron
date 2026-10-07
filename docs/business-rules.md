@@ -81,4 +81,4 @@ Owner/Maintainer podem reordenar andares do Escritório pela alça de arraste ou
 
 Cada contato pode ter somente um vínculo com cada função; atribuições repetidas ou simultâneas não criam duplicatas.
 
-Chamadas de voz retomam automaticamente na mesma sala após interrupções recuperáveis de rede, mantendo estado de microfone/câmera e tentativas com espera crescente. Saída explícita encerra recuperação. Reconexão não dispara saída por sala vazia. Filtro Krisp exige LiveKit Cloud; servidor próprio mantém supressão nativa do navegador.
+Chamadas de voz e vídeo retomam automaticamente na mesma sala após interrupções recuperáveis de rede ou divergência de estado do LiveKit, mantendo estado de microfone/câmera e tentativas com espera crescente. Quando o SDK encerra a conexão recuperável, uma nova conexão usa token atualizado sem exigir troca de sala. Remoção pelo servidor, sala excluída e identidade duplicada não iniciam recuperação automática. Saída explícita encerra recuperação. Reconexão não dispara saída por sala vazia. Filtro Krisp exige LiveKit Cloud; servidor próprio mantém supressão nativa do navegador.

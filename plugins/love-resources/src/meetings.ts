@@ -48,14 +48,13 @@ export async function createMeeting (room: Room): Promise<void> {
 }
 
 export async function leaveMeeting (): Promise<void> {
+  liveKitClient.cancelRecovery()
   const client = getClient()
   const currentParticipationInfo = get(myInfo)
   const office = get(myOffice)
-  if (currentParticipationInfo === undefined) return
-
-  if (office === undefined) {
+  if (currentParticipationInfo !== undefined && office === undefined) {
     await client.update(currentParticipationInfo, { room: love.ids.Reception, x: 0, y: 0 })
-  } else {
+  } else if (currentParticipationInfo !== undefined && office !== undefined) {
     if (currentParticipationInfo.room !== office._id) {
       await client.update(currentParticipationInfo, { room: office._id, x: 0, y: 0 })
     } else {
@@ -88,7 +87,10 @@ export async function joinMeeting (room: Room): Promise<void> {
 }
 
 export async function joinOrCreateMeetingByInvite (roomId: Ref<Room>): Promise<void> {
-  if (currentMeetingRoom === roomId && liveKitClient.liveKitRoom.state !== ConnectionState.Disconnected) return
+  if (
+    currentMeetingRoom === roomId &&
+    (liveKitClient.isConnecting || liveKitClient.liveKitRoom.state !== ConnectionState.Disconnected)
+  ) return
 
   const client = getClient()
   const room = getRoomById(roomId)
@@ -118,7 +120,10 @@ export async function kick (person: Ref<Person>): Promise<void> {
 
 async function connectToMeeting (room: Room): Promise<void> {
   if (getCurrentAccount().role === AccountRole.ReadOnlyGuest) return
-  if (currentMeetingRoom === room._id && liveKitClient.liveKitRoom.state !== ConnectionState.Disconnected) return
+  if (
+    currentMeetingRoom === room._id &&
+    (liveKitClient.isConnecting || liveKitClient.liveKitRoom.state !== ConnectionState.Disconnected)
+  ) return
 
   if (currentMeetingRoom !== undefined) {
     await leaveMeeting()
@@ -132,7 +137,7 @@ async function connectToMeeting (room: Room): Promise<void> {
   try {
     const token = await loveClient.getRoomToken(room)
     const wsURL = getLiveKitEndpoint()
-    await liveKitClient.connect(wsURL, token, room.type === RoomType.Video)
+    await liveKitClient.connect(wsURL, token, room.type === RoomType.Video, async () => await loveClient.getRoomToken(room))
     await navigateToMeetingMinutes(room)
   } catch (err) {
     console.error(err)

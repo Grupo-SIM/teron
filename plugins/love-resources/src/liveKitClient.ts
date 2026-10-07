@@ -1,5 +1,6 @@
 import {
   ConnectionState,
+  DisconnectReason,
   type RemoteParticipant,
   Room as LKRoom,
   RoomEvent,
@@ -60,6 +61,12 @@ export class LiveKitClient {
   private lastParticipantNotificationTimeout: number = -1
   private lastParticipantDisconnectTimeout: number = -1
   private lastParticipantGeneration: number = 0
+  private recoveryGeneration: number = 0
+  private connection: { wsURL: string, refreshToken: () => Promise<string> } | undefined
+  private recovery: Promise<void> | undefined
+  private cancelRecoveryDelay: (() => void) | undefined
+  private cameraEnabled: boolean = false
+  private microphoneEnabled: boolean = false
 
   constructor () {
     const lkRoom = new LKRoom({
@@ -96,7 +103,10 @@ export class LiveKitClient {
     await this.liveKitRoom.prepareConnection(wsUrl, token)
   }
 
-  async connect (wsURL: string, token: string, withVideo: boolean): Promise<void> {
+  async connect (wsURL: string, token: string, withVideo: boolean, refreshToken?: () => Promise<string>): Promise<void> {
+    this.cancelRecovery()
+    await this.recovery
+    this.connection = refreshToken === undefined ? undefined : { wsURL, refreshToken }
     this.isConnecting = true
     this.currentSessionSupportsVideo = withVideo
     try {
@@ -118,6 +128,8 @@ export class LiveKitClient {
         setupMediaSession()
       ])
 
+      this.cameraEnabled = this.currentMediaSession?.state.camera?.enabled ?? false
+      this.microphoneEnabled = this.currentMediaSession?.state.microphone?.enabled ?? false
       this.currentMediaSession?.on('camera', (enabled) => {
         void this.setCameraEnabled(enabled)
       })
@@ -140,6 +152,7 @@ export class LiveKitClient {
 
       await this.updateActiveDevices()
     } catch (error) {
+      this.cancelRecovery()
       this.isConnecting = false
       this.currentMediaSession?.close()
       this.currentMediaSession?.removeAllListeners()
@@ -149,21 +162,29 @@ export class LiveKitClient {
   }
 
   async disconnect (): Promise<void> {
+    this.cancelRecovery()
     screenSharingState.set(ScreenSharingState.Inactive)
     this.clearLastParticipantTimeouts()
+    await this.recovery
     const me = this.liveKitRoom.localParticipant
-    await Promise.all([me.setScreenShareEnabled(false), me.setCameraEnabled(false), me.setMicrophoneEnabled(false)])
-    await this.liveKitRoom.disconnect()
-    this.currentSessionSupportsVideo = false
-    this.currentMediaSession?.close()
-    this.currentMediaSession?.removeAllListeners()
-    this.currentMediaSession = undefined
+    await Promise.allSettled([me.setScreenShareEnabled(false), me.setCameraEnabled(false), me.setMicrophoneEnabled(false)])
+    try {
+      await this.liveKitRoom.disconnect()
+    } finally {
+      this.isConnecting = false
+      lkSessionConnected.set(false)
+      this.currentSessionSupportsVideo = false
+      this.currentMediaSession?.close()
+      this.currentMediaSession?.removeAllListeners()
+      this.currentMediaSession = undefined
+    }
   }
 
   async awaitConnect (): Promise<void> {
     await new Promise<void>((resolve) => {
       if (this.liveKitRoom.state === ConnectionState.Connected) {
         resolve()
+        return
       }
       this.liveKitRoom.once(RoomEvent.Connected, () => {
         resolve()
@@ -185,17 +206,44 @@ export class LiveKitClient {
   onConnected = (): void => {
     this.isConnecting = false
     lkSessionConnected.set(true)
+    this.liveKitRoom.off(RoomEvent.ParticipantConnected, this.onParticipantConnected)
     this.liveKitRoom.on(RoomEvent.ParticipantConnected, this.onParticipantConnected)
+    this.liveKitRoom.off(RoomEvent.ParticipantDisconnected, this.onParticipantDisconnected)
     this.liveKitRoom.on(RoomEvent.ParticipantDisconnected, this.onParticipantDisconnected)
+    this.liveKitRoom.off(RoomEvent.TrackSubscribed, this.onTrackSubscribed)
     this.liveKitRoom.on(RoomEvent.TrackSubscribed, this.onTrackSubscribed)
+    this.liveKitRoom.off(RoomEvent.TrackUnsubscribed, this.onTrackUnsubscribed)
     this.liveKitRoom.on(RoomEvent.TrackUnsubscribed, this.onTrackUnsubscribed)
+    this.liveKitRoom.off(RoomEvent.LocalTrackPublished, this.onLocalTrackPublished)
     this.liveKitRoom.on(RoomEvent.LocalTrackPublished, this.onLocalTrackPublished)
+    this.liveKitRoom.off(RoomEvent.LocalTrackUnpublished, this.onLocalTrackUnpublished)
     this.liveKitRoom.on(RoomEvent.LocalTrackUnpublished, this.onLocalTrackUnpublished)
+    this.liveKitRoom.off(RoomEvent.TrackMuted, this.onTrackMuted)
     this.liveKitRoom.on(RoomEvent.TrackMuted, this.onTrackMuted)
+    this.liveKitRoom.off(RoomEvent.TrackUnmuted, this.onTrackUnmuted)
     this.liveKitRoom.on(RoomEvent.TrackUnmuted, this.onTrackUnmuted)
   }
 
-  onDisconnected = (): void => {
+  onDisconnected = (reason?: DisconnectReason): void => {
+    // STATE_MISMATCH bypasses the SDK reconnect policy and needs a fresh join.
+    const recoverable = reason === undefined ||
+      reason === DisconnectReason.UNKNOWN_REASON ||
+      reason === DisconnectReason.SERVER_SHUTDOWN ||
+      reason === DisconnectReason.STATE_MISMATCH ||
+      reason === DisconnectReason.JOIN_FAILURE ||
+      reason === DisconnectReason.MIGRATION ||
+      reason === DisconnectReason.SIGNAL_CLOSE
+    if (recoverable && this.connection !== undefined) {
+      this.isConnecting = true
+      this.clearLastParticipantTimeouts()
+      screenSharingState.set(ScreenSharingState.Inactive)
+      if (this.recovery === undefined) {
+        const generation = this.recoveryGeneration
+        this.recovery = this.recoverConnection(generation).finally(() => { this.recovery = undefined })
+      }
+      return
+    }
+    this.cancelRecovery()
     this.isConnecting = false
     this.clearLastParticipantTimeouts()
     screenSharingState.set(ScreenSharingState.Inactive)
@@ -212,6 +260,55 @@ export class LiveKitClient {
     this.liveKitRoom.off(RoomEvent.TrackMuted, this.onTrackMuted)
     this.liveKitRoom.off(RoomEvent.TrackUnmuted, this.onTrackUnmuted)
     Analytics.handleEvent(LoveEvents.DisconnectedFromRoom)
+  }
+
+  cancelRecovery (): void {
+    this.recoveryGeneration++
+    this.connection = undefined
+    this.cancelRecoveryDelay?.()
+  }
+
+  private async recoverConnection (generation: number): Promise<void> {
+    let attempt = 0
+    await this.waitForRecovery(300)
+    while (generation === this.recoveryGeneration && this.connection !== undefined) {
+      const connection = this.connection
+      try {
+        const token = await connection.refreshToken()
+        if (generation !== this.recoveryGeneration) return
+        await this.liveKitRoom.connect(connection.wsURL, token, {
+          maxRetries: 1,
+          websocketTimeout: 10000,
+          peerConnectionTimeout: 10000
+        })
+        if (generation !== this.recoveryGeneration) {
+          await this.liveKitRoom.disconnect()
+          return
+        }
+        await this.setActiveCamera(this.currentMediaSession?.state.camera?.deviceId)
+        await this.setActiveMicrophone(this.currentMediaSession?.state.microphone?.deviceId)
+        await this.setCameraEnabled(this.cameraEnabled)
+        await this.setMicrophoneEnabled(this.microphoneEnabled)
+        return
+      } catch (error) {
+        if (generation !== this.recoveryGeneration) return
+        console.error('Failed to recover meeting connection', error)
+        if (this.liveKitRoom.state === ConnectionState.Connected) return
+        await this.waitForRecovery(Math.min(1000 * 2 ** Math.min(attempt++, 5), 30000))
+      }
+    }
+  }
+
+  private async waitForRecovery (delay: number): Promise<void> {
+    await new Promise<void>((resolve) => {
+      const finish = (): void => {
+        clearTimeout(timer)
+        this.cancelRecoveryDelay = undefined
+        resolve()
+      }
+      const timer = window.setTimeout(finish, delay)
+      this.cancelRecoveryDelay = finish
+    })
   }
 
   private clearLastParticipantTimeouts (): void {
@@ -270,17 +367,16 @@ export class LiveKitClient {
   }
 
   onLocalTrackUnpublished = (publication: LocalTrackPublication, _participant: LocalParticipant): void => {
+    if (this.isConnecting || this.liveKitRoom.state !== ConnectionState.Connected) return
     const session = this.currentMediaSession
     if (publication.track?.kind === Track.Kind.Video) {
       if (publication.track.source === Track.Source.ScreenShare) {
         session?.setFeature('sharing', { enabled: false })
         screenSharingState.set(ScreenSharingState.Inactive)
-      } else {
-        session?.setCamera({ enabled: false })
       }
-    } else if (publication.track?.kind === Track.Kind.Audio) {
-      session?.setMicrophone({ enabled: false })
     }
+    // SDK teardown unpublishes camera/microphone before Disconnected. Keep the
+    // user's desired state so a fresh connection restores it.
   }
 
   onTrackMuted = (publication: TrackPublication, participant: Participant): void => {
@@ -356,6 +452,8 @@ export class LiveKitClient {
   }
 
   async setCameraEnabled (value: boolean): Promise<void> {
+    this.cameraEnabled = value
+    if (this.liveKitRoom.state !== ConnectionState.Connected) return
     if (!this.currentSessionSupportsVideo) return
     try {
       await this.liveKitRoom.localParticipant.setCameraEnabled(value)
@@ -371,6 +469,8 @@ export class LiveKitClient {
   }
 
   async setMicrophoneEnabled (value: boolean): Promise<void> {
+    this.microphoneEnabled = value
+    if (this.liveKitRoom.state !== ConnectionState.Connected) return
     try {
       await this.liveKitRoom.localParticipant.setMicrophoneEnabled(value)
     } catch (e) {
