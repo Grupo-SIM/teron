@@ -525,8 +525,10 @@ export const IssuePriorityColor = {
 }
 
 export async function getVisibleFilters (filters: KeyFilter[], space?: Ref<Space>): Promise<KeyFilter[]> {
-  // Removes the "Project" filter if a specific space is provided
-  return space === undefined ? filters : filters.filter((f) => f.key !== 'space')
+  // Legacy attributes remain stored, but no longer belong to the task UI.
+  const removed = new Set(['component', 'blockedBy', 'relations', 'repository'])
+  return filters.filter((filter) => !removed.has(filter.attribute?.name ?? filter.key) &&
+    (space === undefined || filter.key !== 'space'))
 }
 
 export function getIssueChatTitle (object: Issue): string {
