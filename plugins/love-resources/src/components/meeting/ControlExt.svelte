@@ -27,7 +27,7 @@
   import PersonActionPopup from '../PersonActionPopup.svelte'
   import RoomPopup from '../RoomPopup.svelte'
   import RoomButton from '../RoomButton.svelte'
-  import { leaveMeeting, currentMeetingRoom } from '../../meetings'
+  import { leaveMeeting, currentMeetingRoom, recoverMeetingPresence } from '../../meetings'
   import { lkSessionConnected } from '../../liveKitClient'
 
   const client = getClient()
@@ -71,7 +71,8 @@
 
   $: receptionParticipants = $infos.filter((p) => p.room === love.ids.Reception)
 
-  function checkActiveMeeting (loc: Location, meetingSessionConnected: boolean, room: Ref<Room> | undefined): void {
+  function checkActiveMeeting (loc: Location, meetingSessionConnected: boolean, room: Ref<Room> | undefined, participation: ParticipantInfo | undefined): void {
+    if (recoverMeetingPresence(participation)) return
     const meetingWidgetState = $sidebarStore.widgetsState.get(love.ids.MeetingWidget)
     const isMeetingWidgetCreated = meetingWidgetState !== undefined
 
@@ -100,7 +101,7 @@
     }
   }
 
-  $: checkActiveMeeting($location, $lkSessionConnected, $currentRoom?._id)
+  $: checkActiveMeeting($location, $lkSessionConnected, $currentRoom?._id, $myInfo)
 
   $: joined = activeRooms.filter((r) => $myInfo?.room === r._id)
 

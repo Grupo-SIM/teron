@@ -1,6 +1,6 @@
 import { ConnectionState } from 'livekit-client'
 import core, { AccountRole, getCurrentAccount, type Ref } from '@hcengineering/core'
-import love, { getFreeRoomPlace, MeetingStatus, type Room, RoomType, isOffice, RoomAccess } from '@hcengineering/love'
+import love, { getFreeRoomPlace, MeetingStatus, type Room, type ParticipantInfo, RoomType, isOffice, RoomAccess } from '@hcengineering/love'
 import presentation, { getClient } from '@hcengineering/presentation'
 import {
   closeMeetingMinutes,
@@ -18,8 +18,40 @@ import { getPersonByPersonRef } from '@hcengineering/contact-resources'
 import { getMetadata } from '@hcengineering/platform'
 import { sendJoinRequest, unsubscribeJoinRequests } from './joinRequests'
 import { getDateLocale } from '@hcengineering/ui'
+import { shouldRestoreMeetingPresence } from './meeting-presence-recovery'
 
 export let currentMeetingRoom: Ref<Room> | undefined
+let meetingPresence: ParticipantInfo | undefined
+let restoringPresence: Ref<ParticipantInfo> | undefined
+
+export function recoverMeetingPresence (info: ParticipantInfo | undefined): boolean {
+  if (!liveKitClient.isConnecting && liveKitClient.liveKitRoom.state === ConnectionState.Disconnected) return false
+  const room = get(rooms).find((room) => room._id === currentMeetingRoom)
+  const sessionId = getMetadata(presentation.metadata.SessionId) ?? null
+  if (info !== undefined && info.room === currentMeetingRoom && info.sessionId === sessionId) {
+    meetingPresence = { ...info }
+  }
+  if (info !== undefined && restoringPresence === info._id && room !== undefined &&
+    ((info.room === room._id && info.sessionId === sessionId) ||
+      (info.room === (get(myOffice)?._id ?? love.ids.Reception) && info.sessionId === null))) return true
+  if (!shouldRestoreMeetingPresence(
+    meetingPresence, info, currentMeetingRoom, sessionId,
+    get(myOffice)?._id ?? love.ids.Reception, room !== undefined
+  ) || info === undefined || room === undefined) return false
+
+  restoringPresence = info._id
+  const meetingRoom = currentMeetingRoom
+  const place = getFreeRoomPlace(room, get(infos).filter((participant) => participant.room === room._id), getCurrentEmployee())
+  void getClient().diffUpdate(info, { room: room._id, sessionId, x: place.x, y: place.y }).then(() => {
+    if (currentMeetingRoom === meetingRoom) meetingPresence = { ...info, room: room._id, sessionId }
+  }).catch((err) => {
+    console.error('Failed to restore meeting presence', err)
+    if (currentMeetingRoom === meetingRoom) void leaveMeeting()
+  }).finally(() => {
+    if (restoringPresence === info._id) restoringPresence = undefined
+  })
+  return true
+}
 
 export async function createMeeting (room: Room): Promise<void> {
   if (room.access === RoomAccess.DND) return
@@ -48,6 +80,9 @@ export async function createMeeting (room: Room): Promise<void> {
 }
 
 export async function leaveMeeting (): Promise<void> {
+  currentMeetingRoom = undefined
+  meetingPresence = undefined
+  restoringPresence = undefined
   liveKitClient.cancelRecovery()
   const client = getClient()
   const currentParticipationInfo = get(myInfo)
@@ -133,6 +168,7 @@ async function connectToMeeting (room: Room): Promise<void> {
 
   await navigateToOfficeDoc(room)
   await moveToMeetingRoom(room)
+  recoverMeetingPresence(get(myInfo))
 
   try {
     const token = await loveClient.getRoomToken(room)
@@ -164,6 +200,7 @@ async function moveToMeetingRoom (room: Room): Promise<void> {
       room: room._id,
       sessionId
     })
+    meetingPresence = { ...currentInfo, room: room._id, sessionId }
   } else {
     await client.createDoc(love.class.ParticipantInfo, core.space.Workspace, {
       x: place.x,

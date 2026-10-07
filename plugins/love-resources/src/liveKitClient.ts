@@ -289,6 +289,13 @@ export class LiveKitClient {
         await this.setActiveMicrophone(this.currentMediaSession?.state.microphone?.deviceId)
         await this.setCameraEnabled(this.cameraEnabled)
         await this.setMicrophoneEnabled(this.microphoneEnabled)
+        // A second terminal disconnect can arrive while devices are restoring.
+        // Its handler shares this recovery promise, so keep retrying here.
+        if (generation !== this.recoveryGeneration) return
+        if (this.liveKitRoom.state === ConnectionState.Disconnected) {
+          await this.waitForRecovery(Math.min(1000 * 2 ** Math.min(attempt++, 5), 30000))
+          continue
+        }
         return
       } catch (error) {
         if (generation !== this.recoveryGeneration) return

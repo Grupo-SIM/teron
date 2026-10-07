@@ -10,8 +10,10 @@
   import { subscribeJoinRequests, unsubscribeJoinRequests } from '../joinRequests'
   import { Ref } from '@hcengineering/core'
   import { myInfo } from '../stores'
+  import { RemoteAudio } from '../remote-audio'
 
   let parentElement: HTMLDivElement
+  let audio: RemoteAudio | undefined
 
   function handleTrackSubscribed (
     track: RemoteTrack,
@@ -19,9 +21,7 @@
     _participant: RemoteParticipant
   ): void {
     if (track.kind === Track.Kind.Audio) {
-      const element = track.attach()
-      element.id = publication.trackSid
-      parentElement.appendChild(element)
+      audio?.attach(track)
     }
   }
 
@@ -31,11 +31,18 @@
     _participant: RemoteParticipant
   ): void {
     if (track.kind === Track.Kind.Audio) {
-      const element = document.getElementById(publication.trackSid)
-      if (element != null) {
-        parentElement.removeChild(element)
+      audio?.detach(track)
+    }
+  }
+
+  function reconcileAudio (): void {
+    const tracks: RemoteTrack[] = []
+    for (const participant of lk.remoteParticipants.values()) {
+      for (const publication of participant.audioTrackPublications.values()) {
+        if (publication.track !== undefined) tracks.push(publication.track)
       }
     }
+    audio?.reconcile(tracks)
   }
 
   function subscribeRoomRequests (room: Ref<Room> | undefined): void {
@@ -49,17 +56,25 @@
   $: subscribeRoomRequests($myInfo?.room)
 
   onMount(async () => {
+    audio = new RemoteAudio(parentElement)
     pushRootBarComponent('left', love.component.ControlExt, 20)
     lk.on(RoomEvent.TrackSubscribed, handleTrackSubscribed)
     lk.on(RoomEvent.TrackUnsubscribed, handleTrackUnsubscribed)
+    lk.on(RoomEvent.Connected, reconcileAudio)
+    lk.on(RoomEvent.Reconnected, reconcileAudio)
+    reconcileAudio()
 
     await subscribeInviteRequests()
   })
 
   onDestroy(async () => {
-    await unsubscribeInviteRequests()
     lk.off(RoomEvent.TrackSubscribed, handleTrackSubscribed)
     lk.off(RoomEvent.TrackUnsubscribed, handleTrackUnsubscribed)
+    lk.off(RoomEvent.Connected, reconcileAudio)
+    lk.off(RoomEvent.Reconnected, reconcileAudio)
+    audio?.clear()
+    audio = undefined
+    await unsubscribeInviteRequests()
     if ($lkSessionConnected) {
       await liveKitClient.disconnect()
     }

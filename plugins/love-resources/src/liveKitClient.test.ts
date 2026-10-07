@@ -119,6 +119,22 @@ describe('LiveKit terminal disconnection recovery', () => {
     expect(client.liveKitRoom.disconnect).toHaveBeenCalledTimes(1)
   })
 
+  test('another terminal disconnect during device restoration keeps recovery alive', async () => {
+    const switchDevice = client.liveKitRoom.switchActiveDevice as jest.Mock
+    switchDevice.mockImplementationOnce(async () => {
+      loseConnection(DisconnectReason.STATE_MISMATCH)
+    })
+    loseConnection(DisconnectReason.STATE_MISMATCH)
+    await jest.advanceTimersByTimeAsync(300)
+    await flush()
+    expect(refreshToken).toHaveBeenCalledTimes(1)
+    await jest.advanceTimersByTimeAsync(1000)
+    await flush()
+    expect(refreshToken).toHaveBeenCalledTimes(2)
+    expect(client.liveKitRoom.state).toBe(ConnectionState.Connected)
+    expect(client.liveKitRoom.localParticipant.setMicrophoneEnabled).toHaveBeenLastCalledWith(true)
+  })
+
   test('explicit disconnect prevents reconnect after pending token refresh resolves', async () => {
     let resolveToken: (token: string) => void = () => {}
     refreshToken.mockImplementation(async () => await new Promise<string>((resolve) => { resolveToken = resolve }))
