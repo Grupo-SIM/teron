@@ -159,11 +159,8 @@
   <div class="antiPopup" on:keydown={keyDown}>
     <div class="ap-space x2" />
 
-    <div class="p-2 ml-2 mr-2 mb-2 flex-grow flex flex-col">
-      <div class="text-lg font-bold">
-        {getMetadata(presentation.metadata.WorkspaceName) ?? ''}
-      </div>
-      {#if hasRating}
+    {#if hasRating}
+      <div class="p-2 ml-2 mr-2 mb-2 flex-grow flex flex-col">
         <div class="flex-row-center text-sm">
           <Component
             is={ratingPlugin.component.RatingRing}
@@ -173,8 +170,8 @@
         <div class="flex-row-center mt-2">
           <Component is={ratingPlugin.component.RatingActivities} props={{ rating: sysRating }} />
         </div>
-      {/if}
-    </div>
+      </div>
+    {/if}
 
     {#if isAdmin}
       <div class="p-2 ml-2 mr-2 mb-2 flex-grow flex-row-center">
@@ -248,11 +245,6 @@
                     </div>
                   {/if}
                 </span>
-                {#if isAdmin && wsName !== ws.url}
-                  <span class="text-xs">
-                    ({ws.url})
-                  </span>
-                {/if}
                 {#if isAdmin && (_activeSession?.length ?? 0) > 0}
                   <span class="text-xs flex-row-center">
                     <div class="mr-1">
