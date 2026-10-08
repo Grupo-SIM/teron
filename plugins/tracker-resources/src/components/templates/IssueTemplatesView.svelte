@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { AccountRole, getCurrentAccount, hasAccountRole, type DocumentQuery, type Ref, type Space } from '@hcengineering/core'
+  import { type DocumentQuery, type Ref, type Space } from '@hcengineering/core'
   import { type IntlString, translate } from '@hcengineering/platform'
   import { type IssueTemplate } from '@hcengineering/tracker'
   import { Breadcrumb, Button, Header, IconAdd, SearchInput, showPopup, themeStore } from '@hcengineering/ui'
@@ -32,7 +32,6 @@
     <SearchInput bind:value={search} collapsed />
   </svelte:fragment>
   <svelte:fragment slot="actions">
-    {#if hasAccountRole(getCurrentAccount(), AccountRole.Maintainer)}
       <Button
         icon={IconAdd}
         label={tracker.string.IssueTemplate}
@@ -45,7 +44,6 @@
         kind={'primary'}
         on:click={() => showPopup(CreateTextTemplate, {}, 'top')}
       />
-    {/if}
   </svelte:fragment>
 </Header>
 <slot name="afterHeader" />

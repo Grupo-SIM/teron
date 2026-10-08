@@ -13,6 +13,7 @@
 // limitations under the License.
 -->
 <script lang="ts">
+  import { isUnrestrictedTrackerCreation } from '../tracker-creation-policy'
   import contact from '@hcengineering/contact'
   import { Class, Doc, DocumentQuery, FindOptions, Ref, Space, WithLookup, mergeQueries, AccountRole, getCurrentAccount, hasAccountRole } from '@hcengineering/core'
   import { Asset, getResource, IntlString, Resource } from '@hcengineering/platform'
@@ -69,7 +70,7 @@
   const client = getClient()
   const hierarchy = client.getHierarchy()
 
-  $: canCreate = hasAccountRole(getCurrentAccount(), AccountRole.Maintainer)
+  $: canCreate = (isUnrestrictedTrackerCreation(_class) || hasAccountRole(getCurrentAccount(), AccountRole.Maintainer))
 
   let search = ''
   let viewlet: WithLookup<Viewlet> | undefined

@@ -26,6 +26,7 @@ export function canChangeAttribute (
 ): boolean {
   const account = getCurrentAccount()
   const ancestors = getClient().getHierarchy().getAncestors(_class)
+  if (ancestors.some((id) => id.startsWith('tracker:class:'))) return true
   if (!ancestors.includes(task.class.Task) && !hasAccountRole(account, AccountRole.Maintainer)) {
     if (!hasAccountRole(account, AccountRole.User)) return false
     if (ancestors.includes('document:class:Document' as Ref<Class<Doc>>) && object !== undefined && (object as Doc & { lockedBy?: unknown }).lockedBy != null) return false
@@ -69,6 +70,8 @@ export function canChangeAttribute (
 }
 
 export function canChangeDoc (_class: Ref<Class<Doc>>, space: Ref<Space>, store: PermissionsStore): boolean {
+  const ancestors = getClient().getHierarchy().getAncestors(_class)
+  if (ancestors.some((id) => id.startsWith('tracker:class:'))) return true
   if (!canMutateWorkspaceClass(getCurrentAccount(), getClient().getHierarchy().getAncestors(_class), 'update')) return false
   const arePermissionsDisabled = getMetadata(core.metadata.DisablePermissions) ?? false
   if (arePermissionsDisabled) return true
@@ -109,6 +112,8 @@ export function canChangeDoc (_class: Ref<Class<Doc>>, space: Ref<Space>, store:
 }
 
 export function canRemoveDoc (_class: Ref<Class<Doc>>, space: Ref<Space>, store: PermissionsStore): boolean {
+  const ancestors = getClient().getHierarchy().getAncestors(_class)
+  if (ancestors.some((id) => id.startsWith('tracker:class:'))) return true
   if (!canMutateWorkspaceClass(getCurrentAccount(), getClient().getHierarchy().getAncestors(_class), 'remove')) return false
   const arePermissionsDisabled = getMetadata(core.metadata.DisablePermissions) ?? false
   if (arePermissionsDisabled) return true
@@ -132,7 +137,9 @@ export function canRemoveDoc (_class: Ref<Class<Doc>>, space: Ref<Space>, store:
 }
 
 export function canCreateObject (_class: Ref<Class<Doc>>, space: Ref<Space>, store: PermissionsStore): boolean {
+  const ancestors = getClient().getHierarchy().getAncestors(_class)
   if (!canMutateWorkspaceClass(getCurrentAccount(), getClient().getHierarchy().getAncestors(_class), 'create')) return false
+  if (ancestors.some((id) => id.startsWith('tracker:class:'))) return true
   const arePermissionsDisabled = getMetadata(core.metadata.DisablePermissions) ?? false
   if (arePermissionsDisabled) return true
   if (store.whitelist.has(space)) return true

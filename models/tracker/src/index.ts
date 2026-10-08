@@ -379,7 +379,6 @@ function defineApplication (
             spaceClass: tracker.class.Project,
             addSpaceLabel: tracker.string.CreateProject,
             createComponent: tracker.component.CreateProject,
-            visibleIf: tracker.function.IsProjectJoined,
             icon: tracker.icon.Home,
             specials: [
               {
@@ -731,11 +730,7 @@ function defineSpaceType (builder: Builder): void {
       description: tracker.string.ManageWorkflowStatuses,
       icon: task.icon.Task,
       baseClass: tracker.class.Project,
-      availablePermissions: [
-        core.permission.UpdateSpace,
-        core.permission.ArchiveSpace,
-        core.permission.ForbidDeleteObject
-      ],
+      availablePermissions: [],
       allowedClassic: true,
       allowedTaskTypeDescriptors: [tracker.descriptors.Issue]
     },

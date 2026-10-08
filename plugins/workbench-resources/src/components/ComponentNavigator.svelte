@@ -14,6 +14,7 @@
 -->
 
 <script lang="ts">
+  import { isUnrestrictedTrackerCreation } from '../tracker-creation-policy'
   import { onDestroy } from 'svelte'
   import {
     AnyComponent,
@@ -79,7 +80,7 @@
   }
 
   function showCreateDialog (): void {
-    if (createComponent === undefined || !hasAccountRole(getCurrentAccount(), AccountRole.Maintainer)) return
+    if (createComponent === undefined || !(isUnrestrictedTrackerCreation(createComponent) || hasAccountRole(getCurrentAccount(), AccountRole.Maintainer))) return
     showPopup(createComponent, { ...createComponentProps, space }, 'top')
   }
 
@@ -133,7 +134,7 @@
         <Header adaptive={'disabled'}>
           <Breadcrumb icon={navigationComponentIcon} label={navigationComponentLabel} size={'large'} isCurrent />
           <svelte:fragment slot="actions">
-            {#if createComponent && hasAccountRole(getCurrentAccount(), AccountRole.Maintainer)}
+            {#if createComponent && (isUnrestrictedTrackerCreation(createComponent) || hasAccountRole(getCurrentAccount(), AccountRole.Maintainer))}
               <Button
                 icon={IconAdd}
                 kind={'icon'}

@@ -44,6 +44,7 @@ import { BaseMiddleware } from '@hcengineering/server-core'
  * @public
  */
 export class SpacePermissionsMiddleware extends BaseMiddleware implements Middleware {
+  private readonly trackerSpaces = new Set<Ref<Space>>()
   private whitelistSpaces = new Set<Ref<Space>>()
   private readonly restrictedSpaces = new Set<Ref<Space>>()
   private assignmentBySpace: Record<Ref<Space>, RolesAssignment> = {}
@@ -68,6 +69,7 @@ export class SpacePermissionsMiddleware extends BaseMiddleware implements Middle
         const spaces: Space[] = (await this.next?.findAll(ctx, core.class.Space, {})) ?? []
 
         for (const space of spaces) {
+          if (this.isTrackerSpace(space._class)) this.trackerSpaces.add(space._id)
           if (this.isTypedSpace(space)) {
             this.addRestrictedSpace(space)
           }
@@ -147,6 +149,10 @@ export class SpacePermissionsMiddleware extends BaseMiddleware implements Middle
     this.assignmentBySpace[space._id] = requiredValues
 
     this.setPermissions(space._id, this.getRoles(spaceType._id), asMixin, this.getPermissions())
+  }
+
+  private isTrackerSpace (_class: Ref<Class<Space>>): boolean {
+    return this.context.hierarchy.isDerived(_class, 'tracker:class:Project' as Ref<Class<Space>>)
   }
 
   private isTypedSpaceClass (_class: Ref<Class<Space>>): boolean {
@@ -250,6 +256,7 @@ export class SpacePermissionsMiddleware extends BaseMiddleware implements Middle
 
   private handleCreate (tx: TxCUD<Space>): void {
     const createTx = tx as TxCreateDoc<Space>
+    if (this.isTrackerSpace(createTx.objectClass)) this.trackerSpaces.add(createTx.objectId)
     if (!this.context.hierarchy.isDerived(createTx.objectClass, core.class.Space)) return
     if (this.isTypedSpaceClass(createTx.objectClass)) {
       const res = TxProcessor.buildDoc2Doc<TypedSpace>([createTx])
@@ -443,6 +450,8 @@ export class SpacePermissionsMiddleware extends BaseMiddleware implements Middle
     const cudTx = tx as TxCUD<Doc>
     const h = this.context.hierarchy
     const isSpace = h.isDerived(cudTx.objectClass, core.class.Space)
+    // Sector creation is enforced by workspace authorization, not sector roles.
+    if (this.isTrackerSpace(cudTx.objectClass as Ref<Class<Space>>) || this.trackerSpaces.has(cudTx.objectSpace)) return
 
     this.checkSpacePermissions(ctx, cudTx, cudTx.objectSpace)
     if (isSpace) {

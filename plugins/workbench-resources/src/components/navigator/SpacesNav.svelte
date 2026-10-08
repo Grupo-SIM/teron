@@ -14,6 +14,7 @@
 // limitations under the License.
 -->
 <script lang="ts">
+  import { isUnrestrictedTrackerCreation } from '../../tracker-creation-policy'
   import core, { Doc, Ref, Space, AccountRole, getCurrentAccount, hasAccountRole } from '@hcengineering/core'
   import { IntlString, getResource } from '@hcengineering/platform'
   import preference from '@hcengineering/preference'
@@ -103,7 +104,7 @@
   function getParentActions (): Action[] {
     const result = hasSpaceBrowser ? [browseSpaces] : []
     if (
-      hasAccountRole(getCurrentAccount(), AccountRole.Maintainer) &&
+      (isUnrestrictedTrackerCreation(model.spaceClass) || hasAccountRole(getCurrentAccount(), AccountRole.Maintainer)) &&
       model.addSpaceLabel !== undefined &&
       model.createComponent !== undefined
     ) {

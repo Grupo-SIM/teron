@@ -59,6 +59,9 @@ import {
 } from '@hcengineering/server-core'
 import { isOwner, isSystem } from './utils'
 
+// Tracker sectors are workspace-wide; other spaces retain their existing security.
+const trackerProjectClass = 'tracker:class:Project' as Ref<Class<Space>>
+
 type SpaceWithMembers = Pick<Space, '_id' | 'members' | 'private' | '_class' | 'archived'>
 
 /**
@@ -67,6 +70,7 @@ type SpaceWithMembers = Pick<Space, '_id' | 'members' | 'private' | '_class' | '
 export class SpaceSecurityMiddleware extends BaseMiddleware implements Middleware {
   private allowedSpaces: Record<AccountUuid, Ref<Space>[]> = {}
   private readonly spacesMap = new Map<Ref<Space>, SpaceWithMembers>()
+  private readonly trackerSpaces = new Set<Ref<Space>>()
   private readonly privateSpaces = new Set<Ref<Space>>()
   private readonly _domainSpaces = new Map<string, Set<Ref<Space>> | Promise<Set<Ref<Space>>>>()
   private readonly publicSpaces = new Set<Ref<Space>>()
@@ -112,6 +116,7 @@ export class SpaceSecurityMiddleware extends BaseMiddleware implements Middlewar
 
   private addSpace (space: SpaceWithMembers): void {
     this.spacesMap.set(space._id, space)
+    if (this.context.hierarchy.isDerived(space._class, trackerProjectClass)) this.trackerSpaces.add(space._id)
     if (space.private) {
       this.privateSpaces.add(space._id)
     } else {
@@ -146,6 +151,7 @@ export class SpaceSecurityMiddleware extends BaseMiddleware implements Middlewar
               }
             )) ?? []
           this.spacesMap.clear()
+          this.trackerSpaces.clear()
           this.publicSpaces.clear()
           this.systemSpaces.clear()
           for (const space of spaces) {
@@ -183,6 +189,7 @@ export class SpaceSecurityMiddleware extends BaseMiddleware implements Middlewar
       }
     }
     this.spacesMap.delete(_id)
+    this.trackerSpaces.delete(_id)
     this.privateSpaces.delete(_id)
     this.publicSpaces.delete(_id)
   }
@@ -459,6 +466,7 @@ export class SpaceSecurityMiddleware extends BaseMiddleware implements Middlewar
     ctx.contextData.broadcast.targets.spaceSec = async (tx) => {
       const cud = tx as TxCUD<Doc>
       if (cud.objectClass === undefined) return undefined
+      if (this.trackerSpaces.has(tx.objectSpace)) return undefined
 
       // For system and main spaces broadcast to all users except guests that are not collaborators for objects with collab security enabled
       if (this.systemSpaces.has(tx.objectSpace) || this.mainSpaces.has(tx.objectSpace)) {
@@ -532,7 +540,7 @@ export class SpaceSecurityMiddleware extends BaseMiddleware implements Middlewar
     forSearch: boolean = false
   ): Ref<Space>[] {
     const userSpaces = this.allowedSpaces[account.uuid] ?? []
-    let res = [...Array.from(userSpaces), account.uuid as unknown as Ref<Space>, ...this.mainSpaces]
+    let res = [...Array.from(userSpaces), account.uuid as unknown as Ref<Space>, ...this.mainSpaces, ...this.trackerSpaces]
     if (!forSearch || account.role !== AccountRole.ReadOnlyGuest) {
       res = [...res, ...this.systemSpaces]
     }

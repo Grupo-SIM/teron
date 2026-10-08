@@ -142,15 +142,33 @@ describe('server authorization before persistence', () => {
     await middleware.tx(ctx, [{ _class: core.class.TxApplyIf, txes: [create, update('new-task', task.class.Task, { title: 'Changed', dueDate: 0 }), update('otherTask', task.class.Task, { status: 'done' }), update('task', task.class.Task, { $push: { assignees: 'other' } }), remove] } as unknown as Tx])
     expect(forward).toHaveBeenCalledTimes(2)
   })
-  it.each([AccountRole.User, AccountRole.ReadOnlyGuest, AccountRole.DocGuest])('protects %s inaccessible parents, moves and project changes', async (role) => {
+  it.each([AccountRole.User, AccountRole.ReadOnlyGuest, AccountRole.DocGuest])('protects %s inaccessible parents and moves while allowing sector changes', async (role) => {
     const { middleware, ctx } = fixture(role)
     await middleware.tx(ctx, [update('task', task.class.Task, { space: 'readerSpace' })])
     await expect(middleware.tx(ctx, [update('task', task.class.Task, { space: 'hidden' })])).rejects.toThrow()
     await expect(middleware.tx(ctx, [update('task', task.class.Task, { $set: { '_id.value': 'forged' } })])).rejects.toThrow()
-    await expect(middleware.tx(ctx, [update('project', tracker.class.Project, { $inc: { sequence: 2 } })])).rejects.toThrow()
-    await expect(middleware.tx(ctx, [update('project', tracker.class.Project, { $inc: { sequence: 1 }, name: 'Forged' })])).rejects.toThrow()
+    await middleware.tx(ctx, [update('project', tracker.class.Project, { $inc: { sequence: 2 } })])
+    await middleware.tx(ctx, [update('project', tracker.class.Project, { $inc: { sequence: 1 }, name: 'Changed' })])
     const create = { _class: core.class.TxCreateDoc, objectId: 'new-task', objectClass: task.class.Task, objectSpace: space, attributes: { attachedTo: 'hidden', attachedToClass: task.class.Task, collection: 'tasks' } } as unknown as Tx
     await expect(middleware.tx(ctx, [create])).rejects.toThrow()
+  })
+  it.each(Object.values(AccountRole))('restricts %s sector creation to managers and owners', async (role) => {
+    const { middleware, ctx, forward } = fixture(role)
+    const create = { _class: core.class.TxCreateDoc, objectId: 'new-sector', objectClass: tracker.class.Project, objectSpace: space, attributes: { label: 'Project' } } as unknown as Tx
+    if ([AccountRole.Maintainer, AccountRole.Owner, AccountRole.Admin].includes(role as any)) {
+      await middleware.tx(ctx, [create])
+      expect(forward).toHaveBeenCalledTimes(1)
+    } else {
+      await expect(middleware.tx(ctx, [create])).rejects.toBeInstanceOf(PlatformError)
+      await expect(middleware.tx(ctx, [{ _class: core.class.TxApplyIf, txes: [create] } as unknown as Tx])).rejects.toBeInstanceOf(PlatformError)
+      expect(forward).not.toHaveBeenCalled()
+    }
+  })
+  it.each(Object.values(AccountRole))('allows %s project creation and editing', async (role) => {
+    const { middleware, ctx, forward } = fixture(role)
+    const create = { _class: core.class.TxCreateDoc, objectId: 'new-project', objectClass: tracker.class.Milestone, objectSpace: space, attributes: { label: 'Project' } } as unknown as Tx
+    await middleware.tx(ctx, [create, update('new-project', tracker.class.Milestone, { label: 'Changed' })])
+    expect(forward).toHaveBeenCalledTimes(1)
   })
   it('allows assigned status and accessible descriptions, forwarding once', async () => {
     const { middleware, ctx, forward } = fixture()

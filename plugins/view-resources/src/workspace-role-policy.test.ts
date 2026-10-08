@@ -9,9 +9,19 @@ describe('workspace role ceiling', () => {
       expect(canMutateWorkspaceClass(account(role), ['document:class:Document'], operation)).toBe(false)
     }
   })
-  test.each(['document:class:Teamspace', 'tracker:class:Project', 'drive:class:File', 'contact:class:Person'])('members cannot manage structural records (%s)', (id) => {
+  test.each(['document:class:Teamspace', 'drive:class:File', 'contact:class:Person'])('members cannot manage structural records (%s)', (id) => {
     for (const operation of ['create', 'update', 'remove'] as const) {
       expect(canMutateWorkspaceClass(account(AccountRole.User), [id], operation)).toBe(false)
+    }
+  })
+  test.each(Object.values(AccountRole))('tracker only restricts sector creation (%s)', (role) => {
+    for (const operation of ['create', 'update', 'remove'] as const) {
+      for (const id of ['tracker:class:Milestone', 'tracker:class:IssueTemplate', 'tracker:class:Component']) {
+        expect(canMutateWorkspaceClass(account(role), [id], operation)).toBe(true)
+      }
+      expect(canMutateWorkspaceClass(account(role), ['tracker:class:Project'], operation)).toBe(
+        operation !== 'create' || [AccountRole.Maintainer, AccountRole.Owner, AccountRole.Admin].includes(role)
+      )
     }
   })
   test('members can edit, delete and move guidelines', () => {

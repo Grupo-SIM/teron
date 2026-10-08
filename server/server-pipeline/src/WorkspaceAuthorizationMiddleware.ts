@@ -43,9 +43,11 @@ export class WorkspaceAuthorizationMiddleware extends BaseMiddleware {
     for (const tx of clientTransactions(txes)) {
       const isDocument = hierarchy.isDerived(tx.objectClass, document.class.Document)
       const isTask = hierarchy.isDerived(tx.objectClass, task.class.Task)
+      const isTrackerDocument = tx.objectClass.startsWith('tracker:')
+      const isTrackerSector = hierarchy.isDerived(tx.objectClass, tracker.class.Project)
+      if (isTrackerSector && tx._class === core.class.TxCreateDoc && !administrator) throw new PlatformError(new Status(Severity.ERROR, platform.status.Forbidden, {}))
       const isTagReference = hierarchy.isDerived(tx.objectClass, tags.class.TagReference)
       const taskSequence = tx.objectClass === tracker.class.Project && tx._class === core.class.TxUpdateDoc && JSON.stringify((tx as TxUpdateDoc<Doc>).operations) === JSON.stringify({ $inc: { sequence: 1 } })
-      if (!isTask && !isTagReference && !taskSequence && !hasAccountRole(account, AccountRole.User)) throw new PlatformError(new Status(Severity.ERROR, platform.status.Forbidden, {}))
       const created = tx._class === core.class.TxCreateDoc
       const updated = tx._class === core.class.TxUpdateDoc
       const data = created
@@ -54,6 +56,8 @@ export class WorkspaceAuthorizationMiddleware extends BaseMiddleware {
       if (data === undefined || data.space !== tx.objectSpace) throw new Error('Cannot modify an inaccessible document or spoof its space.')
       const spaces = await reader.findAll(ctx, core.class.Space, { _id: tx.objectSpace })
       if (spaces.length === 0) throw new Error('Cannot modify an inaccessible space.')
+      const trackerContent = hierarchy.isDerived(spaces[0]._class, tracker.class.Project)
+      if (!trackerContent && !isTrackerDocument && !isTask && !isTagReference && !taskSequence && !hasAccountRole(account, AccountRole.User)) throw new PlatformError(new Status(Severity.ERROR, platform.status.Forbidden, {}))
       if (administrator) {
         if (created) pending.set(tx.objectId, data)
         continue
@@ -70,14 +74,14 @@ export class WorkspaceAuthorizationMiddleware extends BaseMiddleware {
           if (parent.space !== tx.objectSpace && !hierarchy.isDerived(data._class, calendar.class.Event) && !hierarchy.isDerived(data._class, time.class.ToDo)) throw new Error('Cannot attach content across spaces.')
         }
       }
-      const fields = updated ? changedFields((tx as TxUpdateDoc<Doc>).operations, isTask || taskSequence) : []
+      const fields = updated ? changedFields((tx as TxUpdateDoc<Doc>).operations, isTask || taskSequence || isTrackerDocument || trackerContent) : []
       if (updated && fields.some((field) => (field === '*' ? tx.objectClass !== chunter.class.Channel : ['_id', '_class', ...(isTask || isDocument ? [] : ['space']), 'createdBy', 'createdOn', 'modifiedBy', 'modifiedOn'].includes(field)))) throw new Error('Cannot change document identity or move content.')
       if (isTask && updated && fields.includes('space')) {
         const moved = TxProcessor.updateDoc2Doc({ ...data }, tx as TxUpdateDoc<Doc>)
         if (typeof moved.space !== 'string' || (await reader.findAll(ctx, core.class.Space, { _id: moved.space })).length === 0) throw new Error('Cannot move a task to an inaccessible space.')
       }
       let allowed = false
-      if (isTask) {
+      if (isTask || isTrackerDocument || trackerContent) {
         allowed = true
       } else if (isTagReference) {
         const reference = data as TagReference

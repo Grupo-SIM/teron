@@ -13,6 +13,7 @@
 // limitations under the License.
 -->
 <script lang="ts">
+  import { isUnrestrictedTrackerCreation } from '../tracker-creation-policy'
   import type { Class, Doc, DocumentQuery, Ref, Space } from '@hcengineering/core'
   import core, { WithLookup, AccountRole, getCurrentAccount, hasAccountRole } from '@hcengineering/core'
   import { IntlString, Asset } from '@hcengineering/platform'
@@ -93,7 +94,7 @@
 </script>
 
 {#if space}
-  <Header hideActions={createItemDialog === undefined || !hasAccountRole(getCurrentAccount(), AccountRole.Maintainer)}>
+  <Header hideActions={createItemDialog === undefined || !(isUnrestrictedTrackerCreation(createItemDialog) || hasAccountRole(getCurrentAccount(), AccountRole.Maintainer))}>
     <svelte:fragment slot="beforeTitle">
       <ViewletSelector {viewletQuery} ignoreFragment bind:viewlet bind:viewlets />
       <ViewletSettingButton bind:viewOptions bind:viewlet />
@@ -112,7 +113,7 @@
       <FilterButton {_class} space={spaceId} />
     </svelte:fragment>
     <svelte:fragment slot="actions">
-      {#if createItemDialog && hasAccountRole(getCurrentAccount(), AccountRole.Maintainer)}
+      {#if createItemDialog && (isUnrestrictedTrackerCreation(createItemDialog) || hasAccountRole(getCurrentAccount(), AccountRole.Maintainer))}
         <Button
           icon={IconAdd}
           label={createItemLabel}

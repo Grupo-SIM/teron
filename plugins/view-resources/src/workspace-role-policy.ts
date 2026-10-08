@@ -23,6 +23,10 @@ export function canMutateWorkspaceClass (
   operation: 'create' | 'update' | 'remove',
   field?: string
 ): boolean {
+  if (ancestors.includes('tracker:class:Project') && operation === 'create') {
+    return hasAccountRole(account, AccountRole.Maintainer)
+  }
+  if (ancestors.some((id) => id.startsWith('tracker:class:'))) return true
   if (ancestors.includes('task:class:Task')) return true
   if (hasAccountRole(account, AccountRole.Maintainer)) return true
   if (!hasAccountRole(account, AccountRole.User)) return false
