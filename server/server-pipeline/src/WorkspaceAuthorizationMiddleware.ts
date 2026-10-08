@@ -9,7 +9,7 @@ import core, {
 import drive, { type Folder } from '@hcengineering/drive'
 import platform, { PlatformError, Severity, Status } from '@hcengineering/platform'
 import document, { guidelineAccessFor, type Teamspace } from '@hcengineering/document'
-import love from '@hcengineering/love'
+import love, { MeetingStatus, type MeetingMinutes } from '@hcengineering/love'
 import notification from '@hcengineering/notification'
 import preference from '@hcengineering/preference'
 import tags, { type TagReference } from '@hcengineering/tags'
@@ -210,6 +210,14 @@ export class WorkspaceAuthorizationMiddleware extends BaseMiddleware {
         allowed = (data as Doc & { user: string }).user === account.uuid && updated && fields.every((field) => ['isPinned', 'hidden', 'lastViewedTimestamp'].includes(field))
       } else if (hierarchy.isDerived(tx.objectClass, preference.class.Preference)) {
         allowed = created || (data.createdBy !== undefined && account.socialIds.includes(data.createdBy))
+      } else if (tx.objectClass === love.class.MeetingMinutes) {
+        const meeting = data as MeetingMinutes
+        const room = (await reader.findAll(ctx, love.class.Room, { _id: meeting.attachedTo }))[0]
+        allowed = created && meeting.attachedToClass === love.class.Room && meeting.collection === 'meetings' &&
+          meeting.status === MeetingStatus.Active && meeting.description === null &&
+          room !== undefined && room.space === meeting.space &&
+          Object.keys((tx as TxCreateDoc<MeetingMinutes>).attributes).every((field) =>
+            ['attachedTo', 'attachedToClass', 'collection', 'title', 'description', 'status'].includes(field))
       } else if (hierarchy.isDerived(tx.objectClass, love.class.ParticipantInfo)) {
         allowed = personIds.includes((data as Doc & { person: Ref<Doc> }).person) && (created || (updated && fields.every((field) => ['room', 'x', 'y', 'sessionId'].includes(field))) || tx._class === core.class.TxRemoveDoc)
       }

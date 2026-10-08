@@ -220,7 +220,7 @@ function onJoinRequest (key: string, request: JoinRequest | undefined): void {
     return
   }
   if (keyChanged) {
-    responsePopup?.update({ invite: activeRequestsMap.get(activeRequestKey) })
+    responsePopup?.update({ request: activeRequestsMap.get(activeRequestKey) })
   }
 }
 

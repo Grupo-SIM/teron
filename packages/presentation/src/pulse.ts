@@ -17,6 +17,7 @@ import presentation from './plugin'
 
 let currentWorkspaceUuid: string | undefined
 let currentToken: string | undefined
+let currentPulseUrl: string | undefined
 let promise: Promise<HulypulseClient | undefined> | undefined
 
 export async function createPulseClient (): Promise<HulypulseClient | undefined> {
@@ -28,8 +29,8 @@ export async function createPulseClient (): Promise<HulypulseClient | undefined>
     return undefined
   }
 
-  // Token or workspace changed, need to reconnect
-  if (token !== currentToken || workspaceUuid !== currentWorkspaceUuid) {
+  // Credentials or endpoint changed, need to reconnect
+  if (token !== currentToken || workspaceUuid !== currentWorkspaceUuid || pulseUrl !== currentPulseUrl) {
     closePulseClient()
   }
 
@@ -38,14 +39,15 @@ export async function createPulseClient (): Promise<HulypulseClient | undefined>
     return promise
   }
 
-  promise = new Promise((resolve) => {
-    HulypulseClient.connect(`${pulseUrl}?token=${token}`)
-      .then(resolve)
-      .catch(() => {
-        resolve(undefined)
-      })
+  const connection = HulypulseClient.connect(`${pulseUrl}?token=${token}`).catch(() => {
+    // A transient connection failure must not disable invitations until reload.
+    // Do not clear a newer connection if credentials changed while this one failed.
+    if (promise === connection) promise = undefined
+    return undefined
   })
+  promise = connection
   currentToken = token
+  currentPulseUrl = pulseUrl
   currentWorkspaceUuid = workspaceUuid
 
   // eslint-disable-next-line @typescript-eslint/return-await
@@ -60,5 +62,6 @@ export function closePulseClient (): void {
   }
   promise = undefined
   currentToken = undefined
+  currentPulseUrl = undefined
   currentWorkspaceUuid = undefined
 }

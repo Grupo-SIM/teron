@@ -10,6 +10,7 @@ import attachment from '@hcengineering/attachment'
 import tracker from '@hcengineering/tracker'
 import time from '@hcengineering/time'
 import tags from '@hcengineering/tags'
+import love, { MeetingStatus } from '@hcengineering/love'
 import { type Middleware, type PipelineContext } from '@hcengineering/server-core'
 import { WorkspaceAuthorizationMiddleware } from './WorkspaceAuthorizationMiddleware'
 
@@ -47,6 +48,31 @@ function fixture (role = AccountRole.User, verifiedIdentities: SocialId[] = []):
 const update = (objectId: string, objectClass: string, operations: object, objectSpace = space): Tx => ({ _class: core.class.TxUpdateDoc, objectId, objectClass, operations, objectSpace }) as unknown as Tx
 
 describe('server authorization before persistence', () => {
+  it('lets members start calls in accessible offices and meeting rooms', async () => {
+    const { middleware, ctx, forward } = fixture()
+    docs.set('room', { _id: 'room', _class: love.class.Room, space })
+    const create = (attributes: object = {}): Tx => ({
+      _class: core.class.TxCreateDoc, objectId: 'meeting', objectClass: love.class.MeetingMinutes, objectSpace: space,
+      attributes: { attachedTo: 'room', attachedToClass: love.class.Room, collection: 'meetings', title: 'Call', description: null, status: MeetingStatus.Active, ...attributes }
+    }) as unknown as Tx
+    try {
+      for (const office of [false, true]) {
+        docs.set('room', { _id: 'room', _class: love.class.Room, space, person: office ? 'other' : undefined })
+        await middleware.tx(ctx, [create()])
+      }
+      await expect(middleware.tx(ctx, [create({ attachedTo: 'missing' })])).rejects.toThrow()
+      await expect(middleware.tx(ctx, [create({ attachedToClass: task.class.Task })])).rejects.toThrow()
+      await expect(middleware.tx(ctx, [create({ collection: 'other' })])).rejects.toThrow()
+      await expect(middleware.tx(ctx, [create({ status: MeetingStatus.Finished })])).rejects.toThrow()
+      await expect(middleware.tx(ctx, [create({ meetingEnd: 123 })])).rejects.toThrow()
+      await expect(middleware.tx(ctx, [create(), update('meeting', love.class.MeetingMinutes, { attachedTo: 'other' })])).rejects.toThrow()
+      docs.set('room', { _id: 'room', _class: love.class.Room, space: 'foreign' })
+      await expect(middleware.tx(ctx, [create()])).rejects.toThrow()
+      const readonly = fixture(AccountRole.ReadOnlyGuest)
+      await expect(readonly.middleware.tx(readonly.ctx, [create()])).rejects.toThrow()
+      expect(forward).toHaveBeenCalledTimes(2)
+    } finally { docs.delete('room') }
+  })
   it('allows only self membership changes in public channels, including array operators', async () => {
     const { middleware, ctx, forward } = fixture()
     docs.set('channel', { _id: 'channel', _class: chunter.class.Channel, space, private: false, members: ['other'] })
