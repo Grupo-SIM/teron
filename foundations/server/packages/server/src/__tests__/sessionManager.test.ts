@@ -84,6 +84,7 @@ jest.mock('../workspace', () => ({
     maintenance: false,
     closing: undefined,
     workspaceInitCompleted: false,
+    operations: 0,
     tickHandlers: new Map(),
     close: jest.fn().mockResolvedValue(undefined),
     with: jest.fn((fn) =>
@@ -1337,6 +1338,7 @@ describe('TSessionManager', () => {
       const mockWorkspace = {
         wsId: { uuid: workspaceId, url: 'close-workspace' },
         sessions: new Map([[sessionId, mockSession]]),
+        operations: 0,
         tickHandlers: new Map(),
         maintenance: false
       }
@@ -1647,6 +1649,7 @@ describe('TSessionManager', () => {
       const mockWorkspace = {
         wsId: { uuid: workspaceId, url: 'tick-workspace' },
         sessions: new Map(),
+        operations: 0,
         tickHandlers: new Map([['handler-1', { ticks: 1, operation }]]),
         maintenance: false,
         softShutdown: 300,
@@ -1669,6 +1672,7 @@ describe('TSessionManager', () => {
       const mockWorkspace = {
         wsId: { uuid: workspaceId, url: 'shutdown-workspace' },
         sessions: new Map(),
+        operations: 0,
         tickHandlers: new Map(),
         maintenance: false,
         softShutdown: 300,
@@ -1702,6 +1706,7 @@ describe('TSessionManager', () => {
             }
           ]
         ]),
+        operations: 0,
         tickHandlers: new Map(),
         maintenance: false,
         softShutdown: 100,

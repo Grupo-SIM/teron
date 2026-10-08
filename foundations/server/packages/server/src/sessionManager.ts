@@ -311,10 +311,13 @@ export class TSessionManager implements SessionManager {
         }
       }
 
-      // Wait some time for new client to appear before closing workspace.
+      // Offline cleanup uses a 30s reconnect grace, longer than the 15s idle shutdown.
+      // Keep the workspace alive until scheduled cleanup and its async writes finish.
       if (
         !workspace.maintenance &&
         workspace.sessions.size === 0 &&
+        workspace.tickHandlers.size === 0 &&
+        workspace.operations === 0 &&
         workspace.closing === undefined &&
         workspace.workspaceInitCompleted
       ) {
@@ -1266,12 +1269,12 @@ export class TSessionManager implements SessionManager {
   private async performWorkspaceCloseCheck (workspace: Workspace): Promise<void> {
     const uuid = workspace.wsId.uuid
     const logParams = { uuid, url: workspace.wsId.url }
-    if (workspace.sessions.size === 0) {
+    if (workspace.sessions.size === 0 && workspace.tickHandlers.size === 0 && workspace.operations === 0) {
       if (LOGGING_ENABLED) {
         this.ctx.warn('no sessions for workspace', logParams)
       }
       try {
-        if (workspace.sessions.size === 0) {
+        if (workspace.sessions.size === 0 && workspace.tickHandlers.size === 0 && workspace.operations === 0) {
           await workspace.close(this.ctx)
 
           this.workspaces.delete(uuid)
