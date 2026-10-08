@@ -30,7 +30,7 @@
   import { Document, DocumentEvents, Teamspace } from '@hcengineering/document'
   import notification from '@hcengineering/notification'
   import { Panel } from '@hcengineering/panel'
-  import { getResource, setPlatformStatus, translate, unknownError } from '@hcengineering/platform'
+  import { getResource, setPlatformStatus, unknownError } from '@hcengineering/platform'
   import {
     ComponentExtensions,
     IconWithEmoji,
@@ -46,9 +46,6 @@
 
   import {
     Button,
-    addNotification,
-    NotificationSeverity,
-    NotificationToast,
     ButtonItem,
     Component,
     FocusHandler,
@@ -188,7 +185,6 @@
   async function removeIcon (): Promise<void> {
     if (doc === undefined || effectiveReadonly) return
     await client.update(doc, { $unset: { icon: true, color: true } })
-    addNotification(await translate(document.string.CustomIconRemoved, {}, $themeStore.language), '', NotificationToast, undefined, NotificationSeverity.Info)
   }
 
   async function chooseIcon (): Promise<void> {
