@@ -865,7 +865,32 @@ export function pluginFilterTx (
   if (typeof window !== 'undefined') {
     console.log('exclude plugin', msg)
   }
-  systemTx = systemTx.filter((t) => !totalExcluded.has(t._id))
+  const excludedDocuments = new Set<Ref<Doc>>()
+  systemTx = systemTx.filter((t) => {
+    const excluded = totalExcluded.has(t._id)
+    if (t._class === core.class.TxCreateDoc) {
+      const create = t as TxCreateDoc<Doc>
+      if (excluded) {
+        excludedDocuments.add(create.objectId)
+      } else {
+        excludedDocuments.delete(create.objectId)
+      }
+    } else if (
+      t._class === core.class.TxUpdateDoc ||
+      t._class === core.class.TxMixin ||
+      t._class === core.class.TxRemoveDoc
+    ) {
+      // Workspace transactions may modify model documents created by disabled plugins.
+      // Keep genuine missing-document transactions visible; skip only excluded lifecycles.
+      const cud = t as TxCUD<Doc>
+      const documentExcluded = excludedDocuments.has(cud.objectId)
+      if (t._class === core.class.TxRemoveDoc) {
+        excludedDocuments.delete(cud.objectId)
+      }
+      return !excluded && !documentExcluded
+    }
+    return !excluded
+  })
   return systemTx
 }
 
