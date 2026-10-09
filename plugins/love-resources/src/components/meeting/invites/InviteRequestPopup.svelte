@@ -32,13 +32,20 @@
   export let meetingId: string
 
   onMount(() => {
-    void subscribeInviteResponses()
-    void doUpdateInvites()
-    const interval = setInterval(doUpdateInvites, (inviteRequestSecondsToLive - 2) * 1000)
+    let destroyed = false
+    let interval: ReturnType<typeof setInterval> | undefined
+    const ready = subscribeInviteResponses().then(async () => {
+      if (destroyed) return
+      await doUpdateInvites()
+      if (!destroyed) interval = setInterval(doUpdateInvites, (inviteRequestSecondsToLive - 2) * 1000)
+    })
     return () => {
-      void unsubscribeInviteResponses()
+      destroyed = true
       clearInterval(interval)
-      void cancelInvites(meetingId)
+      void ready.finally(async () => {
+        await unsubscribeInviteResponses()
+        await cancelInvites(meetingId)
+      })
     }
   })
 

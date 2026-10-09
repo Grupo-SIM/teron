@@ -30,22 +30,47 @@
   })
 
   let stopSound: (() => void) | null = null
+  let soundStopped = false
+  let responding = false
+
+  function stopRinging (): void {
+    soundStopped = true
+    stopSound?.()
+    stopSound = null
+  }
 
   async function accept (): Promise<void> {
-    await responseToInviteRequest(true)
+    if (responding) return
+    responding = true
+    stopRinging()
+    try {
+      await responseToInviteRequest(true)
+    } finally {
+      responding = false
+    }
   }
 
   async function decline (): Promise<void> {
-    await responseToInviteRequest(false)
+    if (responding) return
+    responding = true
+    stopRinging()
+    try {
+      await responseToInviteRequest(false)
+    } finally {
+      responding = false
+    }
   }
 
   onMount(async () => {
-    stopSound = await playSound(love.sound.Knock, true)
+    const stop = await playSound(love.sound.Knock, true)
+    if (soundStopped) {
+      stop?.()
+    } else {
+      stopSound = stop
+    }
   })
 
-  onDestroy(() => {
-    stopSound?.()
-  })
+  onDestroy(stopRinging)
 </script>
 
 <div class="antiPopup flex-col-center">

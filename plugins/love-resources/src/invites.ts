@@ -164,11 +164,12 @@ export async function unsubscribeInviteRequests (): Promise<void> {
 export async function responseToInviteRequest (accept: boolean): Promise<void> {
   if (activeRequestKey === undefined) return
 
+  const requestKey = activeRequestKey
+  const activeInvite = activeRequestsMap.get(requestKey)
+  if (activeInvite === undefined) return
+
   const client = await createPulseClient()
   if (client === undefined) return
-
-  const activeInvite = activeRequestsMap.get(activeRequestKey)
-  if (activeInvite === undefined) return
 
   const currentPerson = getCurrentEmployee()
   await client.put(
@@ -177,11 +178,14 @@ export async function responseToInviteRequest (accept: boolean): Promise<void> {
     responseSecondsToLive
   )
 
-  responsePopup?.close()
-  responsePopup = undefined
-  if (activeRequestKey === undefined) return
-  activeRequestsMap.set(activeRequestKey, undefined)
-  activeRequestKey = undefined
+  // The sender may delete the request before put resolves. Keep the captured
+  // invitation and never clear a newer popup that arrived in the meantime.
+  if (activeRequestKey === requestKey) {
+    responsePopup?.close()
+    responsePopup = undefined
+    activeRequestKey = undefined
+  }
+  if (activeRequestsMap.has(requestKey)) activeRequestsMap.set(requestKey, undefined)
 
   if (!accept) return
   await joinOrCreateMeetingByInvite(activeInvite.meetingId as Ref<Room>)
