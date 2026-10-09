@@ -200,7 +200,16 @@ export function navigate (location: PlatformLocation, replace = false): boolean 
   closePopup()
   const cur = locationToUrl(getCurrentLocation())
   const url = locationToUrl(location)
-  if (cur !== url) {
+  // Browser locations decode the hash, while panel links use getPanelURI's
+  // encoded hash. Compare both in the browser's representation so reopening
+  // the same panel cannot repeatedly publish an unchanged location.
+  const comparableUrl = desktopPlatform
+    ? url
+    : locationToUrl({
+      ...location,
+      fragment: location.fragment === undefined ? undefined : parseHash('#' + location.fragment)
+    })
+  if (cur !== comparableUrl) {
     const data = !desktopPlatform ? null : { location }
     const _url = !desktopPlatform ? url : undefined
     if (replace) {
