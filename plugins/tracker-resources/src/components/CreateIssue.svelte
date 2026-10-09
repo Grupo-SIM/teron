@@ -34,7 +34,7 @@
     SortingOrder,
     toIdMap
   } from '@hcengineering/core'
-  import { getResource, translate } from '@hcengineering/platform'
+  import { getResource, setPlatformStatus, translate, unknownError } from '@hcengineering/platform'
   import preference, { SpacePreference } from '@hcengineering/preference'
   import {
     Card,
@@ -543,7 +543,7 @@
       )
       await docCreateManager.commit(operations, _id, currentProject, value, 'post')
       for (const label of object.labels) {
-        await operations.addCollection(label._class, label.space, _id, tracker.class.Issue, 'labels', {
+        await operations.addCollection(label._class, _space, _id, tracker.class.Issue, 'labels', {
           title: label.title,
           color: label.color,
           tag: label.tag
@@ -564,6 +564,11 @@
 
       await descriptionBox?.createAttachments(_id, operations)
       const result = await operations.commit()
+      if (result.result !== true) {
+        const error = new Error('Issue creation transaction was not committed')
+        await setPlatformStatus(unknownError(error))
+        throw error
+      }
 
       const parents: IssueParentInfo[] =
         parentIssue != null
@@ -603,12 +608,11 @@
       })
       console.log('createIssue measure', result, Date.now() - d1)
     } catch (err: any) {
-      resetObject()
-      draftController.remove()
-      descriptionBox?.removeDraft(false)
       console.error(err)
       Analytics.handleEvent(TrackerEvents.IssueCreated, { ok: false, project: currentProject.identifier })
       Analytics.handleError(err)
+      // Card keeps the form open on rejection; retain its fields and drafts for retry.
+      throw err
     }
   }
 

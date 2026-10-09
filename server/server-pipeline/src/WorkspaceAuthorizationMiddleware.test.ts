@@ -48,6 +48,24 @@ function fixture (role = AccountRole.User, verifiedIdentities: SocialId[] = []):
 const update = (objectId: string, objectClass: string, operations: object, objectSpace = space): Tx => ({ _class: core.class.TxUpdateDoc, objectId, objectClass, operations, objectSpace }) as unknown as Tx
 
 describe('server authorization before persistence', () => {
+  it('authorizes member issue creation with labels in the issue sector, including pending parents', async () => {
+    const { middleware, ctx, forward } = fixture()
+    const issue = {
+      _class: core.class.TxCreateDoc, objectId: 'new-labelled-issue', objectClass: tracker.class.Issue, objectSpace: space,
+      attachedTo: tracker.ids.NoParent, attachedToClass: tracker.class.Issue, collection: 'subIssues',
+      attributes: { title: 'New' }
+    } as unknown as Tx
+    const label = (objectSpace: string): Tx => ({
+      _class: core.class.TxCreateDoc, objectId: 'new-label', objectClass: tags.class.TagReference, objectSpace,
+      attachedTo: 'new-labelled-issue', attachedToClass: tracker.class.Issue, collection: 'labels',
+      attributes: { title: 'Label', color: 1, tag: 'tag' }
+    }) as unknown as Tx
+    const batch = (objectSpace: string): Tx => ({ _class: core.class.TxApplyIf, txes: [issue, label(objectSpace)] }) as unknown as Tx
+    await expect(middleware.tx(ctx, [batch('readerSpace')])).rejects.toThrow('Cannot attach content across spaces.')
+    expect(forward).not.toHaveBeenCalled()
+    await middleware.tx(ctx, [batch(space)])
+    expect(forward).toHaveBeenCalledTimes(1)
+  })
   it('lets members start calls in accessible offices and meeting rooms', async () => {
     const { middleware, ctx, forward } = fixture()
     docs.set('room', { _id: 'room', _class: love.class.Room, space })

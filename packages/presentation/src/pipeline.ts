@@ -203,12 +203,12 @@ export class PresentationPipelineImpl implements PresentationPipeline {
     } catch (err) {
       if (err instanceof PlatformError) {
         if (err.status.code === platform.status.ConnectionClosed) {
-          return {}
+          throw err
         }
       }
       const status = unknownError(err)
       await setPlatformStatus(status)
-      return {}
+      throw err
     }
   }
 
