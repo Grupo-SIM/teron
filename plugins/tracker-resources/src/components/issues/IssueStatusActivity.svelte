@@ -12,6 +12,13 @@
   export let accentHeader: boolean = false
 
   const query = createQuery()
+  // Status durations do not need descriptions, attachments, or unrelated edits.
+  const statusProjection = {
+    _class: 1,
+    modifiedOn: 1,
+    'attributes.status': 1,
+    'operations.status': 1
+  } as const
 
   let txes: Tx[] = []
 
@@ -22,11 +29,20 @@
 
   $: query.query(
     core.class.Tx,
-    { objectId: issue._id },
+    {
+      objectId: issue._id,
+      $or: [
+        { _class: core.class.TxCreateDoc },
+        { _class: core.class.TxUpdateDoc, 'operations.status': { $exists: true } }
+      ]
+    },
     (res) => {
       txes = res
     },
-    { sort: { modifiedOn: 1 } }
+    {
+      sort: { modifiedOn: 1 },
+      projection: statusProjection
+    }
   )
 
   let displaySt: WithTime[] = []
