@@ -186,9 +186,13 @@ export class LiveKitClient {
         resolve()
         return
       }
-      this.liveKitRoom.once(RoomEvent.Connected, () => {
+      const onConnected = (): void => {
+        this.liveKitRoom.off(RoomEvent.Connected, onConnected)
+        this.liveKitRoom.off(RoomEvent.Reconnected, onConnected)
         resolve()
-      })
+      }
+      this.liveKitRoom.once(RoomEvent.Connected, onConnected)
+      this.liveKitRoom.once(RoomEvent.Reconnected, onConnected)
     })
   }
 

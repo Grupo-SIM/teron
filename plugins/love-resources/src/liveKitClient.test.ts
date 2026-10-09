@@ -102,6 +102,25 @@ describe('LiveKit terminal disconnection recovery', () => {
     expect(client.liveKitRoom.listenerCount(RoomEvent.LocalTrackPublished)).toBe(1)
   })
 
+  test.each([RoomEvent.Connected, RoomEvent.Reconnected])(
+    'views waiting during a network outage resume on %s without leaking listeners', async (event) => {
+      ;(client.liveKitRoom as any).state = ConnectionState.SignalReconnecting
+      client.liveKitRoom.emit(RoomEvent.SignalReconnecting)
+      const connectedListeners = client.liveKitRoom.listenerCount(RoomEvent.Connected)
+      const reconnectedListeners = client.liveKitRoom.listenerCount(RoomEvent.Reconnected)
+      const ready = jest.fn()
+      const waiting = client.awaitConnect().then(ready)
+      await flush()
+      expect(ready).not.toHaveBeenCalled()
+      ;(client.liveKitRoom as any).state = ConnectionState.Connected
+      client.liveKitRoom.emit(event)
+      await waiting
+      expect(ready).toHaveBeenCalledTimes(1)
+      expect(client.liveKitRoom.listenerCount(RoomEvent.Connected)).toBe(connectedListeners)
+      expect(client.liveKitRoom.listenerCount(RoomEvent.Reconnected)).toBe(reconnectedListeners)
+    }
+  )
+
   test.each([DisconnectReason.PARTICIPANT_REMOVED, DisconnectReason.DUPLICATE_IDENTITY, DisconnectReason.ROOM_DELETED])(
     'does not reconnect after terminal reason %s', async (reason) => {
       loseConnection(reason)
