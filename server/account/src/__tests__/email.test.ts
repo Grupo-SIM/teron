@@ -14,7 +14,9 @@ describe('renderBrandedEmail', () => {
 
     expect(result).toContain('https://teron.app/assets/teron-email-logo.png')
     expect(result).toContain("'Manrope','Segoe UI',Arial,sans-serif")
-    expect(result).toContain('background-color:#090a0f')
+    expect(result).not.toContain('background-color:#090a0f')
+    expect(result).not.toContain('content="dark"')
+    expect(result).toContain('background-color:#111217')
     expect(result).toContain('<h3>Confirm your email</h3><p>Message</p>')
   })
 

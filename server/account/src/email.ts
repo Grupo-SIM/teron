@@ -25,8 +25,6 @@ export function renderBrandedEmail (html: string, language?: string): string {
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width,initial-scale=1">
-  <meta name="color-scheme" content="dark">
-  <meta name="supported-color-schemes" content="dark">
   <style>
     body, table, td, p, a, h1, h2, h3, span { font-family: ${brandFont} !important; }
     .email-content h1, .email-content h2, .email-content h3 { margin: 0 0 14px; color: #ffffff; font-size: 24px; line-height: 1.25; letter-spacing: -0.5px; }
@@ -40,8 +38,8 @@ export function renderBrandedEmail (html: string, language?: string): string {
     }
   </style>
 </head>
-<body style="margin:0;padding:0;background-color:#090a0f;color:#ffffff;font-family:${brandFont};-webkit-font-smoothing:antialiased">
-  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="width:100%;background-color:#090a0f">
+<body style="margin:0;padding:0;color:#ffffff;font-family:${brandFont};-webkit-font-smoothing:antialiased">
+  <table role="presentation" width="100%" cellpadding="0" cellspacing="0" border="0" style="width:100%">
     <tr>
       <td class="email-outer" align="center" style="padding:48px 16px">
         <table role="presentation" width="560" cellpadding="0" cellspacing="0" border="0" style="width:100%;max-width:560px">
