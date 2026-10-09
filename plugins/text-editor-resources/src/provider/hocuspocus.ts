@@ -28,6 +28,7 @@ export interface HocuspocusCollabProviderURLParameters {
 
 export class HocuspocusCollabProvider extends HocuspocusProvider implements Provider {
   readonly loaded: Promise<void>
+  private readonly ownsWebsocket: boolean
 
   constructor (configuration: HocuspocusCollabProviderConfiguration) {
     const parameters: Record<string, any> = {}
@@ -42,6 +43,7 @@ export class HocuspocusCollabProvider extends HocuspocusProvider implements Prov
       parameters
     }
     super(hocuspocusConfig)
+    this.ownsWebsocket = configuration.websocketProvider === undefined
 
     this.loaded = new Promise((resolve) => {
       this.on('synced', resolve)
@@ -50,6 +52,9 @@ export class HocuspocusCollabProvider extends HocuspocusProvider implements Prov
 
   destroy (): void {
     super.destroy()
-    this.configuration.websocketProvider.disconnect()
+    if (this.ownsWebsocket) {
+      // Disconnect alone leaves the connection checker and pending retries alive.
+      this.configuration.websocketProvider.destroy()
+    }
   }
 }
