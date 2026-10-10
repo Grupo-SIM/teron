@@ -15,7 +15,7 @@
 
 import { AccountRole, getCurrentAccount, type Ref } from '@hcengineering/core'
 import { getCurrentEmployee, type Person } from '@hcengineering/contact'
-import { type PopupResult, showPopup } from '@hcengineering/ui'
+import { type PopupResult, doNotDisturb, showPopup } from '@hcengineering/ui'
 import { type UnsubscribeCallback } from '@hcengineering/hulypulse-client'
 import presentation, { createPulseClient } from '@hcengineering/presentation'
 import { getMetadata } from '@hcengineering/platform'
@@ -144,6 +144,14 @@ let unsubscribeRequest: UnsubscribeCallback | undefined
 let activeRequestKey: string | undefined
 let activeRequestsMap: Map<string, InviteRequest | undefined>
 
+doNotDisturb.subscribe((enabled) => {
+  if (!enabled) return
+  responsePopup?.close()
+  responsePopup = undefined
+  activeRequestKey = undefined
+  activeRequestsMap?.clear()
+})
+
 export async function subscribeInviteRequests (): Promise<void> {
   if (getCurrentAccount().role === AccountRole.ReadOnlyGuest) return
   const client = await createPulseClient()
@@ -199,6 +207,13 @@ function onInviteRequest (key: string, request: InviteRequest | undefined): void
     }
   } else if (!activeRequestsMap.has(key)) {
     activeRequestsMap.set(key, request)
+  }
+  if (get(doNotDisturb)) {
+    responsePopup?.close()
+    responsePopup = undefined
+    activeRequestKey = undefined
+    activeRequestsMap.clear()
+    return
   }
   let keyChanged: boolean = false
   if (activeRequestKey === undefined && activeRequestsMap.size > 0) {

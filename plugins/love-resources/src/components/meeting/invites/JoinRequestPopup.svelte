@@ -26,25 +26,36 @@
     updateJoinRequest
   } from '../../../joinRequests'
   import { onMount } from 'svelte'
+  import { playSound } from '@hcengineering/presentation'
 
   export let meetingId: string
 
   $: room = $rooms.find((p) => p._id === meetingId)
 
   onMount(() => {
-    void subscribeJoinResponses()
-    void doUpdateRequest()
-    const interval = setInterval(doUpdateRequest, (joinRequestSecondsToLive - 2) * 1000)
+    let destroyed = false
+    let stopSound: (() => void) | null = null
+    let interval: ReturnType<typeof setInterval> | undefined
+    void playSound(love.sound.Knock, true).then((stop) => {
+      if (destroyed) stop?.()
+      else stopSound = stop
+    })
+    void subscribeJoinResponses().then(async () => {
+      if (destroyed) {
+        await unsubscribeJoinResponses()
+        return
+      }
+      interval = setInterval(() => { void updateJoinRequest(meetingId) }, (joinRequestSecondsToLive - 2) * 1000)
+      await updateJoinRequest(meetingId)
+    })
     return () => {
+      destroyed = true
+      stopSound?.()
       void unsubscribeJoinResponses()
       clearInterval(interval)
-      void cancelJoinRequest()
+      void cancelJoinRequest(meetingId)
     }
   })
-
-  async function doUpdateRequest (): Promise<void> {
-    await updateJoinRequest()
-  }
 
   async function cancel (): Promise<void> {
     closeJoinRequestPopup()

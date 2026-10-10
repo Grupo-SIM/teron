@@ -19,6 +19,7 @@
   import Label from '../Label.svelte'
   import StatusComponent from '../Status.svelte'
   import Clock from './Clock.svelte'
+  import DoNotDisturbButton from './DoNotDisturbButton.svelte'
   import RootBarExtension from './RootBarExtension.svelte'
   import Settings from './Settings.svelte'
   import { isAppFocusedStore } from '../../stores'
@@ -279,6 +280,7 @@
         <div class="flex-row-reverse flex-gap-0-5" style:-webkit-app-region={'no-drag'}>
           <Settings />
           <Clock />
+          <DoNotDisturbButton />
           <div class="flex-row-center flex-gap-0-5">
             {#if !secondRow}
               <RootBarExtension position="right" />

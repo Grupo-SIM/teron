@@ -1,5 +1,9 @@
 {
     "string": {
+    "EnableDoNotDisturb": "Enable Do Not Disturb",
+    "DisableDoNotDisturb": "Disable Do Not Disturb",
+    "DoNotDisturbEnabled": "Do Not Disturb enabled",
+    "DoNotDisturbDisabled": "Do Not Disturb disabled",
         "EditBoxPlaceholder": "输入文本...",
         "Ok": "确定",
         "Cancel": "取消",

@@ -25,6 +25,10 @@ export const uiId = 'ui' as Plugin
 
 export const uis = plugin(uiId, {
   string: {
+    EnableDoNotDisturb: '' as IntlString,
+    DisableDoNotDisturb: '' as IntlString,
+    DoNotDisturbEnabled: '' as IntlString,
+    DoNotDisturbDisabled: '' as IntlString,
     EditBoxPlaceholder: '' as IntlString,
     Ok: '' as IntlString,
     Cancel: '' as IntlString,

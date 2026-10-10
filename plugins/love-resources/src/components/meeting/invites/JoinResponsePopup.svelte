@@ -27,22 +27,41 @@
   $: person = $personByRefStore.get(request.from)
 
   let stopSound: (() => void) | null = null
+  let soundStopped = false
+  let responding = false
+
+  function stopRinging (): void {
+    soundStopped = true
+    stopSound?.()
+    stopSound = null
+  }
 
   async function accept (): Promise<void> {
-    await responseToJoinRequest(request, true)
+    await respond(true)
   }
 
   async function decline (): Promise<void> {
-    await responseToJoinRequest(request, false)
+    await respond(false)
+  }
+
+  async function respond (accept: boolean): Promise<void> {
+    if (responding) return
+    responding = true
+    stopRinging()
+    try {
+      await responseToJoinRequest(request, accept)
+    } finally {
+      responding = false
+    }
   }
 
   onMount(async () => {
-    stopSound = await playSound(love.sound.Knock, true)
+    const stop = await playSound(love.sound.Knock, true)
+    if (soundStopped) stop?.()
+    else stopSound = stop
   })
 
-  onDestroy(() => {
-    stopSound?.()
-  })
+  onDestroy(stopRinging)
 </script>
 
 <div class="antiPopup flex-col-center">

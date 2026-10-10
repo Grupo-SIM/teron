@@ -3,6 +3,7 @@ import type { PushData } from './index'
 declare const self: any
 
 interface PushEvent extends Event {
+  waitUntil: (promise: Promise<void>) => void
   data: PushMessageData
 }
 
@@ -11,8 +12,19 @@ interface PushMessageData {
 }
 
 self.addEventListener('push', (event: PushEvent) => {
+  event.waitUntil(handlePush(event))
+})
+
+async function handlePush (event: PushEvent): Promise<void> {
+  try {
+    const cache = await caches.open('teron-notification-preferences')
+    const preference = await cache.match('/__teron-do-not-disturb')
+    if (await preference?.text() === 'true') return
+  } catch {
+    // Cache Storage can be unavailable; preserve normal notification delivery.
+  }
   const payload: PushData = event.data.json()
-  self.registration.showNotification(payload.title, {
+  await self.registration.showNotification(payload.title, {
     body: payload.body,
     icon: payload.icon,
     tag: payload.tag,
@@ -22,7 +34,7 @@ self.addEventListener('push', (event: PushEvent) => {
       notificationId: payload.tag
     }
   })
-})
+}
 
 async function handleNotificationClick (event: any): Promise<void> {
   event.notification.close()

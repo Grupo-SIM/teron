@@ -88,3 +88,5 @@ Chamadas de voz e vídeo retomam automaticamente na mesma sala após interrupç�
 Membros User podem convidar pessoas para chamadas e iniciar reuniões em offices e salas acessíveis; convite não exige Owner/Maintainer. Criação do registro ativo da reunião valida sala e espaço, sem conceder administração da estrutura do Escritório.
 
 Criação de tarefa grava referências de etiquetas no mesmo Setor da tarefa, inclusive ao usar modelos ou duplicações. Sucesso só aparece após confirmação do commit; falha mantém formulário e rascunho para correção e nova tentativa.
+
+Não perturbe é preferência local do dispositivo, persistida entre sessões e sincronizada entre abas. Quando ativo, silencia convites de chamada, pedidos de entrada, sons e alertas de notificações no navegador/desktop; notificações permanecem na caixa de entrada. Confirmações de ações continuam visíveis.

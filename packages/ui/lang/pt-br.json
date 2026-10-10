@@ -1,5 +1,9 @@
 {
     "string": {
+    "EnableDoNotDisturb": "Ativar não perturbe",
+    "DisableDoNotDisturb": "Desativar não perturbe",
+    "DoNotDisturbEnabled": "Não perturbe ativado",
+    "DoNotDisturbDisabled": "Não perturbe desativado",
         "EditBoxPlaceholder": "Digite o texto...",
         "Ok": "Ok",
         "Cancel": "Cancelar",

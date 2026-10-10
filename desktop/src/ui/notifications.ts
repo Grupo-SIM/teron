@@ -1,3 +1,4 @@
+import { get } from 'svelte/store'
 //
 // Copyright © 2025 Hardcore Engineering Inc.
 //
@@ -24,7 +25,7 @@ import notification, {
 } from '@hcengineering/notification'
 import { addEventListener, getMetadata, IntlString, translate } from '@hcengineering/platform'
 import { createNotificationsQuery, getClient } from '@hcengineering/presentation'
-import { location } from '@hcengineering/ui'
+import { doNotDisturb, location } from '@hcengineering/ui'
 import workbench, { workbenchId } from '@hcengineering/workbench'
 import desktopPreferences, { defaultNotificationPreference } from '@hcengineering/desktop-preferences'
 import { activePreferences } from '@hcengineering/desktop-preferences-resources'
@@ -156,7 +157,7 @@ export function configureNotifications (): void {
           electronAPI.setBadge(prevUnViewdNotificationsCount + newUnreadNotifications)
         }
 
-        if (preferences.bounceAppIcon) {
+        if (preferences.bounceAppIcon && !get(doNotDisturb)) {
           electronAPI.dockBounce()
         }
       })
@@ -177,6 +178,7 @@ export function configureNotifications (): void {
         const notification = res.getResult()[0]
         if (notification !== undefined && !notificationHistory.has(notification.id)) {
           notificationHistory.set(notification.id, notification.created.getTime())
+          if (get(doNotDisturb)) return
           electronAPI.sendNotification({
             silent: !preferences.playSound,
             application: inboxId,
@@ -213,7 +215,7 @@ export function configureNotifications (): void {
         if (preferences.showUnreadCounter) {
           electronAPI.setBadge(unViewedNotifications.length + newUnreadNotifications)
         }
-        if (preferences.bounceAppIcon) {
+        if (preferences.bounceAppIcon && !get(doNotDisturb)) {
           electronAPI.dockBounce()
         }
         prevUnViewdNotificationsCount = unViewedNotifications.length
@@ -231,6 +233,7 @@ export function configureNotifications (): void {
             })
           }
 
+          if (get(doNotDisturb)) return
           electronAPI.sendNotification({
             silent: !preferences.playSound,
             application: notificationId,

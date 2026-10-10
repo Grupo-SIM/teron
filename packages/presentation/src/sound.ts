@@ -1,3 +1,5 @@
+import { doNotDisturb } from '@hcengineering/ui'
+import { get } from 'svelte/store'
 import { type Class, type Doc, type Ref } from '@hcengineering/core'
 import { type Asset, getMetadata, getResource } from '@hcengineering/platform'
 import { getClient } from '.'
@@ -33,12 +35,14 @@ export async function prepareSound (key: string): Promise<void> {
 }
 
 export async function playSound (soundKey: string, loop = false): Promise<(() => void) | null> {
+  if (get(doNotDisturb)) return null
   const soundAssetKey = soundKey as Asset
 
   if (!sounds.has(soundAssetKey)) {
     await prepareSound(soundKey)
   }
 
+  if (get(doNotDisturb)) return null
   const sound = sounds.get(soundKey as Asset)
   if (sound === undefined) {
     console.error('Cannot prepare audio buffer', soundKey)
@@ -52,10 +56,18 @@ export async function playSound (soundKey: string, loop = false): Promise<(() =>
     audio.connect(context.destination)
     audio.start()
 
-    return (): void => {
+    let stopped = false
+    let unsubscribe = (): void => {}
+    const stop = (): void => {
+      if (stopped) return
+      stopped = true
       audio.stop()
       audio.disconnect(context.destination)
+      unsubscribe()
     }
+    unsubscribe = doNotDisturb.subscribe((enabled) => { if (enabled) stop() })
+    audio.onended = () => { unsubscribe() }
+    return stop
   } catch (err) {
     console.error('Error when playing sound back', soundKey, err)
     return null

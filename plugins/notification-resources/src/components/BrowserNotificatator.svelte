@@ -16,7 +16,7 @@
   import { AccountRole, Class, Doc, getCurrentAccount, Ref } from '@hcengineering/core'
   import notification, { BrowserNotification } from '@hcengineering/notification'
   import { createQuery, getClient } from '@hcengineering/presentation'
-  import { addNotification, getCurrentResolvedLocation, Location, NotificationSeverity } from '@hcengineering/ui'
+  import { addNotification, doNotDisturb, getCurrentResolvedLocation, Location, NotificationSeverity } from '@hcengineering/ui'
   import view from '@hcengineering/view'
   import { parseLinkId } from '@hcengineering/view-resources'
   import { Analytics } from '@hcengineering/analytics'
@@ -79,6 +79,10 @@
   }
 
   async function notify (value: BrowserNotification): Promise<void> {
+    if ($doNotDisturb) {
+      await removeNotification(value)
+      return
+    }
     const _id: Ref<Doc> | undefined = value.objectId
 
     const getSidebarObject = await getResource(workbench.function.GetSidebarObject)
@@ -92,6 +96,10 @@
     const locObjectId = await getObjectIdFromLocation(getCurrentResolvedLocation())
 
     if (_id && _id === locObjectId) {
+      await removeNotification(value)
+      return
+    }
+    if ($doNotDisturb) {
       await removeNotification(value)
       return
     }

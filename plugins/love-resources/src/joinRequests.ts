@@ -1,3 +1,4 @@
+import { get } from 'svelte/store'
 //
 // Copyright © 2025 Hardcore Engineering Inc.
 //
@@ -15,7 +16,7 @@
 
 import { AccountRole, getCurrentAccount, type Ref } from '@hcengineering/core'
 import { getCurrentEmployee, type Person } from '@hcengineering/contact'
-import { type PopupResult, showPopup } from '@hcengineering/ui'
+import { type PopupResult, doNotDisturb, showPopup } from '@hcengineering/ui'
 import { type UnsubscribeCallback } from '@hcengineering/hulypulse-client'
 import presentation, { createPulseClient } from '@hcengineering/presentation'
 import { getMetadata } from '@hcengineering/platform'
@@ -136,6 +137,14 @@ let unsubscribeRequest: UnsubscribeCallback | undefined
 let activeRequestKey: string | undefined
 let activeRequestsMap: Map<string, JoinRequest | undefined> | undefined
 
+doNotDisturb.subscribe((enabled) => {
+  if (!enabled) return
+  responsePopup?.close()
+  responsePopup = undefined
+  activeRequestKey = undefined
+  activeRequestsMap?.clear()
+})
+
 export async function subscribeJoinRequests (meetingId: string | undefined): Promise<void> {
   if (getCurrentAccount().role === AccountRole.ReadOnlyGuest) return
   if (meetingId === undefined) return
@@ -188,6 +197,13 @@ function onJoinRequest (key: string, request: JoinRequest | undefined): void {
     }
   } else if (!activeRequestsMap.has(key)) {
     activeRequestsMap.set(key, request)
+  }
+  if (get(doNotDisturb)) {
+    responsePopup?.close()
+    responsePopup = undefined
+    activeRequestKey = undefined
+    activeRequestsMap.clear()
+    return
   }
   let keyChanged: boolean = false
   if (activeRequestKey === undefined && activeRequestsMap.size > 0) {

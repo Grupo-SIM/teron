@@ -1,18 +1,18 @@
 import { createPulseClient } from '@hcengineering/presentation'
-import { showPopup } from '@hcengineering/ui'
+import { doNotDisturb, showPopup } from '@hcengineering/ui'
 import { joinOrCreateMeetingByInvite } from './meetings'
 import { responseToInviteRequest, subscribeInviteRequests, type InviteRequest } from './invites'
 
 jest.mock('@hcengineering/core', () => ({ AccountRole: { ReadOnlyGuest: 'readonly' }, getCurrentAccount: () => ({ role: 'user' }) }))
 jest.mock('@hcengineering/contact', () => ({ getCurrentEmployee: () => 'recipient' }))
-jest.mock('@hcengineering/ui', () => ({ showPopup: jest.fn() }))
+jest.mock('@hcengineering/ui', () => ({ showPopup: jest.fn(), doNotDisturb: { value: false, subscribe: jest.fn(), set (value: boolean) { this.value = value } } }))
 jest.mock('@hcengineering/presentation', () => ({
   __esModule: true,
   default: { metadata: { WorkspaceUuid: 'workspace' } },
   createPulseClient: jest.fn()
 }))
 jest.mock('@hcengineering/platform', () => ({ getMetadata: () => 'workspace' }))
-jest.mock('svelte/store', () => ({ get: jest.fn() }))
+jest.mock('svelte/store', () => ({ get: (store: any) => store?.value }))
 jest.mock('./stores', () => ({ myInfo: {} }))
 jest.mock('@hcengineering/love', () => ({ __esModule: true, default: { ids: { Reception: 'reception' } } }))
 jest.mock('./components/meeting/invites/InviteRequestPopup.svelte', () => ({}))
@@ -27,6 +27,7 @@ describe('invite acceptance', () => {
 
   beforeEach(async () => {
     jest.clearAllMocks()
+    doNotDisturb.set(false)
     jest.mocked(showPopup).mockReturnValue({ close, update: jest.fn() } as any)
     jest.mocked(createPulseClient).mockResolvedValue({
       subscribe: jest.fn(async (_prefix: string, callback: typeof notify) => { notify = callback; return jest.fn() }),
@@ -63,4 +64,16 @@ describe('invite acceptance', () => {
     await responseToInviteRequest(false)
     expect(joinOrCreateMeetingByInvite).not.toHaveBeenCalled()
   })
+  test('suppresses incoming calls until Do Not Disturb is disabled', () => {
+    doNotDisturb.set(true)
+    jest.mocked(showPopup).mockClear()
+    notify('muted', { from: 'other' as any, meetingId: 'muted-room' })
+    expect(showPopup).not.toHaveBeenCalled()
+    expect(close).toHaveBeenCalled()
+    doNotDisturb.set(false)
+    notify('new', { from: 'other' as any, meetingId: 'new-room' })
+    expect(showPopup).toHaveBeenCalledTimes(1)
+    expect(jest.mocked(showPopup).mock.calls[0][1]).toEqual({ invite: { from: 'other', meetingId: 'new-room' } })
+  })
+
 })
