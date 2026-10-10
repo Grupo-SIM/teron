@@ -81,17 +81,18 @@ export function closeJoinRequestPopup (): void {
   requestPopup = undefined
 }
 
-export async function updateJoinRequest (): Promise<void> {
+export async function updateJoinRequest (meetingId = requestMeetingId): Promise<void> {
+  if (meetingId === undefined || meetingId !== requestMeetingId) return
   if (getCurrentAccount().role === AccountRole.ReadOnlyGuest) return
   const client = await createPulseClient()
   const currentPerson = getCurrentEmployee()
 
-  if (client === undefined) return
+  if (client === undefined || meetingId !== requestMeetingId) return
 
   try {
     await client.put(
-      `${getPulsePrefix()}/request/${requestMeetingId}/${currentPerson}`,
-      { from: currentPerson, meetingId: requestMeetingId },
+      `${getPulsePrefix()}/request/${meetingId}/${currentPerson}`,
+      { from: currentPerson, meetingId },
       joinRequestSecondsToLive
     )
   } catch (error) {
@@ -99,34 +100,36 @@ export async function updateJoinRequest (): Promise<void> {
   }
 }
 
-export async function cancelJoinRequest (): Promise<void> {
+export async function cancelJoinRequest (meetingId = requestMeetingId): Promise<void> {
+  if (meetingId === undefined) return
+  if (requestMeetingId === meetingId) requestMeetingId = undefined
   const client = await createPulseClient()
   const currentPerson = getCurrentEmployee()
 
   if (client === undefined) return
   try {
-    await client.delete(`${getPulsePrefix()}/request/${requestMeetingId}/${currentPerson}`)
+    await client.delete(`${getPulsePrefix()}/request/${meetingId}/${currentPerson}`)
   } catch (error) {
     console.warn('failed to delete invite info:', error)
   }
-  requestMeetingId = undefined
 }
 
 async function onJoinResponse (_key: string, response: JoinResponse | undefined): Promise<void> {
-  const client = await createPulseClient()
-  if (
-    client === undefined ||
-    response === undefined ||
-    requestMeetingId === undefined ||
-    requestMeetingId !== response.meetingId
-  ) {
-    return
-  }
+  if (response === undefined || requestMeetingId !== response.meetingId) return
 
-  const currentPerson = getCurrentEmployee()
-  await client.delete(`${getPulsePrefix()}/request/${requestMeetingId}/${currentPerson}`)
-  await client.delete(`${getPulsePrefix()}/response/${currentPerson}/${requestMeetingId}`)
+  // Claim the response before any await so repeated events cannot join twice.
+  requestMeetingId = undefined
   closeJoinRequestPopup()
+  try {
+    const client = await createPulseClient()
+    if (client !== undefined) {
+      const currentPerson = getCurrentEmployee()
+      await client.delete(`${getPulsePrefix()}/request/${response.meetingId}/${currentPerson}`)
+      await client.delete(`${getPulsePrefix()}/response/${currentPerson}/${response.meetingId}`)
+    }
+  } catch (error) {
+    console.warn('failed to clean up join response:', error)
+  }
   if (!response.accept) return
   await joinOrCreateMeetingByInvite(response.meetingId as Ref<Room>)
 }
@@ -166,11 +169,13 @@ export async function unsubscribeJoinRequests (): Promise<void> {
 export async function responseToJoinRequest (joinRequest: JoinRequest, accept: boolean): Promise<void> {
   if (activeRequestKey === undefined) return
 
-  const client = await createPulseClient()
-  if (client === undefined || activeRequestsMap === undefined) return
-
-  const activeRequest = activeRequestsMap.get(activeRequestKey)
+  const requestKey = activeRequestKey
+  const requests = activeRequestsMap
+  const activeRequest = requests?.get(requestKey)
   if (activeRequest === undefined) return
+
+  const client = await createPulseClient()
+  if (client === undefined) return
 
   await client.put(
     `${getPulsePrefix()}/response/${joinRequest.from}/${joinRequest.meetingId}`,
@@ -178,11 +183,12 @@ export async function responseToJoinRequest (joinRequest: JoinRequest, accept: b
     responseSecondsToLive
   )
 
-  responsePopup?.close()
-  responsePopup = undefined
-  if (activeRequestKey === undefined) return
-  activeRequestsMap.set(activeRequestKey, undefined)
-  activeRequestKey = undefined
+  if (activeRequestKey === requestKey) {
+    responsePopup?.close()
+    responsePopup = undefined
+    activeRequestKey = undefined
+  }
+  if (requests?.has(requestKey) === true) requests.set(requestKey, undefined)
 
   if (!accept) return
   await joinOrCreateMeetingByInvite(joinRequest.meetingId as Ref<Room>)

@@ -8,6 +8,18 @@ import notification from '@hcengineering/notification'
 const sounds = new Map<Asset, AudioBuffer>()
 const context = new AudioContext()
 
+function resumeAudio (): void {
+  if (context.state !== 'suspended') return
+  // A browser can leave resume pending until user interaction. Do not delay
+  // playback's stop handle while waiting for autoplay permission.
+  void context.resume().catch((err) => { console.error('Cannot resume audio', err) })
+}
+
+if (typeof document !== 'undefined') {
+  document.addEventListener('pointerdown', resumeAudio, true)
+  document.addEventListener('keydown', resumeAudio, true)
+}
+
 export async function isNotificationAllowed (_class?: Ref<Class<Doc>>): Promise<boolean> {
   if (_class === undefined) return false
   const client = getClient()
@@ -36,6 +48,7 @@ export async function prepareSound (key: string): Promise<void> {
 
 export async function playSound (soundKey: string, loop = false): Promise<(() => void) | null> {
   if (get(doNotDisturb)) return null
+  resumeAudio()
   const soundAssetKey = soundKey as Asset
 
   if (!sounds.has(soundAssetKey)) {
