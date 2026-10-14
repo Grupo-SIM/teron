@@ -65,6 +65,8 @@ export class LiveKitClient {
   private connection: { wsURL: string, refreshToken: () => Promise<string> } | undefined
   private recovery: Promise<void> | undefined
   private cancelRecoveryDelay: (() => void) | undefined
+  // Keep capture alive when SDK teardown stops its published tracks.
+  private readonly screenCapture = new Map<Track.Source, MediaStreamTrack>()
   private cameraEnabled: boolean = false
   private microphoneEnabled: boolean = false
 
@@ -267,6 +269,7 @@ export class LiveKitClient {
   }
 
   cancelRecovery (): void {
+    this.releaseScreenCapture()
     this.recoveryGeneration++
     this.connection = undefined
     this.cancelRecoveryDelay?.()
@@ -293,6 +296,8 @@ export class LiveKitClient {
         await this.setActiveMicrophone(this.currentMediaSession?.state.microphone?.deviceId)
         await this.setCameraEnabled(this.cameraEnabled)
         await this.setMicrophoneEnabled(this.microphoneEnabled)
+        if (generation !== this.recoveryGeneration) return
+        await this.restoreScreenCapture()
         // A second terminal disconnect can arrive while devices are restoring.
         // Its handler shares this recovery promise, so keep retrying here.
         if (generation !== this.recoveryGeneration) return
@@ -304,7 +309,9 @@ export class LiveKitClient {
       } catch (error) {
         if (generation !== this.recoveryGeneration) return
         console.error('Failed to recover meeting connection', error)
-        if (this.liveKitRoom.state === ConnectionState.Connected) return
+        if (this.liveKitRoom.state === ConnectionState.Connected &&
+          [...this.screenCapture.keys()].every(source =>
+            this.liveKitRoom.localParticipant.getTrackPublication(source) !== undefined)) return
         await this.waitForRecovery(Math.min(1000 * 2 ** Math.min(attempt++, 5), 30000))
       }
     }
@@ -365,6 +372,10 @@ export class LiveKitClient {
     const session = this.currentMediaSession
     const track = publication.track?.mediaStreamTrack
     const deviceId = track?.getSettings().deviceId
+    const source = publication.track?.source
+    if (track !== undefined && (source === Track.Source.ScreenShare || source === Track.Source.ScreenShareAudio)) {
+      if (!this.screenCapture.has(source)) this.screenCapture.set(source, track.clone())
+    }
     if (publication.track?.kind === Track.Kind.Video) {
       if (publication.track.source === Track.Source.ScreenShare) {
         session?.setFeature('sharing', { enabled: true, track, deviceId })
@@ -372,7 +383,7 @@ export class LiveKitClient {
       } else {
         session?.setCamera({ enabled: true, track, deviceId })
       }
-    } else if (publication.track?.kind === Track.Kind.Audio) {
+    } else if (publication.track?.kind === Track.Kind.Audio && source === Track.Source.Microphone) {
       session?.setMicrophone({ enabled: true, track, deviceId })
     }
   }
@@ -382,6 +393,7 @@ export class LiveKitClient {
     const session = this.currentMediaSession
     if (publication.track?.kind === Track.Kind.Video) {
       if (publication.track.source === Track.Source.ScreenShare) {
+        this.releaseScreenCapture()
         session?.setFeature('sharing', { enabled: false })
         screenSharingState.set(ScreenSharingState.Inactive)
       }
@@ -395,7 +407,7 @@ export class LiveKitClient {
     const session = this.currentMediaSession
     if (publication.track?.kind === Track.Kind.Video && publication.track.source === Track.Source.Camera) {
       session?.setCamera({ enabled: false })
-    } else if (publication.track?.kind === Track.Kind.Audio) {
+    } else if (publication.track?.kind === Track.Kind.Audio && publication.track.source === Track.Source.Microphone) {
       session?.setMicrophone({ enabled: false })
     }
   }
@@ -407,7 +419,7 @@ export class LiveKitClient {
     const deviceId = track?.getSettings().deviceId
     if (publication.track?.kind === Track.Kind.Video && publication.track?.source === Track.Source.Camera) {
       session?.setCamera({ enabled: true, track, deviceId })
-    } else if (publication.track?.kind === Track.Kind.Audio) {
+    } else if (publication.track?.kind === Track.Kind.Audio && publication.track.source === Track.Source.Microphone) {
       session?.setMicrophone({ enabled: true, track, deviceId })
     }
   }
@@ -495,7 +507,35 @@ export class LiveKitClient {
     }
   }
 
+  private releaseScreenCapture (): void {
+    for (const track of this.screenCapture.values()) track.stop()
+    this.screenCapture.clear()
+  }
+
+  private async restoreScreenCapture (): Promise<void> {
+    const video = this.screenCapture.get(Track.Source.ScreenShare)
+    if (video === undefined) return
+    if (video.readyState === 'ended') {
+      this.releaseScreenCapture()
+      this.currentMediaSession?.setFeature('sharing', { enabled: false })
+      return
+    }
+    for (const [source, capture] of this.screenCapture) {
+      if (capture.readyState === 'ended') continue
+      if (this.liveKitRoom.state !== ConnectionState.Connected) return
+      if (this.liveKitRoom.localParticipant.getTrackPublication(source) !== undefined) continue
+      const track = capture.clone()
+      try {
+        await this.liveKitRoom.localParticipant.publishTrack(track, { source })
+      } catch (error) {
+        track.stop()
+        throw error
+      }
+    }
+  }
+
   async setScreenShareEnabled (value: boolean, withAudio: boolean = false): Promise<void> {
+    if (!value) this.releaseScreenCapture()
     try {
       await this.liveKitRoom.localParticipant.setScreenShareEnabled(value, { audio: withAudio })
     } catch (e) {

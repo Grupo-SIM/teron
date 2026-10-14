@@ -10,6 +10,8 @@ jest.mock('livekit-client', () => {
       state = actual.ConnectionState.Disconnected
       remoteParticipants = new Map()
       localParticipant = {
+        getTrackPublication: jest.fn(() => undefined),
+        publishTrack: jest.fn(async () => {}),
         setCameraEnabled: jest.fn(async () => {}),
         setMicrophoneEnabled: jest.fn(async () => {}),
         setScreenShareEnabled: jest.fn(async () => {})
@@ -129,6 +131,63 @@ describe('LiveKit terminal disconnection recovery', () => {
       expect(session.close).toHaveBeenCalled()
     }
   )
+
+  const publishScreen = (source = 'screen_share'): any => {
+    const capture: any = { readyState: 'live', stop: jest.fn(), clone: jest.fn() }
+    const republished = { stop: jest.fn() }
+    capture.clone.mockReturnValue(republished)
+    const original = { getSettings: () => ({}), clone: jest.fn(() => capture) }
+    client.onLocalTrackPublished({ track: {
+      kind: source === 'screen_share' ? 'video' : 'audio', source, mediaStreamTrack: original
+    } } as any, {} as any)
+    return { capture, republished }
+  }
+
+  test('fresh join republishes live screen and audio capture without requesting display permission', async () => {
+    const video = publishScreen()
+    const audio = publishScreen('screen_share_audio')
+    expect(session.setMicrophone).not.toHaveBeenCalled()
+    loseConnection(DisconnectReason.STATE_MISMATCH)
+    await jest.advanceTimersByTimeAsync(300)
+    expect(client.liveKitRoom.localParticipant.publishTrack).toHaveBeenCalledWith(video.republished, { source: 'screen_share' })
+    expect(client.liveKitRoom.localParticipant.publishTrack).toHaveBeenCalledWith(audio.republished, { source: 'screen_share_audio' })
+    expect(client.liveKitRoom.localParticipant.setScreenShareEnabled).not.toHaveBeenCalled()
+    expect(video.capture.stop).not.toHaveBeenCalled()
+    await client.disconnect()
+    expect(video.capture.stop).toHaveBeenCalledTimes(1)
+    expect(audio.capture.stop).toHaveBeenCalledTimes(1)
+  })
+
+  test('screen publication failure retries without abandoning live capture', async () => {
+    const log = jest.spyOn(console, 'error').mockImplementation(() => {})
+    const video = publishScreen()
+    ;(client.liveKitRoom.localParticipant.publishTrack as jest.Mock).mockRejectedValueOnce(new Error('publish failed'))
+    loseConnection(DisconnectReason.STATE_MISMATCH)
+    await jest.advanceTimersByTimeAsync(300)
+    expect(video.republished.stop).toHaveBeenCalled()
+    expect(video.capture.stop).not.toHaveBeenCalled()
+    await jest.advanceTimersByTimeAsync(1000)
+    expect(client.liveKitRoom.localParticipant.publishTrack).toHaveBeenCalledTimes(2)
+    log.mockRestore()
+  })
+
+  test('stopping sharing during outage releases capture and prevents restoration', async () => {
+    const video = publishScreen()
+    loseConnection(DisconnectReason.STATE_MISMATCH)
+    await client.setScreenShareEnabled(false)
+    await jest.advanceTimersByTimeAsync(300)
+    expect(video.capture.stop).toHaveBeenCalledTimes(1)
+    expect(client.liveKitRoom.localParticipant.publishTrack).not.toHaveBeenCalled()
+  })
+
+  test('ended capture is cleared instead of prompting again after recovery', async () => {
+    const video = publishScreen()
+    video.capture.readyState = 'ended'
+    loseConnection(DisconnectReason.STATE_MISMATCH)
+    await jest.advanceTimersByTimeAsync(300)
+    expect(client.liveKitRoom.localParticipant.publishTrack).not.toHaveBeenCalled()
+    expect(session.setFeature).toHaveBeenLastCalledWith('sharing', { enabled: false })
+  })
 
   test('explicit disconnect cancels scheduled recovery', async () => {
     loseConnection(DisconnectReason.STATE_MISMATCH)
