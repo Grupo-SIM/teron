@@ -251,6 +251,9 @@
   :global(.hidden) {
     display: none;
   }
+  .cover :global(video.video) {
+    height: 100%;
+  }
   .cover {
     overflow: hidden;
     object-fit: cover;
@@ -286,9 +289,10 @@
   .parent {
     position: relative;
     flex-shrink: 0;
-    height: max-content;
+    height: 100%;
     min-height: 0;
     max-height: 100%;
+    overflow: hidden;
     background-color: black;
     border-radius: 0.75rem;
 

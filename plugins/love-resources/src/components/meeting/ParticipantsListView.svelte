@@ -113,3 +113,12 @@
     <ParticipantView {...participant} />
   </div>
 {/each}
+
+<style lang="scss">
+  .video {
+    min-width: 0;
+    min-height: 0;
+    flex-shrink: 0;
+    aspect-ratio: 16 / 9;
+  }
+</style>
