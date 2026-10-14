@@ -1,5 +1,6 @@
 import {
   ConnectionState,
+  setLogExtension,
   DisconnectReason,
   type RemoteParticipant,
   Room as LKRoom,
@@ -26,6 +27,9 @@ import love from './plugin'
 import { $myPreferences } from './stores'
 import { leaveMeeting } from './meetings'
 import { voiceReconnectPolicy } from './voice-reconnect-policy'
+import { logConnectionDiagnostic } from './connection-diagnostics'
+
+setLogExtension(logConnectionDiagnostic)
 
 export enum ScreenSharingState {
   Inactive,
