@@ -15,6 +15,8 @@ import { type UnsubscribeCallback, type Callback } from '@hcengineering/hulypuls
 import { type IntlString, getMetadata } from '@hcengineering/platform'
 import presentation, { createPulseClient } from '@hcengineering/presentation'
 import { type PersonId } from '@hcengineering/core'
+import { anonymousMode } from '@hcengineering/ui'
+import { get } from 'svelte/store'
 
 const typingDelaySeconds = 2
 
@@ -101,6 +103,10 @@ export async function subscribeTyping (
 }
 
 export async function setTyping (socialId: PersonId, objectId: string, status?: IntlString): Promise<void> {
+  if (get(anonymousMode)) {
+    await clearTyping(socialId, objectId)
+    return
+  }
   const client = await createPulseClient()
 
   if (client !== undefined) {

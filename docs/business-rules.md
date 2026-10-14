@@ -94,3 +94,5 @@ Não perturbe é preferência local do dispositivo, persistida entre sessões e 
 Compartilhamento de tela preserva captura ainda ativa durante reconexão recuperável e republica vídeo e áudio na mesma sala sem solicitar nova permissão. Parar compartilhamento, sair da chamada ou encerrar captura libera as faixas preservadas e impede retomada automática. Áudio da tela não altera estado do microfone.
 
 Falha transitória ao consultar versão do frontend durante reconexão não recarrega a página nem descarta estado local; uma versão diferente confirmada mantém fluxo de atualização. Cards de participantes presentes na sala preservam identidade visual enquanto o transporte da chamada reconecta; saída confirmada remove o card.
+
+Modo anônimo e não perturbe são independentes e podem ficar ativos juntos. Modo anônimo faz o usuário aparecer offline aos demais, oculta sua presença no Escritório e deixa de publicar presença em documentos e digitação, sem encerrar sua sessão. Não perturbe mantém comportamento de silenciar alertas. Barra superior indica não perturbe ativo em vermelho e modo anônimo ativo em roxo, com ícones distintos, descrição acessível e confirmação ao alternar.

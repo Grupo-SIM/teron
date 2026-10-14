@@ -334,7 +334,10 @@ describe('server authorization before persistence', () => {
     await expect(middleware.tx(ctx, [update('otherPresence', core.class.UserStatus, { online: true })])).rejects.toThrow()
     await expect(middleware.tx(ctx, [update('ownPresence', core.class.UserStatus, { user: 'other' })])).rejects.toThrow()
     await expect(middleware.tx(ctx, [update('ownPresence', core.class.UserStatus, { online: 'true' })])).rejects.toThrow()
-    expect(forward).toHaveBeenCalledTimes(2)
+    await middleware.tx(ctx, [update('ownPresence', core.class.UserStatus, { anonymous: true, online: false })])
+    await expect(middleware.tx(ctx, [update('otherPresence', core.class.UserStatus, { anonymous: true })])).rejects.toThrow()
+    await expect(middleware.tx(ctx, [update('ownPresence', core.class.UserStatus, { anonymous: 'true' })])).rejects.toThrow()
+    expect(forward).toHaveBeenCalledTimes(3)
   })
   it('refuses readonly non-task edits and preserves trusted trigger transactions', async () => {
     const { middleware, ctx, forward } = fixture(AccountRole.ReadOnlyGuest)

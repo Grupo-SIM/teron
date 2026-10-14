@@ -156,9 +156,9 @@ export async function OnUserStatus (txes: Tx[], control: TriggerControl): Promis
       if (val === undefined) return []
       const status = (await control.findAll(control.ctx, core.class.UserStatus, { _id: updateTx.objectId }))[0]
       if (status !== undefined) {
-        if (val) {
+        if (val || updateTx.operations.connected === true) {
           result.push(...(await createUserInfo(status.user, control)))
-        } else {
+        } else if (status.anonymous !== true || updateTx.operations.connected === false) {
           result.push(...(await removeUserInfo(status.user, control)))
         }
       }

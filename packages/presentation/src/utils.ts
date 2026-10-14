@@ -59,7 +59,7 @@ import core, {
 } from '@hcengineering/core'
 import { getMetadata, getResource } from '@hcengineering/platform'
 import { LiveQuery as LQ } from '@hcengineering/query'
-import { type AnyComponent, type AnySvelteComponent, getRawCurrentLocation, workspaceId } from '@hcengineering/ui'
+import { type AnyComponent, type AnySvelteComponent, getRawCurrentLocation, workspaceId, anonymousMode } from '@hcengineering/ui'
 import view, { type AttributeCategory, type AttributeEditor } from '@hcengineering/view'
 import { deepEqual } from 'fast-equals'
 import { onDestroy } from 'svelte'
@@ -273,6 +273,44 @@ export function onClient (l: OnClientListener): void {
   }
 }
 
+let anonymousPresenceInitialized = false
+let anonymousPresenceSync = Promise.resolve()
+function syncAnonymousPresence (): void {
+  anonymousPresenceSync = anonymousPresenceSync.then(async () => {
+    if (client === undefined || !anonymousPresenceInitialized) return
+    const currentClient = client
+    const account = getCurrentAccount()
+    const anonymous = get(anonymousMode)
+    const status = await currentClient.findOne(core.class.UserStatus, { user: account.uuid })
+    if (currentClient !== client) return
+    if (status === undefined) {
+      await currentClient.createDoc(core.class.UserStatus, core.space.Space, {
+        user: account.uuid, online: !anonymous, anonymous
+      })
+    } else if (status.anonymous !== anonymous || status.online !== !anonymous) {
+      await currentClient.update(status, { anonymous, online: !anonymous })
+    }
+  }).catch((err) => { console.error('Failed to update anonymous presence', err) })
+}
+anonymousMode.subscribe(syncAnonymousPresence)
+onClient(async () => {
+  anonymousPresenceInitialized = false
+  const status = await client.findOne(core.class.UserStatus, { user: getCurrentAccount().uuid })
+  if (status?.anonymous !== undefined) anonymousMode.set(status.anonymous)
+  anonymousPresenceInitialized = true
+  syncAnonymousPresence()
+})
+
+addTxListener((txes) => {
+  if (!anonymousPresenceInitialized || !txes.some((tx) => (tx as TxCUD<Doc>).objectClass === core.class.UserStatus)) return
+  const currentClient = client
+  void currentClient.findOne(core.class.UserStatus, { user: getCurrentAccount().uuid }).then((status) => {
+    if (currentClient === client && status?.anonymous !== undefined && status.anonymous !== get(anonymousMode)) {
+      anonymousMode.set(status.anonymous)
+    }
+  }).catch((err) => { console.error('Failed to refresh anonymous presence', err) })
+})
+
 let txQueue: Tx[] = []
 
 export type RefreshListener = () => void
@@ -391,6 +429,7 @@ export async function setClient (_client: Client): Promise<void> {
 
   const uiClient = new UIClient(pipeline, liveQuery)
 
+  anonymousPresenceInitialized = false
   client = uiClient
 
   const notifyCaller = reduceCalls(async () => {

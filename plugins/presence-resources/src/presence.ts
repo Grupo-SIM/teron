@@ -15,6 +15,8 @@ import { type Employee, type Person } from '@hcengineering/contact'
 import { type UnsubscribeCallback, type Callback } from '@hcengineering/hulypulse-client'
 import { type Class, type Doc, type Ref } from '@hcengineering/core'
 import { getMetadata } from '@hcengineering/platform'
+import { anonymousMode } from '@hcengineering/ui'
+import { get } from 'svelte/store'
 import presentation, { createPulseClient } from '@hcengineering/presentation'
 
 export interface PresenceInfo {
@@ -97,6 +99,10 @@ export async function subscribePresence (
 }
 
 export async function updatePresence (presence: PresenceInfo, presenceTtlSeconds: number): Promise<void> {
+  if (get(anonymousMode)) {
+    await deletePresence(presence)
+    return
+  }
   const client = await createPulseClient()
 
   if (client !== undefined) {

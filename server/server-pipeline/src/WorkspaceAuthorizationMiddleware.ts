@@ -93,10 +93,11 @@ export class WorkspaceAuthorizationMiddleware extends BaseMiddleware {
       } else if (taskSequence) {
         allowed = true
       } else if (tx.objectClass === core.class.UserStatus) {
-        const status = data as Doc & { user: AccountUuid, online: boolean }
+        const status = data as Doc & { user: AccountUuid, online: boolean, anonymous?: boolean }
         const nextStatus = updated ? TxProcessor.updateDoc2Doc({ ...status }, tx as TxUpdateDoc<Doc>) : status
         allowed = status.user === account.uuid && typeof (nextStatus as typeof status).online === 'boolean' &&
-          (created || (updated && fields.every((field) => field === 'online')))
+          ((nextStatus as typeof status).anonymous === undefined || typeof (nextStatus as typeof status).anonymous === 'boolean') &&
+          (created || (updated && fields.every((field) => field === 'online' || field === 'anonymous')))
       } else if (tx.objectClass === contact.class.Person && tx.objectSpace === contact.space.Contacts) {
         const person = data as Person
         const ownPerson = person.personUuid === account.uuid || (person.personUuid == null && personIds.includes(person._id))

@@ -1,6 +1,6 @@
 import { aiBotSocialIdentityStore } from '@hcengineering/ai-bot-resources'
 import { getCurrentEmployee } from '@hcengineering/contact'
-import { getPersonRefByPersonId } from '@hcengineering/contact-resources'
+import { getPersonRefByPersonId, statusByUserStore, loadUsersStatus } from '@hcengineering/contact-resources'
 import { type Ref } from '@hcengineering/core'
 import {
   type DevicesPreference,
@@ -20,7 +20,12 @@ export const myOffice = derived(rooms, (val) => {
   const personId = getCurrentEmployee()
   return val.find((p) => (p as Office).person === personId) as Office | undefined
 })
-export const infos = writable<ParticipantInfo[]>([])
+const allInfos = writable<ParticipantInfo[]>([])
+export const infos = derived([allInfos, statusByUserStore],
+  ([participants, statuses]) => {
+    const self = getCurrentEmployee()
+    return participants.filter((info) => info.person === self || (info.account === null || statuses.get(info.account)?.anonymous !== true))
+  })
 export const myInfo = derived(infos, (val) => {
   const personId = getCurrentEmployee()
   return val.find((p) => p.person === personId)
@@ -69,6 +74,7 @@ const floorsQuery = createQuery(true)
 const preferencesQuery = createQuery(true)
 
 onClient(() => {
+  loadUsersStatus()
   const roomPromise = new Promise<void>((resolve) =>
     query.query(love.class.Room, {}, (res) => {
       rooms.set(res)
@@ -77,7 +83,7 @@ onClient(() => {
   )
   const infoPromise = new Promise<void>((resolve) =>
     statusQuery.query(love.class.ParticipantInfo, {}, async (res) => {
-      infos.set(await filterParticipantInfo(res))
+      allInfos.set(await filterParticipantInfo(res))
       resolve()
     })
   )

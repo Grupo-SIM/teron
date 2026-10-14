@@ -646,6 +646,8 @@ export interface PersonInfo extends BasePerson {
  */
 // TODO: move to contact
 export interface UserStatus extends Doc {
+  anonymous?: boolean
+  connected?: boolean
   online: boolean
   user: AccountUuid
 }

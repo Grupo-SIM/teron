@@ -25,6 +25,10 @@ export const uiId = 'ui' as Plugin
 
 export const uis = plugin(uiId, {
   string: {
+    EnableAnonymousMode: '' as IntlString,
+    DisableAnonymousMode: '' as IntlString,
+    AnonymousModeEnabled: '' as IntlString,
+    AnonymousModeDisabled: '' as IntlString,
     EnableDoNotDisturb: '' as IntlString,
     DisableDoNotDisturb: '' as IntlString,
     DoNotDisturbEnabled: '' as IntlString,

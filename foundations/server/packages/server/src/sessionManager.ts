@@ -1087,12 +1087,14 @@ export class TSessionManager implements SessionManager {
       if (status === undefined) {
         const tx = txFactory.createTxCreateDoc(core.class.UserStatus, core.space.Space, {
           online,
+          connected: online,
           user
         })
         await session.tx(clientCtx, tx)
-      } else if (status.online !== online) {
+      } else if (status.online !== (online && status.anonymous !== true) || status.connected !== online) {
         const tx = txFactory.createTxUpdateDoc(status._class, status.space, status._id, {
-          online
+          online: online && status.anonymous !== true,
+          connected: online
         })
         await session.tx(clientCtx, tx)
       }

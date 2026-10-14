@@ -1,0 +1,51 @@
+import contact from '@hcengineering/contact'
+import core, { type Tx, type UserStatus } from '@hcengineering/core'
+import love from '@hcengineering/love'
+import { type TriggerControl } from '@hcengineering/server-core'
+import { OnUserStatus } from './index'
+
+function fixture (connected: boolean, hasInfo: boolean): { control: TriggerControl, remove: jest.Mock, create: jest.Mock } {
+  const remove = jest.fn(() => ({ _class: core.class.TxRemoveDoc }))
+  const create = jest.fn(() => ({ _class: core.class.TxCreateDoc }))
+  const status = { user: 'account', online: false, anonymous: true, connected }
+  const control = {
+    ctx: {}, branding: {}, hierarchy: { isDerived: () => false },
+    txFactory: {
+      createTxRemoveDoc: remove,
+      createTxCreateDoc: create,
+      createTxApplyIf: jest.fn(() => ({ _class: core.class.TxApplyIf }))
+    },
+    findAll: jest.fn(async (_ctx: unknown, klass: unknown) => {
+      if (klass === core.class.UserStatus) return [status]
+      if (klass === contact.class.Person) return [{ _id: 'person', name: 'Test User' }]
+      if (klass === love.class.ParticipantInfo) return hasInfo ? [{ _id: 'info', _class: klass, space: core.space.Workspace }] : []
+      return []
+    })
+  } as unknown as TriggerControl
+  return { control, remove, create }
+}
+
+function update (operations: Partial<UserStatus>): Tx {
+  return {
+    _class: core.class.TxUpdateDoc, objectClass: core.class.UserStatus,
+    objectId: 'status', operations
+  } as unknown as Tx
+}
+
+describe('anonymous office presence', () => {
+  it('preserves own room when becoming anonymous', async () => {
+    const { control, remove } = fixture(true, true)
+    expect(await OnUserStatus([update({ online: false, anonymous: true })], control)).toEqual([])
+    expect(remove).not.toHaveBeenCalled()
+  })
+  it('restores own room after reconnecting anonymously', async () => {
+    const { control, create } = fixture(true, false)
+    expect(await OnUserStatus([update({ online: false, connected: true })], control)).toHaveLength(1)
+    expect(create).toHaveBeenCalledTimes(1)
+  })
+  it('removes retained room after final anonymous connection closes', async () => {
+    const { control, remove } = fixture(false, true)
+    expect(await OnUserStatus([update({ online: false, connected: false })], control)).toHaveLength(1)
+    expect(remove).toHaveBeenCalledTimes(1)
+  })
+})

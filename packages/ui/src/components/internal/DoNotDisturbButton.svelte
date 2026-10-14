@@ -25,6 +25,7 @@
   class:pressed={$doNotDisturb}
   style:border={'1px solid var(--theme-divider-color)'}
   style:cursor={'pointer'}
+  class:active={$doNotDisturb}
   title={label}
   aria-label={label}
   aria-pressed={$doNotDisturb}
@@ -35,3 +36,11 @@
     <path d="M7 12h10" />
   </svg>
 </button>
+
+<style>
+  .statusButton.active {
+    color: #ef4444;
+    background: rgba(239, 68, 68, 0.14);
+    border-color: #ef4444 !important;
+  }
+</style>

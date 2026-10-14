@@ -19,6 +19,7 @@
   import Label from '../Label.svelte'
   import StatusComponent from '../Status.svelte'
   import Clock from './Clock.svelte'
+  import AnonymousModeButton from './AnonymousModeButton.svelte'
   import DoNotDisturbButton from './DoNotDisturbButton.svelte'
   import RootBarExtension from './RootBarExtension.svelte'
   import Settings from './Settings.svelte'
@@ -281,6 +282,7 @@
           <Settings />
           <Clock />
           <DoNotDisturbButton />
+          <AnonymousModeButton />
           <div class="flex-row-center flex-gap-0-5">
             {#if !secondRow}
               <RootBarExtension position="right" />

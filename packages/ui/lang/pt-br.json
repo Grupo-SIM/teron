@@ -1,5 +1,9 @@
 {
     "string": {
+    "EnableAnonymousMode": "Ativar modo anônimo",
+    "DisableAnonymousMode": "Desativar modo anônimo",
+    "AnonymousModeEnabled": "Modo anônimo ativado: aparecendo offline",
+    "AnonymousModeDisabled": "Modo anônimo desativado",
     "EnableDoNotDisturb": "Ativar não perturbe",
     "DisableDoNotDisturb": "Desativar não perturbe",
     "DoNotDisturbEnabled": "Não perturbe ativado",
