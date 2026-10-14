@@ -14,6 +14,7 @@
 
   let parentElement: HTMLDivElement
   let audio: RemoteAudio | undefined
+  let audioRecoveryInterval: ReturnType<typeof setInterval> | undefined
 
   function handleTrackSubscribed (
     track: RemoteTrack,
@@ -53,6 +54,10 @@
       })
   }
 
+  function recoverVisibleAudio (): void {
+    if (document.visibilityState === 'visible') reconcileAudio()
+  }
+
   $: subscribeRoomRequests($myInfo?.room)
 
   onMount(async () => {
@@ -62,6 +67,10 @@
     lk.on(RoomEvent.TrackUnsubscribed, handleTrackUnsubscribed)
     lk.on(RoomEvent.Connected, reconcileAudio)
     lk.on(RoomEvent.Reconnected, reconcileAudio)
+    audioRecoveryInterval = setInterval(reconcileAudio, 5000)
+    document.addEventListener('visibilitychange', recoverVisibleAudio)
+    document.addEventListener('pointerdown', recoverVisibleAudio)
+    document.addEventListener('keydown', recoverVisibleAudio)
     reconcileAudio()
 
     await subscribeInviteRequests()
@@ -72,6 +81,10 @@
     lk.off(RoomEvent.TrackUnsubscribed, handleTrackUnsubscribed)
     lk.off(RoomEvent.Connected, reconcileAudio)
     lk.off(RoomEvent.Reconnected, reconcileAudio)
+    clearInterval(audioRecoveryInterval)
+    document.removeEventListener('visibilitychange', recoverVisibleAudio)
+    document.removeEventListener('pointerdown', recoverVisibleAudio)
+    document.removeEventListener('keydown', recoverVisibleAudio)
     audio?.clear()
     audio = undefined
     await unsubscribeInviteRequests()

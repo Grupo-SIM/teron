@@ -7,7 +7,26 @@ export class RemoteAudio {
   constructor (private readonly parent: HTMLElement) {}
 
   attach (track: RemoteTrack): void {
-    if (this.elements.has(track)) return
+    const existing = this.elements.get(track)
+    if (existing !== undefined) {
+      const stream = existing.srcObject as MediaStream | null
+      const missingTrack = stream === null || !stream.getAudioTracks().includes(track.mediaStreamTrack)
+      const missingElement = existing.parentElement !== this.parent
+      if (missingTrack || missingElement || existing.paused || existing.ended) {
+        console.warn('[meeting-audio] ' + JSON.stringify({
+          timestamp: new Date().toISOString(),
+          trackSID: track.sid,
+          missingTrack,
+          missingElement,
+          paused: existing.paused,
+          ended: existing.ended
+        }))
+        // Let the SDK restore the stream, output device and playback error handling.
+        track.attach(existing)
+        if (missingElement) this.parent.appendChild(existing)
+      }
+      return
+    }
     const element = track.attach()
     this.elements.set(track, element)
     this.parent.appendChild(element)
