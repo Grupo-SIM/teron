@@ -3,6 +3,7 @@
   import ParticipantView from './ParticipantView.svelte'
   import { Participant, RemoteParticipant, RoomEvent } from 'livekit-client'
   import { createEventDispatcher, onDestroy, onMount } from 'svelte'
+  import { get } from 'svelte/store'
   import { liveKitClient, lk } from '../../utils'
   import { infos } from '../../stores'
   import { Ref } from '@hcengineering/core'
@@ -32,6 +33,7 @@
   }
 
   let participants: ParticipantData[] = []
+  let destroyed = false
 
   function attachParticipant (participant: Participant): void {
     const current = participants.find((p) => p._id === participant.identity)
@@ -51,14 +53,19 @@
 
   function handleParticipantDisconnected (participant: RemoteParticipant): void {
     const index = participants.findIndex((p) => p._id === participant.identity)
-    if (index !== -1) {
-      participants.splice(index, 1)
+    if (index !== -1 && participants[index].participant === participant) {
+      if (get(infos).some((info) => info.room === room && info.person === participant.identity)) {
+        participants[index].participant = undefined
+      } else {
+        participants.splice(index, 1)
+      }
       participants = participants
     }
   }
 
   onMount(async () => {
     await liveKitClient.awaitConnect()
+    if (destroyed) return
     for (const participant of lk.remoteParticipants.values()) {
       attachParticipant(participant)
     }
@@ -69,6 +76,8 @@
 
   onDestroy(
     infos.subscribe((data) => {
+      const roomPeople = new Set(data.filter((info) => info.room === room).map((info) => info.person))
+      participants = participants.filter((p) => p.participant !== undefined || roomPeople.has(p._id as Ref<Person>))
       for (const info of data) {
         if (info.room !== room) continue
         const current = participants.find((p) => p._id === info.person)
@@ -85,6 +94,7 @@
   )
 
   onDestroy(() => {
+    destroyed = true
     lk.off(RoomEvent.ParticipantConnected, attachParticipant)
     lk.off(RoomEvent.ParticipantDisconnected, handleParticipantDisconnected)
   })

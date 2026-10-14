@@ -404,9 +404,9 @@ export async function connect (title: string): Promise<Client | undefined> {
                       location.reload()
                     }
                   } catch (err: any) {
-                    // Failed to load server config, reload location
-                    console.log('reload due to config loading error')
-                    location.reload()
+                    // A transient network failure does not prove an upgrade.
+                    // Preserve local state; the next reconnect checks the version again.
+                    console.warn('Could not check frontend version after reconnect', err)
                   }
                 }
               }

@@ -92,3 +92,5 @@ Criação de tarefa grava referências de etiquetas no mesmo Setor da tarefa, in
 Não perturbe é preferência local do dispositivo, persistida entre sessões e sincronizada entre abas. Quando ativo, silencia convites de chamada, pedidos de entrada, sons e alertas de notificações no navegador/desktop; notificações permanecem na caixa de entrada. Confirmações de ações continuam visíveis.
 
 Compartilhamento de tela preserva captura ainda ativa durante reconexão recuperável e republica vídeo e áudio na mesma sala sem solicitar nova permissão. Parar compartilhamento, sair da chamada ou encerrar captura libera as faixas preservadas e impede retomada automática. Áudio da tela não altera estado do microfone.
+
+Falha transitória ao consultar versão do frontend durante reconexão não recarrega a página nem descarta estado local; uma versão diferente confirmada mantém fluxo de atualização. Cards de participantes presentes na sala preservam identidade visual enquanto o transporte da chamada reconecta; saída confirmada remove o card.

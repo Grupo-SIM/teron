@@ -74,6 +74,9 @@
       videoTrack?.detach(videoTrackElement)
       videoTrackElement.remove()
     }
+    videoTrack = undefined
+    videoTrackElement = undefined
+    videoMuted = true
   }
 
   function setTrackMuted (value: boolean): void {
@@ -137,6 +140,7 @@
     activeParticipant.off(ParticipantEvent.TrackMuted, muteHandler)
     activeParticipant.off(ParticipantEvent.TrackUnmuted, muteHandler)
     activeParticipant.off(ParticipantEvent.IsSpeakingChanged, speachHandler)
+    activeParticipant.off(ParticipantEvent.ConnectionQualityChanged, onConnectionQualityChanged)
     if (activeParticipant.isLocal) {
       activeParticipant.off(ParticipantEvent.LocalTrackPublished, onLocalTrackPublished)
       activeParticipant.off(ParticipantEvent.LocalTrackUnpublished, onLocalTrackUnpublished)
@@ -170,6 +174,9 @@
     detachCurrentTrack()
 
     activeParticipant = p
+    isSpeaking = false
+    isBadConnection = false
+    microphoneMuted = true
     if (p === undefined) return
 
     for (const publication of p.trackPublications.values()) {
@@ -204,6 +211,7 @@
 
   onDestroy(() => {
     lk.off(RoomEvent.ChatMessage, onChatMessage)
+    detachParticipant()
     detachCurrentTrack()
   })
 
