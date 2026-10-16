@@ -928,6 +928,12 @@ export class LiveQuery implements WithTx, Client {
       TxProcessor.updateDoc2Doc(doc, virtualTx)
 
       for (const key in q.query) {
+        // Logical predicates need the full document: unchanged branch fields are
+        // absent from the partial document assembled from this transaction.
+        if (key === '$or' || key === '$and') {
+          matched = true
+          continue
+        }
         const value = (q.query as any)[key]
         const tkey = checkMixinKey(key, q._class, this.client.getHierarchy())
         if ((doc as any)[tkey] === undefined) continue
