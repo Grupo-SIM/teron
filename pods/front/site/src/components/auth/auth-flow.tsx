@@ -283,8 +283,16 @@ export function AuthFlow({ variant, locale }: { variant: Variant; locale: Locale
     setRegion(availableRegions.find((item) => item.name)?.region ?? "");
   }
 
-  async function finishWorkspace(result: WorkspaceLoginInfo) {
+  async function finishWorkspace(result: WorkspaceLoginInfo | LoginInfo) {
     if (!api) return;
+    if (!result.token) {
+      setStep("confirmation-sent");
+      return;
+    }
+    if (!("workspaceUrl" in result)) {
+      await completeAuthentication(result);
+      return;
+    }
     await api.setCookie(result.token);
     let destination = `/workbench/${encodeURIComponent(result.workspaceUrl)}`;
     if (navigateUrl.current) {

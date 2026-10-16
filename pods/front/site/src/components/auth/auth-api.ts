@@ -205,7 +205,7 @@ export class AuthApi {
   }
 
   join(email: string, password: string, inviteId: string, workspaceUrl: string) {
-    return this.rpc<WorkspaceLoginInfo>("join", { email, password, inviteId, workspaceUrl });
+    return this.rpc<WorkspaceLoginInfo | LoginInfo>("join", { email, password, inviteId, workspaceUrl });
   }
 
   signUpJoin(
@@ -216,7 +216,7 @@ export class AuthApi {
     inviteId: string,
     workspaceUrl: string,
   ) {
-    return this.rpc<WorkspaceLoginInfo>("signUpJoin", {
+    return this.rpc<WorkspaceLoginInfo | LoginInfo>("signUpJoin", {
       email,
       password,
       first: firstName,
@@ -227,6 +227,9 @@ export class AuthApi {
   }
 
   async setCookie(token: string): Promise<void> {
+    if (!token || token === "undefined" || token === "null") {
+      throw new Error(getDictionary(this.locale).authErrors.sessionStartFailed);
+    }
     const response = await fetch(joinUrl(this.config.accountsUrl, "/cookie"), {
       method: "PUT",
       credentials: "include",

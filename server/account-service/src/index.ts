@@ -21,7 +21,7 @@ import { Analytics } from '@hcengineering/analytics'
 import { registerProviders } from '@hcengineering/auth-providers'
 import { metricsAggregate, type Branding, type BrandingMap, type MeasureContext } from '@hcengineering/core'
 import platform, { Severity, Status, addStringsLoader, setMetadata, unknownStatus } from '@hcengineering/platform'
-import serverToken, { decodeToken, decodeTokenVerbose, generateToken } from '@hcengineering/server-token'
+import serverToken, { decodeToken, decodeTokenVerbose, generateToken, TokenError } from '@hcengineering/server-token'
 import cors from '@koa/cors'
 import type Cookies from 'cookies'
 import { type IncomingHttpHeaders } from 'http'
@@ -323,7 +323,16 @@ export function serveAccount (measureCtx: MeasureContext, brandings: BrandingMap
     }
 
     // Ensure we don't set the token with workspace to the cookie
-    const { account, extra } = decodeTokenVerbose(measureCtx, token)
+    let decodedToken: ReturnType<typeof decodeTokenVerbose>
+    try {
+      decodedToken = decodeTokenVerbose(measureCtx, token)
+    } catch (err) {
+      if (!(err instanceof TokenError)) throw err
+      ctx.res.writeHead(401, KEEP_ALIVE_HEADERS)
+      ctx.res.end(JSON.stringify({ error: new Status(Severity.ERROR, platform.status.Unauthorized, {}) }))
+      return
+    }
+    const { account, extra } = decodedToken
     const tokenWithoutWorkspace = generateToken(account, undefined, extra)
 
     const cookieOpts = getCookieOptions(ctx)
