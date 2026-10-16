@@ -1332,13 +1332,20 @@ export async function join (
     throw new PlatformError(new Status(Severity.ERROR, platform.status.BadRequest, {}))
   }
 
-  const { token, account } = await login(ctx, db, branding, _token, { email, password })
-
-  if (token == null) {
-    return { account }
-  }
-
+  let loginInfo = await login(ctx, db, branding, _token, { email, password })
+  const { account } = loginInfo
   const workspaceJoinInfo = await getWorkspaceJoinInfo(ctx, db, email, inviteId, workspaceUrl, account)
+
+  if (loginInfo.token == null && workspaceJoinInfo.invite?.email === cleanEmail(email)) {
+    // A valid recipient-bound invite proves access to this email address.
+    // Revalidate without membership shortcuts before confirming an existing account.
+    await getWorkspaceJoinInfo(ctx, db, email, inviteId, workspaceUrl)
+    await confirmEmail(ctx, db, account, email)
+    await confirmHulyIds(ctx, db, account)
+    loginInfo = await login(ctx, db, branding, _token, { email, password })
+  }
+  if (loginInfo.token == null || loginInfo.tfaRequired) return loginInfo
+  const { token } = loginInfo
   ctx.info('Joining a workspace using invite', {
     email,
     normalizedEmail: workspaceJoinInfo.email,
@@ -1630,10 +1637,11 @@ export async function signUpJoin (
     inviteId
   })
 
-  // Require email confirmation just like the regular signUp flow.
-  // Auto-confirm only when no mail service is configured (dev setups).
+  // Recipient-bound invitations already prove access to the invited email.
+  // Generic invitation links still require email confirmation.
   const mailURL = getMetadata(accountPlugin.metadata.MAIL_URL)
-  const forceConfirmation = mailURL !== undefined && mailURL !== ''
+  const recipientConfirmed = workspaceJoinInfo.invite?.email === cleanEmail(email)
+  const forceConfirmation = mailURL !== undefined && mailURL !== '' && !recipientConfirmed
 
   const { account, socialId } = await signUpByEmail(
     ctx,
@@ -1669,7 +1677,9 @@ export async function signUpJoin (
     }
   }
 
-  ctx.warn('Please provide MAIL_URL to enable sign up email confirmations.')
+  if (mailURL === undefined || mailURL === '') {
+    ctx.warn('Please provide MAIL_URL to enable sign up email confirmations.')
+  }
   await confirmHulyIds(ctx, db, account)
 
   return await doJoinByInvite(

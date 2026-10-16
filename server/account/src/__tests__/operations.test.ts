@@ -2928,7 +2928,7 @@ describe('account operations', () => {
         workspaceUrl: mockWorkspaceUrl
       }
 
-      test('should NOT auto-confirm and should send confirmation with invite info when MAIL_URL is configured', async () => {
+      test('should require confirmation for generic invites when MAIL_URL is configured', async () => {
         const mockSocialId = {
           _id: 'social-id' as PersonId,
           personUuid: mockAccountId,
@@ -2944,7 +2944,7 @@ describe('account operations', () => {
 
         jest.spyOn(utils, 'getWorkspaceJoinInfo').mockResolvedValue({
           email: mockEmail,
-          invite: mockInvite,
+          invite: { ...mockInvite, email: undefined },
           workspace: mockWorkspace
         } as any)
         jest.spyOn(utils, 'signUpByEmail').mockResolvedValue({
@@ -2987,7 +2987,7 @@ describe('account operations', () => {
         })
       })
 
-      test('should auto-confirm and join when MAIL_URL is not configured (dev fallback)', async () => {
+      test.each(['', 'http://mail-service.com'])('should auto-confirm recipient-bound invite with MAIL_URL=%s', async (mailUrl) => {
         const mockSocialId = {
           _id: 'social-id' as PersonId,
           personUuid: mockAccountId,
@@ -3013,9 +3013,10 @@ describe('account operations', () => {
           account: mockAccountId,
           socialId: mockSocialId._id
         })
+        jest.spyOn(utils, 'confirmHulyIds').mockResolvedValue()
         jest.spyOn(utils, 'sendEmailConfirmation').mockResolvedValue()
         jest.spyOn(utils, 'doJoinByInvite').mockResolvedValue(joinResult as any)
-        ;(getMetadata as jest.Mock).mockReturnValue('') // No mail service configured
+        ;(getMetadata as jest.Mock).mockReturnValue(mailUrl)
 
         const result = await signUpJoin(mockCtx, mockDb, mockBranding, mockToken, baseParams)
 
