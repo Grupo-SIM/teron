@@ -54,8 +54,9 @@
   let isSpeaking: boolean = false
   let isBadConnection: boolean = false
 
-  $: personByRefStore = getPersonByPersonRefStore([_id as Ref<Person>])
-  $: user = $personByRefStore.get(_id as Ref<Person>)
+  $: personRef = _id as Ref<Person>
+  $: personByRefStore = getPersonByPersonRefStore([personRef])
+  $: user = $personByRefStore.get(personRef)
   $: userName = (user !== undefined ? user.name : activeParticipant?.name) ?? ''
 
   function attachTrack (track: Track): void {
@@ -236,7 +237,7 @@
     <span class="overflow-label">{formatName(userName)}</span>
   </div>
   <div class="participant-actions">
-    <KickParticipantButton person={_id as Ref<Person>} {room} />
+    <KickParticipantButton person={personRef} {room} />
   </div>
   {#each reactions as reaction (reaction.id)}
     <Reaction
