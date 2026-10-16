@@ -48,6 +48,25 @@ function fixture (role = AccountRole.User, verifiedIdentities: SocialId[] = []):
 const update = (objectId: string, objectClass: string, operations: object, objectSpace = space): Tx => ({ _class: core.class.TxUpdateDoc, objectId, objectClass, operations, objectSpace }) as unknown as Tx
 
 describe('server authorization before persistence', () => {
+  it('allows only owners and maintainers to remove another room participant', async () => {
+    docs.set('room-participant', { _id: 'room-participant', _class: love.class.ParticipantInfo, space, person: 'other', room: 'meeting-room' })
+    try {
+      for (const role of [AccountRole.Owner, AccountRole.Maintainer, AccountRole.User, AccountRole.ReadOnlyGuest, AccountRole.DocGuest]) {
+        const { middleware, ctx, forward } = fixture(role)
+        const action = middleware.tx(ctx, [update('room-participant', love.class.ParticipantInfo, { room: love.ids.Reception, x: 0, y: 0 })])
+        if ([AccountRole.Owner, AccountRole.Maintainer].includes(role)) {
+          await action
+          expect(forward).toHaveBeenCalledTimes(1)
+        } else {
+          await expect(action).rejects.toThrow()
+          expect(forward).not.toHaveBeenCalled()
+        }
+      }
+    } finally {
+      docs.delete('room-participant')
+    }
+  })
+
   it('authorizes member issue creation with labels in the issue sector, including pending parents', async () => {
     const { middleware, ctx, forward } = fixture()
     const issue = {

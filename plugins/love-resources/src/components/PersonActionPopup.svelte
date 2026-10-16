@@ -1,7 +1,7 @@
 <script lang="ts">
   import { Person } from '@hcengineering/contact'
-  import { Ref } from '@hcengineering/core'
-  import { isOffice, Room, RoomAccess } from '@hcengineering/love'
+  import { AccountRole, getCurrentAccount, Ref } from '@hcengineering/core'
+  import { Room, RoomAccess } from '@hcengineering/love'
   import { ActionIcon } from '@hcengineering/ui'
   import love from '../plugin'
   import { myInfo } from '../stores'
@@ -11,17 +11,17 @@
   export let room: Room
   export let person: Ref<Person>
 
-  $: isMyOffice = isOffice(room) && room.person === $myInfo?.person
+  const canKick = [AccountRole.Owner, AccountRole.Maintainer].includes(getCurrentAccount().role)
 </script>
 
 <div class="p-3 flex-gap-2 antiPopup">
-  {#if isMyOffice && person !== $myInfo?.person}
+  {#if canKick && room._id !== love.ids.Reception && person !== $myInfo?.person}
     <ActionIcon
       size={'small'}
       label={love.string.Kick}
       icon={love.icon.Kick}
       action={() => {
-        void kick(person)
+        void kick(person, room._id)
       }}
     />
   {/if}
