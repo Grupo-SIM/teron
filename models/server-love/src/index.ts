@@ -43,6 +43,15 @@ export function createModel (builder: Builder): void {
   })
 
   builder.createDoc(serverCore.class.Trigger, core.space.Model, {
+    trigger: serverLove.trigger.OnPerson,
+    txMatch: {
+      objectClass: contact.class.Person,
+      _class: { $in: [core.class.TxCreateDoc, core.class.TxUpdateDoc] }
+    },
+    isAsync: true
+  })
+
+  builder.createDoc(serverCore.class.Trigger, core.space.Model, {
     trigger: serverLove.trigger.OnUserStatus,
     txMatch: {
       objectClass: core.class.UserStatus

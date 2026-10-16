@@ -18,6 +18,7 @@ export default plugin(serverLoveId, {
   },
   trigger: {
     OnEmployee: '' as Resource<TriggerFunc>,
+    OnPerson: '' as Resource<TriggerFunc>,
     OnUserStatus: '' as Resource<TriggerFunc>,
     OnParticipantInfo: '' as Resource<TriggerFunc>,
     OnRoomInfo: '' as Resource<TriggerFunc>,

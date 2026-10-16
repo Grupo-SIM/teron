@@ -139,6 +139,26 @@ async function removeUserInfo (user: AccountUuid, control: TriggerControl): Prom
   return res
 }
 
+export async function OnPerson (txes: Tx[], control: TriggerControl): Promise<Tx[]> {
+  const result: Tx[] = []
+  for (const tx of txes) {
+    const actualTx = tx as TxCUD<Person>
+    if (actualTx.objectClass !== contact.class.Person) continue
+    let user: AccountUuid | undefined
+    if (actualTx._class === core.class.TxCreateDoc) {
+      user = (actualTx as TxCreateDoc<Person>).attributes.personUuid as AccountUuid | undefined
+    } else if (actualTx._class === core.class.TxUpdateDoc) {
+      user = (actualTx as TxUpdateDoc<Person>).operations.personUuid as AccountUuid | undefined
+    }
+    if (user === undefined) continue
+    const status = (await control.findAll(control.ctx, core.class.UserStatus, { user }))[0]
+    if (status?.online === true || status?.connected === true) {
+      result.push(...(await createUserInfo(user, control)))
+    }
+  }
+  return result
+}
+
 export async function OnUserStatus (txes: Tx[], control: TriggerControl): Promise<Tx[]> {
   const result: Tx[] = []
   for (const tx of txes) {
@@ -153,7 +173,7 @@ export async function OnUserStatus (txes: Tx[], control: TriggerControl): Promis
     } else if (actualTx._class === core.class.TxUpdateDoc) {
       const updateTx = actualTx as TxUpdateDoc<UserStatus>
       const val = updateTx.operations.online
-      if (val === undefined) return []
+      if (val === undefined && updateTx.operations.connected === undefined) continue
       const status = (await control.findAll(control.ctx, core.class.UserStatus, { _id: updateTx.objectId }))[0]
       if (status !== undefined) {
         if (val || updateTx.operations.connected === true) {
@@ -437,6 +457,7 @@ export default async () => ({
   },
   trigger: {
     OnEmployee,
+    OnPerson,
     OnUserStatus,
     OnParticipantInfo,
     OnRoomInfo
