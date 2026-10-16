@@ -189,6 +189,12 @@
   }
 }
 
+// Preview labels sit above the card border at every container size.
+.preview .floorGrid-room .floorGrid-room__header {
+  top: auto;
+  bottom: calc(100% + 100% / var(--teron-floor-roomHeight) / 3 + .125rem);
+}
+
 // Room
 @media only screen and (max-width: 1024px) {
   .room-container + .bar > .bar__left-panel button span { display: none; }
