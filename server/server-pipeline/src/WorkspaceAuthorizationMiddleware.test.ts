@@ -48,6 +48,32 @@ function fixture (role = AccountRole.User, verifiedIdentities: SocialId[] = []):
 const update = (objectId: string, objectClass: string, operations: object, objectSpace = space): Tx => ({ _class: core.class.TxUpdateDoc, objectId, objectClass, operations, objectSpace }) as unknown as Tx
 
 describe('server authorization before persistence', () => {
+  it('allows office owners to expel visitors only from their own office', async () => {
+    docs.set('hostOffice', { _id: 'hostOffice', _class: love.class.Room, space, person })
+    docs.set('visitorOffice', { _id: 'visitorOffice', _class: love.class.Room, space, person: 'visitor' })
+    docs.set('visitor', { _id: 'visitor', _class: love.class.ParticipantInfo, space, person: 'visitor', room: 'hostOffice' })
+    try {
+      for (const room of [love.ids.Reception, 'visitorOffice']) {
+        const { middleware, ctx, forward } = fixture()
+        await middleware.tx(ctx, [update('visitor', love.class.ParticipantInfo, { room, x: 0, y: 0 })])
+        expect(forward).toHaveBeenCalledTimes(1)
+      }
+      for (const operations of [
+        { room: 'hostOffice', x: 0, y: 0 },
+        { room: 'unrelated', x: 0, y: 0 },
+        { room: love.ids.Reception, x: 0, y: 0, person },
+        { room: love.ids.Reception, x: 0, y: 0, sessionId: 'spoofed' }
+      ]) {
+        const { middleware, ctx } = fixture()
+        await expect(middleware.tx(ctx, [update('visitor', love.class.ParticipantInfo, operations)])).rejects.toThrow()
+      }
+      docs.set('hostOffice', { _id: 'hostOffice', _class: love.class.Room, space, person: 'stranger' })
+      const { middleware, ctx } = fixture()
+      await expect(middleware.tx(ctx, [update('visitor', love.class.ParticipantInfo, { room: love.ids.Reception, x: 0, y: 0 })])).rejects.toThrow()
+    } finally {
+      for (const id of ['hostOffice', 'visitorOffice', 'visitor']) docs.delete(id)
+    }
+  })
   it('allows only owners and maintainers to remove another room participant', async () => {
     docs.set('room-participant', { _id: 'room-participant', _class: love.class.ParticipantInfo, space, person: 'other', room: 'meeting-room' })
     try {

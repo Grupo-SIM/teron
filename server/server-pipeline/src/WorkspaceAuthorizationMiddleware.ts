@@ -9,7 +9,7 @@ import core, {
 import drive, { type Folder } from '@hcengineering/drive'
 import platform, { PlatformError, Severity, Status } from '@hcengineering/platform'
 import document, { guidelineAccessFor, type Teamspace } from '@hcengineering/document'
-import love, { MeetingStatus, type MeetingMinutes } from '@hcengineering/love'
+import love, { MeetingStatus, isOffice, type ParticipantInfo, type MeetingMinutes } from '@hcengineering/love'
 import notification from '@hcengineering/notification'
 import preference from '@hcengineering/preference'
 import tags, { type TagReference } from '@hcengineering/tags'
@@ -225,6 +225,17 @@ export class WorkspaceAuthorizationMiddleware extends BaseMiddleware {
             ['attachedTo', 'attachedToClass', 'collection', 'title', 'description', 'status'].includes(field))
       } else if (hierarchy.isDerived(tx.objectClass, love.class.ParticipantInfo)) {
         allowed = personIds.includes((data as Doc & { person: Ref<Doc> }).person) && (created || (updated && fields.every((field) => ['room', 'x', 'y', 'sessionId'].includes(field))) || tx._class === core.class.TxRemoveDoc)
+        if (!allowed && updated && fields.every((field) => ['room', 'x', 'y'].includes(field))) {
+          const participant = data as ParticipantInfo
+          const sourceRoom = (await reader.findAll(ctx, love.class.Room, { _id: participant.room }))[0]
+          const nextParticipant = TxProcessor.updateDoc2Doc({ ...participant }, tx as TxUpdateDoc<ParticipantInfo>)
+          const destination = (await reader.findAll(ctx, love.class.Room, { _id: nextParticipant.room }))[0]
+          allowed = sourceRoom !== undefined && isOffice(sourceRoom) && sourceRoom.person !== null &&
+            personIds.includes(sourceRoom.person) && participant.person !== sourceRoom.person &&
+            nextParticipant.room !== participant.room && nextParticipant.x === 0 && nextParticipant.y === 0 &&
+            (nextParticipant.room === love.ids.Reception ||
+              (destination !== undefined && isOffice(destination) && destination.person === participant.person))
+        }
       }
       if (!allowed) throw new PlatformError(new Status(Severity.ERROR, platform.status.Forbidden, {}))
       if (created) pending.set(tx.objectId, data)

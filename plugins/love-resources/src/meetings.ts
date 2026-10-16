@@ -144,10 +144,14 @@ export async function joinOrCreateMeetingByInvite (roomId: Ref<Room>): Promise<v
 }
 
 export async function kick (person: Ref<Person>, room: Ref<Room>): Promise<void> {
-  if (![AccountRole.Owner, AccountRole.Maintainer].includes(getCurrentAccount().role)) return
   if (person === get(myInfo)?.person || room === love.ids.Reception) return
   const client = getClient()
   const allRooms = get(rooms)
+  const sourceRoom = await client.findOne(love.class.Room, { _id: room })
+  if (sourceRoom === undefined) return
+  const canKick = [AccountRole.Owner, AccountRole.Maintainer].includes(getCurrentAccount().role) ||
+    (isOffice(sourceRoom) && sourceRoom.person === get(myInfo)?.person)
+  if (!canKick) return
   const participantInfo = await client.findOne(love.class.ParticipantInfo, { person, room })
   if (participantInfo === undefined) return
   const participantOffice = allRooms.find((r) => isOffice(r) && r.person === person && r._id !== room)
