@@ -204,6 +204,7 @@ export class LiveKitClient {
 
   onReconnecting = (): void => {
     this.isConnecting = true
+    this.syncScreenSharingState()
     this.clearLastParticipantTimeouts()
   }
 
@@ -211,6 +212,7 @@ export class LiveKitClient {
     this.isConnecting = false
     lkSessionConnected.set(true)
     this.clearLastParticipantTimeouts()
+    this.syncScreenSharingState()
   }
 
   onConnected = (): void => {
@@ -220,6 +222,8 @@ export class LiveKitClient {
     this.liveKitRoom.on(RoomEvent.ParticipantConnected, this.onParticipantConnected)
     this.liveKitRoom.off(RoomEvent.ParticipantDisconnected, this.onParticipantDisconnected)
     this.liveKitRoom.on(RoomEvent.ParticipantDisconnected, this.onParticipantDisconnected)
+    this.liveKitRoom.off(RoomEvent.TrackUnpublished, this.onTrackUnpublished)
+    this.liveKitRoom.on(RoomEvent.TrackUnpublished, this.onTrackUnpublished)
     this.liveKitRoom.off(RoomEvent.TrackSubscribed, this.onTrackSubscribed)
     this.liveKitRoom.on(RoomEvent.TrackSubscribed, this.onTrackSubscribed)
     this.liveKitRoom.off(RoomEvent.TrackUnsubscribed, this.onTrackUnsubscribed)
@@ -232,6 +236,7 @@ export class LiveKitClient {
     this.liveKitRoom.on(RoomEvent.TrackMuted, this.onTrackMuted)
     this.liveKitRoom.off(RoomEvent.TrackUnmuted, this.onTrackUnmuted)
     this.liveKitRoom.on(RoomEvent.TrackUnmuted, this.onTrackUnmuted)
+    this.syncScreenSharingState()
   }
 
   onDisconnected = (reason?: DisconnectReason): void => {
@@ -269,6 +274,7 @@ export class LiveKitClient {
     this.liveKitRoom.off(RoomEvent.LocalTrackUnpublished, this.onLocalTrackUnpublished)
     this.liveKitRoom.off(RoomEvent.TrackMuted, this.onTrackMuted)
     this.liveKitRoom.off(RoomEvent.TrackUnmuted, this.onTrackUnmuted)
+    this.liveKitRoom.off(RoomEvent.TrackUnpublished, this.onTrackUnpublished)
     Analytics.handleEvent(LoveEvents.DisconnectedFromRoom)
   }
 
@@ -340,10 +346,12 @@ export class LiveKitClient {
   }
 
   onParticipantConnected = (_participant: RemoteParticipant): void => {
+    this.syncScreenSharingState()
     this.clearLastParticipantTimeouts()
   }
 
   onParticipantDisconnected = (_participant: RemoteParticipant): void => {
+    this.syncScreenSharingState()
     if (this.liveKitRoom.state === ConnectionState.Connected && this.liveKitRoom.remoteParticipants.size === 0) {
       this.clearLastParticipantTimeouts()
       this.lastParticipantNotificationTimeout = window.setTimeout(() => {
@@ -352,24 +360,52 @@ export class LiveKitClient {
     }
   }
 
-  onTrackSubscribed = (
-    track: RemoteTrack,
-    _publication: RemoteTrackPublication,
-    _participant: RemoteParticipant
-  ): void => {
-    if (track.kind === Track.Kind.Video && track.source === Track.Source.ScreenShare) {
-      screenSharingState.set(ScreenSharingState.Remote)
+  // Derive state from all current publications: one departing share must not
+  // hide another, and muted/unsubscribed shares must not leave a black tile.
+  syncScreenSharingState = (): void => {
+    this.reconcileScreenSharingState()
+  }
+
+  private reconcileScreenSharingState (excluded?: TrackPublication): void {
+    const hasScreen = (participant: Participant): boolean => {
+      const publication = participant.getTrackPublication(Track.Source.ScreenShare)
+      return publication !== excluded && publication?.kind === Track.Kind.Video && !publication.isMuted &&
+        publication.track !== undefined && publication.track.mediaStreamTrack.readyState !== 'ended'
+    }
+    const connected = this.liveKitRoom.state === ConnectionState.Connected
+    const local = connected && hasScreen(this.liveKitRoom.localParticipant)
+    const remote = connected && [...this.liveKitRoom.remoteParticipants.values()].some(hasScreen)
+    screenSharingState.set(local ? ScreenSharingState.Local : remote ? ScreenSharingState.Remote : ScreenSharingState.Inactive)
+    if (!this.isConnecting && this.liveKitRoom.state === ConnectionState.Connected) {
+      const track = local
+        ? this.liveKitRoom.localParticipant.getTrackPublication(Track.Source.ScreenShare)?.track?.mediaStreamTrack
+        : undefined
+      this.currentMediaSession?.setFeature('sharing', local
+        ? { enabled: true, track, deviceId: track?.getSettings().deviceId }
+        : { enabled: false })
     }
   }
 
-  onTrackUnsubscribed = (
-    track: RemoteTrack,
+  onTrackUnpublished = (publication: RemoteTrackPublication): void => {
+    this.reconcileScreenSharingState(publication)
+  }
+
+  onTrackSubscribed = (
+    _track: RemoteTrack,
     _publication: RemoteTrackPublication,
     _participant: RemoteParticipant
   ): void => {
-    if (track.kind === Track.Kind.Video && track.source === Track.Source.ScreenShare) {
-      screenSharingState.set(ScreenSharingState.Inactive)
-    }
+    this.syncScreenSharingState()
+  }
+
+  onTrackUnsubscribed = (
+    _track: RemoteTrack,
+    _publication: RemoteTrackPublication,
+    _participant: RemoteParticipant
+  ): void => {
+    this.reconcileScreenSharingState(_publication.track === _track ? _publication : undefined)
+    // LiveKit emits Unsubscribed before clearing publication.track.
+    queueMicrotask(this.syncScreenSharingState)
   }
 
   onLocalTrackPublished = (publication: LocalTrackPublication, _participant: LocalParticipant): void => {
@@ -378,12 +414,24 @@ export class LiveKitClient {
     const deviceId = track?.getSettings().deviceId
     const source = publication.track?.source
     if (track !== undefined && (source === Track.Source.ScreenShare || source === Track.Source.ScreenShareAudio)) {
-      if (!this.screenCapture.has(source)) this.screenCapture.set(source, track.clone())
+      if (!this.screenCapture.has(source)) {
+        const capture = track.clone()
+        this.screenCapture.set(source, capture)
+        if (source === Track.Source.ScreenShare) {
+          capture.addEventListener('ended', () => {
+            if (this.screenCapture.get(source) !== capture) return
+            this.releaseScreenCapture()
+            this.reconcileScreenSharingState(this.liveKitRoom.localParticipant.getTrackPublication(Track.Source.ScreenShare))
+            this.currentMediaSession?.setFeature('sharing', { enabled: false })
+            void this.setScreenShareEnabled(false)
+          }, { once: true })
+        }
+      }
     }
     if (publication.track?.kind === Track.Kind.Video) {
       if (publication.track.source === Track.Source.ScreenShare) {
         session?.setFeature('sharing', { enabled: true, track, deviceId })
-        screenSharingState.set(ScreenSharingState.Local)
+        this.syncScreenSharingState()
       } else {
         session?.setCamera({ enabled: true, track, deviceId })
       }
@@ -393,13 +441,14 @@ export class LiveKitClient {
   }
 
   onLocalTrackUnpublished = (publication: LocalTrackPublication, _participant: LocalParticipant): void => {
+    this.reconcileScreenSharingState(publication)
     if (this.isConnecting || this.liveKitRoom.state !== ConnectionState.Connected) return
     const session = this.currentMediaSession
     if (publication.track?.kind === Track.Kind.Video) {
       if (publication.track.source === Track.Source.ScreenShare) {
         this.releaseScreenCapture()
         session?.setFeature('sharing', { enabled: false })
-        screenSharingState.set(ScreenSharingState.Inactive)
+        this.reconcileScreenSharingState(publication)
       }
     }
     // SDK teardown unpublishes camera/microphone before Disconnected. Keep the
@@ -407,6 +456,7 @@ export class LiveKitClient {
   }
 
   onTrackMuted = (publication: TrackPublication, participant: Participant): void => {
+    this.syncScreenSharingState()
     if (!participant.isLocal) return
     const session = this.currentMediaSession
     if (publication.track?.kind === Track.Kind.Video && publication.track.source === Track.Source.Camera) {
@@ -417,6 +467,7 @@ export class LiveKitClient {
   }
 
   onTrackUnmuted = (publication: TrackPublication, participant: Participant): void => {
+    this.syncScreenSharingState()
     if (!participant.isLocal) return
     const session = this.currentMediaSession
     const track = publication.track?.mediaStreamTrack
@@ -544,6 +595,8 @@ export class LiveKitClient {
       await this.liveKitRoom.localParticipant.setScreenShareEnabled(value, { audio: withAudio })
     } catch (e) {
       console.log(e)
+    } finally {
+      this.syncScreenSharingState()
     }
   }
 }

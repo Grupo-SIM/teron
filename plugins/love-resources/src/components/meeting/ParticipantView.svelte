@@ -23,21 +23,19 @@
     ChatMessage,
     ConnectionQuality,
     LocalParticipant,
-    type LocalTrackPublication,
     Participant,
     ParticipantEvent,
     RemoteParticipant,
     type RemoteTrack,
-    type RemoteTrackPublication,
     RoomEvent,
-    Track,
-    TrackPublication
+    Track
   } from 'livekit-client'
   import BadConnection from '../icons/BadConnection.svelte'
   import { lk } from '../../utils'
   import Reaction from './Reaction.svelte'
   import { Room } from '@hcengineering/love'
   import KickParticipantButton from '../KickParticipantButton.svelte'
+  import { getParticipantMedia } from '../../participant-media'
 
   export let room: Ref<Room>
   export let _id: string
@@ -98,58 +96,45 @@
     isSpeaking = speaking
   }
 
-  function muteHandler (publication: TrackPublication): void {
-    if (publication.kind === Track.Kind.Audio) {
-      microphoneMuted = publication.isMuted
-    } else if (publication.kind === Track.Kind.Video && publication.source !== Track.Source.ScreenShare) {
-      setTrackMuted(publication.isMuted)
+  function reconcileParticipantMedia (): void {
+    updateParticipantMedia()
+  }
+
+  function onTrackUnsubscribed (track: RemoteTrack): void {
+    // LiveKit emits this event before clearing the publication track.
+    updateParticipantMedia(track)
+  }
+
+  function updateParticipantMedia (unsubscribedTrack?: Track): void {
+    const media = getParticipantMedia(activeParticipant, unsubscribedTrack)
+    microphoneMuted = media.microphoneMuted
+    if (media.cameraTrack !== videoTrack) {
+      if (media.cameraTrack === undefined) {
+        detachCurrentTrack()
+      } else {
+        attachTrack(media.cameraTrack)
+      }
     }
+    setTrackMuted(media.cameraMuted)
   }
 
   function onConnectionQualityChanged (quality: ConnectionQuality): void {
     isBadConnection = quality === ConnectionQuality.Lost || quality === ConnectionQuality.Poor
   }
 
-  function onLocalTrackPublished (publication: LocalTrackPublication): void {
-    if (publication.track === undefined) return
-    if (publication.kind === Track.Kind.Audio) {
-      microphoneMuted = publication.isMuted
-    } else if (publication.kind === Track.Kind.Video && publication.source !== Track.Source.ScreenShare) {
-      attachTrack(publication.track)
-    }
-  }
-
-  function onLocalTrackUnpublished (publication: LocalTrackPublication): void {
-    if (videoTrack === publication.track) {
-      detachCurrentTrack()
-    }
-  }
-
-  function onTrackSubscribed (track: RemoteTrack, publication: RemoteTrackPublication): void {
-    if (track.kind === Track.Kind.Audio) {
-      microphoneMuted = track.isMuted
-    } else if (track.kind === Track.Kind.Video && track.source !== Track.Source.ScreenShare) {
-      attachTrack(track)
-    }
-  }
-
-  function onTrackUnsubscribed (track: RemoteTrack, publication: RemoteTrackPublication): void {
-    if (videoTrack === track) {
-      detachCurrentTrack()
-    }
-  }
-
   function detachParticipant (): void {
     if (activeParticipant === undefined) return
-    activeParticipant.off(ParticipantEvent.TrackMuted, muteHandler)
-    activeParticipant.off(ParticipantEvent.TrackUnmuted, muteHandler)
+    activeParticipant.off(ParticipantEvent.TrackMuted, reconcileParticipantMedia)
+    activeParticipant.off(ParticipantEvent.TrackUnmuted, reconcileParticipantMedia)
     activeParticipant.off(ParticipantEvent.IsSpeakingChanged, speachHandler)
     activeParticipant.off(ParticipantEvent.ConnectionQualityChanged, onConnectionQualityChanged)
     if (activeParticipant.isLocal) {
-      activeParticipant.off(ParticipantEvent.LocalTrackPublished, onLocalTrackPublished)
-      activeParticipant.off(ParticipantEvent.LocalTrackUnpublished, onLocalTrackUnpublished)
+      activeParticipant.off(ParticipantEvent.LocalTrackPublished, reconcileParticipantMedia)
+      activeParticipant.off(ParticipantEvent.LocalTrackUnpublished, reconcileParticipantMedia)
     } else {
-      activeParticipant.off(ParticipantEvent.TrackSubscribed, onTrackSubscribed)
+      activeParticipant.off(ParticipantEvent.TrackPublished, reconcileParticipantMedia)
+      activeParticipant.off(ParticipantEvent.TrackUnpublished, reconcileParticipantMedia)
+      activeParticipant.off(ParticipantEvent.TrackSubscribed, reconcileParticipantMedia)
       activeParticipant.off(ParticipantEvent.TrackUnsubscribed, onTrackUnsubscribed)
     }
     activeParticipant = undefined
@@ -183,30 +168,21 @@
     microphoneMuted = true
     if (p === undefined) return
 
-    for (const publication of p.trackPublications.values()) {
-      if (
-        publication.track !== undefined &&
-        publication.track.kind === Track.Kind.Video &&
-        publication.track.source !== Track.Source.ScreenShare
-      ) {
-        attachTrack(publication.track)
-        break
-      }
-    }
-
     mirror = p.isLocal
-    microphoneMuted = !p.isMicrophoneEnabled
+    reconcileParticipantMedia()
 
-    p.on(ParticipantEvent.TrackMuted, muteHandler)
-    p.on(ParticipantEvent.TrackUnmuted, muteHandler)
+    p.on(ParticipantEvent.TrackMuted, reconcileParticipantMedia)
+    p.on(ParticipantEvent.TrackUnmuted, reconcileParticipantMedia)
     p.on(ParticipantEvent.IsSpeakingChanged, speachHandler)
     p.on(ParticipantEvent.ConnectionQualityChanged, onConnectionQualityChanged)
 
     if (p.isLocal) {
-      p.on(ParticipantEvent.LocalTrackPublished, onLocalTrackPublished)
-      p.on(ParticipantEvent.LocalTrackUnpublished, onLocalTrackUnpublished)
+      p.on(ParticipantEvent.LocalTrackPublished, reconcileParticipantMedia)
+      p.on(ParticipantEvent.LocalTrackUnpublished, reconcileParticipantMedia)
     } else {
-      p.on(ParticipantEvent.TrackSubscribed, onTrackSubscribed)
+      p.on(ParticipantEvent.TrackPublished, reconcileParticipantMedia)
+      p.on(ParticipantEvent.TrackUnpublished, reconcileParticipantMedia)
+      p.on(ParticipantEvent.TrackSubscribed, reconcileParticipantMedia)
       p.on(ParticipantEvent.TrackUnsubscribed, onTrackUnsubscribed)
     }
   }
@@ -215,12 +191,14 @@
 
   onDestroy(() => {
     lk.off(RoomEvent.ChatMessage, onChatMessage)
+    lk.off(RoomEvent.Reconnected, reconcileParticipantMedia)
     detachParticipant()
     detachCurrentTrack()
   })
 
   onMount(() => {
     lk.on(RoomEvent.ChatMessage, onChatMessage)
+    lk.on(RoomEvent.Reconnected, reconcileParticipantMedia)
     setParticipant(participant)
   })
 </script>

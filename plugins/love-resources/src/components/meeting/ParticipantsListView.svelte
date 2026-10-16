@@ -63,13 +63,24 @@
     }
   }
 
+  function reconcileParticipants (): void {
+    const current = new Map<string, Participant>([
+      ...Array.from(lk.remoteParticipants.values(), (participant): [string, Participant] => [participant.identity, participant]),
+      [lk.localParticipant.identity, lk.localParticipant]
+    ])
+    const roomPeople = new Set(get(infos).filter((info) => info.room === room).map((info) => info.person))
+    participants = participants.filter((entry) => current.has(entry._id) || roomPeople.has(entry._id as Ref<Person>))
+    for (const entry of participants) entry.participant = current.get(entry._id)
+    for (const participant of current.values()) attachParticipant(participant)
+    participants = participants
+  }
+
   onMount(async () => {
     await liveKitClient.awaitConnect()
     if (destroyed) return
-    for (const participant of lk.remoteParticipants.values()) {
-      attachParticipant(participant)
-    }
-    attachParticipant(lk.localParticipant)
+    reconcileParticipants()
+    lk.on(RoomEvent.Connected, reconcileParticipants)
+    lk.on(RoomEvent.Reconnected, reconcileParticipants)
     lk.on(RoomEvent.ParticipantConnected, attachParticipant)
     lk.on(RoomEvent.ParticipantDisconnected, handleParticipantDisconnected)
   })
@@ -95,6 +106,8 @@
 
   onDestroy(() => {
     destroyed = true
+    lk.off(RoomEvent.Connected, reconcileParticipants)
+    lk.off(RoomEvent.Reconnected, reconcileParticipants)
     lk.off(RoomEvent.ParticipantConnected, attachParticipant)
     lk.off(RoomEvent.ParticipantDisconnected, handleParticipantDisconnected)
   })

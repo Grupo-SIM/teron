@@ -45,7 +45,7 @@ jest.mock('./stores', () => ({ $myPreferences: { camEnabled: true, micEnabled: t
 jest.mock('./meetings', () => ({ leaveMeeting: jest.fn() }))
 
 import { useMedia } from '@hcengineering/media-resources'
-import { LiveKitClient } from './liveKitClient'
+import { LiveKitClient, screenSharingState, ScreenSharingState } from './liveKitClient'
 
 class MockSession extends EventEmitter {
   state = { camera: { enabled: true, deviceId: 'camera' }, microphone: { enabled: true, deviceId: 'mic' } }
@@ -63,6 +63,7 @@ describe('LiveKit terminal disconnection recovery', () => {
   let refreshToken: jest.Mock
 
   beforeEach(async () => {
+    jest.clearAllMocks()
     jest.useFakeTimers()
     ;(globalThis as any).window = globalThis
     session = new MockSession()
@@ -133,7 +134,7 @@ describe('LiveKit terminal disconnection recovery', () => {
   )
 
   const publishScreen = (source = 'screen_share'): any => {
-    const capture: any = { readyState: 'live', stop: jest.fn(), clone: jest.fn() }
+    const capture: any = { readyState: 'live', stop: jest.fn(), clone: jest.fn(), addEventListener: jest.fn() }
     const republished = { stop: jest.fn() }
     capture.clone.mockReturnValue(republished)
     const original = { getSettings: () => ({}), clone: jest.fn(() => capture) }
@@ -187,6 +188,52 @@ describe('LiveKit terminal disconnection recovery', () => {
     await jest.advanceTimersByTimeAsync(300)
     expect(client.liveKitRoom.localParticipant.publishTrack).not.toHaveBeenCalled()
     expect(session.setFeature).toHaveBeenLastCalledWith('sharing', { enabled: false })
+  })
+
+  test('capture ending clears local sharing and disables SDK sharing', async () => {
+    const { capture } = publishScreen()
+    capture.addEventListener.mock.calls[0][1]()
+    await flush()
+    expect(capture.stop).toHaveBeenCalledTimes(1)
+    expect(session.setFeature).toHaveBeenLastCalledWith('sharing', { enabled: false })
+    expect(client.liveKitRoom.localParticipant.setScreenShareEnabled).toHaveBeenLastCalledWith(false, { audio: false })
+  })
+
+  test('reconciles surviving, muted, ended and unsubscribed remote shares', () => {
+    const publication = (): any => ({
+      kind: 'video', isMuted: false, track: { mediaStreamTrack: { readyState: 'live' } }
+    })
+    const first = publication()
+    const second = publication()
+    const participant = (pub: any): any => ({ getTrackPublication: () => pub })
+    client.liveKitRoom.remoteParticipants.set('first', participant(first))
+    client.liveKitRoom.remoteParticipants.set('second', participant(second))
+    client.onTrackSubscribed({} as any, first, {} as any)
+    expect(screenSharingState.set).toHaveBeenLastCalledWith(ScreenSharingState.Remote)
+    client.onTrackUnsubscribed(first.track, first, {} as any)
+    expect(screenSharingState.set).toHaveBeenLastCalledWith(ScreenSharingState.Remote)
+    first.track = undefined
+    second.isMuted = true
+    client.onTrackMuted(second, { isLocal: false } as any)
+    expect(screenSharingState.set).toHaveBeenLastCalledWith(ScreenSharingState.Inactive)
+    second.isMuted = false
+    client.onTrackUnmuted(second, { isLocal: false } as any)
+    expect(screenSharingState.set).toHaveBeenLastCalledWith(ScreenSharingState.Remote)
+    client.onTrackUnsubscribed(second.track, second, {} as any)
+    expect(screenSharingState.set).toHaveBeenLastCalledWith(ScreenSharingState.Inactive)
+    second.track.mediaStreamTrack.readyState = 'ended'
+    client.onReconnected()
+    expect(screenSharingState.set).toHaveBeenLastCalledWith(ScreenSharingState.Inactive)
+  })
+
+  test('participant departure removes the last remote share', () => {
+    const publication: any = { kind: 'video', isMuted: false, track: { mediaStreamTrack: { readyState: 'live' } } }
+    client.liveKitRoom.remoteParticipants.set('remote', { getTrackPublication: () => publication } as any)
+    client.onReconnected()
+    expect(screenSharingState.set).toHaveBeenLastCalledWith(ScreenSharingState.Remote)
+    client.liveKitRoom.remoteParticipants.clear()
+    client.onParticipantDisconnected({} as any)
+    expect(screenSharingState.set).toHaveBeenLastCalledWith(ScreenSharingState.Inactive)
   })
 
   test('explicit disconnect cancels scheduled recovery', async () => {
