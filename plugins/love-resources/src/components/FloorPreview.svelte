@@ -260,6 +260,10 @@
     :global(.floorGrid) {
       min-width: 0 !important;
       max-width: 100% !important;
+      // Labels sit above room borders and need space between adjacent rows.
+      row-gap: 1rem;
+      aspect-ratio: auto !important;
+      padding-top: 1rem;
     }
   }
 </style>
