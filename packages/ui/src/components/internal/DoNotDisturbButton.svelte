@@ -3,6 +3,7 @@
   import { themeStore } from '@hcengineering/theme'
   import { doNotDisturb } from '../../do-not-disturb'
   import ui from '../../plugin'
+  import { tooltip } from '../../tooltips'
   import { addNotification } from '../../utils'
   import NotificationToast from '../NotificationToast.svelte'
   import { NotificationSeverity } from '../notifications/NotificationSeverity'
@@ -26,7 +27,7 @@
   style:border={'1px solid var(--theme-divider-color)'}
   style:cursor={'pointer'}
   class:active={$doNotDisturb}
-  title={label}
+  use:tooltip={{ label: $doNotDisturb ? ui.string.DisableDoNotDisturb : ui.string.EnableDoNotDisturb, direction: 'bottom' }}
   aria-label={label}
   aria-pressed={$doNotDisturb}
   on:click={toggle}

@@ -3,6 +3,7 @@
   import { themeStore } from '@hcengineering/theme'
   import { anonymousMode } from '../../anonymous-mode'
   import ui from '../../plugin'
+  import { tooltip } from '../../tooltips'
   import { addNotification } from '../../utils'
   import NotificationToast from '../NotificationToast.svelte'
   import { NotificationSeverity } from '../notifications/NotificationSeverity'
@@ -26,7 +27,7 @@
   style:border={'1px solid var(--theme-divider-color)'}
   style:cursor={'pointer'}
   class:active={$anonymousMode}
-  title={label}
+  use:tooltip={{ label: $anonymousMode ? ui.string.DisableAnonymousMode : ui.string.EnableAnonymousMode, direction: 'bottom' }}
   aria-label={label}
   aria-pressed={$anonymousMode}
   on:click={toggle}
