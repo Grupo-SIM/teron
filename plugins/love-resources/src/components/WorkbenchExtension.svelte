@@ -46,9 +46,14 @@
     audio?.reconcile(tracks)
   }
 
+  let roomSubscriptionGeneration = 0
+
   function subscribeRoomRequests (room: Ref<Room> | undefined): void {
+    const generation = ++roomSubscriptionGeneration
     unsubscribeJoinRequests()
-      .then(() => subscribeJoinRequests(room))
+      .then(async () => {
+        if (generation === roomSubscriptionGeneration) await subscribeJoinRequests(room)
+      })
       .catch((e) => {
         console.log(e)
       })
@@ -58,7 +63,8 @@
     if (document.visibilityState === 'visible') reconcileAudio()
   }
 
-  $: subscribeRoomRequests($myInfo?.room)
+  $: notificationRoom = $myInfo?.room
+  $: subscribeRoomRequests(notificationRoom)
 
   onMount(async () => {
     audio = new RemoteAudio(parentElement)
@@ -87,6 +93,8 @@
     document.removeEventListener('keydown', recoverVisibleAudio)
     audio?.clear()
     audio = undefined
+    roomSubscriptionGeneration++
+    await unsubscribeJoinRequests()
     await unsubscribeInviteRequests()
     if ($lkSessionConnected) {
       await liveKitClient.disconnect()

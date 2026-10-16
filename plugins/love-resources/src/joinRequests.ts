@@ -17,7 +17,7 @@ import { get } from 'svelte/store'
 import { AccountRole, getCurrentAccount, type Ref } from '@hcengineering/core'
 import { getCurrentEmployee, type Person } from '@hcengineering/contact'
 import { type PopupResult, showPopup } from '@hcengineering/ui'
-import { type UnsubscribeCallback } from '@hcengineering/hulypulse-client'
+import { PulseSubscription } from './pulse-subscription'
 import presentation, { createPulseClient } from '@hcengineering/presentation'
 import { getMetadata } from '@hcengineering/platform'
 import { type Room } from '@hcengineering/love'
@@ -42,28 +42,20 @@ export interface JoinResponse {
 }
 
 const requestPopupCategory = 'joinRequest'
-let unsubscribeResponse: UnsubscribeCallback | undefined
+const responseSubscription = new PulseSubscription()
 let requestPopup: PopupResult | undefined
 let requestMeetingId: string | undefined
 
 export async function subscribeJoinResponses (): Promise<void> {
-  const client = await createPulseClient()
   const currentPerson = getCurrentEmployee()
-
-  if (client === undefined) return
-
-  unsubscribeResponse = await client.subscribe(
+  await responseSubscription.start<JoinResponse>(
     `${getPulsePrefix()}/response/${currentPerson}/`,
-    (key: string, inviteResponse: JoinResponse | undefined) => {
-      void onJoinResponse(key, inviteResponse)
-    }
+    (key, response) => { void onJoinResponse(key, response) }
   )
 }
 
 export async function unsubscribeJoinResponses (): Promise<void> {
-  if (unsubscribeResponse !== undefined) {
-    await unsubscribeResponse()
-  }
+  await responseSubscription.stop()
 }
 
 export function sendJoinRequest (meetingId: string): void {
@@ -137,7 +129,7 @@ async function onJoinResponse (_key: string, response: JoinResponse | undefined)
 
 const responsePopupCategory = 'joinResponse'
 let responsePopup: PopupResult | undefined
-let unsubscribeRequest: UnsubscribeCallback | undefined
+const requestSubscription = new PulseSubscription()
 let activeRequestKey: string | undefined
 let activeRequestsMap: Map<string, JoinRequest | undefined> | undefined
 
@@ -153,18 +145,16 @@ export async function subscribeJoinRequests (meetingId: string | undefined): Pro
   if (getCurrentAccount().role === AccountRole.ReadOnlyGuest) return
   if (meetingId === undefined) return
 
-  const client = await createPulseClient()
-  if (client === undefined) return
-
   activeRequestsMap = new Map<string, JoinRequest>()
-  unsubscribeRequest = await client.subscribe(`${getPulsePrefix()}/request/${meetingId}/`, onJoinRequest)
+  await requestSubscription.start(`${getPulsePrefix()}/request/${meetingId}/`, onJoinRequest)
 }
 
 export async function unsubscribeJoinRequests (): Promise<void> {
   activeRequestsMap = undefined
-  if (unsubscribeRequest !== undefined) {
-    await unsubscribeRequest()
-  }
+  await requestSubscription.stop()
+  responsePopup?.close()
+  responsePopup = undefined
+  activeRequestKey = undefined
 }
 
 export async function responseToJoinRequest (joinRequest: JoinRequest, accept: boolean): Promise<void> {

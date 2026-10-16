@@ -139,19 +139,23 @@ export class HulypulseClient implements Disposable {
     await new Promise((resolve, reject) => {
       const ws = new WebSocket(this.url.toString())
       this.ws = ws
+      let opened = false
 
       ws.onopen = () => {
+        opened = true
         this.resubscribe()
         this.startPing()
         resolve(undefined)
       }
 
       ws.onerror = (event) => {
-        this.reconnect()
+        if (!opened) reject(new Error('Pulse connection failed'))
+        else if (this.ws === ws) this.reconnect()
       }
 
       ws.onclose = (event) => {
-        this.reconnect()
+        if (!opened) reject(new Error('Pulse connection failed'))
+        else if (this.ws === ws) this.reconnect()
       }
 
       ws.onmessage = (event) => {
@@ -216,7 +220,7 @@ export class HulypulseClient implements Disposable {
     for (const [key] of this.subscribes) {
       this.send({ type: 'sub', key }).catch((error) => {
         console.error(`Resubscription failed for key=${key}:`, error)
-        // throw new Error(`Resubscription failed for key=${key}: ${error.message ?? error}`)
+        this.reconnect()
       })
     }
   }
@@ -227,16 +231,12 @@ export class HulypulseClient implements Disposable {
       if (this.ws?.readyState === WebSocket.OPEN) {
         this.ws.send('ping')
       }
-      if (this.pingTimeout !== undefined) {
-        clearTimeout(this.pingTimeout)
+      if (this.pingTimeout === undefined) {
+        this.pingTimeout = setTimeout(() => {
+          console.warn('WS-server not responding to ping, reconnecting')
+          this.reconnect()
+        }, this.PING_TIMEOUT_MS)
       }
-      this.pingTimeout = setTimeout(() => {
-        if (this.ws?.readyState !== WebSocket.OPEN) {
-          console.warn('WS-server not responding to ping, closing connection')
-          clearInterval(this.pingInterval)
-          this.ws?.close(WS_CLOSE_NORMAL)
-        }
-      }, this.PING_TIMEOUT_MS)
     }, this.PING_INTERVAL_MS)
   }
 
@@ -261,10 +261,18 @@ export class HulypulseClient implements Disposable {
       this.reconnectTimeout = undefined
     }
     this.stopPing()
+    const ws = this.ws
+    this.ws = null
+    ws?.close(WS_CLOSE_NORMAL)
+    for (const pending of this.pending.values()) {
+      clearTimeout(pending.send_timeout)
+      pending.reject(new Error('WebSocket connection closed.'))
+    }
+    this.pending.clear()
 
     if (!this.closed_manually) {
       this.reconnectTimeout = setTimeout(() => {
-        void this.connect()
+        void this.connect().catch(() => { this.reconnect() })
       }, this.RECONNECT_INTERVAL_MS)
     }
   }
@@ -277,12 +285,22 @@ export class HulypulseClient implements Disposable {
     this.reconnectTimeout = undefined
     this.stopPing()
     this.ws?.close()
+    for (const pending of this.pending.values()) {
+      clearTimeout(pending.send_timeout)
+      pending.reject(new Error('WebSocket connection closed.'))
+    }
+    this.pending.clear()
   }
 
   static async connect (url: string | URL): Promise<HulypulseClient> {
     const client = new HulypulseClient(url)
-    await client.connect()
-    return client
+    try {
+      await client.connect()
+      return client
+    } catch (error) {
+      client.close()
+      throw error
+    }
   }
 
   public async info (): Promise<string> {
@@ -312,18 +330,33 @@ export class HulypulseClient implements Disposable {
       // Already subscribed?
       list.push(callback)
       if (list.length === 1) {
-        void (await this.send({ type: 'sub', key }))
+        try {
+          await this.send({ type: 'sub', key })
+        } catch (error) {
+          const remaining = list.filter((cb) => cb !== callback)
+          if (remaining.length === 0) this.subscribes.delete(key)
+          else this.subscribes.set(key, remaining)
+          throw error
+        }
       }
     }
 
-    // callback for every old item (ttl > 1 sec for atomicity)
+    await this.refresh(key, callback)
+
+    return async () => {
+      return await this.unsubscribe(key, callback)
+    }
+  }
+
+  /** Recover live values when a pub/sub event was missed. */
+  public async refresh<T> (key: string, callback: Callback<T>): Promise<void> {
     const prevlist = await this.send({ type: 'list', key })
     if (prevlist?.error === undefined && Array.isArray(prevlist?.result)) {
       for (const item of prevlist.result) {
         try {
           const value = item.data !== undefined ? JSON.parse(item.data) : undefined
           if (
-            (item.ttl ?? item.expires_at ?? 0) <= 1 || // TODO: remove expires_at after upgrade server
+            (item.ttl ?? item.expires_at ?? 0) <= 0 || // TODO: remove expires_at after upgrade server
             value === undefined
           ) {
             continue
@@ -336,9 +369,6 @@ export class HulypulseClient implements Disposable {
       }
     }
 
-    return async () => {
-      return await this.unsubscribe(key, callback)
-    }
   }
 
   public async unsubscribe (key: string, callback: Callback<any>): Promise<boolean> {
@@ -456,19 +486,24 @@ export class HulypulseClient implements Disposable {
 
     return await new Promise((resolve, reject) => {
       if (this.closed_manually || this.ws?.readyState !== WebSocket.OPEN) {
-        resolve({ error: 'WebSocket is not open.' })
+        reject(new Error('WebSocket is not open.'))
         return
       }
       const sendTimeout = setTimeout(() => {
         const pending = this.pending.get(id)
         if (pending !== undefined) {
-          pending.resolve({ error: 'Timeout waiting for response' })
+          pending.reject(new Error('Timeout waiting for response'))
           this.pending.delete(id)
         }
       }, this.SEND_TIMEOUT_MS)
       this.pending.set(id, { resolve, reject, send_timeout: sendTimeout })
-      this.ws.send(JSON.stringify(message))
-      this.startPing() // reset ping timer on any send
+      try {
+        this.ws.send(JSON.stringify(message))
+      } catch (error) {
+        clearTimeout(sendTimeout)
+        this.pending.delete(id)
+        reject(error)
+      }
     })
   }
 }

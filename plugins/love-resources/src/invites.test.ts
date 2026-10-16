@@ -4,7 +4,7 @@ import { RoomAccess } from '@hcengineering/love'
 import { createPulseClient } from '@hcengineering/presentation'
 import { doNotDisturb, showPopup } from '@hcengineering/ui'
 import { joinOrCreateMeetingByInvite } from './meetings'
-import { responseToInviteRequest, subscribeInviteRequests, type InviteRequest } from './invites'
+import { unsubscribeInviteRequests, responseToInviteRequest, subscribeInviteRequests, type InviteRequest } from './invites'
 
 jest.mock('svelte/store', () => jest.requireActual('./tests/notification-store'))
 jest.mock('@hcengineering/core', () => ({ AccountRole: { ReadOnlyGuest: 'readonly' }, getCurrentAccount: () => ({ role: 'user' }) }))
@@ -106,3 +106,5 @@ describe('invite acceptance', () => {
   })
 
 })
+
+afterEach(async () => { await unsubscribeInviteRequests() })

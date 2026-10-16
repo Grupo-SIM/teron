@@ -5,6 +5,8 @@ import { createPulseClient } from '@hcengineering/presentation'
 import { doNotDisturb, showPopup } from '@hcengineering/ui'
 import { joinOrCreateMeetingByInvite } from './meetings'
 import {
+  unsubscribeJoinRequests,
+  unsubscribeJoinResponses,
   responseToJoinRequest,
   sendJoinRequest,
   subscribeJoinRequests,
@@ -145,4 +147,9 @@ describe('knock response delivery', () => {
     expect(remove).not.toHaveBeenCalled()
     expect(joinOrCreateMeetingByInvite).not.toHaveBeenCalled()
   })
+})
+
+afterEach(async () => {
+  await unsubscribeJoinRequests()
+  await unsubscribeJoinResponses()
 })

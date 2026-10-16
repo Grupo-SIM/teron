@@ -16,7 +16,7 @@
 import { AccountRole, getCurrentAccount, type Ref } from '@hcengineering/core'
 import { getCurrentEmployee, type Person } from '@hcengineering/contact'
 import { type PopupResult, showPopup } from '@hcengineering/ui'
-import { type UnsubscribeCallback } from '@hcengineering/hulypulse-client'
+import { PulseSubscription } from './pulse-subscription'
 import presentation, { createPulseClient } from '@hcengineering/presentation'
 import { getMetadata } from '@hcengineering/platform'
 import { get } from 'svelte/store'
@@ -44,28 +44,20 @@ export interface InviteResponse {
 }
 
 const requestPopupCategory = 'inviteRequest'
-let unsubscribeResponse: UnsubscribeCallback | undefined
+const responseSubscription = new PulseSubscription()
 let requestPopup: PopupResult | undefined
 let requestPersons: Array<Ref<Person>> | undefined
 
 export async function subscribeInviteResponses (): Promise<void> {
-  const client = await createPulseClient()
-  if (client === undefined) return
-
   const currentPerson = getCurrentEmployee()
-
-  unsubscribeResponse = await client.subscribe(
+  await responseSubscription.start<InviteResponse>(
     `${getPulsePrefix()}/response/${currentPerson}/`,
-    (key: string, inviteResponse: InviteResponse | undefined) => {
-      void onInviteResponse(key, inviteResponse)
-    }
+    (key, response) => { void onInviteResponse(key, response) }
   )
 }
 
 export async function unsubscribeInviteResponses (): Promise<void> {
-  if (unsubscribeResponse !== undefined) {
-    await unsubscribeResponse()
-  }
+  await responseSubscription.stop()
 }
 
 export function sendInvites (persons: Array<Ref<Person>>): void {
@@ -141,7 +133,7 @@ async function onInviteResponse (_key: string, response: InviteResponse | undefi
 
 const responsePopupCategory = 'inviteResponse'
 let responsePopup: PopupResult | undefined
-let unsubscribeRequest: UnsubscribeCallback | undefined
+const requestSubscription = new PulseSubscription()
 let activeRequestKey: string | undefined
 let activeRequestsMap: Map<string, InviteRequest | undefined>
 
@@ -155,19 +147,17 @@ roomNotificationsMuted.subscribe((enabled) => {
 
 export async function subscribeInviteRequests (): Promise<void> {
   if (getCurrentAccount().role === AccountRole.ReadOnlyGuest) return
-  const client = await createPulseClient()
-  if (client === undefined) return
-
   const currentPerson = getCurrentEmployee()
 
   activeRequestsMap = new Map<string, InviteRequest>()
-  unsubscribeRequest = await client.subscribe(`${getPulsePrefix()}/request/${currentPerson}/`, onInviteRequest)
+  await requestSubscription.start(`${getPulsePrefix()}/request/${currentPerson}/`, onInviteRequest)
 }
 
 export async function unsubscribeInviteRequests (): Promise<void> {
-  if (unsubscribeRequest !== undefined) {
-    await unsubscribeRequest()
-  }
+  await requestSubscription.stop()
+  responsePopup?.close()
+  responsePopup = undefined
+  activeRequestKey = undefined
 }
 
 export async function responseToInviteRequest (accept: boolean): Promise<void> {
