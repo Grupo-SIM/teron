@@ -30,6 +30,8 @@
   export let gap: 'large' | 'small' | 'medium' | 'none' = 'none'
   export let labelGap: 'large' | 'medium' = 'medium'
   export let kind: 'primary' | 'positive' | 'negative' | 'default' = 'default'
+
+  let input: HTMLInputElement
 </script>
 
 <!-- svelte-ignore a11y-click-events-have-key-events -->
@@ -42,18 +44,20 @@
   class:kind-positive={kind === 'positive'}
   class:kind-negative={kind === 'negative'}
   tabindex="-1"
-  on:click={() => {
-    if (!disabled && group !== value) action()
+  on:click={(event) => {
+    if (disabled || (event.target instanceof Element && event.target.closest('input, label') !== null)) return
+    input.click()
   }}
 >
   <input
+    bind:this={input}
     {id}
     type="radio"
     bind:group
     {value}
     {disabled}
-    on:click={() => {
-      if (!disabled && group !== value) action()
+    on:change={() => {
+      if (!disabled) action()
     }}
   />
   <div class="marker" />
