@@ -148,9 +148,8 @@ export async function kick (person: Ref<Person>, room: Ref<Room>): Promise<void>
   if (person === get(myInfo)?.person || room === love.ids.Reception) return
   const client = getClient()
   const allRooms = get(rooms)
-  const participantsInfo = get(infos)
-  const participantInfo = participantsInfo.find((p) => p.person === person)
-  if (participantInfo === undefined || participantInfo.room !== room) return
+  const participantInfo = await client.findOne(love.class.ParticipantInfo, { person, room })
+  if (participantInfo === undefined) return
   const participantOffice = allRooms.find((r) => isOffice(r) && r.person === person && r._id !== room)
   await client.update(participantInfo, { room: participantOffice?._id ?? love.ids.Reception, x: 0, y: 0 })
 }

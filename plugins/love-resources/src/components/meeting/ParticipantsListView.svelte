@@ -110,7 +110,7 @@
 
 {#each activeParticipants as participant, i (participant._id)}
   <div class="video">
-    <ParticipantView {...participant} />
+    <ParticipantView {...participant} {room} />
   </div>
 {/each}
 

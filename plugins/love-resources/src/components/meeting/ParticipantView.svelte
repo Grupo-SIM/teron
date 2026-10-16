@@ -36,7 +36,10 @@
   import BadConnection from '../icons/BadConnection.svelte'
   import { lk } from '../../utils'
   import Reaction from './Reaction.svelte'
+  import { Room } from '@hcengineering/love'
+  import KickParticipantButton from '../KickParticipantButton.svelte'
 
+  export let room: Ref<Room>
   export let _id: string
   export let participant: Participant | undefined = undefined
 
@@ -232,6 +235,9 @@
     {#if microphoneMuted}<MicDisabled fill={'var(--bg-negative-default)'} size={'small'} />{/if}
     <span class="overflow-label">{formatName(userName)}</span>
   </div>
+  <div class="participant-actions">
+    <KickParticipantButton person={_id as Ref<Person>} {room} />
+  </div>
   {#each reactions as reaction (reaction.id)}
     <Reaction
       {...reaction}
@@ -286,6 +292,14 @@
     border-radius: 50%;
     transform: translate(-50%, -50%);
   }
+  .participant-actions {
+    position: absolute;
+    top: 0.5rem;
+    right: 0.5rem;
+    z-index: 2;
+    border-radius: 0.5rem;
+    background-color: rgba(0, 0, 0, 0.5);
+  }
   .parent {
     position: relative;
     flex-shrink: 0;
@@ -327,6 +341,7 @@
       inset: 0;
       border-radius: 0.75rem;
       z-index: 1;
+      pointer-events: none;
     }
     &.speach::before {
       border: 3px solid var(--border-talk-indication-secondary);

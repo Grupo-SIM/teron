@@ -99,6 +99,6 @@ Modo anônimo e não perturbe são independentes e podem ficar ativos juntos. Mo
 
 Não perturbe da sala é configuração compartilhada e persistida por sala, independente da preferência local do dispositivo. Bloqueia batidas e convites de pessoas de fora para participantes da sala, inclusive alertas pendentes ao ativar; outras salas permanecem disponíveis. Controles de acesso da chamada e configurações da sala permitem alterar o modo; escritório pessoal mantém controle exclusivo do titular.
 
-Somente Owner (proprietário) e Maintainer (gerente) podem expulsar outros participantes de salas do Escritório. Expulsão retorna participante ao escritório pessoal ou à recepção quando esse escritório é a sala de origem ou não existe; não bloqueia entrada futura.
+Somente Owner (proprietário) e Maintainer (gerente) podem expulsar outros participantes de salas do Escritório. A ação também fica disponível no cartão do participante dentro da chamada, inclusive em modo anônimo, sem revelar sua presença no mapa. Expulsão retorna participante ao escritório pessoal ou à recepção quando esse escritório é a sala de origem ou não existe; não bloqueia entrada futura.
 
 Se o status online chegar antes do vínculo entre conta e contato, concluir esse vínculo recompõe a presença no Escritório: escritório pessoal quando disponível, recepção como alternativa. Presença já existente mantém sua sala.
