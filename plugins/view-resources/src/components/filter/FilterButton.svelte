@@ -105,12 +105,6 @@
     size={'medium'}
     pressed={$filterStore.length > 0}
     showTooltip={{ label: $filterStore.length === 0 ? view.string.Filter : view.string.ClearFilters }}
-    on:mousemove={(ev) => {
-      if ($filterStore.length === 0) add(ev.currentTarget)
-    }}
-    on:focus={(ev) => {
-      if ($filterStore.length === 0) add(ev.currentTarget)
-    }}
     on:click={(ev) => {
       if ($filterStore.length === 0) add(ev.currentTarget)
       else setFilters([])
