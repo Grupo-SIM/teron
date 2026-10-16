@@ -74,6 +74,29 @@ describe('server authorization before persistence', () => {
       for (const id of ['hostOffice', 'visitorOffice', 'visitor']) docs.delete(id)
     }
   })
+  it('protects personal office owners while allowing voluntary exit', async () => {
+    docs.set('office', { _id: 'office', _class: love.class.Room, space, person: 'other' })
+    docs.set('owner', { _id: 'owner', _class: love.class.ParticipantInfo, space, person: 'other', room: 'office' })
+    try {
+      for (const role of [AccountRole.Owner, AccountRole.Maintainer, AccountRole.User]) {
+        const { middleware, ctx, forward } = fixture(role)
+        for (const operations of [{ room: love.ids.Reception }, { $set: { room: love.ids.Reception } }, { person }]) {
+          await expect(middleware.tx(ctx, [update('owner', love.class.ParticipantInfo, operations)])).rejects.toThrow()
+        }
+        await expect(middleware.tx(ctx, [{ _class: core.class.TxRemoveDoc, objectId: 'owner', objectClass: love.class.ParticipantInfo, objectSpace: space } as unknown as Tx])).rejects.toThrow()
+        expect(forward).not.toHaveBeenCalled()
+      }
+      docs.set('office', { _id: 'office', _class: love.class.Room, space, person })
+      docs.set('owner', { _id: 'owner', _class: love.class.ParticipantInfo, space, person, room: 'office' })
+      const { middleware, ctx, forward } = fixture()
+      await middleware.tx(ctx, [update('owner', love.class.ParticipantInfo, { room: love.ids.Reception })])
+      expect(forward).toHaveBeenCalledTimes(1)
+    } finally {
+      docs.delete('office')
+      docs.delete('owner')
+    }
+  })
+
   it('allows only owners and maintainers to remove another room participant', async () => {
     docs.set('room-participant', { _id: 'room-participant', _class: love.class.ParticipantInfo, space, person: 'other', room: 'meeting-room' })
     try {

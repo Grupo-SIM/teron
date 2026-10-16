@@ -11,12 +11,13 @@
   export let room: Ref<Room>
 
   $: participantRoom = $rooms.find((candidate) => candidate._id === room)
+  $: ownsRoom = participantRoom !== undefined && isOffice(participantRoom) && participantRoom.person === person
 
   $: canKick = [AccountRole.Owner, AccountRole.Maintainer].includes(getCurrentAccount().role) ||
     (participantRoom !== undefined && isOffice(participantRoom) && participantRoom.person === $myInfo?.person)
 </script>
 
-{#if canKick && room !== love.ids.Reception && person !== $myInfo?.person}
+{#if canKick && !ownsRoom && participantRoom !== undefined && room !== love.ids.Reception && person !== $myInfo?.person}
   <ActionIcon
     size={'small'}
     label={love.string.Kick}

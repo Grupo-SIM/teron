@@ -148,7 +148,7 @@ export async function kick (person: Ref<Person>, room: Ref<Room>): Promise<void>
   const client = getClient()
   const allRooms = get(rooms)
   const sourceRoom = await client.findOne(love.class.Room, { _id: room })
-  if (sourceRoom === undefined) return
+  if (sourceRoom === undefined || (isOffice(sourceRoom) && sourceRoom.person === person)) return
   const canKick = [AccountRole.Owner, AccountRole.Maintainer].includes(getCurrentAccount().role) ||
     (isOffice(sourceRoom) && sourceRoom.person === get(myInfo)?.person)
   if (!canKick) return

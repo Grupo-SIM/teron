@@ -58,6 +58,17 @@ export class WorkspaceAuthorizationMiddleware extends BaseMiddleware {
       if (spaces.length === 0) throw new Error('Cannot modify an inaccessible space.')
       const trackerContent = hierarchy.isDerived(spaces[0]._class, tracker.class.Project)
       if (!trackerContent && !isTrackerDocument && !isTask && !isTagReference && !taskSequence && !hasAccountRole(account, AccountRole.User)) throw new PlatformError(new Status(Severity.ERROR, platform.status.Forbidden, {}))
+      if (!created && hierarchy.isDerived(tx.objectClass, love.class.ParticipantInfo)) {
+        const participant = data as ParticipantInfo
+        const nextParticipant = updated ? TxProcessor.updateDoc2Doc({ ...participant }, tx as TxUpdateDoc<ParticipantInfo>) : undefined
+        if (!personIds.includes(participant.person) && (nextParticipant === undefined || nextParticipant.room !== participant.room || nextParticipant.person !== participant.person)) {
+          const room = (await reader.findAll(ctx, love.class.Room, { _id: participant.room }))[0]
+          if (room !== undefined && isOffice(room) && room.person === participant.person) {
+            throw new PlatformError(new Status(Severity.ERROR, platform.status.Forbidden, {}))
+          }
+        }
+        if (nextParticipant !== undefined) pending.set(tx.objectId, nextParticipant)
+      }
       if (administrator) {
         if (created) pending.set(tx.objectId, data)
         continue
