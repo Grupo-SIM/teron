@@ -102,3 +102,7 @@ Não perturbe da sala é configuração compartilhada e persistida por sala, ind
 Owner (proprietário) e Maintainer (gerente) podem expulsar outros participantes de salas do Escritório. O titular de um escritório pessoal também pode expulsar visitantes da própria sala; essa permissão não se estende a salas de terceiros. A ação também fica disponível no cartão do participante dentro da chamada, inclusive em modo anônimo, sem revelar sua presença no mapa. Expulsão retorna participante ao escritório pessoal ou à recepção quando esse escritório é a sala de origem ou não existe; não bloqueia entrada futura.
 
 Se o status online chegar antes do vínculo entre conta e contato, concluir esse vínculo recompõe a presença no Escritório: escritório pessoal quando disponível, recepção como alternativa. Presença já existente mantém sua sala.
+
+Batidas em salas e escritórios reproduzem som somente para quem recebe o pedido de entrada; quem inicia a batida acompanha o pedido sem áudio.
+
+Titular do escritório pessoal não pode ser expulso da própria sala, mesmo por Owner/Maintainer. Botão de expulsão fica oculto e servidor rejeita remoção ou mudança forçada de sala; saída voluntária continua permitida.

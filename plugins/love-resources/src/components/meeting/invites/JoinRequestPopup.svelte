@@ -26,7 +26,6 @@
     updateJoinRequest
   } from '../../../joinRequests'
   import { onMount } from 'svelte'
-  import { playSound } from '@hcengineering/presentation'
 
   export let meetingId: string
 
@@ -34,12 +33,7 @@
 
   onMount(() => {
     let destroyed = false
-    let stopSound: (() => void) | null = null
     let interval: ReturnType<typeof setInterval> | undefined
-    void playSound(love.sound.Knock, true).then((stop) => {
-      if (destroyed) stop?.()
-      else stopSound = stop
-    })
     void subscribeJoinResponses().then(async () => {
       if (destroyed) {
         await unsubscribeJoinResponses()
@@ -50,7 +44,6 @@
     })
     return () => {
       destroyed = true
-      stopSound?.()
       void unsubscribeJoinResponses()
       clearInterval(interval)
       void cancelJoinRequest(meetingId)
