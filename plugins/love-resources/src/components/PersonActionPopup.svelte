@@ -25,7 +25,7 @@
       }}
     />
   {/if}
-  {#if $myInfo?.room !== room._id}
+  {#if $myInfo?.room !== room._id && room.access !== RoomAccess.DND}
     <ActionIcon
       size={'small'}
       label={love.string.Invite}

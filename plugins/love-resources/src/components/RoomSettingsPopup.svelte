@@ -13,14 +13,18 @@
 // limitations under the License.
 -->
 <script lang="ts">
-  import { Modal } from '@hcengineering/ui'
+  import { Label, Modal } from '@hcengineering/ui'
   import presentation from '@hcengineering/presentation'
   import { Room } from '@hcengineering/love'
   import { createEventDispatcher } from 'svelte'
   import RoomRecordingSettings from './RoomRecordingSettings.svelte'
   import love from '../plugin'
+  import RoomAccessButton from './meeting/controls/RoomAccessButton.svelte'
+  import { rooms } from '../stores'
 
   export let room: Room
+
+  $: currentRoom = $rooms.find((value) => value._id === room._id) ?? room
 
   const dispatch = createEventDispatcher()
 
@@ -37,7 +41,15 @@
   showCancelButton={false}
   on:close
 >
-  <RoomRecordingSettings {room} />
+  <div class="antiGrid">
+    <div class="antiGrid-row">
+      <div class="antiGrid-row__header">
+        <Label label={love.string.ChangeAccess} />
+      </div>
+      <RoomAccessButton room={currentRoom} size="small" />
+    </div>
+  </div>
+  <RoomRecordingSettings room={currentRoom} />
 </Modal>
 
 <style lang="scss">

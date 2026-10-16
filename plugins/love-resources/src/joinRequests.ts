@@ -16,12 +16,13 @@ import { get } from 'svelte/store'
 
 import { AccountRole, getCurrentAccount, type Ref } from '@hcengineering/core'
 import { getCurrentEmployee, type Person } from '@hcengineering/contact'
-import { type PopupResult, doNotDisturb, showPopup } from '@hcengineering/ui'
+import { type PopupResult, showPopup } from '@hcengineering/ui'
 import { type UnsubscribeCallback } from '@hcengineering/hulypulse-client'
 import presentation, { createPulseClient } from '@hcengineering/presentation'
 import { getMetadata } from '@hcengineering/platform'
 import { type Room } from '@hcengineering/love'
 import { joinOrCreateMeetingByInvite } from './meetings'
+import { roomNotificationsMuted } from './room-notifications'
 import JoinRequestPopup from './components/meeting/invites/JoinRequestPopup.svelte'
 import JoinResponsePopup from './components/meeting/invites/JoinResponsePopup.svelte'
 
@@ -140,7 +141,7 @@ let unsubscribeRequest: UnsubscribeCallback | undefined
 let activeRequestKey: string | undefined
 let activeRequestsMap: Map<string, JoinRequest | undefined> | undefined
 
-doNotDisturb.subscribe((enabled) => {
+roomNotificationsMuted.subscribe((enabled) => {
   if (!enabled) return
   responsePopup?.close()
   responsePopup = undefined
@@ -204,7 +205,7 @@ function onJoinRequest (key: string, request: JoinRequest | undefined): void {
   } else if (!activeRequestsMap.has(key)) {
     activeRequestsMap.set(key, request)
   }
-  if (get(doNotDisturb)) {
+  if (get(roomNotificationsMuted)) {
     responsePopup?.close()
     responsePopup = undefined
     activeRequestKey = undefined

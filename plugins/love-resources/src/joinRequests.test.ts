@@ -1,5 +1,8 @@
+import { type Writable } from 'svelte/store'
+import { currentRoom } from './stores'
+import { RoomAccess } from '@hcengineering/love'
 import { createPulseClient } from '@hcengineering/presentation'
-import { showPopup } from '@hcengineering/ui'
+import { doNotDisturb, showPopup } from '@hcengineering/ui'
 import { joinOrCreateMeetingByInvite } from './meetings'
 import {
   responseToJoinRequest,
@@ -10,10 +13,10 @@ import {
   type JoinResponse
 } from './joinRequests'
 
+jest.mock('svelte/store', () => jest.requireActual('./tests/notification-store'))
 jest.mock('@hcengineering/core', () => ({ AccountRole: { ReadOnlyGuest: 'readonly' }, getCurrentAccount: () => ({ role: 'user' }) }))
 jest.mock('@hcengineering/contact', () => ({ getCurrentEmployee: () => 'recipient' }))
-jest.mock('@hcengineering/ui', () => ({ showPopup: jest.fn(), doNotDisturb: { subscribe: jest.fn(() => jest.fn()) } }))
-jest.mock('svelte/store', () => ({ get: () => false }))
+jest.mock('@hcengineering/ui', () => ({ showPopup: jest.fn(), doNotDisturb: jest.requireActual('./tests/notification-store').writable(false) }))
 jest.mock('@hcengineering/presentation', () => ({
   __esModule: true,
   default: { metadata: { WorkspaceUuid: 'workspace' } },
@@ -24,6 +27,11 @@ jest.mock('./components/meeting/invites/JoinRequestPopup.svelte', () => ({}))
 jest.mock('./components/meeting/invites/JoinResponsePopup.svelte', () => ({}))
 jest.mock('./meetings', () => ({ joinOrCreateMeetingByInvite: jest.fn() }))
 
+jest.mock('./stores', () => ({ myInfo: {}, currentRoom: jest.requireActual('./tests/notification-store').writable(undefined) }))
+jest.mock('@hcengineering/love', () => ({ __esModule: true, default: { ids: { Reception: 'reception' } }, RoomAccess: { DND: 'dnd', Open: 'open' } }))
+
+const mockCurrentRoom = currentRoom as Writable<any>
+
 describe('knock acceptance', () => {
   let notifyRequest: (key: string, request: JoinRequest | undefined) => void
   const request: JoinRequest = { from: 'sender' as any, meetingId: 'room' }
@@ -31,6 +39,8 @@ describe('knock acceptance', () => {
   const put = jest.fn()
 
   beforeEach(async () => {
+    mockCurrentRoom.set(undefined)
+    doNotDisturb.set(false)
     jest.clearAllMocks()
     jest.mocked(showPopup).mockReturnValue({ close, update: jest.fn() } as any)
     jest.mocked(createPulseClient).mockResolvedValue({
@@ -40,6 +50,19 @@ describe('knock acceptance', () => {
     put.mockResolvedValue(undefined)
     await subscribeJoinRequests('room')
     notifyRequest('request', request)
+  })
+
+  test('room DND closes pending knocks and suppresses new knocks until room changes', () => {
+    mockCurrentRoom.set({ _id: 'room', access: RoomAccess.DND } as any)
+    expect(close).toHaveBeenCalledTimes(1)
+    jest.mocked(showPopup).mockClear()
+    notifyRequest('muted', { from: 'other' as any, meetingId: 'room' })
+    expect(showPopup).not.toHaveBeenCalled()
+    mockCurrentRoom.set(undefined)
+    notifyRequest('fresh', request)
+    expect(showPopup).toHaveBeenCalledTimes(1)
+    expect(jest.mocked(showPopup).mock.calls[0][1]).toEqual({ request })
+    notifyRequest('fresh', undefined)
   })
 
   test('joins captured room when requester removes knock before response finishes', async () => {
@@ -75,6 +98,8 @@ describe('knock response delivery', () => {
   const response = { accept: true, meetingId: 'room' }
 
   beforeEach(async () => {
+    mockCurrentRoom.set(undefined)
+    doNotDisturb.set(false)
     jest.clearAllMocks()
     jest.mocked(showPopup).mockReturnValue({ close, update: jest.fn() } as any)
     jest.mocked(createPulseClient).mockResolvedValue({
