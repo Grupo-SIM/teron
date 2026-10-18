@@ -332,11 +332,10 @@ jobs:
           trap 'rm -rf .ci/front-build-cache' EXIT
           tar -czf .ci/front-build-cache/cache.tar.gz common/temp/build-cache dev/prod/.build_dev
 
-          docker build --tag "$DOCKER_FRONT_BUILD_CACHE_IMAGE" --file - .ci/front-build-cache <<'DOCKERFILE'
-          FROM scratch
-          COPY cache.tar.gz /cache.tar.gz
-          CMD ["/unused"]
-          DOCKERFILE
+          # Import the archive directly to avoid BuildKit storing another full build context.
+          tar -C .ci/front-build-cache -cf - cache.tar.gz |
+            docker import --change 'CMD ["/unused"]' - "$DOCKER_FRONT_BUILD_CACHE_IMAGE"
+          rm -rf .ci/front-build-cache
           docker push "$DOCKER_FRONT_BUILD_CACHE_IMAGE"
           docker image rm "$DOCKER_FRONT_BUILD_CACHE_IMAGE"
 
