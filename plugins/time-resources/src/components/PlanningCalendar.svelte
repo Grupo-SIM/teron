@@ -191,11 +191,12 @@
     showLabel = showLabel ? element.clientWidth > rem(3.5) + 399 : element.clientWidth > rem(3.5) + 400
   }}
 >
-  <Header adaptive={'disabled'}>
+  <Header>
     <div class="heading-medium-20 line-height-auto overflow-label">
       <Label label={time.string.Schedule} />: <Label label={getTitle(currentDate, $ticker)} />
     </div>
     <svelte:fragment slot="actions">
+      <slot name="actions" />
       {#if calendarIds === undefined}<CalendarFilter {calendars} bind:selectedCalendar />{/if}
       <ButtonIcon
         icon={IconChevronLeft}
