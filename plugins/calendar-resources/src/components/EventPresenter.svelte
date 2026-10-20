@@ -19,6 +19,7 @@
   import { DatePresenter, DateTimeRangePresenter, Label, showPopup, DateRangePresenter } from '@hcengineering/ui'
   import view, { ObjectEditor } from '@hcengineering/view'
   import calendar from '../plugin'
+  import EventOwner from './EventOwner.svelte'
 
   export let value: Event
   export let hideDetails: boolean = false
@@ -46,6 +47,7 @@
       {:else}
         <Label label={calendar.string.Busy} />
       {/if}
+      <EventOwner user={value.user} />
     </div>
     {#if !inline}
       {#if value.allDay}

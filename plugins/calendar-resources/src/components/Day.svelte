@@ -20,6 +20,7 @@
   import calendar from '../plugin'
   import { calendarByIdStore, isVisible } from '../utils'
   import EventsPopup from './EventsPopup.svelte'
+  import EventOwner from './EventOwner.svelte'
 
   export let events: Event[]
   export let date: Date
@@ -78,11 +79,14 @@
             }
           }}
         >
-          {#if isVisible(e, $calendarByIdStore)}
-            {e.title}
-          {:else}
-            <Label label={calendar.string.Busy} />
-          {/if}
+          <span class="overflow-label">
+            {#if isVisible(e, $calendarByIdStore)}
+              {e.title}
+            {:else}
+              <Label label={calendar.string.Busy} />
+            {/if}
+            <EventOwner user={e.user} />
+          </span>
           {#if !e.allDay}
             <div>
               {addZero(new Date(e.date).getHours())}:{addZero(new Date(e.date).getMinutes())}

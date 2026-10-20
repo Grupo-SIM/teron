@@ -16,6 +16,7 @@
   import { Event } from '@hcengineering/calendar'
   import { Label, addZero } from '@hcengineering/ui'
   import calendar from '../plugin'
+  import EventOwner from './EventOwner.svelte'
 
   export let event: Event
   export let hideDetails: boolean = false
@@ -31,13 +32,14 @@
 </script>
 
 {#if !narrow}
-  {#if !hideDetails}
-    <b class="overflow-label">
-      {event.title}
-    </b>
-  {:else}
-    <span class="content-dark-color"><Label label={calendar.string.Busy} /></span>
-  {/if}
+  <span class="overflow-label">
+    {#if !hideDetails}
+      <b>{event.title}</b>
+    {:else}
+      <span class="content-dark-color"><Label label={calendar.string.Busy} /></span>
+    {/if}
+    <EventOwner user={event.user} />
+  </span>
 {/if}
 {#if !oneRow}
   <span class="overflow-label text-sm">{getTime(startDate)}-{getTime(endDate)}</span>
