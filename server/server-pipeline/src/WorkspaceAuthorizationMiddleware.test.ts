@@ -407,6 +407,15 @@ describe('server authorization before persistence', () => {
     await expect(middleware.tx(ctx, [update('ownPresence', core.class.UserStatus, { anonymous: 'true' })])).rejects.toThrow()
     expect(forward).toHaveBeenCalledTimes(3)
   })
+  it('permits session connection and disconnect cleanup only for the same account', async () => {
+    const { middleware, ctx, forward } = fixture()
+    await middleware.tx(ctx, [update('ownPresence', core.class.UserStatus, { online: true, connected: true })])
+    await middleware.tx(ctx, [update('ownPresence', core.class.UserStatus, { online: false, connected: false })])
+    await middleware.tx(ctx, [update('ownPresence', core.class.UserStatus, { online: false, anonymous: true, connected: false })])
+    await expect(middleware.tx(ctx, [update('otherPresence', core.class.UserStatus, { online: false, connected: false })])).rejects.toThrow()
+    await expect(middleware.tx(ctx, [update('ownPresence', core.class.UserStatus, { connected: 'false' })])).rejects.toThrow()
+    expect(forward).toHaveBeenCalledTimes(3)
+  })
   it('refuses readonly non-task edits and preserves trusted trigger transactions', async () => {
     const { middleware, ctx, forward } = fixture(AccountRole.ReadOnlyGuest)
     await expect(middleware.tx(ctx, [update('event', calendar.class.Event, { title: 'text' })])).rejects.toThrow()
