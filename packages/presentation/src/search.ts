@@ -14,6 +14,7 @@
 //
 
 import type { Class, Ref, Doc, SearchResultDoc, TxOperations } from '@hcengineering/core'
+import { getResource } from '@hcengineering/platform'
 import { type ObjectSearchCategory } from './types'
 import plugin from './plugin'
 import { getClient } from './utils'
@@ -56,6 +57,16 @@ async function searchCategory (
   limit?: number
 ): Promise<SearchSection | undefined> {
   if (category.classToSearch === undefined) return
+  // Mixins (such as Employee) are stored on documents of their base class,
+  // so filtering the fulltext index by the mixin class cannot find them.
+  if (client.getHierarchy().isMixin(category.classToSearch)) {
+    const queryObjects = await getResource(category.query)
+    const results = await queryObjects(client, query)
+    return {
+      category,
+      items: results.slice(0, limit ?? 5).map(({ doc, title }) => ({ id: doc._id, doc, title }))
+    }
+  }
   const classes =
     category.includeChilds === true
       ? client.getHierarchy().getDescendants(category.classToSearch)

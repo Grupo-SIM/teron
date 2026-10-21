@@ -39,6 +39,7 @@
 - Mudança de dia usa intervalo entre meia-noite local e a seguinte; compromissos que atravessam o limite aparecem no dia correspondente. Eventos privados alheios não oferecem edição.
 - Contatos mantém seções Funcionários, Externos e Clientes; Departamento e vínculo interno de colaboradores não aparecem como campos editáveis. Mesclar contatos não é ação disponível.
 - Buscas de listas e seletores tratam consulta como trecho literal, ignorando caixa e acentos; texto persistido permanece intacto.
+- Menções com `@` listam funcionários ativos e permitem buscá-los por nome, sem depender da indexação de texto; opções Todos e Aqui permanecem disponíveis.
 
 ## Autorização de workspace
 
