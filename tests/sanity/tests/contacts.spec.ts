@@ -1,4 +1,4 @@
-import { test } from '@playwright/test'
+import { expect, test } from '@playwright/test'
 import { fillSearch, generateId, PlatformSetting, PlatformURI } from './utils'
 import { ContractPage, ButtonAction } from './model/contacts/contract-page'
 
@@ -70,7 +70,7 @@ test.describe('contact tests', () => {
     await contractPage.checkIfPersonIsDeleted(first, last, 0)
   })
 
-  test('kick-and-delete-employee', async () => {
+  test('kick-and-delete-employee', async ({ page }) => {
     await contractPage.clickAppContact()
     // Create employee
     await contractPage.clickEmployeeNavElement('Employee')
@@ -83,7 +83,13 @@ test.describe('contact tests', () => {
     await contractPage.fillEmailInput(mail)
     await contractPage.clickCreateButton()
     await contractPage.waitForFormAntiCardDetached()
-    await contractPage.kickEmployee(first, last)
+    await contractPage.clickOnEmployee(first, last)
+    await expect(page.getByRole('status').filter({ hasText: 'Deactivated account' })).toHaveCount(0)
+    await page.getByTestId('btnMoreActions').click()
+    await contractPage.kickEmployeeOption().click()
+    await contractPage.okButton().click()
+    await expect(page.getByRole('status').filter({ hasText: 'Deactivated account' })).toBeVisible()
+    await contractPage.closePanel()
     // After kick, employee is inactive and hidden by default. Toggle off to see it.
     await contractPage.toggleHideInactive()
     await contractPage.expectKickEmployeeShowsInactiveStatus(first, last)

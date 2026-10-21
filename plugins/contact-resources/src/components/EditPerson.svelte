@@ -27,6 +27,7 @@
   import ChannelsDropdown from './ChannelsDropdown.svelte'
   import ChannelsEditor from './ChannelsEditor.svelte'
   import EditableAvatar from './EditableAvatar.svelte'
+  import DeactivatedHeader from './person/DeactivatedHeader.svelte'
 
   export let object: Person
   export let readonly: boolean = false
@@ -37,6 +38,7 @@
 
   const account = getCurrentAccount()
   $: editable = !readonly && hasAccountRole(account, AccountRole.Maintainer)
+  $: deactivated = h.hasMixin(object, contact.mixin.Employee) && !h.as(object, contact.mixin.Employee).active
 
   let avatarEditor: EditableAvatar
 
@@ -141,6 +143,11 @@
       {/key}
     </div>
     <div class="flex-grow flex-col">
+      {#if deactivated}
+        <div class="mb-4" role="status">
+          <DeactivatedHeader />
+        </div>
+      {/if}
       <div class="name">
         <EditBox
           placeholder={contact.string.PersonFirstNamePlaceholder}
