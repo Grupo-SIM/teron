@@ -18,7 +18,7 @@
     },
     "privacy": {
       "title": "Teron — Política de Privacidade",
-      "description": "Como a Teron coleta, usa, compartilha e protege dados pessoais, e como exercer os direitos previstos na LGPD."
+      "description": "Como o Teron coleta, usa, compartilha e protege dados pessoais, e como exercer os direitos previstos na LGPD."
     },
     "terms": {
       "title": "Teron — Termos de Serviço",
@@ -48,7 +48,7 @@
     "pricing": "Preços"
   },
   "auth": {
-    "loginTitle": "Entrar na Teron",
+    "loginTitle": "Entrar no Teron",
     "signupTitle": "Criar nova conta",
     "email": "E-mail",
     "emailPlaceholder": "nome@empresa.com.br",
@@ -337,7 +337,7 @@
     }
   },
   "pricing": {
-    "pageTitle": "Preços da Teron",
+    "pageTitle": "Preços do Teron",
     "brandArticle": "O",
     "perUser": "por usuário",
     "opening": "Teron foi criado com um princípio: oferecer uma plataforma completa, acessível e transparente para empresas de diferentes tamanhos.",
@@ -361,7 +361,7 @@
     "computeAfter": "serão incorporados continuamente ao Teron, trazendo novas possibilidades para ajudar sua equipe a trabalhar de forma mais inteligente e eficiente.",
     "closing": "A melhor forma de entender o Teron é usando. Traga sua equipe, explore os recursos e experimente uma nova forma de organizar, colaborar e conduzir o trabalho dentro da sua empresa.",
     "contact": "Pronto para simplificar sua rotina?",
-    "plansTitle": "Planos da Teron",
+    "plansTitle": "Planos do Teron",
     "plans": {
       "free": {
         "name": "Grátis",
@@ -392,14 +392,14 @@
   "privacy": {
     "title": "Política de Privacidade",
     "updatedAt": "11 de agosto de 2026",
-    "intro": "Esta Política explica quais dados pessoais a Teron trata, para quê, com quem compartilha e como você exerce seus direitos. Ela segue a Lei Geral de Proteção de Dados (Lei nº 13.709/2018).",
+    "intro": "Esta Política explica quais dados pessoais o Teron trata, para quê, com quem compartilha e como você exerce seus direitos. Ela segue a Lei Geral de Proteção de Dados (Lei nº 13.709/2018).",
     "sections": {
       "controller": {
         "title": "1. Quem trata seus dados",
         "controllerPrefix": "O controlador é",
         "companySuffix": ", CNPJ 38.486.051/0001-48.",
-        "organizationPrefix": "Quando você usa a plataforma como membro de uma organização, é essa organização que decide o que entra nos documentos, tarefas e mensagens — nesse caso ela é a controladora desse conteúdo e a Teron atua como",
-        "processor": "operadora",
+        "organizationPrefix": "Quando você usa a plataforma como membro de uma organização, é essa organização que decide o que entra nos documentos, tarefas e mensagens — nesse caso ela é a controladora desse conteúdo e o Teron atua como",
+        "processor": "operador",
         "organizationSuffix": ", tratando os dados conforme as instruções dela."
       },
       "collected": {
@@ -474,7 +474,7 @@
         "title": "8. Seus direitos",
         "body": "A LGPD garante a você os direitos de confirmar a existência de tratamento, acessar seus dados, corrigir dados incompletos ou desatualizados, solicitar anonimização, bloqueio ou eliminação de dados desnecessários, pedir a portabilidade, revogar consentimento e se opor a tratamentos feitos com base em legítimo interesse.",
         "contactPrefix": "Para exercer qualquer um deles, escreva para",
-        "contactSuffix": ". Respondemos em até 15 dias. Se você usa a Teron por meio de uma organização, encaminharemos o pedido a ela quando o tratamento estiver sob a responsabilidade dela."
+        "contactSuffix": ". Respondemos em até 15 dias. Se você usa o Teron por meio de uma organização, encaminharemos o pedido a ela quando o tratamento estiver sob a responsabilidade dela."
       },
       "transfers": {
         "title": "9. Transferência internacional",
@@ -494,11 +494,11 @@
   "terms": {
     "title": "Termos de Serviço",
     "updatedAt": "11 de agosto de 2026",
-    "intro": "Estes Termos regem o uso da Teron — a plataforma de trabalho que reúne projetos, tarefas, documentos e comunicação em um só lugar. Ao criar uma conta ou usar a plataforma, você concorda com o que está escrito aqui.",
+    "intro": "Estes Termos regem o uso do Teron — a plataforma de trabalho que reúne projetos, tarefas, documentos e comunicação em um só lugar. Ao criar uma conta ou usar a plataforma, você concorda com o que está escrito aqui.",
     "sections": {
       "about": {
         "title": "1. Quem somos",
-        "companyPrefix": "A Teron é operada por",
+        "companyPrefix": "O Teron é operado por",
         "companySuffix": ", inscrita no CNPJ sob o nº 38.486.051/0001-48. Neste documento, “Teron”, “nós” e “nosso” se referem a essa empresa; “você” se refere a quem usa a plataforma, seja por conta própria ou em nome de uma organização.",
         "authority": "Se você aceita estes Termos em nome de uma empresa, declara ter poderes para vinculá-la — e, nesse caso, “você” significa essa empresa."
       },
@@ -522,7 +522,7 @@
       },
       "acceptableUse": {
         "title": "4. Uso aceitável",
-        "intro": "Ao usar a Teron, você concorda em não:",
+        "intro": "Ao usar o Teron, você concorda em não:",
         "unlawful": "violar a lei, direitos de terceiros ou publicar conteúdo ilícito, difamatório ou que viole propriedade intelectual;",
         "malware": "enviar malware, tentar obter acesso não autorizado a sistemas ou contornar limites técnicos e de uso da plataforma;",
         "spam": "usar a plataforma para envio de spam ou para sobrecarregar a infraestrutura de forma automatizada;",
@@ -538,7 +538,7 @@
       },
       "intellectualProperty": {
         "title": "6. Nossa propriedade intelectual",
-        "body": "A plataforma, o código, a marca, a identidade visual e a documentação são da Teron ou de seus licenciantes. Estes Termos concedem a você um direito de uso limitado, não exclusivo e intransferível — não uma transferência de propriedade."
+        "body": "A plataforma, o código, a marca, a identidade visual e a documentação são do Teron ou de seus licenciantes. Estes Termos concedem a você um direito de uso limitado, não exclusivo e intransferível — não uma transferência de propriedade."
       },
       "availability": {
         "title": "7. Disponibilidade e mudanças no serviço",
@@ -558,7 +558,7 @@
       },
       "changes": {
         "title": "10. Alterações destes Termos",
-        "body": "Podemos atualizar estes Termos. Mudanças relevantes serão comunicadas por e-mail ou dentro da plataforma com pelo menos 30 dias de antecedência. Continuar usando a Teron depois da entrada em vigor significa concordar com a nova versão."
+        "body": "Podemos atualizar estes Termos. Mudanças relevantes serão comunicadas por e-mail ou dentro da plataforma com pelo menos 30 dias de antecedência. Continuar usando o Teron depois da entrada em vigor significa concordar com a nova versão."
       },
       "contact": {
         "title": "11. Contato",
