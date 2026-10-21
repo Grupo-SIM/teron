@@ -5,6 +5,7 @@
   import tags from '@hcengineering/tags'
   import { Chip, getEventPopupPositionElement, resizeObserver, showPopup, tooltip } from '@hcengineering/ui'
   import { afterUpdate, createEventDispatcher } from 'svelte'
+  import { getLabelQuery } from '../label-query'
   import TagReferencePresenter from './TagReferencePresenter.svelte'
   import TagsReferencePresenter from './TagsReferencePresenter.svelte'
   import TagsEditorPopup from './TagsEditorPopup.svelte'
@@ -29,19 +30,23 @@
   let items: TagReference[] = []
   const query = createQuery()
 
-  $: update(object, value)
+  $: update(object, value, _class, key, queryWhenEmpty, ignoreFirst)
 
-  function update (object: WithLookup<Doc>, value: number) {
-    if (value > 0 || queryWhenEmpty) {
+  function update (
+    object: WithLookup<Doc>,
+    value: number,
+    targetClass: Ref<Class<Doc>> | undefined,
+    collection: string | undefined,
+    queryWhenEmpty: boolean,
+    ignoreFirst: boolean
+  ) {
+    const filter = getLabelQuery(object._id, value, targetClass, collection, queryWhenEmpty)
+    if (filter !== undefined) {
       query.query(
         tags.class.TagReference,
-        {
-          attachedTo: object._id,
-          ...(_class !== undefined ? { attachedToClass: _class } : {}),
-          ...(key !== undefined ? { collection: key } : {})
-        },
+        filter,
         (result) => {
-        items = result.slice(ignoreFirst ? 1 : 0)
+          items = result.slice(ignoreFirst ? 1 : 0)
         }
       )
     } else {
