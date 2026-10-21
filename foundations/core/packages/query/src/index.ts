@@ -179,6 +179,16 @@ export class LiveQuery implements WithTx, Client {
       if (key === '$search') continue
       if (skipLookup && key.startsWith('$lookup')) continue
       const value = (query as any)[key]
+      if (key === '$or' || key === '$and') {
+        if (!Array.isArray(value) || value.some((branch) => branch == null || typeof branch !== 'object' || Array.isArray(branch))) {
+          throw new Error('Invalid logical query.')
+        }
+        const matches = (branch: DocumentQuery<Doc>): boolean => this.match({ ...q, query: branch }, doc, skipLookup)
+        if (!(key === '$or' ? value.some(matches) : value.every(matches))) {
+          return false
+        }
+        continue
+      }
       const result = findProperty([doc], key, value)
       if (result.length === 0) {
         return false
