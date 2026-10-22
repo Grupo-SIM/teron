@@ -1,6 +1,6 @@
 <script lang="ts">
-  import { Employee } from '@hcengineering/contact'
-  import { EmployeeArrayEditor } from '@hcengineering/contact-resources'
+  import contact, { Employee } from '@hcengineering/contact'
+  import { EmployeeArrayEditor, UsersPopup } from '@hcengineering/contact-resources'
   import { Ref } from '@hcengineering/core'
   import { getClient } from '@hcengineering/presentation'
   import { getTaskAssignees } from '@hcengineering/task'
@@ -39,8 +39,20 @@
     }
     if (stored.length > 0) await operations.commit()
     dispatch('change', assignees)
-    if (isAction) dispatch('close')
   }
 </script>
 
-<EmployeeArrayEditor label={tracker.string.Assignee} value={selected} onChange={change} {kind} {size} {width} {readonly} />
+{#if isAction}
+  <UsersPopup
+    _class={contact.mixin.Employee}
+    docQuery={{ active: true }}
+    selectedUsers={selected}
+    multiSelect
+    {readonly}
+    on:update={(event) => change(event.detail)}
+    on:close
+    on:changeContent
+  />
+{:else}
+  <EmployeeArrayEditor label={tracker.string.Assignee} value={selected} onChange={change} {kind} {size} {width} {readonly} />
+{/if}
