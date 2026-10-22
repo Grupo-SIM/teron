@@ -27,14 +27,9 @@
     confirming = false
     deleting = true
     try {
-      const references = await client.findAll(tags.class.TagReference, { tag: element._id })
-      const ops = client.apply()
-      for (const reference of references) {
-        await ops.removeCollection(reference._class, reference.space, reference._id,
-          reference.attachedTo, reference.attachedToClass, reference.collection)
-      }
-      await ops.remove(element)
-      await ops.commit()
+      // TagElementRemove collects all references on the server, including inaccessible ones.
+      // Submit only the parent deletion so reference cleanup has a single owner.
+      await client.remove(element)
       dispatch('deleted')
       addNotification(await translate(tags.string.TagDeleted, {}, $themeStore.language), element.title,
         Label, { label: tags.string.TagDeleted })
