@@ -107,3 +107,5 @@ Se o status online chegar antes do vínculo entre conta e contato, concluir esse
 Batidas em salas e escritórios reproduzem som somente para quem recebe o pedido de entrada; quem inicia a batida acompanha o pedido sem áudio.
 
 Titular do escritório pessoal não pode ser expulso da própria sala, mesmo por Owner/Maintainer. Botão de expulsão fica oculto e servidor rejeita remoção ou mudança forçada de sala; saída voluntária continua permitida.
+
+Seletores de tarefas agrupam digitação antes de consultar a busca e exibem somente resultados da consulta atual. Respostas antigas não substituem a busca mais recente; consulta sem correspondências mantém lista vazia. Carregamento permanece visível até os dados necessários estarem disponíveis.

@@ -23,8 +23,10 @@
   } from '@hcengineering/core'
   import type { IntlString } from '@hcengineering/platform'
   import { Label } from '@hcengineering/ui'
-  import { createEventDispatcher } from 'svelte'
-  import presentation, { searchFor, type SearchItem } from '..'
+  import { createEventDispatcher, onDestroy } from 'svelte'
+  import { Analytics } from '@hcengineering/analytics'
+  import { createDebouncedSearch } from '../debounced-search'
+  import presentation, { searchFor } from '..'
   import { ObjectCreate, type ObjectSearchCategory } from '../types'
   import { createQuery } from '../utils'
   import DocPopup from './DocPopup.svelte'
@@ -82,6 +84,32 @@
   let resObjects: Doc[] = []
 
   let extraItems: Ref<Doc>[] = []
+  let searching = false
+  let documentsLoading = false
+  let spotlightReady = false
+  const spotlightSearch = createDebouncedSearch(
+    async ({ search, category }: { search: string, category: Ref<ObjectSearchCategory> | undefined }) =>
+      await searchFor('spotlight', search, category, 50),
+    {
+      pending: () => {
+        searching = true
+        spotlightReady = false
+        extraItems = []
+        resObjects = []
+      },
+      result: ({ items }) => {
+        extraItems = items.map((it) => it.item.id)
+        spotlightReady = true
+        searching = false
+      },
+      error: (error) => {
+        searching = false
+        spotlightReady = true
+        Analytics.handleError(error)
+      }
+    }
+  )
+  onDestroy(spotlightSearch.cancel)
 
   const query = createQuery()
   const sQuery = createQuery() // Query for selected objects
@@ -89,10 +117,11 @@
   $: noSearchField = searchMode === 'disabled'
   $: _idExtra = typeof docQuery?._id === 'object' ? docQuery?._id : {}
   $: if (searchMode === 'spotlight' && search !== '') {
-    void searchSpotlight(search).then((items) => {
-      extraItems = items.map((it) => it.item.id)
-    })
+    spotlightSearch.update({ search, category })
   } else {
+    spotlightSearch.cancel()
+    searching = false
+    spotlightReady = false
     extraItems = []
   }
 
@@ -107,8 +136,14 @@
             ? { $search: search, _id: { $nin: ignoreObjects, ..._idExtra } }
             : { _id: { $nin: ignoreObjects, ..._idExtra } }
         case 'spotlight':
-          return extraItems.length > 0
-            ? { _id: { $in: extraItems, $nin: ignoreObjects } }
+          return search !== ''
+            ? {
+                _id: {
+                  ..._idExtra,
+                  $in: extraItems.filter((id) => _idExtra.$in === undefined || _idExtra.$in.includes(id)),
+                  $nin: ignoreObjects
+                }
+              }
             : { _id: { $nin: ignoreObjects, ..._idExtra } }
         default:
           return search !== ''
@@ -118,15 +153,23 @@
     })()
   }
 
-  $: query.query<Doc>(
-    _class,
-    fquery,
-    (result) => {
-      result.sort(sort)
-      resObjects = result
-    },
-    { ...(options ?? {}), limit: 200 }
-  )
+  $: if (searchMode === 'spotlight' && search !== '' && (!spotlightReady || extraItems.length === 0)) {
+    query.unsubscribe()
+    resObjects = []
+    documentsLoading = false
+  } else {
+    const requested = query.query<Doc>(
+      _class,
+      fquery,
+      (result) => {
+        result.sort(sort)
+        resObjects = result
+        documentsLoading = false
+      },
+      { ...(options ?? {}), limit: 200 }
+    )
+    if (requested) documentsLoading = true
+  }
 
   $: if (selectedObjects.length > 0) {
     sQuery.query<Doc>(
@@ -159,10 +202,6 @@
       objects = resObjects.filter(filter)
     }
   }
-
-  async function searchSpotlight (search: string): Promise<SearchItem[]> {
-    return (await searchFor('spotlight', search, category, 50)).items
-  }
 </script>
 
 <DocPopup
@@ -184,7 +223,7 @@
   {readonly}
   {disallowDeselect}
   {embedded}
-  {loading}
+  loading={loading || searching || documentsLoading}
   {type}
   {showVersions}
   {onSelect}

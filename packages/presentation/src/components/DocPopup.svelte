@@ -107,7 +107,7 @@
 
   function handleSelection (evt: Event | undefined, objects: Doc[], selection: number): void {
     const item = objects[selection]
-    if (item === undefined) {
+    if (item === undefined || loading || readonly) {
       return
     }
 
@@ -237,6 +237,7 @@
         width={'100%'}
         autoFocus={!$deviceOptionsStore.isMobile}
         bind:value={search}
+        {loading}
         on:change={() => dispatch('search', search)}
         on:input={() => dispatch('search', search)}
         {placeholder}
@@ -261,48 +262,93 @@
   {/if}
   <div class="scroll">
     <div class="box">
-      <ListView bind:this={list} count={objects.length} bind:selection>
-        <svelte:fragment slot="category" let:item>
-          {#if showCategories}
-            {@const obj = toAny(objects[item])}
-            {#if item === 0 || (item > 0 && getGroup(objects[item - 1], groupBy) !== getGroup(obj, groupBy))}
-              <!--Category for first item-->
-              {#if item > 0}<div class="menu-separator" />{/if}
-              <div class="category-box">
-                <slot name="category" item={obj} />
-              </div>
+      {#if loading}
+        <div class="search-skeleton" aria-busy="true">
+          {#each [0, 1, 2, 3, 4] as row}
+            <div class="menu-item flex-row-center gap-3" aria-hidden="true">
+              <div class="skeleton-icon" />
+              <div class="skeleton-text" style:width={`${65 - row * 5}%`} />
+            </div>
+          {/each}
+        </div>
+      {/if}
+      <div class:search-hidden={loading}>
+        <ListView bind:this={list} count={objects.length} bind:selection>
+          <svelte:fragment slot="category" let:item>
+            {#if showCategories}
+              {@const obj = toAny(objects[item])}
+              {#if item === 0 || (item > 0 && getGroup(objects[item - 1], groupBy) !== getGroup(obj, groupBy))}
+                <!--Category for first item-->
+                {#if item > 0}<div class="menu-separator" />{/if}
+                <div class="category-box">
+                  <slot name="category" item={obj} />
+                </div>
+              {/if}
             {/if}
-          {/if}
-        </svelte:fragment>
-        <svelte:fragment slot="item" let:item>
-          {@const obj = objects[item]}
-          {@const isDeselectDisabled = selectedElements.has(obj._id) && forbiddenDeselectItemIds.has(obj._id)}
-          {@const versionedDoc = isHasVersions(isVersionable, obj)}
-          {#if versionedDoc}
-            <Submenu
-              withoutMargin
-              props={{
-                _class,
-                selected,
-                multiSelect,
-                selectedObjects,
-                shadows,
-                width,
-                size,
-                groupBy,
-                readonly,
-                disallowDeselect,
-                embedded,
-                loading,
-                type: 'presenter',
-                forceShowSelected: false,
-                searchMode: 'disabled',
-                docQuery: { baseId: versionedDoc.baseId },
-                onSelect: onVersionSelect
-              }}
-              options={{ component: ObjectPopup }}
-            >
-              <svelte:fragment slot="item">
+          </svelte:fragment>
+          <svelte:fragment slot="item" let:item>
+            {@const obj = objects[item]}
+            {@const isDeselectDisabled = selectedElements.has(obj._id) && forbiddenDeselectItemIds.has(obj._id)}
+            {@const versionedDoc = isHasVersions(isVersionable, obj)}
+            {#if versionedDoc}
+              <Submenu
+                withoutMargin
+                props={{
+                  _class,
+                  selected,
+                  multiSelect,
+                  selectedObjects,
+                  shadows,
+                  width,
+                  size,
+                  groupBy,
+                  readonly,
+                  disallowDeselect,
+                  embedded,
+                  loading,
+                  type: 'presenter',
+                  forceShowSelected: false,
+                  searchMode: 'disabled',
+                  docQuery: { baseId: versionedDoc.baseId },
+                  onSelect: onVersionSelect
+                }}
+                options={{ component: ObjectPopup }}
+              >
+                <svelte:fragment slot="item">
+                  {#if type === 'text'}
+                    <span class="label" class:disabled={readonly || isDeselectDisabled || loading}>
+                      <slot name="item" item={obj} />
+                    </span>
+                  {:else if type === 'presenter'}
+                    {#if presenter !== undefined}
+                      <svelte:component this={presenter} value={obj} />
+                    {/if}
+                  {:else}
+                    <slot name="item" item={obj} />
+                  {/if}
+                  {#if (allowDeselect && selected) || multiSelect || selected}
+                    <div class="check mr-2" class:disabled={readonly}>
+                      {#if obj._id === selected || selectedElements.has(obj._id)}
+                        {#if loading}
+                          <Spinner size={'small'} />
+                        {:else}
+                          <div use:tooltip={{ label: titleDeselect ?? presentation.string.Deselect }}>
+                            <Icon icon={IconCheck} size={'small'} />
+                          </div>
+                        {/if}
+                      {/if}
+                    </div>
+                  {/if}
+                </svelte:fragment>
+              </Submenu>
+            {:else}
+              <button
+                class="menu-item withList w-full flex-row-center"
+                disabled={readonly || isDeselectDisabled || loading}
+                on:click={() => {
+                  handleSelection(undefined, objects, item)
+                }}
+              >
                 {#if type === 'text'}
                   <span class="label" class:disabled={readonly || isDeselectDisabled || loading}>
                     <slot name="item" item={obj} />
@@ -315,7 +361,7 @@
                   <slot name="item" item={obj} />
                 {/if}
                 {#if (allowDeselect && selected) || multiSelect || selected}
-                  <div class="check mr-2" class:disabled={readonly}>
+                  <div class="check" class:disabled={readonly}>
                     {#if obj._id === selected || selectedElements.has(obj._id)}
                       {#if loading}
                         <Spinner size={'small'} />
@@ -327,50 +373,41 @@
                     {/if}
                   </div>
                 {/if}
-              </svelte:fragment>
-            </Submenu>
-          {:else}
-            <button
-              class="menu-item withList w-full flex-row-center"
-              disabled={readonly || isDeselectDisabled || loading}
-              on:click={() => {
-                handleSelection(undefined, objects, item)
-              }}
-            >
-              {#if type === 'text'}
-                <span class="label" class:disabled={readonly || isDeselectDisabled || loading}>
-                  <slot name="item" item={obj} />
-                </span>
-              {:else if type === 'presenter'}
-                {#if presenter !== undefined}
-                  <svelte:component this={presenter} value={obj} />
-                {/if}
-              {:else}
-                <slot name="item" item={obj} />
-              {/if}
-              {#if (allowDeselect && selected) || multiSelect || selected}
-                <div class="check" class:disabled={readonly}>
-                  {#if obj._id === selected || selectedElements.has(obj._id)}
-                    {#if loading}
-                      <Spinner size={'small'} />
-                    {:else}
-                      <div use:tooltip={{ label: titleDeselect ?? presentation.string.Deselect }}>
-                        <Icon icon={IconCheck} size={'small'} />
-                      </div>
-                    {/if}
-                  {/if}
-                </div>
-              {/if}
-            </button>
-          {/if}
-        </svelte:fragment>
-      </ListView>
+              </button>
+            {/if}
+          </svelte:fragment>
+        </ListView>
+      </div>
     </div>
   </div>
   {#if !embedded}<div class="menu-space" />{/if}
 </div>
 
 <style lang="scss">
+  .search-hidden {
+    display: none;
+  }
+
+  .search-skeleton {
+    pointer-events: none;
+
+    .skeleton-icon,
+    .skeleton-text {
+      background: var(--theme-button-border);
+      border-radius: 0.25rem;
+      opacity: 0.5;
+    }
+
+    .skeleton-icon {
+      width: 1rem;
+      height: 1rem;
+    }
+
+    .skeleton-text {
+      height: 0.875rem;
+    }
+  }
+
   .plainContainer {
     color: var(--caption-color);
     background-color: var(--theme-bg-color);
