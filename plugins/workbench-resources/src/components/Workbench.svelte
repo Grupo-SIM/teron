@@ -454,14 +454,23 @@
     if (fragment !== currentFragment) {
       currentFragment = fragment
       if (fragment != null && fragment.trim().length > 0) {
-        await setOpenPanelFocus(fragment)
+        let opened = false
+        try {
+          opened = await setOpenPanelFocus(fragment)
+        } finally {
+          // Failed/aborted open must not leave the fragment marked as already open,
+          // otherwise re-opening the same item is ignored until the tab is switched.
+          if (!opened && currentFragment === fragment) {
+            currentFragment = undefined
+          }
+        }
       } else {
         closePanel()
       }
     }
   }
 
-  async function setOpenPanelFocus (fragment: string): Promise<void> {
+  async function setOpenPanelFocus (fragment: string): Promise<boolean> {
     const props = decodeURIComponent(fragment).split('|')
 
     if (props.length >= 3) {
