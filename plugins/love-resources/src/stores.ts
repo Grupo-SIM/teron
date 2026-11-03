@@ -21,10 +21,16 @@ export const myOffice = derived(rooms, (val) => {
   return val.find((p) => (p as Office).person === personId) as Office | undefined
 })
 const allInfos = writable<ParticipantInfo[]>([])
-export const infos = derived([allInfos, statusByUserStore],
-  ([participants, statuses]) => {
+export const infos = derived([allInfos, statusByUserStore, rooms],
+  ([participants, statuses, rooms]) => {
     const self = getCurrentEmployee()
-    return participants.filter((info) => info.person === self || (info.account === null || statuses.get(info.account)?.anonymous !== true))
+    return participants.filter((info) => {
+      if (info.person === self || info.account === null) return true
+      if (statuses.get(info.account)?.anonymous !== true) return true
+      // Anonymous users are only hidden while inside their own office
+      const room = rooms.find((p) => p._id === info.room)
+      return (room as Office | undefined)?.person !== info.person
+    })
   })
 export const myInfo = derived(infos, (val) => {
   const personId = getCurrentEmployee()
