@@ -76,8 +76,16 @@
     }
   }
 
+  let removing = false
   async function remove (): Promise<void> {
-    await client.remove(room)
+    if (removing) return
+    removing = true
+    try {
+      await client.remove(room)
+    } catch (err) {
+      removing = false
+      throw err
+    }
   }
 
   $: roomIsInUse = $infos.some((info) => info.room === room._id)
