@@ -125,8 +125,7 @@ export class WorkspaceAuthorizationMiddleware extends BaseMiddleware {
           const mixin = tx as TxMixin<Person, Person>
           const attributes = mixin.attributes as Record<string, unknown>
           allowed = ownPerson && mixin.mixin === contact.mixin.Employee &&
-            ((Object.keys(attributes).length === 2 && attributes.active === true && attributes.role === 'USER' &&
-                (person as unknown as Record<string, any>)[contact.mixin.Employee]?.active !== false) ||
+            ((Object.keys(attributes).length === 2 && attributes.active === true && attributes.role === 'USER') ||
               (Object.keys(attributes).length === 1 && typeof attributes.timezone === 'string'))
         }
         if (allowed && !personIds.includes(person._id)) personIds.push(person._id)

@@ -372,8 +372,9 @@ describe('server authorization before persistence', () => {
       docs.set('invited-person', { _id: 'invited-person', _class: contact.class.Person, space: contact.space.Contacts, personUuid: 'someone-else' })
       await expect(middleware.tx(ctx, [employee()])).rejects.toThrow()
       docs.set('invited-person', { _id: 'invited-person', _class: contact.class.Person, space: contact.space.Contacts, personUuid: 'account', [contact.mixin.Employee]: { active: false, role: 'USER' } })
-      await expect(middleware.tx(ctx, [employee()])).rejects.toThrow()
-      expect(forward).toHaveBeenCalledTimes(2)
+      // a previously removed member that was invited again may reactivate its own employee
+      await middleware.tx(ctx, [employee()])
+      expect(forward).toHaveBeenCalledTimes(3)
     } finally { docs.delete('invited-person'); docs.delete(contact.space.Contacts) }
   })
   it('links and initializes only the caller legacy person and verifies the first local social identity', async () => {
